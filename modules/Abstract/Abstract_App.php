@@ -8,7 +8,7 @@ abstract class Abstract_App {
 		
         set_include_path(get_include_path()
         . PATH_SEPARATOR . './modules'
-        . PATH_SEPARATOR . './core/modules');
+        . PATH_SEPARATOR . './yaoi/modules');
         spl_autoload_register(function($class){
             $path = explode('_', $class);
             array_pop($path);
