@@ -58,7 +58,7 @@ abstract class Abstract_App {
 
 
     private static $resources = array();
-    static function db($id = 'default') {
+    static function &db($id = 'default') {
         $resource = &self::$resources['db_' . $id];
         if (!isset($resource)) {
             if (isset(Database_Conf::$dsn[$id])) {
@@ -68,7 +68,7 @@ abstract class Abstract_App {
                 throw new Database_Exception('Default database connection not configured', Database_Exception::DEFAULT_NOT_SET);
             }
             else {
-                $resource = &static::db();
+                $resource = static::db();
             }
         }
         return $resource;

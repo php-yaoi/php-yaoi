@@ -1,6 +1,6 @@
 <?php
 
-abstract class Database_Abstract_Driver {
+abstract class Database_Abstract_Driver implements Database_Server_Generic {
     /**
      * @var Database_Dsn
      */
@@ -8,12 +8,6 @@ abstract class Database_Abstract_Driver {
     public function __construct(Database_Dsn $dsn) {
         $this->dsn = $dsn;
     }
-
-    abstract public function query($statement);
-    abstract public function lastInsertId();
-    abstract public function escape($value);
-    abstract public function rewind($result);
-    abstract public function fetchAssoc($result);
 
     public function quote($value) {
         if (null === $value) {
@@ -36,6 +30,4 @@ abstract class Database_Abstract_Driver {
             return "'" . $this->escape($value) . "'";
         }
     }
-
-
 }

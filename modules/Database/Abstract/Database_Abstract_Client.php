@@ -21,6 +21,10 @@ abstract class Database_Abstract_Client {
         return $query;
     }
 
+    public function getDriver() {
+        return $this->driver;
+    }
+
     public function quote($s) {
         return $this->driver->quote($s);
     }
