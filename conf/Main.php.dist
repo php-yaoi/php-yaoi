@@ -1,0 +1,3 @@
+<?php
+
+Database_Conf::$dsn['default'] = 'mysqli://user:password@localhost/name';
