@@ -1,4 +1,4 @@
 php-yaoi
 ========
 
-Yet another object interoprator for PHP
+Yet another object interoperator for PHP
