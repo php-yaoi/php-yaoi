@@ -1,6 +1,6 @@
 <?php
 
-abstract class Database_Abstract_Client {
+abstract class Database_Abstract_Client implements Mock_Able {
     /**
      * @var Database_Driver
      */
@@ -49,4 +49,24 @@ abstract class Database_Abstract_Client {
         return new Database_Update($this);
     }
 
+    protected $mockDataSet;
+    protected $mockRecord = false;
+    public function mockRecord(Mock_DataSet $dataSet)
+    {
+        $this->mockDataSet = $dataSet;
+    }
+
+    public function mockStop()
+    {
+        unset($this->mockDataSet);
+        $this->mockRecord = false;
+        $this->mockPlay = false;
+    }
+
+    protected $mockPlay = false;
+    public function mockPlay(Mock_DataSet $dataSet)
+    {
+        $this->mockDataSet = $dataSet;
+        $this->mockPlay = true;
+    }
 }
