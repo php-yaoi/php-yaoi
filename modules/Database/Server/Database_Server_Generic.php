@@ -15,5 +15,4 @@ interface Database_Server_Generic {
     public function rewind($result);
     public function fetchAssoc($result);
     public function quote($value);
-
 }

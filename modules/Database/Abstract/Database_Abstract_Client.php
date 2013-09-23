@@ -31,22 +31,22 @@ abstract class Database_Abstract_Client implements Mock_Able {
 
     public function select() {
         // TODO implement
-        return new Database_Select($this);
+        //return new Database_Select($this);
     }
 
     public function delete() {
         // TODO implement
-        return new Databse_Delete($this);
+        //return new Databse_Delete($this);
     }
 
     public function insert() {
         // TODO implement
-        return new Database_Insert($this);
+        //return new Database_Insert($this);
     }
 
     public function update() {
         // TODO implement
-        return new Database_Update($this);
+        //return new Database_Update($this);
     }
 
     protected $mockDataSet;
