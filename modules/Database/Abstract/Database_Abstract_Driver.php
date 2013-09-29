@@ -31,65 +31,51 @@ abstract class Database_Abstract_Driver implements Database_Server_Generic, Mock
         }
     }
 
+
     /**
      * @var Mock_DataSet
      */
     protected $mockDataSet;
-    protected $mockRecord = false;
-    public function mockRecord(Mock_DataSet $dataSet)
-    {
-        if ($this->mockPlay) {
-            throw new Mock_Exception('Mock playback already started', Mock_Exception::ALREADY_PLAYING);
+    public function mock(Mock_DataSet $dataSet = null) {
+        if (null === $dataSet) {
+            return $this->mockDataSet;
         }
-        $this->mockDataSet = $dataSet;
-        $this->mockRecord = true;
-    }
-
-    public function mockStop()
-    {
-        unset($this->mockDataSet);
-        $this->mockRecord = false;
-        $this->mockPlay = false;
-    }
-
-    protected $mockPlay = false;
-    public function mockPlay(Mock_DataSet $dataSet)
-    {
-        if ($this->mockRecord) {
-            throw new Mock_Exception('Mock recording already started', Mock_Exception::ALREADY_RECORDING);
+        else {
+            $this->mockDataSet = $dataSet;
+            return $this->mockDataSet;
         }
-        $this->mockDataSet = $dataSet;
-        $this->mockPlay = true;
     }
 
 
+
+    abstract protected function performQuery($statement);
     public function query($statement)
     {
-        if ($this->mockPlay) {
+        if (null !== $this->mockDataSet && $this->mockDataSet->playActive()) {
             return $this->mockDataSet->get($statement);
         }
         else {
-            //return $this->
+            $res = $this->performQuery($statement);
         }
     }
 
-    public function lastInsertId()
+    public function lastInsertId($res)
     {
-        // TODO: Implement lastInsertId() method.
+
     }
 
+
+    abstract protected function performRowsAffected();
+    public function rowsAffected($res)
+    {
+
+    }
+
+    abstract protected function performEscape($value);
     public function escape($value)
     {
-        // TODO: Implement escape() method.
+        return $this->performEscape($value);
     }
 
-    public function rewind($result)
-    {
-        // TODO: Implement rewind() method.
-    }
 
-    public function fetchAssoc($result)
-    {
-        // TODO: Implement fetchAssoc() method.
-    }
 }

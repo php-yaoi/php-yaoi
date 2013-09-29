@@ -96,7 +96,7 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
      * @param $statement
      * @return bool|mysqli_result
      */
-    public function query($statement) {
+    protected function performQuery($statement) {
         if (null === $this->mysqli) {
             $this->connect();
         }
