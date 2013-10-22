@@ -19,8 +19,6 @@
  */
 
 abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
-    const FAMILY = 'mysql';
-
     /**
      * @var mysqli
      */

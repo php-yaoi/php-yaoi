@@ -1,6 +1,5 @@
 <?php
 interface Mock_Able {
-    public function mockRecord(Mock_DataSet $dataSet);
-    public function mockStop();
+    public function mockCapture(Mock_DataSet $dataSet);
     public function mockPlay(Mock_DataSet $dataSet);
 }
