@@ -18,7 +18,7 @@ class Mock_StrictSequenceData implements Mock_DataSet {
     public function add($key, $value)
     {
         if (!$this->captureActive()) {
-            throw new Mock_Exception('Capture not started', Mock_Exception::CAPTURE_UNAVAILABLE);
+            throw new Mock_Exception('Capture not started', Mock_Exception::CAPTURE_REQUIRED);
         }
         $this->storage->set($this->sequenceId . $key, $value);
         ++$this->sequenceId;
@@ -27,7 +27,7 @@ class Mock_StrictSequenceData implements Mock_DataSet {
     public function get($key = null)
     {
         if (!$this->playActive()) {
-            throw new Mock_Exception('Playback not started', Mock_Exception::PLAYBACK_UNAVAILABLE);
+            throw new Mock_Exception('Playback not started', Mock_Exception::PLAY_REQUIRED);
         }
 
         if (null === $item = $this->storage->get($this->sequenceId . $key)) {

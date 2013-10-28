@@ -1,19 +1,22 @@
 <?php
 
-abstract class Database_Abstract_Client {
+abstract class Database_Abstract_Client implements Mock_Able {
     /**
      * @var Database_Driver
      */
     protected $driver;
 
     public function __construct($dsnUrl = null) {
-        $dsn = new Database_Dsn($dsnUrl);
-        $driverClass = 'Database_Driver_' . ucfirst($dsn->scheme);
-        $this->driver = new $driverClass($dsn);
+        if (null !== $dsnUrl) {
+            $dsn = new Database_Dsn($dsnUrl);
+            $driverClass = 'Database_Driver_' . ucfirst($dsn->scheme);
+            $this->driver = new $driverClass($dsn);
+        }
     }
 
     /**
      * @param null $statement
+     * @param null $binds
      * @return Database_Query
      */
     public function query($statement = null, $binds = null) {
@@ -28,6 +31,7 @@ abstract class Database_Abstract_Client {
     public function quote($s) {
         return $this->driver->quote($s);
     }
+
 
     public function select() {
         // TODO implement
@@ -48,4 +52,25 @@ abstract class Database_Abstract_Client {
         // TODO implement
         //return new Database_Update($this);
     }
+
+
+    protected $originalDriver;
+    public function mock(Mock_DataSet $dataSet = null)
+    {
+        if ($dataSet instanceof Mock_DataSetPlay) {
+            $driver = new Database_Mock_DriverPlay();
+            $this->originalDriver = $this->driver;
+            $this->driver = $driver;
+        }
+        elseif ($dataSet instanceof Mock_DataSetCapture) {
+            $driver = new Database_Mock_DriverCapture();
+            $driver->setOriginalDriver($this->driver);
+            $this->originalDriver = $this->driver;
+            $this->driver = $driver;
+        }
+        elseif (null === $dataSet && null !== $this->originalDriver) {
+            $this->driver = $this->originalDriver;
+        }
+    }
+
 }

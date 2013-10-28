@@ -1,11 +1,18 @@
 <?php
 
-abstract class Database_Abstract_Driver implements Database_Server_Generic, Mock_Able {
+abstract class Database_Abstract_Driver implements Database_Server_Generic {
+    const RESULT = 'result';
+    const LAST_INSERT_ID = 'lid';
+    const QUERY = 'query';
+    const ESCAPE = 'escape';
+    const ASSOC_ROWS = 'assoc_rows';
+    const REWIND = 'rewind';
+
     /**
      * @var Database_Dsn
      */
     protected $dsn;
-    public function __construct(Database_Dsn $dsn) {
+    public function __construct(Database_Dsn $dsn = null) {
         $this->dsn = $dsn;
     }
 
@@ -30,49 +37,4 @@ abstract class Database_Abstract_Driver implements Database_Server_Generic, Mock
             return "'" . $this->escape($value) . "'";
         }
     }
-
-
-
-    abstract protected function executeQuery($statement);
-    abstract protected function executeLastInsertId($result);
-    abstract protected function executeEscape($string);
-    abstract protected function executeFetchAssoc($result);
-    abstract protected function executeRewind($result);
-
-
-    public function query($statement) {
-        if ($this->mockDataSet)
-        if (Mock_Able::MOCK_PLAY == $this->mockStatus) {
-            return $this->mockDataSet->get($statement);
-        }
-        else {
-            return $this->executeQuery($statement);
-        }
-    }
-
-    public function fetchAssoc($result) {
-        if ($result instanceof Mock_DataSet) {
-
-        }
-        else {
-            $row = $this->executeFetchAssoc($result);
-            if (Mock_Able::MOCK_CAPTURE == $this->mockStatus) {
-
-            }
-        }
-    }
-
-
-
-    /**
-     * @var Mock_DataSet
-     */
-    protected $mockDataSet;
-
-    public function setMock(Mock_DataSet $dataSet = null)
-    {
-        $this->mockDataSet = $dataSet;
-    }
-
-
 }
