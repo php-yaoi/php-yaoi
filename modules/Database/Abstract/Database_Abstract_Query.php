@@ -16,10 +16,10 @@ abstract class Database_Abstract_Query implements Iterator {
      */
     private $db;
 
-    public function __construct(&$statement, $binds = array(), Database_Driver $db, Database_Client $client = null) {
+    public function __construct(&$statement, $binds = null, Database_Abstract_Client $client) {
         $this->statement = $statement;
         $this->binds = $binds;
-        $this->db = $db;
+        $this->db = $client->getDriver();
     }
 
     /**

@@ -59,7 +59,7 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
      * @param mysqli_result $result
      * @return mixed
      */
-    public function rewind($result)
+    protected function executeRewind($result)
     {
         return $result->data_seek(0);
     }
@@ -68,7 +68,7 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
      * @param mysqli_result $result
      * @return mixed
      */
-    public function fetchAssoc($result) {
+    protected function executeFetchAssoc($result) {
         return $result->fetch_assoc();
     }
 
@@ -81,11 +81,11 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
     }
 
 
-    public function lastInsertId() {
+    protected function executeLastInsertId($result) {
         return $this->mysqli->insert_id;
     }
 
-    public function escape($string) {
+    protected function executeEscape($string) {
         return $this->mysqli->real_escape_string($string);
     }
 
@@ -94,7 +94,7 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
      * @param $statement
      * @return bool|mysqli_result
      */
-    protected function performQuery($statement) {
+    protected function executeQuery($statement) {
         if (null === $this->mysqli) {
             $this->connect();
         }

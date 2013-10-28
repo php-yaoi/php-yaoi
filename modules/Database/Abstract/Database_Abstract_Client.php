@@ -16,8 +16,8 @@ abstract class Database_Abstract_Client {
      * @param null $statement
      * @return Database_Query
      */
-    public function query($statement = null) {
-        $query = new Database_Query($statement, array(), $this->driver);
+    public function query($statement = null, $binds = null) {
+        $query = new Database_Query($statement, $binds, $this);
         return $query;
     }
 
