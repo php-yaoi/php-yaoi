@@ -24,7 +24,7 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
      */
     private $mysqli;
 
-    public function connect() {
+    protected function connect() {
         if ($this->mysqli) {
             return $this;
         }
