@@ -12,6 +12,7 @@ class String_Dsn extends Base {
         if (!$p = parse_url($dsnUrl)) {
             throw new String_Exception('Malformed DSN URL', String_Exception::BAD_DSN);
         }
+
         if (isset($p['query'])) {
             parse_str($p['query'],$p['query']);
             foreach ($p['query'] as $key => $value) {

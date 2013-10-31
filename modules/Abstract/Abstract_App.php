@@ -73,5 +73,21 @@ abstract class Abstract_App {
         }
         return $resource;
     }
+
+    static function cache($id = 'default') {
+        $resource = &self::$resources['st_' . $id];
+        if (!isset($resource)) {
+            if (isset(Storage_Conf::$dsn[$id])) {
+                $resource = new Storage_Client(Storage_Conf::$dsn[$id]);
+            }
+            elseif ('default' == $id) {
+                throw new Storage_Exception('Default storage connection not configured', Storage_Exception::DEFAULT_NOT_SET);
+            }
+            else {
+                $resource = static::cache();
+            }
+        }
+        return $resource;
+    }
 }
 

@@ -9,7 +9,7 @@ abstract class Database_Abstract_Client implements Mock_Able {
     public function __construct($dsnUrl = null) {
         if (null !== $dsnUrl) {
             $dsn = new Database_Dsn($dsnUrl);
-            $driverClass = 'Database_Driver_' . String_Utils::underscoresToCamelCase($dsn->scheme);
+            $driverClass = 'Database_Driver_' . String_Utils::toCamelCase($dsn->scheme, '-');
             $this->driver = new $driverClass($dsn);
         }
     }

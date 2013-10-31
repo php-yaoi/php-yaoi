@@ -1,11 +1,11 @@
 <?php
 
 class String_Utils {
-    static function underscoresToCamelCase($s) {
-        return implode('', array_map('ucfirst', explode('_', $s)));
+    static function toCamelCase($string, $delimiter = '_') {
+        return implode('', array_map('ucfirst', explode($delimiter, $string)));
     }
 
-    static function camelCaseToUnderscores($s) {
-        return strtolower(ltrim(preg_replace('/([A-Z])/', '_$1', $s), '_'));
+    static function fromCamelCase($string, $delimiter = '_') {
+        return strtolower(ltrim(preg_replace('/([A-Z])/', $delimiter . '$1', $string), $delimiter));
     }
 } 

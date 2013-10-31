@@ -8,8 +8,8 @@ class Storage_Client implements Storage_KeyValue {
 
     public function __construct($dsnUrl = null) {
         if (null !== $dsnUrl) {
-            $dsn = new Database_Dsn($dsnUrl);
-            $driverClass = 'Storage_Driver_' . String_Utils::underscoresToCamelCase($dsn->scheme);
+            $dsn = new Storage_Dsn($dsnUrl);
+            $driverClass = 'Storage_Driver_' . String_Utils::toCamelCase($dsn->scheme, '-');
             $this->driver = new $driverClass($dsn);
         }
     }
