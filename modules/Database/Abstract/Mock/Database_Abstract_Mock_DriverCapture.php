@@ -15,8 +15,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
 
     public function query($statement)
     {
-        $queryMock = $this->mock->create();
-        $this->mock->add($statement, $queryMock, self::QUERY);
+        $queryMock = $this->mock->branch($statement, self::QUERY);
         $queryMock->temp(self::RESULT, $this->driver->query($statement));
         return $queryMock;
     }

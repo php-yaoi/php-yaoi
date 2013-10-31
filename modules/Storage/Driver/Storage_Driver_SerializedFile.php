@@ -6,7 +6,7 @@
  * Time: 10:31
  */
 
-class Storage_Driver_SerializedFile extends Storage_Driver {
+class Storage_Driver_SerializedFile extends Storage_Driver implements Storage_ArrayKey {
 
     protected $data;
     protected $fileName;

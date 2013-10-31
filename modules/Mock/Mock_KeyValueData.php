@@ -11,12 +11,12 @@ class Mock_KeyValueData implements Mock_DataSet {
         // TODO: Implement get() method.
     }
 
-    public function capture(Storage_KeyValue $data)
+    public function capture(Storage_Client $data)
     {
         // TODO: Implement capture() method.
     }
 
-    public function play(Storage_KeyValue $data)
+    public function play(Storage_Client $data)
     {
         // TODO: Implement play() method.
     }

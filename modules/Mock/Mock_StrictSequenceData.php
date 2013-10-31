@@ -9,7 +9,7 @@ class Mock_StrictSequenceData implements Mock_DataSet {
     private $capture = false;
 
     /**
-     * @var Storage_KeyValue
+     * @var Storage_Client
      */
     private $storage;
 
@@ -36,13 +36,13 @@ class Mock_StrictSequenceData implements Mock_DataSet {
         }
     }
 
-    public function capture(Storage_KeyValue $data)
+    public function capture(Storage_Client $data)
     {
         $this->storage = $data;
         $this->capture = true;
     }
 
-    public function play(Storage_KeyValue $data)
+    public function play(Storage_Client $data)
     {
         $this->storage = $data;
         $this->play = true;

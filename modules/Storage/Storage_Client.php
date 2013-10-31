@@ -1,6 +1,6 @@
 <?php
 
-class Storage_Client implements Storage_KeyValue {
+class Storage_Client {
     /**
      * @var Storage_Driver
      */
@@ -16,6 +16,7 @@ class Storage_Client implements Storage_KeyValue {
 
     public function get($key)
     {
+        $this->prepareKey($key);
         return $this->driver->get($key);
     }
 
@@ -24,14 +25,22 @@ class Storage_Client implements Storage_KeyValue {
         return $this;
     }
 
+    /**
+     * @param $key
+     * @param null $value
+     * @param int $ttl
+     * @return self
+     */
     public function set($key, $value = null, $ttl = 0)
     {
+        $this->prepareKey($key);
         $this->driver->set($key, $value, $ttl);
         return $this;
     }
 
     public function delete($key)
     {
+        $this->prepareKey($key);
         $this->driver->delete($key);
         return $this;
     }
@@ -40,6 +49,12 @@ class Storage_Client implements Storage_KeyValue {
     {
         $this->driver->deleteAll();
         return $this;
+    }
+
+    protected function prepareKey(&$key) {
+        if (is_array($key) && !($this->driver instanceof Storage_ArrayKey)) {
+            $key = implode('/', $key);
+        }
     }
 
 } 
