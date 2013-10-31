@@ -1,6 +1,6 @@
 <?php
 
-class MappableBase extends Base implements Mappable {
+class MappableBase extends Base_Class implements Mappable {
     private $mappedProperties = array();
 
     /**

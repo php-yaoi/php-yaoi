@@ -1,6 +1,6 @@
 <?php
 
-class String_Dsn extends Base {
+class String_Dsn extends Base_Class {
     public $scheme;
     public $username;
     public $password;
