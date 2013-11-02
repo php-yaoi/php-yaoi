@@ -24,7 +24,7 @@ abstract class Database_Abstract_Driver implements Database_Server_Generic {
             return (string)$value;
         }
         elseif (is_float($value)) {
-            return sprintf('%F', $value);
+            return rtrim(rtrim(sprintf('%F', $value), '0'), '.');
         }
         elseif (is_array($value) || $value instanceof Iterator) {
             $result = '';

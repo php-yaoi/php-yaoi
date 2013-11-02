@@ -25,10 +25,6 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
     private $mysqli;
 
     protected function connect() {
-        if ($this->mysqli) {
-            return $this;
-        }
-
         $host = $this->dsn->hostname;
         if ($this->dsn->persistent) {
             if (is_null($host)) {
@@ -76,8 +72,6 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
         if ($this->mysqli) {
             $this->mysqli->close();
         }
-
-        return $this;
     }
 
 
@@ -99,6 +93,10 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
             $this->connect();
         }
         return $this->mysqli->query($statement);
+    }
+
+    public function __destruct() {
+        $this->disconnect();
     }
 
 

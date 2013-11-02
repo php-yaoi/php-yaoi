@@ -11,8 +11,13 @@ class Mock_DataSetCapture implements Mock_DataSet{
     }
 
 
+    protected $sequenceId = 0;
     public function add($key, $value, $section = null) {
-        $this->storage->set(array($section, $key), $value);
+        if (null === $key) {
+            $key = $this->sequenceId++;
+        }
+
+        $this->storage->set(null === $section ? $key : array($section, $key), $value);
     }
 
     /**

@@ -47,6 +47,7 @@ abstract class Database_Abstract_Query implements Iterator {
 
     public function fetchAll() {
         $this->rewind();
+
         $result = array();
         while ($r = $this->db->fetchAssoc($this->result)) {
             $result []= $r;
@@ -75,7 +76,10 @@ abstract class Database_Abstract_Query implements Iterator {
      */
     public function current()
     {
-        return $this->current();
+        if (null === $this->current) {
+            $this->next();
+        }
+        return $this->current;
     }
 
     /**
@@ -104,6 +108,9 @@ abstract class Database_Abstract_Query implements Iterator {
      */
     public function key()
     {
+        if (null === $this->current) {
+            return 0;
+        }
         return $this->position;
     }
 
@@ -131,8 +138,24 @@ abstract class Database_Abstract_Query implements Iterator {
             $this->execute();
         }
         $this->db->rewind($this->result);
-        $this->position = 0;
-        $this->current = $this->db->fetchAssoc($this->result);
-        $this->valid = !is_null($this->current);
+        $this->position = -1;
+        $this->valid = true;
     }
+
+    protected $skipAutoExecute = 0;
+    public function skipAutoExecute($true = 1) {
+        $this->skipAutoExecute = $true;
+        return $this;
+    }
+
+    public function __destruct() {
+        if (!$this->executed && !$this->skipAutoExecute) {
+            $this->execute();
+        }
+    }
+
+    public function lastInsertId() {
+        return $this->db->lastInsertId($this->result);
+    }
+
 }
