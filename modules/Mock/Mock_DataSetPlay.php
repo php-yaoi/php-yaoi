@@ -34,8 +34,4 @@ class Mock_DataSetPlay extends Mock_DataSetBase {
 
         return $this->storage->get($key);
     }
-
-    public function reset() {
-        $this->sequenceId = 0;
-    }
 }

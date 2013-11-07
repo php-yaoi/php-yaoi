@@ -34,7 +34,7 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function rewind($queryMock)
     {
-        return $queryMock->get(self::REWIND);
+        return $queryMock->get(null, self::REWIND);
     }
 
     /**
