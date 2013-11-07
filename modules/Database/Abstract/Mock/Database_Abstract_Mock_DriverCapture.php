@@ -31,6 +31,18 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
         return $res;
     }
 
+    /**
+     * @param Mock_DataSetCapture $queryMock
+     * @return mixed
+     */
+    public function rowsAffected($queryMock)
+    {
+        $res = $this->driver->rowsAffected($queryMock->temp(self::RESULT));
+        $queryMock->add(self::ROWS_AFFECTED, $res);
+        return $res;
+    }
+
+
     public function escape($value)
     {
         $res = $this->driver->escape($value);
@@ -45,7 +57,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function rewind($queryMock)
     {
         $res =  $this->driver->rewind($queryMock->temp(self::RESULT));
-        $queryMock->add(self::REWIND, $res);
+        $queryMock->add(null, $res, self::REWIND);
         return $res;
     }
 
@@ -73,5 +85,17 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
             throw new Mock_Exception(Mock_Exception::CAPTURE_REQUIRED, 'Capture data set required');
         }
     }
+
+    /**
+     * @param Mock_DataSetCapture $queryMock
+     */
+    public function queryErrorMessage($queryMock)
+    {
+        $err = $this->driver->queryErrorMessage($queryMock->temp(self::RESULT));
+        $queryMock->add(self::ERROR_MESSAGE, $err);
+        return $err;
+    }
+
+
 
 }

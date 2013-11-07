@@ -79,6 +79,17 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
         return $this->mysqli->insert_id;
     }
 
+    /**
+     * @param mysqli_result $result
+     * @return int
+     */
+    public function rowsAffected($result) {
+        if ((true === $result) || !$affected = $result->num_rows) {
+            $affected = $this->mysqli->affected_rows;
+        }
+        return $affected;
+    }
+
     public function escape($string) {
         return $this->mysqli->real_escape_string($string);
     }
@@ -98,6 +109,12 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
     public function __destruct() {
         $this->disconnect();
     }
+
+
+    public function queryErrorMessage($result) {
+        return $this->mysqli->errno . ' ' . $this->mysqli->error;
+    }
+
 
 
 }

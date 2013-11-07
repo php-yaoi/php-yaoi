@@ -3,7 +3,8 @@
 abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver implements Mock_Able {
     public function query($statement)
     {
-        return $this->mock->get($statement, self::QUERY);
+        $queryMock = $this->mock->branch($statement, self::QUERY);
+        return $queryMock;
     }
 
     /**
@@ -13,6 +14,15 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
     {
         return $queryMock->get(self::LAST_INSERT_ID);
     }
+
+    /**
+     * @param Mock_DataSetPlay $queryMock
+     */
+    public function rowsAffected($queryMock)
+    {
+        return $queryMock->get(self::ROWS_AFFECTED);
+    }
+
 
     public function escape($value)
     {
@@ -49,4 +59,13 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
             throw new Mock_Exception(Mock_Exception::PLAY_REQUIRED, 'Play data set required');
         }
     }
+
+    /**
+     * @param Mock_DataSetPlay $queryMock
+     */
+    public function queryErrorMessage($queryMock)
+    {
+        return $queryMock->get(self::ERROR_MESSAGE);
+    }
+
 }
