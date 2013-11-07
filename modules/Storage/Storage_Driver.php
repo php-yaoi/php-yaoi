@@ -11,6 +11,13 @@ abstract class Storage_Driver {
     protected $dsn;
     public function __construct(Storage_Dsn $dsn = null) {
         $this->dsn = $dsn;
+
+        if (!empty($dsn->staticPropertyRef)) {
+            $s = $dsn->staticPropertyRef;
+            $s = explode('::$', $s);
+            $s[0]::$$s[1] = $this;
+
+        }
     }
 
     abstract function get($key);

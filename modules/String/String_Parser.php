@@ -45,6 +45,10 @@ class String_Parser extends Base_Class {
         return new self(substr($this->string, $startPosition, $endPosition - $startPosition));
     }
 
+    public function resetPosition() {
+        $this->position = 0;
+    }
+
     public function __toString() {
         return (string)$this->string;
     }

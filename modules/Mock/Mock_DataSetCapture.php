@@ -1,34 +1,22 @@
 <?php
 
-class Mock_DataSetCapture implements Mock_DataSet{
-    /**
-     * @var Storage_Client
-     */
-    protected $storage;
-
-    public function __construct(Storage_Client $data) {
-        $this->storage = $data;
-    }
-
-
+class Mock_DataSetCapture extends Mock_DataSetBase {
     protected $sequenceId = 0;
+
     public function add($key, $value, $section = null) {
         if (null === $key) {
             $key = $this->sequenceId++;
         }
 
-        $this->storage->set(null === $section ? $key : array($section, $key), $value);
-    }
+        if (null !== $key) {
+            $key = array($section, $key);
+        }
 
-    /**
-     * @param $key
-     * @param null $section
-     * @return static
-     */
-    public function branch($key, $section = null) {
-        $mock = new static($this->storage);
-        $this->add($key, $mock, $section);
-        return $mock;
+        if ($this->branchKey) {
+            $key = array_merge($this->branchKey, is_array($key) ? $key : array($key));
+        }
+
+        $this->storage->set($key, $value);
     }
 
 
@@ -53,4 +41,5 @@ class Mock_DataSetCapture implements Mock_DataSet{
             return $value;
         }
     }
+
 }

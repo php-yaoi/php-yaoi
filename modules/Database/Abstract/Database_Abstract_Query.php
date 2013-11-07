@@ -11,15 +11,21 @@
 abstract class Database_Abstract_Query implements Iterator {
     protected $statement;
     protected $binds;
-    /**
-     * @var Database_Driver
-     */
-    private $db;
+
+    private $dbResourceId;
 
     public function __construct(&$statement, $binds = null, Database_Abstract_Client $client) {
         $this->statement = $statement;
         $this->binds = $binds;
-        $this->db = $client->getDriver();
+
+        $this->dbResourceId = DependencyRepository::add($client->getDriver());
+    }
+
+    /**
+     * @return Database_Driver
+     */
+    private function db() {
+        return DependencyRepository::$items[$this->dbResourceId];
     }
 
     /**
@@ -29,7 +35,7 @@ abstract class Database_Abstract_Query implements Iterator {
         if ($this->binds) {
             $replace = array();
             foreach ($this->binds as $key => $value) {
-                $replace [':' . $key] = $this->db->quote($value);
+                $replace [':' . $key] = $this->db()->quote($value);
             }
             return strtr($this->statement, $replace);
         }
@@ -39,8 +45,9 @@ abstract class Database_Abstract_Query implements Iterator {
     protected $executed = false;
     protected $result;
     public function execute() {
-
-        $this->result = $this->db->query($this->build());
+        if (!$this->result = $this->db()->query($this->build())) {
+            throw new Database_Exception($this->db()->queryErrorMessage($this->result), Database_Exception::QUERY_ERROR);
+        }
         $this->executed = true;
         return $this;
     }
@@ -49,17 +56,19 @@ abstract class Database_Abstract_Query implements Iterator {
         $this->rewind();
 
         $result = array();
-        while ($r = $this->db->fetchAssoc($this->result)) {
+
+        while ($r = $this->db()->fetchAssoc($this->result)) {
             $result []= $r;
         }
         return $result;
     }
 
-    public function fetchRow() {
+    public function fetchRow($field = null) {
         if (!$this->executed) {
             $this->execute();
         }
-        return $this->db->fetchAssoc($this->result);
+        $result = $this->db()->fetchAssoc($this->result);
+        return null === $field ? $result : $result[$field];
     }
 
 
@@ -90,7 +99,7 @@ abstract class Database_Abstract_Query implements Iterator {
      */
     public function next()
     {
-        if (is_null($this->current = $this->db->fetchAssoc($this->result))) {
+        if (is_null($this->current = $this->db()->fetchAssoc($this->result))) {
             $this->valid = false;
             $this->position = null;
         }
@@ -137,7 +146,8 @@ abstract class Database_Abstract_Query implements Iterator {
         if (!$this->executed) {
             $this->execute();
         }
-        $this->db->rewind($this->result);
+
+        $this->db()->rewind($this->result);
         $this->position = -1;
         $this->valid = true;
     }
@@ -152,10 +162,35 @@ abstract class Database_Abstract_Query implements Iterator {
         if (!$this->executed && !$this->skipAutoExecute) {
             $this->execute();
         }
+        unset(DependencyRepository::$items[$this->dbResourceId]);
     }
 
     public function lastInsertId() {
-        return $this->db->lastInsertId($this->result);
+        if (!$this->executed) {
+            $this->execute();
+        }
+
+        return $this->db()->lastInsertId($this->result);
     }
+
+    public function lastInsertIdIn(&$var) {
+        $var = $this->lastInsertId();
+        return $this;
+    }
+
+    public function rowsAffected() {
+        if (!$this->executed) {
+            $this->execute();
+        }
+        return $this->db()->rowsAffected($this->result);
+    }
+
+    public function rowsAffectedIn(&$var) {
+        $var = $this->rowsAffected();
+        return $this;
+    }
+
+
+
 
 }
