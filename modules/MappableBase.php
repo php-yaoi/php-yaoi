@@ -1,14 +1,14 @@
 <?php
 
 class MappableBase extends Base_Class implements Mappable {
-    private $mappedProperties = array();
+    protected $mappedProperties = array();
 
     /**
      * @param array $row
      * @param MappableBase $object
      * @return static
      */
-    static public function fromArray(array $row, MappableBase $object = null) {
+    static public function fromArray(array $row, $object = null) {
         if (is_null($object)) {
             $object = new static;
         }
