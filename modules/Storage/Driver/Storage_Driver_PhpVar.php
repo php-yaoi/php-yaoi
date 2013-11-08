@@ -1,6 +1,6 @@
 <?php
 
-class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, Storage_ExportArray {
+class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, Storage_ExportImportArray {
     protected $data = array();
     protected $loaded = true;
     protected $modified = false;
@@ -81,8 +81,9 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
         return $this->data;
     }
 
-    public function __sleep() {
-        return array('data');
+    public function importArray(array &$data)
+    {
+        $this->data = $data;
     }
 
 }

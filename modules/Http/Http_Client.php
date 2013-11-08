@@ -100,11 +100,32 @@ class Http_Client {
 
         }
 
-        $context = stream_context_create($context);
-        $response = file_get_contents($this->url, false, $context);
-        foreach ($http_response_header as $hdr) {
-            $this->responseHeaders []= $hdr;
+        if ($this->mock) {
+            $response = '';
+            $mock = $this->mock->branch(crc32(serialize($context)), $this->url);
+            if ($mock instanceof Mock_DataSetPlay) {
+                $response = $mock->get(null, 'response');
+                $this->responseHeaders = $mock->get(null, 'responseHeaders');
+            }
+            elseif ($mock instanceof Mock_DataSetCapture) {
+                $context = stream_context_create($context);
+                $response = file_get_contents($this->url, false, $context);
+                foreach ($http_response_header as $hdr) {
+                    $this->responseHeaders []= $hdr;
+                }
+                $mock->add(null, $response, 'response');
+                $mock->add(null, $this->responseHeaders, 'responseHeaders');
+            }
         }
+        else {
+            $context = stream_context_create($context);
+            $response = file_get_contents($this->url, false, $context);
+            foreach ($http_response_header as $hdr) {
+                $this->responseHeaders []= $hdr;
+            }
+        }
+
+
         if ($logFlags) {
             $log .= ''
                 . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($http_response_header, 1) : '')
@@ -118,6 +139,15 @@ class Http_Client {
         //print_r($response);
 
         return $response;
+    }
+
+
+    /**
+     * @var Mock_DataSetBase
+     */
+    private $mock;
+    public function mock(Mock_DataSet $dataSet = null) {
+        $this->mock = $dataSet;
     }
 
 
