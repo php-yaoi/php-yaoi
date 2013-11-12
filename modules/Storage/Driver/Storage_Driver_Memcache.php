@@ -10,7 +10,17 @@ class Storage_Driver_Memcache extends Storage_Driver {
     protected function connect() {
         $this->memcache = new Memcache();
         $hostname = $this->dsn->unixSocket ? 'unix://' . $this->dsn->unixSocket : $this->dsn->hostname;
-        $port = $this->dsn->unixSocket ? 0 : ($this->dsn->port ? $this->dsn->port : ini_get(' memcache.default_port'));
+        if ($this->dsn->unixSocket) {
+            $port = 0;
+        }
+        else {
+            $port = $this->dsn->port
+                ? $this->dsn->port
+                : ini_get(' memcache.default_port');
+            if (!$port) {
+                $port = 11211;
+            }
+        }
         $this->memcache->connect($hostname, $port, $this->dsn->connectionTimeout);
     }
 

@@ -24,9 +24,9 @@ class String_Parser extends Base_Class {
             $startPosition = $this->position;
         }
         else {
-            $startPosition = strpos($this->string, $start, $this->position);
+            $startPosition = strpos($this->string, (string)$start, $this->position);
             if (false === $startPosition) {
-                return new self();
+                return new static();
             }
             $startPosition += strlen($start);
         }
@@ -35,18 +35,22 @@ class String_Parser extends Base_Class {
             $endPosition = strlen($this->string);
         }
         else {
-            $endPosition = strpos($this->string, $end, $startPosition);
+            $endPosition = strpos($this->string, (string)$end, $startPosition);
             if (false === $endPosition) {
-                return new self();
+                return new static();
             }
         }
 
         $this->position = $endPosition + strlen($end);
-        return new self(substr($this->string, $startPosition, $endPosition - $startPosition));
+        return new static(substr($this->string, $startPosition, $endPosition - $startPosition));
     }
 
+    /**
+     * @return $this
+     */
     public function resetPosition() {
         $this->position = 0;
+        return $this;
     }
 
     public function __toString() {

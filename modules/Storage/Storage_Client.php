@@ -67,12 +67,22 @@ class Storage_Client {
      * @throws Storage_Exception
      */
     public function exportArray() {
-        if (!$this->driver instanceof Storage_ExportArray) {
+        if (!$this->driver instanceof Storage_ExportImportArray) {
             throw new Storage_Exception('Export not supported in ' . get_class($this->driver),
                 Storage_Exception::EXPORT_ARRAY_NOT_SUPPORTED);
         }
 
         return $this->driver->exportArray();
+    }
+
+    public function importArray($data) {
+        if (!$this->driver instanceof Storage_ExportImportArray) {
+            throw new Storage_Exception('Export not supported in ' . get_class($this->driver),
+                Storage_Exception::EXPORT_ARRAY_NOT_SUPPORTED);
+        }
+
+        return $this->driver->importArray($data);
+
     }
 
 } 
