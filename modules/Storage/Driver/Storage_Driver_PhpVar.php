@@ -2,7 +2,6 @@
 
 class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, Storage_ExportImportArray {
     protected $data = array();
-    protected $loaded = true;
     protected $modified = false;
 
     public function set($key, $value, $ttl) {
@@ -76,7 +75,7 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
         $this->data = array();
     }
 
-    public function exportArray()
+    public function &exportArray()
     {
         return $this->data;
     }
