@@ -58,10 +58,6 @@ class Storage_Client {
     }
 
 
-    public function getDriver() {
-        return $this->driver;
-    }
-
     /**
      * @return array
      * @throws Storage_Exception

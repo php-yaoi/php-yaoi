@@ -9,7 +9,7 @@ class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar implements Sto
         $this->fileName = $this->dsn->path;
 
         if (file_exists($this->fileName)) {
-            $this->data = unserialize(file_get_contents($this->fileName));
+            $this->data = @unserialize(file_get_contents($this->fileName));
             if (false === $this->data) {
                 throw new Storage_Exception('Bad serialized data', Storage_Exception::BAD_SERIALIZED_DATA);
             }

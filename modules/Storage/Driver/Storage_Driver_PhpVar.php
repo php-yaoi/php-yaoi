@@ -72,6 +72,10 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
 
     public function deleteAll()
     {
+        if ($this->data) {
+            $this->modified = true;
+        }
+
         $this->data = array();
     }
 
