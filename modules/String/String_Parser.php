@@ -57,6 +57,11 @@ class String_Parser extends Base_Class {
         return (string)$this->string;
     }
 
+    public function assignTo(&$var = null) {
+        $var = $this;
+        return null !== $this->string;
+    }
+
 }
 
 //echo SimpleParser::create('<div class="active odd">hooy</div>')->inner(null, '"');

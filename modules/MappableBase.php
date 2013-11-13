@@ -1,7 +1,7 @@
 <?php
 
 class MappableBase extends Base_Class implements Mappable {
-    protected $mappedProperties = array();
+    protected static $mappedProperties = array();
 
     /**
      * @param array $row
@@ -14,7 +14,7 @@ class MappableBase extends Base_Class implements Mappable {
         }
 
         foreach ($row as $key => $value) {
-            $object->mappedProperties[$key] = $key;
+            static::$mappedProperties[$key] = $key;
             $object->$key = $value;
         }
         return $object;
@@ -53,7 +53,7 @@ class MappableBase extends Base_Class implements Mappable {
 
     public function toArray() {
         $result = array();
-        foreach ($this->mappedProperties as $key) {
+        foreach (static::$mappedProperties as $key) {
             $result[$key] = $this->$key;
         }
         return $result;

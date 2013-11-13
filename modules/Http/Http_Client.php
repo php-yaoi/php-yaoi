@@ -24,11 +24,13 @@ class Http_Client {
 
 
     public $cookies = array();
+    public $charset = 'UTF-8';
     public $post;
     public $url;
     public $referrer;
     public $followLocation = false;
     public $responseHeaders = array();
+    public $parsedHeaders = array();
     public $headers = array();
     public $defaultHeaders = array(
         'User-Agent' => 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0',
@@ -44,13 +46,44 @@ class Http_Client {
 
     public function parseResponseCookies() {
         $cookies = array();
+        $this->parsedHeaders = array();
         foreach ($this->responseHeaders as $hdr) {
+            if ($p = strpos($hdr, ':')) {
+                $header = substr($hdr, 0, $p);
+                $value = trim(substr($hdr, $p + 1));
+
+                $tmp = explode(';', $value);
+                $valueParams = array(
+                    'value' => $value,
+                );
+                if (count($tmp) > 1) {
+                    foreach ($tmp as $tm) {
+                        $tm = explode('=', trim($tm), 2);
+                        if (isset($tm[1])) {
+                            $valueParams[$tm[0]] = $tm[1];
+                        }
+                        else {
+                            $valueParams['baseValue'] = $tm[0];
+                        }
+                    }
+                }
+
+                $this->parsedHeaders [$header]= $valueParams;
+            }
+
             if (preg_match('/^Set-Cookie:\s*([^;]+)/', $hdr, $matches)) {
                 //echo $hdr;
                 parse_str($matches[1], $tmp);
                 $cookies += $tmp;
             }
+
+            //Content-Type: text/html; charset=WINDOWS-1251
         }
+
+        if (isset($this->parsedHeaders['Content-Type']['charset'])) {
+            $this->charset = $this->parsedHeaders['Content-Type']['charset'];
+        }
+
         $this->cookies = array_merge($this->cookies, $cookies);
     }
 

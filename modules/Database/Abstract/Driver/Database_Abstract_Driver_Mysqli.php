@@ -91,6 +91,9 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
     }
 
     public function escape($string) {
+        if (null === $this->mysqli) {
+            $this->connect();
+        }
         return $this->mysqli->real_escape_string($string);
     }
 

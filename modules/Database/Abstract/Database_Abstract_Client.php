@@ -36,6 +36,10 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
     }
 
 
+    public function insert() {
+        return new Database_Insert($this);
+    }
+
     /*
     public function select() {
         // TODO implement
@@ -47,10 +51,6 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
         //return new Databse_Delete($this);
     }
 
-    public function insert() {
-        // TODO implement
-        //return new Database_Insert($this);
-    }
 
     public function update() {
         // TODO implement
