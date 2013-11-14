@@ -25,7 +25,7 @@ class String_Dsn extends Base_Class {
         }
 
         if (isset($p['path'])) {
-            $this->path = trim($p['path'], '/');
+            $this->path = substr($p['path'], 1);
         }
 
         if (isset($p['user'])) {
