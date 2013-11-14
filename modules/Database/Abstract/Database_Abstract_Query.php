@@ -63,6 +63,18 @@ abstract class Database_Abstract_Query implements Iterator {
         return $result;
     }
 
+    public function fetchPairs() {
+        $this->rewind();
+
+        $result = array();
+
+        while ($r = $this->db()->fetchAssoc($this->result)) {
+            $r = array_values($r);
+            $result [$r[0]]= $r[1];
+        }
+        return $result;
+    }
+
     public function fetchRow($field = null) {
         if (!$this->executed) {
             $this->execute();
