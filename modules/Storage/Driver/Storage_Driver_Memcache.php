@@ -31,6 +31,19 @@ class Storage_Driver_Memcache extends Storage_Driver {
         return $this->memcache->set($key, $value, 0, $ttl);
     }
 
+    function keyExists($key) {
+        if (null === $this->memcache) {
+            $this->connect();
+        }
+        if ($this->memcache->add($key, null)) {
+            $this->memcache->delete($key);
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
     public function get($key) {
         if (null === $this->memcache) {
             $this->connect();

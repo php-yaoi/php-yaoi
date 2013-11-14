@@ -70,6 +70,9 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
         }
         elseif ($dataSet instanceof Mock_DataSetCapture) {
             $driver = new Database_Mock_DriverCapture();
+            if ($this->originalDriver) {
+                $this->driver = $this->originalDriver;
+            }
             $driver->setOriginalDriver($this->driver);
             $this->originalDriver = $this->driver;
             $driver->mock($dataSet);

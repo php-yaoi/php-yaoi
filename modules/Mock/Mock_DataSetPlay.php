@@ -18,7 +18,7 @@ class Mock_DataSetPlay extends Mock_DataSetBase {
         }
 
         $result = $this->storage->get($key);
-        if (null === $result) {
+        if ((null === $result) && !$this->storage->keyExists($key)) {
             throw new Mock_Exception('Record not found: ' . print_r($key, 1), Mock_Exception::KEY_NOT_FOUND);
         }
         return $result;

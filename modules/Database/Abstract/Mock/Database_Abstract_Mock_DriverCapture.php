@@ -56,7 +56,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
      */
     public function rewind($queryMock)
     {
-        $res =  $this->driver->rewind($queryMock->temp(self::RESULT));
+        $res = $this->driver->rewind($queryMock->temp(self::RESULT));
         $queryMock->add(null, $res, self::REWIND);
         return $res;
     }

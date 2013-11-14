@@ -21,6 +21,7 @@ abstract class Storage_Driver {
     }
 
     abstract function get($key);
+    abstract function keyExists($key);
     abstract function set($key, $value, $ttl);
     abstract function delete($key);
     abstract function deleteAll();

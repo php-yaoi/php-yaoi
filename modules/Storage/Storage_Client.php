@@ -20,6 +20,11 @@ class Storage_Client {
         return $this->driver->get($key);
     }
 
+    public function keyExists($key) {
+        $this->prepareKey($key);
+        return $this->driver->keyExists($key);
+    }
+
     public function getIn($key, &$var) {
         $var = $this->get($key);
         return $this;

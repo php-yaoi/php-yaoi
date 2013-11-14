@@ -32,7 +32,7 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
             }
             return $kk;
         }
-        elseif (isset($this->data[$key])) {
+        elseif (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
         elseif (null === $key) {
@@ -40,6 +40,30 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
         }
         else {
             return null;
+        }
+    }
+
+    public function keyExists($key) {
+        if (is_array($key)) {
+            $kk =& $this->data;
+            foreach ($key as $k) {
+                if (array_key_exists($k, $kk)) {
+                    $kk =& $kk[$k];
+                }
+                else {
+                    return false;
+                }
+            }
+            return true;
+        }
+        elseif (array_key_exists($key, $this->data)) {
+            return true;
+        }
+        elseif (null === $key) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
