@@ -11,4 +11,5 @@ class Storage_Dsn extends String_Dsn {
     public $unixSocket;
     public $connectionTimeout = 1;
     public $staticPropertyRef;
+    public $compression;
 }

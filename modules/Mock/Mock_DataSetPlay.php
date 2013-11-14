@@ -17,6 +17,10 @@ class Mock_DataSetPlay extends Mock_DataSetBase {
             $key = array_merge($this->branchKey, is_array($key) ? $key : array($key));
         }
 
-        return $this->storage->get($key);
+        $result = $this->storage->get($key);
+        if (null === $result) {
+            throw new Mock_Exception('Record not found: ' . print_r($key, 1), Mock_Exception::KEY_NOT_FOUND);
+        }
+        return $result;
     }
 }

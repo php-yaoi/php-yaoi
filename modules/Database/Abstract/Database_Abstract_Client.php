@@ -79,4 +79,19 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
             $this->driver = $this->originalDriver;
         }
     }
+
+    public static function createById($id = 'default') {
+        if (!isset($resource)) {
+            if (isset(Database_Conf::$dsn[$id])) {
+                $resource = new Database_Client(Database_Conf::$dsn[$id]);
+            }
+            elseif ('default' == $id) {
+                throw new Database_Exception('Default database connection not configured', Database_Exception::DEFAULT_NOT_SET);
+            }
+            else {
+                $resource = self::createById('default');
+            }
+        }
+        return $resource;
+    }
 }

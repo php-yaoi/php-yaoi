@@ -61,15 +61,7 @@ abstract class Abstract_App {
     static function &db($id = 'default') {
         $resource = &self::$resources['db_' . $id];
         if (!isset($resource)) {
-            if (isset(Database_Conf::$dsn[$id])) {
-                $resource = new Database_Client(Database_Conf::$dsn[$id]);
-            }
-            elseif ('default' == $id) {
-                throw new Database_Exception('Default database connection not configured', Database_Exception::DEFAULT_NOT_SET);
-            }
-            else {
-                $resource = static::db();
-            }
+            $resource = Database_Client::createById($id);
         }
         return $resource;
     }
