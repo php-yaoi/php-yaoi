@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Storage_Driver_DatabaseWrapper
+ * TODO implement, WIP!
+ */
+
 class Storage_Driver_DatabaseWrapper extends Storage_Driver {
 
     private $table;
