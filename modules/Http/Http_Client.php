@@ -133,6 +133,8 @@ class Http_Client {
 
         }
 
+        $this->responseHeaders = array();
+
         if ($this->mock) {
             $response = '';
             $mock = $this->mock->branch(crc32(serialize($context)), $this->url);
@@ -142,7 +144,7 @@ class Http_Client {
             }
             elseif ($mock instanceof Mock_DataSetCapture) {
                 $context = stream_context_create($context);
-                $response = file_get_contents($this->url, false, $context);
+                $response = @file_get_contents($this->url, false, $context);
                 foreach ($http_response_header as $hdr) {
                     $this->responseHeaders []= $hdr;
                 }
@@ -152,7 +154,7 @@ class Http_Client {
         }
         else {
             $context = stream_context_create($context);
-            $response = file_get_contents($this->url, false, $context);
+            $response = @file_get_contents($this->url, false, $context);
             foreach ($http_response_header as $hdr) {
                 $this->responseHeaders []= $hdr;
             }
@@ -161,7 +163,7 @@ class Http_Client {
 
         if ($logFlags) {
             $log .= ''
-                . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($http_response_header, 1) : '')
+                . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($this->responseHeaders, 1) : '')
                 . ($logFlags & self::LOG_RESPONSE_BODY ? print_r($response, 1) : '')
                 ;
             Log::get($this->logName)->write($log);
