@@ -143,20 +143,35 @@ class Http_Client {
                 $this->responseHeaders = $mock->get(null, 'responseHeaders');
             }
             elseif ($mock instanceof Mock_DataSetCapture) {
-                $context = stream_context_create($context);
-                $response = @file_get_contents($this->url, false, $context);
+                $ctx = stream_context_create($context);
+                $response = @file_get_contents($this->url, false, $ctx);
                 foreach ($http_response_header as $hdr) {
                     $this->responseHeaders []= $hdr;
                 }
+                if (false === $response) {
+                    $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                    $e->context = $context;
+                    $e->responseHeaders = $this->responseHeaders;
+                    $e->url = $this->url;
+                    throw $e;
+                }
+
                 $mock->add(null, $response, 'response');
                 $mock->add(null, $this->responseHeaders, 'responseHeaders');
             }
         }
         else {
-            $context = stream_context_create($context);
-            $response = @file_get_contents($this->url, false, $context);
+            $ctx = stream_context_create($context);
+            $response = @file_get_contents($this->url, false, $ctx);
             foreach ($http_response_header as $hdr) {
                 $this->responseHeaders []= $hdr;
+            }
+            if (false === $response) {
+                $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                $e->context = $context;
+                $e->responseHeaders = $this->responseHeaders;
+                $e->url = $this->url;
+                throw $e;
             }
         }
 
