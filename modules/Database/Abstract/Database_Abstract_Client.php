@@ -36,29 +36,6 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
     }
 
 
-    public function insert() {
-        return new Database_Insert($this);
-    }
-
-    /*
-    public function select() {
-        // TODO implement
-        //return new Database_Select($this);
-    }
-
-    public function delete() {
-        // TODO implement
-        //return new Databse_Delete($this);
-    }
-
-
-    public function update() {
-        // TODO implement
-        //return new Database_Update($this);
-    }
-
-    */
-
     protected $originalDriver;
     public function mock(Mock_DataSet $dataSet = null)
     {
