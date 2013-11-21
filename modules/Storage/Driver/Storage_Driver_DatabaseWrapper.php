@@ -29,6 +29,7 @@ class Storage_Driver_DatabaseWrapper extends Storage_Driver {
 
     function keyExists($key)
     {
+        return $this->client()->query("SELECT count(1) FROM $this->table WHERE `key` = ?", $key)->fetchRow();
     }
 
     function set($key, $value, $ttl)
