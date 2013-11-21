@@ -6,9 +6,12 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
      */
     protected $driver;
 
-    public function __construct($dsnUrl = null) {
-        if (null !== $dsnUrl) {
-            $dsn = new Database_Dsn($dsnUrl);
+    public function __construct($dsn = null) {
+        if (null !== $dsn) {
+            if (!$dsn instanceof Database_Dsn) {
+                $dsn = new Database_Dsn($dsn);
+            }
+
             $driverClass = 'Database_Driver_' . String_Utils::toCamelCase($dsn->scheme, '-');
             if (!class_exists($driverClass)) {
                 throw new Database_Exception('Driver for ' . $dsn->scheme . ' not found', Database_Exception::NO_DRIVER);

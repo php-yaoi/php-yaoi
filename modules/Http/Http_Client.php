@@ -133,6 +133,8 @@ class Http_Client {
 
         }
 
+        $this->responseHeaders = array();
+
         if ($this->mock) {
             $response = '';
             $mock = $this->mock->branch(crc32(serialize($context)), $this->url);
@@ -141,27 +143,42 @@ class Http_Client {
                 $this->responseHeaders = $mock->get(null, 'responseHeaders');
             }
             elseif ($mock instanceof Mock_DataSetCapture) {
-                $context = stream_context_create($context);
-                $response = file_get_contents($this->url, false, $context);
+                $ctx = stream_context_create($context);
+                $response = @file_get_contents($this->url, false, $ctx);
                 foreach ($http_response_header as $hdr) {
                     $this->responseHeaders []= $hdr;
                 }
+                if (false === $response) {
+                    $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                    $e->context = $context;
+                    $e->responseHeaders = $this->responseHeaders;
+                    $e->url = $this->url;
+                    throw $e;
+                }
+
                 $mock->add(null, $response, 'response');
                 $mock->add(null, $this->responseHeaders, 'responseHeaders');
             }
         }
         else {
-            $context = stream_context_create($context);
-            $response = file_get_contents($this->url, false, $context);
+            $ctx = stream_context_create($context);
+            $response = @file_get_contents($this->url, false, $ctx);
             foreach ($http_response_header as $hdr) {
                 $this->responseHeaders []= $hdr;
+            }
+            if (false === $response) {
+                $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                $e->context = $context;
+                $e->responseHeaders = $this->responseHeaders;
+                $e->url = $this->url;
+                throw $e;
             }
         }
 
 
         if ($logFlags) {
             $log .= ''
-                . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($http_response_header, 1) : '')
+                . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($this->responseHeaders, 1) : '')
                 . ($logFlags & self::LOG_RESPONSE_BODY ? print_r($response, 1) : '')
                 ;
             Log::get($this->logName)->write($log);
