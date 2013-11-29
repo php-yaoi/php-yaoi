@@ -1,6 +1,7 @@
 <?php
 
 class View_Table {
+    public $optionEscapeHTML = false;
 
     public $rows = array();
 
@@ -23,7 +24,11 @@ class View_Table {
         foreach ($this->rows as $row) {
             echo '<tr>';
             foreach ($keys as $key) {
-                echo '<td>', array_key_exists($key, $row) ? $row[$key] : '', '</td>';
+                $value = array_key_exists($key, $row) ? $row[$key] : '';
+                if ($this->optionEscapeHTML) {
+                    $value = str_replace('<', '&lt;', $value);
+                }
+                echo '<td>', $value, '</td>';
             }
             echo '</tr>';
             break;
