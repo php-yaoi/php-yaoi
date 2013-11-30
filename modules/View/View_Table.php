@@ -13,18 +13,21 @@ class View_Table {
         echo '<table>', "\n";
         $keys = array();
         foreach ($this->rows as $row) {
-            echo '<tr>';
-            foreach ($row as $key => $value) {
-                $keys []= $key;
-                echo '<th>', $key, '</th>';
+            if (!$keys) {
+                echo '<tr>';
+                foreach ($row as $key => $value) {
+                    $keys []= $key;
+                    echo '<th>', $key, '</th>';
+                }
+                echo '</tr>', "\n";
             }
-            echo '</tr>', "\n";
-            break;
-        }
-        foreach ($this->rows as $row) {
+
             echo '<tr>';
             foreach ($keys as $key) {
                 $value = array_key_exists($key, $row) ? $row[$key] : '';
+                if (null === $value) {
+                    $value = 'NULL';
+                }
                 if ($this->optionEscapeHTML) {
                     $value = str_replace('<', '&lt;', $value);
                 }
