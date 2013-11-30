@@ -10,7 +10,7 @@ class View_Table {
     }
 
     public function render() {
-        echo '<table>';
+        echo '<table>', "\n";
         $keys = array();
         foreach ($this->rows as $row) {
             echo '<tr>';
@@ -18,7 +18,7 @@ class View_Table {
                 $keys []= $key;
                 echo '<th>', $key, '</th>';
             }
-            echo '</tr>';
+            echo '</tr>', "\n";
             break;
         }
         foreach ($this->rows as $row) {
@@ -30,8 +30,7 @@ class View_Table {
                 }
                 echo '<td>', $value, '</td>';
             }
-            echo '</tr>';
-            break;
+            echo '</tr>', "\n";
         }
 
 
