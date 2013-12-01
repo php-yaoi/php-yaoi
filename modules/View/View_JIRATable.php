@@ -1,16 +1,20 @@
 <?php
 
-class View_Table {
-    public $optionEscapeHTML = false;
-
+class View_JIRATable extends View_HTMLTable {
     public $rows = array();
-
-    public function add($row) {
-        $this->rows []= $row;
+    public function add($row)
+    {
+        // TODO: Implement add() method.
     }
 
+    public function setRows(&$rows)
+    {
+        $this->rows = $rows;
+        return $this;
+    }
+
+
     public function render() {
-        echo '<table>', "\n";
         $keys = array();
         foreach ($this->rows as $row) {
             if (!$keys) {
@@ -22,7 +26,7 @@ class View_Table {
                 echo '</tr>', "\n";
             }
 
-            echo '<tr>';
+            echo '| ';
             foreach ($keys as $key) {
                 $value = array_key_exists($key, $row) ? $row[$key] : '';
                 if (null === $value) {
@@ -31,12 +35,12 @@ class View_Table {
                 if ($this->optionEscapeHTML) {
                     $value = str_replace('<', '&lt;', $value);
                 }
-                echo '<td>', $value, '</td>';
+                echo $value, ' | ';
             }
-            echo '</tr>', "\n";
+            echo ' |', "\n";
         }
 
-
-        echo '</table>';
+        return $this;
     }
+
 } 
