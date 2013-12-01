@@ -3,16 +3,17 @@
 class View_HTMLTable extends View_HTMLElement implements View_TableRenderer {
     public $optionEscapeHTML = false;
 
-    public $rows = array();
+    protected $tag = 'table';
+    public $content = array();
 
     public function add($row) {
-        $this->rows []= $row;
+        $this->content []= $row;
         return $this;
     }
 
     public function setRows(&$rows)
     {
-        $this->rows = $rows;
+        $this->content = $rows;
         return $this;
     }
 
@@ -20,7 +21,7 @@ class View_HTMLTable extends View_HTMLElement implements View_TableRenderer {
     public function render() {
         echo '<table>', "\n";
         $keys = array();
-        foreach ($this->rows as $row) {
+        foreach ($this->content as $row) {
             if (!$keys) {
                 echo '<tr>';
                 foreach ($row as $key => $value) {

@@ -1,6 +1,6 @@
 <?php
 
-class View_HTMLElement {
+class View_HTMLElement implements  View_Renderer {
     protected $id;
     protected $classes = array();
     protected $attributes;
@@ -25,6 +25,10 @@ class View_HTMLElement {
     public function render() {
         echo $this->__toString();
         return $this;
+    }
+
+    public function isEmpty() {
+
     }
 
     public function __toString() {
