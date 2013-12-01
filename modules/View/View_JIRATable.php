@@ -18,12 +18,12 @@ class View_JIRATable extends View_HTMLTable {
         $keys = array();
         foreach ($this->rows as $row) {
             if (!$keys) {
-                echo '<tr>';
+                echo '|| ';
                 foreach ($row as $key => $value) {
                     $keys []= $key;
-                    echo '<th>', $key, '</th>';
+                    echo $key, ' || ';
                 }
-                echo '</tr>', "\n";
+                echo "\n";
             }
 
             echo '| ';
@@ -37,7 +37,7 @@ class View_JIRATable extends View_HTMLTable {
                 }
                 echo $value, ' | ';
             }
-            echo ' |', "\n";
+            echo "\n";
         }
 
         return $this;
