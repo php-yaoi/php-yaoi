@@ -97,7 +97,7 @@ class Http_Client {
         $context = array(
             'http' => array(
                 'method' => 'GET',
-                'follow_location' => $this->followLocation, // don't or do follow redirects
+                'follow_location' => false, //$this->followLocation, // don't or do follow redirects
                 'header' => '',
             ),
         );
