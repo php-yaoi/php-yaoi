@@ -28,7 +28,12 @@ class View_HTMLElement implements  View_Renderer {
     }
 
     public function isEmpty() {
-
+        if ($this->content instanceof Is_Empty) {
+            return $this->content->isEmpty();
+        }
+        else {
+            return empty($this->content);
+        }
     }
 
     public function __toString() {
