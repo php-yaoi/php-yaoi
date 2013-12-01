@@ -167,7 +167,7 @@ class Http_Client {
             foreach ($http_response_header as $hdr) {
                 $this->responseHeaders []= $hdr;
             }
-            if (false === $response) {
+            if (!$this->skipBadRequestException && false === $response) {
                 $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
                 $e->context = $context;
                 $e->responseHeaders = $this->responseHeaders;
