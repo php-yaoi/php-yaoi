@@ -11,6 +11,8 @@ class Http_Client {
     const LOG_RESPONSE_HEADERS = 8;
     const LOG_RESPONSE_BODY = 16;
 
+    const XML_HTTP_REQUEST = 'XMLHttpRequest';
+
     const FILENAME_LOG = 'http_client.log';
 
     public $logFlags = 0;
@@ -28,6 +30,7 @@ class Http_Client {
     public $post;
     public $url;
     public $referrer;
+    public $xRequestedWith;
     public $followLocation = false;
     public $skipBadRequestException = true;
     public $responseHeaders = array();
@@ -35,6 +38,10 @@ class Http_Client {
     public $headers = array();
     public $defaultHeaders = array(
         'User-Agent' => 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0',
+        'Accept' =>	'application/json, text/javascript, */*; q=0.01',
+        'Accept-Encoding' => 'gzip, deflate',
+        'Accept-Language' => 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Connection' => 'close',
     );
 
     public function reset() {
@@ -98,6 +105,9 @@ class Http_Client {
         $context = array(
             'http' => array(
                 'method' => 'GET',
+                'protocol_version' => 1.1,
+                'ignore_errors' => true,
+                'timeout' => 5,
                 'follow_location' => false, //$this->followLocation, // don't or do follow redirects
                 'header' => '',
             ),
@@ -110,12 +120,16 @@ class Http_Client {
         if ($this->post) {
             $context['http']['method'] = 'POST';
             $context['http']['content'] = http_build_query($this->post);
-            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
             $headers['Content-Length'] = strlen($context['http']['content']);
         }
 
         if ($this->referrer) {
             $headers['Referer'] = $this->referrer;
+        }
+        if ($this->xRequestedWith) {
+            $headers['X-Requested-With'] = $this->xRequestedWith;
+            $this->xRequestedWith = null;
         }
         $this->referrer = $this->url;
 
