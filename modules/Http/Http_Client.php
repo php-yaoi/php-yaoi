@@ -26,6 +26,7 @@ class Http_Client {
 
 
     public $cookies = array();
+    public $requestCharset = 'UTF-8';
     public $charset = 'UTF-8';
     public $post;
     public $url;
@@ -38,11 +39,15 @@ class Http_Client {
     public $headers = array();
     public $defaultHeaders = array(
         'User-Agent' => 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0',
-        'Accept' =>	'application/json, text/javascript, */*; q=0.01',
-        'Accept-Encoding' => 'gzip, deflate',
+        'Accept' =>	'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        //'Accept-Encoding' => 'gzip, deflate',
         'Accept-Language' => 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
         'Connection' => 'close',
     );
+
+    public function __construct() {
+        $this->reset();
+    }
 
     public function reset() {
         $this->headers = $this->defaultHeaders;
@@ -102,26 +107,20 @@ class Http_Client {
             $this->logOnce = null;
         }
 
-        $context = array(
-            'http' => array(
-                'method' => 'GET',
-                'protocol_version' => 1.1,
-                'ignore_errors' => true,
-                'timeout' => 5,
-                'follow_location' => false, //$this->followLocation, // don't or do follow redirects
-                'header' => '',
-            ),
-        );
+        $driver = new Http_ClientDriver_FileGetContents();
+
         $headers = $this->headers;
         if ($this->cookies) {
             $headers['Cookie'] = http_build_query($this->cookies, null, '; ');
         }
 
         if ($this->post) {
-            $context['http']['method'] = 'POST';
-            $context['http']['content'] = http_build_query($this->post);
-            $headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-            $headers['Content-Length'] = strlen($context['http']['content']);
+            $driver->setMethod('POST');
+            $content = http_build_query($this->post);
+            $driver->setRequestContent($content);
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            $headers['Content-Length'] = strlen($content);
+            unset($content);
         }
 
         if ($this->referrer) {
@@ -133,9 +132,13 @@ class Http_Client {
         }
         $this->referrer = $this->url;
 
-        foreach ($headers as $type => $value) {
-            $context['http']['header'] .= $type . ': ' . $value . "\r\n";
+        if (isset($headers['Content-Type'])) {
+            $headers['Content-Type'] .= '; charset=' . $this->requestCharset;
         }
+
+        $driver->setHeaders($headers);
+        $driver->setUrl($this->url);
+
 
 
         $log = '';
@@ -143,29 +146,27 @@ class Http_Client {
             $log .= ''
                 . ($logFlags & self::LOG_URL ? print_r($this->url, 1) . "\n" : '')
                 . ($logFlags & self::LOG_POST ? print_r($this->post, 1) : '')
-                . ($logFlags & self::LOG_CONTEXT ? print_r($context, 1) : '')
+                //. ($logFlags & self::LOG_CONTEXT ? print_r($context, 1) : '')
                 ;
-
         }
 
         $this->responseHeaders = array();
 
         if ($this->mock) {
             $response = '';
-            $mock = $this->mock->branch(crc32(serialize($context)), $this->url);
+            $mock = $this->mock->branch(crc32(serialize($driver->getRequest())), $this->url);
             if ($mock instanceof Mock_DataSetPlay) {
                 $response = $mock->get(null, 'response');
                 $this->responseHeaders = $mock->get(null, 'responseHeaders');
             }
             elseif ($mock instanceof Mock_DataSetCapture) {
-                $ctx = stream_context_create($context);
-                $response = @file_get_contents($this->url, false, $ctx);
-                foreach ($http_response_header as $hdr) {
-                    $this->responseHeaders []= $hdr;
-                }
+                $driver->fetch();
+                $response = $driver->getResponseContent();
+                $this->responseHeaders = $driver->getResponseHeaders();
+
                 if (!$this->skipBadRequestException && false === $response) {
                     $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
-                    $e->context = $context;
+                    $e->request = $driver->getRequest();
                     $e->responseHeaders = $this->responseHeaders;
                     $e->url = $this->url;
                     throw $e;
@@ -176,14 +177,13 @@ class Http_Client {
             }
         }
         else {
-            $ctx = stream_context_create($context);
-            $response = @file_get_contents($this->url, false, $ctx);
-            foreach ($http_response_header as $hdr) {
-                $this->responseHeaders []= $hdr;
-            }
+            $driver->fetch();
+            $response = $driver->getResponseContent();
+            $this->responseHeaders = $driver->getResponseHeaders();
+
             if (!$this->skipBadRequestException && false === $response) {
                 $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
-                $e->context = $context;
+                $e->request = $driver->getRequest();
                 $e->responseHeaders = $this->responseHeaders;
                 $e->url = $this->url;
                 throw $e;
@@ -202,6 +202,14 @@ class Http_Client {
         //print_r($this->responseHeaders);
         $this->parseResponseCookies();
         //print_r($response);
+
+        if ($this->followLocation) {
+            if (!empty($this->parsedHeaders['Location'])) {
+                $this->post = null;
+                $this->url = $this->parsedHeaders['Location']['value'];
+                return $this->fetch();
+            }
+        }
 
         return $response;
     }
