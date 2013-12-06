@@ -40,7 +40,7 @@ class Http_Client {
     public $defaultHeaders = array(
         'User-Agent' => 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0',
         'Accept' =>	'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        //'Accept-Encoding' => 'gzip, deflate',
+        'Accept-Encoding' => 'gzip, deflate',
         'Accept-Language' => 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
         'Connection' => 'close',
     );
@@ -81,7 +81,7 @@ class Http_Client {
                     }
                 }
 
-                $this->parsedHeaders [$header]= $valueParams;
+                $this->parsedHeaders [strtolower($header)]= $valueParams;
             }
 
             if (preg_match('/^Set-Cookie:\s*([^;]+)/', $hdr, $matches)) {
@@ -93,8 +93,8 @@ class Http_Client {
             //Content-Type: text/html; charset=WINDOWS-1251
         }
 
-        if (isset($this->parsedHeaders['Content-Type']['charset'])) {
-            $this->charset = $this->parsedHeaders['Content-Type']['charset'];
+        if (isset($this->parsedHeaders['content-type']['charset'])) {
+            $this->charset = $this->parsedHeaders['content-type']['charset'];
         }
 
         $this->cookies = array_merge($this->cookies, $cookies);
@@ -204,10 +204,27 @@ class Http_Client {
         //print_r($response);
 
         if ($this->followLocation) {
-            if (!empty($this->parsedHeaders['Location'])) {
+            if (!empty($this->parsedHeaders['location'])) {
                 $this->post = null;
-                $this->url = $this->parsedHeaders['Location']['value'];
+                $this->url = $this->parsedHeaders['location']['value'];
                 return $this->fetch();
+            }
+        }
+
+
+        if (!empty($this->parsedHeaders['content-encoding'])) {
+
+            if ('gzip' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
+                if (!function_exists('gzdecode')) {
+                    $response = gzinflate(substr($response, 10, -8));
+                }
+                else {
+                    $response = gzdecode($response);
+                }
+            }
+
+            elseif ('deflate' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
+                $response = gzinflate($response);
             }
         }
 
