@@ -26,6 +26,11 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
      * @return Database_Query
      */
     public function query($statement = null, $binds = null) {
+        if (func_num_args() > 2) {
+            $arguments = func_get_args();
+            array_shift($arguments);
+            $binds = $arguments;
+        }
         $query = new Database_Query($statement, $binds, $this);
         return $query;
     }
