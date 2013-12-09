@@ -34,10 +34,46 @@ abstract class Database_Abstract_Query implements Iterator {
     public function build() {
         if ($this->binds) {
             $replace = array();
+            $unnamed = true;
+            $i = 0;
+
+            // check binds array type
             foreach ($this->binds as $key => $value) {
-                $replace [':' . $key] = $this->db()->quote($value);
+                if ($unnamed && $key != $i++) {
+                    $unnamed = false;
+                    break;
+                }
             }
-            return strtr($this->statement, $replace);
+
+            if ($unnamed) {
+                $statement = $this->statement;
+                $pos = 0;
+                foreach ($this->binds as $value) {
+                    $pos = strpos($statement, '?', $pos);
+                    if ($pos !== false) {
+                        $value = $this->db()->quote($value);
+                        $statement = substr_replace($statement, $value, $pos, 1);
+                        $pos += strlen($value);
+                    }
+                    else {
+                        throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
+                    }
+                }
+
+                if (strpos($statement, '?', $pos) !== false) {
+                    throw new Database_Exception('Redundant placeholder', Database_Exception::PLACEHOLDER_REDUNDANT);
+                }
+
+                return $statement;
+            }
+
+
+            else {
+                foreach ($this->binds as $key => $value) {
+                    $replace [':' . $key] = $this->db()->quote($value);
+                }
+                return strtr($this->statement, $replace);
+            }
         }
         return $this->statement;
     }

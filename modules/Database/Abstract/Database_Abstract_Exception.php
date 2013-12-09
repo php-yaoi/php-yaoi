@@ -6,4 +6,6 @@ abstract class Database_Abstract_Exception extends Exception {
     const WRONG_SERVER_TYPE = 3;
     const NO_DRIVER = 4;
     const QUERY_ERROR = 5;
+    const PLACEHOLDER_NOT_FOUND = 6;
+    const PLACEHOLDER_REDUNDANT = 7;
 }
