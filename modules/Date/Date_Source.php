@@ -34,6 +34,55 @@ class Date_Source implements Mock_Able {
     }
 
 
+    public function date($format, $timestamp = null) {
+        if (null === $timestamp) {
+            $result = date($format, $this->now());
+        }
+        else {
+            $result = date($format, $timestamp);
+        }
+        return $result;
+    }
+
+
+    private $year;
+    private $month;
+    private $rusMonths = array(
+        'января' => '01',
+        'февраля' => '02',
+        'марта' => '03',
+        'апреля' => '04',
+        'мая' => '05',
+        'июня' => '06',
+        'июля' => '07',
+        'августа' => '08',
+        'сентября' => '09',
+        'октября' => '10',
+        'ноября' => '11',
+        'декабря' => '12',
+    );
+
+    public function rusDayMonthToDate($string) {
+        if (null === $this->year || null === $this->month) {
+            list($this->year, $this->month) = explode('/', $this->date('Y/m'));
+        }
+
+        list($d, $m) = explode(' ', strtr($string, $this->rusMonths));
+        if ($d < 10) {
+            $d = '0' . $d;
+        }
+
+
+        if ($m < $this->month) {
+            return ($this->year + 1) . '-' . $m . '-' . $d;
+        }
+        else {
+            return $this->year . '-' . $m . '-' . $d;
+        }
+
+    }
+
+
     /**
      * @var Mock_DataSet
      */
