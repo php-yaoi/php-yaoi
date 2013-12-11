@@ -47,6 +47,7 @@ class Date_Source implements Mock_Able {
 
     private $year;
     private $month;
+    private $day;
     private $rusMonths = array(
         'января' => '01',
         'февраля' => '02',
@@ -64,12 +65,29 @@ class Date_Source implements Mock_Able {
 
     public function rusDayMonthToDate($string) {
         if (null === $this->year || null === $this->month) {
-            list($this->year, $this->month) = explode('/', $this->date('Y/m'));
+            list($this->year, $this->month, $this->day) = explode('/', $this->date('Y/m/d'));
         }
 
         list($d, $m) = explode(' ', strtr($string, $this->rusMonths));
+
+        if (strpos($m, '.') !== false) {
+            if ($d < $this->day) {
+                $m = $this->month + 1;
+                if ($m > 12) {
+                    $m = 1;
+                }
+            }
+            else {
+                $m = $this->month;
+            }
+        }
+
         if ($d < 10) {
             $d = '0' . $d;
+        }
+
+        if ($m < 10) {
+            $m = '0' . (1 * $m);
         }
 
 
