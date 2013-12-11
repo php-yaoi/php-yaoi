@@ -47,6 +47,10 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
             . $this->mysqli->connect_error, Database_Exception::CONNECTION_ERROR);
         }
 
+        if ($this->dsn->charset) {
+            $this->query("SET NAMES " . $this->dsn->charset);
+        }
+
         return $this;
     }
 
