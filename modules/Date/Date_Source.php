@@ -70,6 +70,9 @@ class Date_Source implements Mock_Able {
 
         list($d, $m) = explode(' ', strtr($string, $this->rusMonths));
 
+        /**
+         * parsing 12 д. as 2013-12-12
+         */
         if (strpos($m, '.') !== false) {
             if ($d < $this->day) {
                 $m = $this->month + 1;
@@ -80,14 +83,15 @@ class Date_Source implements Mock_Able {
             else {
                 $m = $this->month;
             }
+            if ($m < 10) {
+                $m = '0' . $m;
+            }
+
         }
+
 
         if ($d < 10) {
             $d = '0' . $d;
-        }
-
-        if ($m < 10) {
-            $m = '0' . (1 * $m);
         }
 
 
