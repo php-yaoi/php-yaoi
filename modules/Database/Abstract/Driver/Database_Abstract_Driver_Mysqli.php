@@ -51,6 +51,10 @@ abstract class Database_Abstract_Driver_Mysqli extends Database_Driver  {
             $this->query("SET NAMES " . $this->dsn->charset);
         }
 
+        if ($this->dsn->timezone) {
+            $this->query("SET time_zone = '" . $this->dsn->timezone . "'");
+        }
+
         return $this;
     }
 

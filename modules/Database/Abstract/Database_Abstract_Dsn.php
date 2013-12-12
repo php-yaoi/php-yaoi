@@ -5,4 +5,5 @@ abstract class Database_Abstract_Dsn extends String_Dsn {
     public $logQueries = false;
     public $unixSocket;
     public $charset;
+    public $timezone;
 }
