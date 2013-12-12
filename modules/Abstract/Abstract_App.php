@@ -92,5 +92,18 @@ abstract class Abstract_App {
         }
         return $resource;
     }
+
+    /**
+     * @param string $id
+     * @return Date_Source
+     */
+    static function time($id = 'default') {
+        $resource = &self::$resources['time_' . $id];
+        if (!isset($resource)) {
+            $resource = new Date_Source();
+        }
+        return $resource;
+    }
+
 }
 
