@@ -17,12 +17,17 @@ abstract class Abstract_App {
         );
         spl_autoload_register(function($class){
             $path = explode('_', $class);
+            $path2 = ($path ? implode('/', $path) . '/' : '') . $class . '.php';
             array_pop($path);
             $path = ($path ? implode('/', $path) . '/' : '') . $class . '.php';
             //die($path);
 
             if ($path = stream_resolve_include_path($path)) {
                 require_once $path;
+                return true;
+            }
+            elseif ($path2 = stream_resolve_include_path($path2)) {
+                require_once $path2;
                 return true;
             }
             else {
