@@ -61,7 +61,7 @@ abstract class Database_Abstract_Query implements Iterator {
                 }
 
                 if (strpos($statement, '?', $pos) !== false) {
-                    throw new Database_Exception('Redundant placeholder', Database_Exception::PLACEHOLDER_REDUNDANT);
+                    throw new Database_Exception('Redundant placeholder: "' . $this->statement . '", binds: ' . var_export($this->binds), Database_Exception::PLACEHOLDER_REDUNDANT);
                 }
 
                 return $statement;
