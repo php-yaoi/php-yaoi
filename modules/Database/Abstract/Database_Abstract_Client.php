@@ -31,6 +31,9 @@ abstract class Database_Abstract_Client extends Base_Class implements Mock_Able 
             array_shift($arguments);
             $binds = $arguments;
         }
+        if (null !== $binds && !is_array($binds)) {
+            $binds = array($binds);
+        }
         $query = new Database_Query($statement, $binds, $this);
         return $query;
     }
