@@ -24,6 +24,16 @@ class Http_ClientDriver_FileGetContents implements Http_ClientDriver_Interface {
         $this->url = $url;
     }
 
+    public function setProxy(String_Dsn $proxy) {
+        $this->context['http']['proxy'] = $proxy->scheme . '://' . $proxy->hostname
+            . ($proxy->port ? ':' . $proxy->port : '');
+        $this->context['http']['request_fulluri'] = true;
+        if ($proxy->username) {
+            $this->context['http']['header'] .= "Proxy-Authorization: Basic "
+                . base64_encode($proxy->username . ':' . $proxy->password) . "\r\n";
+        }
+    }
+
     public function setMethod($method) {
         $this->context['http']['method'] = $method;
     }
