@@ -2,16 +2,25 @@
 
 /**
  * Class Http_Auth
- * @method static Http_Auth create($salt, $title = 'Restricted Area')
+ * @method static Http_Auth create($salt, $users = array(), $title = 'Restricted Area')
  */
 class Http_Auth extends Base_Class {
     private $salt;
     private $users = array();
     public $title;
 
-    public function __construct($salt, $title = 'Restricted Area') {
+    const AREA_NOT_SET = 1;
+    public static $areas = array();
+
+    public function __construct($salt, $users = array(), $title = 'Restricted Area') {
         $this->salt = $salt;
+        $this->users = $users;
         $this->title = $title;
+    }
+
+    public function addUser($login, $passwordHash) {
+        $this->users[$login] = $passwordHash;
+        return $this;
     }
 
     public function addUsers($users) {
@@ -30,7 +39,7 @@ class Http_Auth extends Base_Class {
             if (!array_key_exists($_SERVER['PHP_AUTH_USER'], $this->users)) {
                 $this->fatal('Unknown user');
             } elseif ($this->users[$_SERVER['PHP_AUTH_USER']]
-                != md5($_SERVER['PHP_AUTH_USER'] . $this->salt . $_SERVER['PHP_AUTH_PW'])) {
+                != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
                 $this->fatal('Bad password');
             }
 
@@ -38,6 +47,15 @@ class Http_Auth extends Base_Class {
                 $this->fatal('Logout');
             }
         }
+    }
+
+    public function logout() {
+        $this->check(true);
+    }
+
+
+    public function hash($login, $password) {
+        md5($login . $this->salt . $password);
     }
 
     private function fatal($message) {
