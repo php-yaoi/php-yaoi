@@ -44,14 +44,14 @@ abstract class Abstract_App {
         if (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
             self::$instance->path = $_SERVER['REQUEST_URI'];
             self::$instance->host = $_SERVER['HTTP_HOST'];
-            self::$instance->mode = self::MODE_CLI;
+            self::$instance->mode = self::MODE_HTTP;
         }
         elseif (isset($_SERVER['argv'][1])) {
             self::$instance->path = $_SERVER['argv'][1];
             if (isset($_SERVER['argv'][2])) {
                 self::$instance->host = $_SERVER['argv'][2];
             }
-            self::$instance->mode = self::MODE_HTTP;
+            self::$instance->mode = self::MODE_CLI;
         }
     }
 
