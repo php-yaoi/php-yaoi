@@ -55,7 +55,7 @@ class Http_Auth extends Base_Class {
 
 
     public function hash($login, $password) {
-        md5($login . $this->salt . $password);
+        return md5($login . $this->salt . $password);
     }
 
     private function fatal($message) {
