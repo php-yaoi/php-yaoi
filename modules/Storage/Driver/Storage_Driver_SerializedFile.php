@@ -77,4 +77,23 @@ class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar implements Sto
     public function __destruct() {
         $this->saveAll();
     }
+
+
+    public function &exportArray()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+        return $this->data;
+    }
+
+    public function importArray(array &$data)
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+        $this->data = $data;
+        $this->modified = true;
+    }
+
 }
