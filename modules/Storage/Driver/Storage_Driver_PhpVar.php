@@ -111,6 +111,7 @@ class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, 
     public function importArray(array &$data)
     {
         $this->data = $data;
+        $this->modified = true;
     }
 
 }
