@@ -1,6 +1,6 @@
 <?php
 
-class Storage_Client {
+class Storage_Client extends Base_Class {
     /**
      * @var Storage_Driver
      */
