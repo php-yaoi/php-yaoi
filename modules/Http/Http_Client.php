@@ -5,6 +5,8 @@
  * TODO detect response charset
  */
 class Http_Client {
+    public static $globalSettings = array();
+
     const LOG_URL = 1;
     const LOG_POST = 2;
     const LOG_CONTEXT = 4;
@@ -45,8 +47,17 @@ class Http_Client {
         'Connection' => 'close',
     );
 
-    public function __construct() {
+    public function __construct($ignoreGlobalSettings = false) {
         $this->reset();
+        if (!$ignoreGlobalSettings) {
+            if (isset(self::$globalSettings['proxy'])) {
+                $this->setProxy(self::$globalSettings['proxy']);
+            }
+
+            if (isset(self::$globalSettings['defaultHeaders'])) {
+                $this->defaultHeaders = array_merge($this->defaultHeaders, self::$globalSettings['defaultHeaders']);
+            }
+        }
     }
 
     public function reset() {
@@ -100,6 +111,18 @@ class Http_Client {
         $this->cookies = array_merge($this->cookies, $cookies);
     }
 
+
+    protected $proxy;
+    public function setProxy($dsn) {
+        if ($dsn instanceof String_Dsn) {
+            $this->proxy = $dsn;
+        }
+        else {
+            $this->proxy = new String_Dsn($dsn);
+        }
+    }
+
+
     public function fetch() {
         $logFlags = $this->logFlags;
         if ($this->logOnce) {
@@ -108,6 +131,10 @@ class Http_Client {
         }
 
         $driver = new Http_ClientDriver_FileGetContents();
+
+        if ($this->proxy) {
+            $driver->setProxy($this->proxy);
+        }
 
         $headers = $this->headers;
         if ($this->cookies) {

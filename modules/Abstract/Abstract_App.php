@@ -17,12 +17,17 @@ abstract class Abstract_App {
         );
         spl_autoload_register(function($class){
             $path = explode('_', $class);
+            $path2 = ($path ? implode('/', $path) . '/' : '') . $class . '.php';
             array_pop($path);
             $path = ($path ? implode('/', $path) . '/' : '') . $class . '.php';
             //die($path);
 
             if ($path = stream_resolve_include_path($path)) {
                 require_once $path;
+                return true;
+            }
+            elseif ($path2 = stream_resolve_include_path($path2)) {
+                require_once $path2;
                 return true;
             }
             else {
@@ -39,14 +44,14 @@ abstract class Abstract_App {
         if (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
             self::$instance->path = $_SERVER['REQUEST_URI'];
             self::$instance->host = $_SERVER['HTTP_HOST'];
-            self::$instance->mode = self::MODE_CLI;
+            self::$instance->mode = self::MODE_HTTP;
         }
         elseif (isset($_SERVER['argv'][1])) {
             self::$instance->path = $_SERVER['argv'][1];
             if (isset($_SERVER['argv'][2])) {
                 self::$instance->host = $_SERVER['argv'][2];
             }
-            self::$instance->mode = self::MODE_HTTP;
+            self::$instance->mode = self::MODE_CLI;
         }
     }
 
@@ -92,5 +97,18 @@ abstract class Abstract_App {
         }
         return $resource;
     }
+
+    /**
+     * @param string $id
+     * @return Date_Source
+     */
+    static function time($id = 'default') {
+        $resource = &self::$resources['time_' . $id];
+        if (!isset($resource)) {
+            $resource = new Date_Source();
+        }
+        return $resource;
+    }
+
 }
 
