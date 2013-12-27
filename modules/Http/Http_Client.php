@@ -165,7 +165,8 @@ class Http_Client {
                 catch (Mock_Exception $e) {
                     if ($this->logError) {
                         $this->logError->push($e->getMessage()
-                            . ', request: ' . print_r($driver->getRequest(), 1));
+                            . ', request: ' . print_r($driver->getRequest(), 1)
+                            . ', serialize: ' . serialize($driver->getRequest()));
                     }
                     throw $e;
                 }
