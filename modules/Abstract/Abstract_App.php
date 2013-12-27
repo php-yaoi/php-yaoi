@@ -8,6 +8,9 @@ abstract class Abstract_App {
     public $path;
     public $mode;
 
+    public $logPath = 'logs/';
+    public $logErrors = true;
+
     public static function init() {
 		
         set_include_path(get_include_path()
@@ -61,7 +64,7 @@ abstract class Abstract_App {
 
     protected function setUpErrorHandling() {
         $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext){
-            file_put_contents('logs/php-errors-' . $errno . '.log',
+            file_put_contents($this->logPath . 'php-errors-' . $errno . '.log',
                 date('r') . "\t" . App::instance()->path
                 . "\t" . $errno . "\t" . $errstr . "\t" . $errfile . ':' . $errline . "\t"
                 . PHP_EOL,
