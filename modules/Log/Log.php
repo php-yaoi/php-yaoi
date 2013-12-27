@@ -32,7 +32,11 @@ abstract class Log {
      * @return Log
      * @throws Client_Exception
      */
-    public static function createByDsn(String_Dsn $dsn) {
+    public static function createByDsn($dsn) {
+        if (!$dsn instanceof String_Dsn) {
+            $dsn = new String_Dsn($dsn);
+        }
+
         $driverClass = 'Log_' . String_Utils::toCamelCase($dsn->scheme, '-');
         if (!class_exists($driverClass)) {
             throw new Client_Exception('Driver for ' . $dsn->scheme . ' not found', Client_Exception::NO_DRIVER);

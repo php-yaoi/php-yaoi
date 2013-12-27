@@ -163,7 +163,10 @@ class Http_Client {
                     $this->responseHeaders = $mock->get(null, 'responseHeaders');
                 }
                 catch (Mock_Exception $e) {
-
+                    if ($this->logError) {
+                        $this->logError->push($e->getMessage()
+                            . ', request: ' . print_r($driver->getRequest(), 1));
+                    }
                     throw $e;
                 }
             }
