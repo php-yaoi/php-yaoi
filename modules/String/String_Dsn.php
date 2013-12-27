@@ -9,7 +9,16 @@ class String_Dsn extends Base_Class {
     public $path;
 
     public function __construct($dsnUrl) {
-        if (false === strpos($dsnUrl, '://') ||  !$p = parse_url($dsnUrl)) {
+        if (false === ($pos = strpos($dsnUrl, '://'))) {
+            $this->scheme = $dsnUrl;
+            return;
+        }
+
+        if ('/' === $dsnUrl[$pos + 3]) {
+            $dsnUrl = substr($dsnUrl, 0, $pos) . '://dummy' . substr($dsnUrl, $pos + 3);
+        }
+
+        if (!$p = parse_url($dsnUrl)) {
             throw new String_Exception('Malformed DSN URL', String_Exception::BAD_DSN);
         }
 
