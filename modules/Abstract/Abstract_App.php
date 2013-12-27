@@ -138,5 +138,18 @@ abstract class Abstract_App {
         return $resource;
     }
 
+
+    /**
+     * @param string $id
+     * @return Log
+     */
+    static function log($id = 'default') {
+        $resource = &self::$resources['log_' . $id];
+        if (!isset($resource)) {
+            $resource = Log::createById($id);
+        }
+        return $resource;
+    }
+
 }
 

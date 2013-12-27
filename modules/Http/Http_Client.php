@@ -7,25 +7,7 @@
 class Http_Client {
     public static $globalSettings = array();
 
-    const LOG_URL = 1;
-    const LOG_POST = 2;
-    const LOG_CONTEXT = 4;
-    const LOG_RESPONSE_HEADERS = 8;
-    const LOG_RESPONSE_BODY = 16;
-
     const XML_HTTP_REQUEST = 'XMLHttpRequest';
-
-    const FILENAME_LOG = 'http_client.log';
-
-    public $logFlags = 0;
-    public $logOnce;
-
-    /**
-     * @var Log
-     */
-    public $logName = self::FILENAME_LOG;
-
-
 
     public $cookies = array();
     public $requestCharset = 'UTF-8';
@@ -124,12 +106,6 @@ class Http_Client {
 
 
     public function fetch() {
-        $logFlags = $this->logFlags;
-        if ($this->logOnce) {
-            $logFlags = $this->logOnce;
-            $this->logOnce = null;
-        }
-
         $driver = new Http_ClientDriver_FileGetContents();
 
         if ($this->proxy) {
@@ -168,24 +144,28 @@ class Http_Client {
 
 
 
-        $log = '';
-        if ($logFlags) {
-            $log .= ''
-                . ($logFlags & self::LOG_URL ? print_r($this->url, 1) . "\n" : '')
-                . ($logFlags & self::LOG_POST ? print_r($this->post, 1) : '')
-                //. ($logFlags & self::LOG_CONTEXT ? print_r($context, 1) : '')
-                ;
+        if ($this->logUrl) {
+            $this->logUrl->push($this->url);
+        }
+
+        if ($this->logPost) {
+            $this->logPost->push(print_r($this->post, 1));
         }
 
         $this->responseHeaders = array();
 
         if ($this->mock) {
             $response = '';
-            print_r($driver->getRequest());
             $mock = $this->mock->branch(crc32(serialize($driver->getRequest())), $this->url);
             if ($mock instanceof Mock_DataSetPlay) {
-                $response = $mock->get(null, 'response');
-                $this->responseHeaders = $mock->get(null, 'responseHeaders');
+                try {
+                    $response = $mock->get(null, 'response');
+                    $this->responseHeaders = $mock->get(null, 'responseHeaders');
+                }
+                catch (Mock_Exception $e) {
+
+                    throw $e;
+                }
             }
             elseif ($mock instanceof Mock_DataSetCapture) {
                 $driver->fetch();
@@ -219,17 +199,16 @@ class Http_Client {
         }
 
 
-        if ($logFlags) {
-            $log .= ''
-                . ($logFlags & self::LOG_RESPONSE_HEADERS ? print_r($this->responseHeaders, 1) : '')
-                . ($logFlags & self::LOG_RESPONSE_BODY ? print_r($response, 1) : '')
-                ;
-            Log::get($this->logName)->write($log);
+        if ($this->logResponseHeaders) {
+            $this->logResponseHeaders->push(print_r($this->responseHeaders, 1));
         }
 
-        //print_r($this->responseHeaders);
+        if ($this->logResponseBody) {
+            $this->logResponseBody->push(print_r($response, 1));
+        }
+
+
         $this->parseResponseCookies();
-        //print_r($response);
 
         if ($this->followLocation) {
             if (!empty($this->parsedHeaders['location'])) {
@@ -268,5 +247,61 @@ class Http_Client {
         $this->mock = $dataSet;
     }
 
+
+    /**
+     * @var Log
+     */
+    private $logError;
+    public function logError(Log $log = null) {
+        $this->logError = $log;
+    }
+
+
+    /**
+     * @var Log
+     */
+    private $logUrl;
+    public function logUrl(Log $log = null) {
+        $this->logUrl = $log;
+        return $this;
+    }
+
+
+    /**
+     * @var Log
+     */
+    private $logPost;
+    public function logPost(Log $log = null) {
+        $this->logPost = $log;
+        return $this;
+    }
+
+    /**
+     * @var Log
+     */
+    private $logContext;
+    public function logContext(Log $log = null) {
+        $this->logContext = $log;
+        return $this;
+    }
+
+    /**
+     * @var Log
+     */
+    private $logResponseHeaders;
+    public function logResponseHeaders(Log $log = null) {
+        $this->logResponseHeaders = $log;
+        return $this;
+    }
+
+
+    /**
+     * @var Log
+     */
+    private $logResponseBody;
+    public function logResponseBody(Log $log = null) {
+        $this->logResponseBody = $log;
+        return $this;
+    }
 
 }
