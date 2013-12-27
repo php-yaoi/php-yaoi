@@ -181,6 +181,7 @@ class Http_Client {
 
         if ($this->mock) {
             $response = '';
+            print_r($driver->getRequest());
             $mock = $this->mock->branch(crc32(serialize($driver->getRequest())), $this->url);
             if ($mock instanceof Mock_DataSetPlay) {
                 $response = $mock->get(null, 'response');
