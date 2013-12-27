@@ -53,7 +53,32 @@ abstract class Abstract_App {
             }
             self::$instance->mode = self::MODE_CLI;
         }
+
+
+        self::$instance->setUpErrorHandling();
+
     }
+
+    protected function setUpErrorHandling() {
+        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext){
+            file_put_contents('logs/php-errors-' . $errno . '.log',
+                date('r') . "\t" . App::instance()->path
+                . "\t" . $errno . "\t" . $errstr . "\t" . $errfile . ':' . $errline . "\t"
+                . PHP_EOL,
+
+                FILE_APPEND);
+        };
+
+        register_shutdown_function(function() use ($errorHandler) {
+            $error = error_get_last();
+            if(null !== $error) {
+                $errorHandler($error['type'], $error['message'], $error['file'], $error['line'], null);
+            }
+        });
+
+        set_error_handler($errorHandler);
+    }
+
 
     abstract function route($path = null, $host = null);
 
