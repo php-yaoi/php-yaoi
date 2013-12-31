@@ -166,7 +166,7 @@ class Http_Client {
                     if ($this->logError) {
                         $this->logError->push($e->getMessage()
                             . ', request: ' . print_r($driver->getRequest(), 1)
-                            . ', serialize: ' . serialize($driver->getRequest()));
+                            . ', serialize: ' . base64_encode(serialize($driver->getRequest())));
                     }
                     throw $e;
                 }
