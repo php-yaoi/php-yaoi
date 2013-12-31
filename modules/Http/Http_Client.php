@@ -142,8 +142,6 @@ class Http_Client {
         $driver->setHeaders($headers);
         $driver->setUrl($this->url);
 
-
-
         if ($this->logUrl) {
             $this->logUrl->push($this->url);
         }
