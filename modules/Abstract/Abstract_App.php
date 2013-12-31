@@ -63,8 +63,9 @@ abstract class Abstract_App {
     }
 
     protected function setUpErrorHandling() {
-        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext){
-            file_put_contents($this->logPath . 'php-errors-' . $errno . '.log',
+        $app = $this;
+        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext) use ($app) {
+            file_put_contents($app->logPath . 'php-errors-' . $errno . '.log',
                 date('r') . "\t" . App::instance()->path
                 . "\t" . $errno . "\t" . $errstr . "\t" . $errfile . ':' . $errline . "\t"
                 . PHP_EOL,
