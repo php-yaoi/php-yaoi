@@ -12,7 +12,6 @@ class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar implements Sto
             if ($this->dsn->compression) {
                 //$this->data = @unserialize(file_get_contents($this->fileName));
                 $this->data = @unserialize(gzuncompress(file_get_contents($this->fileName)));
-                echo 'aaa';
             }
             else {
                 $this->data = @unserialize(file_get_contents($this->fileName));
