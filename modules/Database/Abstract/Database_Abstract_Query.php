@@ -198,6 +198,7 @@ abstract class Database_Abstract_Query implements Iterator {
         $this->db()->rewind($this->result);
         $this->position = -1;
         $this->valid = true;
+        $this->current = null;
     }
 
     protected $skipAutoExecute = 0;
