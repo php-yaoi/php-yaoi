@@ -1,9 +1,9 @@
 <?php
 
-class String_Parser extends Base_Class {
+class String_Parser extends Base_Class implements Is_Empty {
     private $string;
 
-    private $position = 0;
+    private $offset = 0;
 
     public function __construct($string = null) {
         $this->string = $string;
@@ -21,35 +21,46 @@ class String_Parser extends Base_Class {
         }
 
         if (is_null($start)) {
-            $startPosition = $this->position;
+            $startOffset = $this->offset;
         }
         else {
-            $startPosition = strpos($this->string, (string)$start, $this->position);
-            if (false === $startPosition) {
+            $startOffset = strpos($this->string, (string)$start, $this->offset);
+            if (false === $startOffset) {
                 return new static();
             }
-            $startPosition += strlen($start);
+            $startOffset += strlen($start);
         }
 
         if (is_null($end)) {
-            $endPosition = strlen($this->string);
+            $endOffset = strlen($this->string);
         }
         else {
-            $endPosition = strpos($this->string, (string)$end, $startPosition);
-            if (false === $endPosition) {
+            $endOffset = strpos($this->string, (string)$end, $startOffset);
+            if (false === $endOffset) {
                 return new static();
             }
         }
 
-        $this->position = $endPosition + strlen($end);
-        return new static(substr($this->string, $startPosition, $endPosition - $startPosition));
+        $this->offset = $endOffset + strlen($end);
+        return new static(substr($this->string, $startOffset, $endOffset - $startOffset));
     }
+
 
     /**
      * @return $this
+     * @deprecated, use setOffset()
      */
     public function resetPosition() {
-        $this->position = 0;
+        $this->offset = 0;
+        return $this;
+    }
+
+    public function getOffset() {
+        return $this->offset;
+    }
+
+    public function setOffset($offset) {
+        $this->offset = $offset;
         return $this;
     }
 
@@ -57,11 +68,109 @@ class String_Parser extends Base_Class {
         return (string)$this->string;
     }
 
+    /**
+     * @param null $var
+     * @return bool
+     * @deprecated, use iterate()
+     */
     public function assignTo(&$var = null) {
         $var = $this;
         return null !== $this->string;
     }
 
+    public function isEmpty() {
+        return null === $this->string;
+    }
+
+    /**
+     * @param null $start
+     * @param null $end
+     * @return String_Parser[]
+     */
+    public function all($start = null, $end = null) {
+        return new String_ParserIterator($this, $start, $end);
+    }
 }
 
-//echo SimpleParser::create('<div class="active odd">hooy</div>')->inner(null, '"');
+class String_ParserIterator implements Iterator {
+
+    private $start;
+    private $end;
+    private $valid;
+    private $current;
+    private $position = -1;
+
+    private $parser;
+    private $offset;
+
+    public function __construct(String_Parser $parser, $start = null, $end = null) {
+        $this->parser = $parser;
+        $this->offset = $parser->getOffset();
+        $this->start = $start;
+        $this->end = $end;
+    }
+
+    public function current()
+    {
+        if (null === $this->current) {
+            $this->next();
+        }
+        return $this->current;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Move forward to next element
+     * @link http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     */
+    public function next()
+    {
+        $this->current = $this->parser->inner($this->start, $this->end);
+        if ($this->current->isEmpty()) {
+            $this->valid = false;
+            $this->position = -1;
+        }
+        else {
+            $this->valid = true;
+            ++$this->position;
+        }
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Return the key of the current element
+     * @link http://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     */
+    public function key()
+    {
+        return $this->position;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Checks if current position is valid
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns true on success or false on failure.
+     */
+    public function valid()
+    {
+        return $this->valid;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Rewind the Iterator to the first element
+     * @link http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     */
+    public function rewind()
+    {
+        $this->parser->setOffset($this->offset);
+        $this->position = -1;
+        $this->valid = true;
+        $this->current = null;
+    }
+}
