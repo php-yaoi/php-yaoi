@@ -2,28 +2,47 @@
 
 class Date_Source implements Mock_Able {
 
+    const MOCK_NOW = 'now';
+    const MOCK_STR_TO_TIME = 'str_to_time';
+    const MOCK_MICRO_NOW = 'micro_now';
+
     public function now() {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->get();
+                return $this->mock->branch2(static::MOCK_NOW)->get2();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
                 $now = time();
-                $this->mock->add(null, $now);
+                $this->mock->branch2(static::MOCK_NOW)->add2($now);
                 return $now;
             }
         }
         return time();
     }
 
+    public function microNow() {
+        if ($this->mock) {
+            if ($this->mock instanceof Mock_DataSetPlay) {
+                return $this->mock->branch2(static::MOCK_MICRO_NOW)->get2();
+            }
+            elseif ($this->mock instanceof Mock_DataSetCapture) {
+                $now = microtime(1);
+                $this->mock->branch2(static::MOCK_MICRO_NOW)->add2($now);
+                return $now;
+            }
+        }
+        return microtime(1);
+    }
+
     public function strToTime($string) {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->get(array($string, null));
+                return $this->mock->branch2(static::MOCK_STR_TO_TIME, $string)->get2();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
                 $ut = strtotime($string);
-                $this->mock->add(array($string, null), $ut);
+                $this->mock->branch2(static::MOCK_STR_TO_TIME, $string)->add2($ut);
+                //$this->mock->add(array(null, $string), $ut, static::MOCK_STR_TO_TIME);
                 return $ut;
             }
         }

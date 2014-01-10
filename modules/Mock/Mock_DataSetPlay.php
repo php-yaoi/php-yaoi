@@ -1,15 +1,25 @@
 <?php
 
 class Mock_DataSetPlay extends Mock_DataSetBase {
-    protected $sequenceId = 0;
 
 
+    public function get2($key = null) {
+        return $this->get($key);
+    }
+
+    /**
+     * @param null $key
+     * @param null $section
+     * @return mixed
+     * @throws Mock_Exception
+     * @deprecated
+     */
     public function get($key = null, $section = null) {
         if (null === $key) {
             $key = $this->sequenceId++;
         }
 
-        if (null !== $key) {
+        if (null !== $section) {
             $key = array($section, $key);
         }
 

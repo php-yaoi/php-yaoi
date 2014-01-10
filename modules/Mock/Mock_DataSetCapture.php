@@ -1,20 +1,30 @@
 <?php
 
 class Mock_DataSetCapture extends Mock_DataSetBase {
-    protected $sequenceId = 0;
+    public function add2($value, $key = null) {
+        return $this->add($key, $value);
+    }
 
+    /**
+     * @deprecated
+     * @param $key
+     * @param $value
+     * @param null $section
+     */
     public function add($key, $value, $section = null) {
         if (null === $key) {
             $key = $this->sequenceId++;
         }
 
-        if (null !== $key) {
+        if (null !== $section) {
             $key = array($section, $key);
         }
 
         if ($this->branchKey) {
             $key = array_merge($this->branchKey, is_array($key) ? $key : array($key));
         }
+
+
 
         $this->storage->set($key, $value);
     }
@@ -41,5 +51,4 @@ class Mock_DataSetCapture extends Mock_DataSetBase {
             return $value;
         }
     }
-
 }

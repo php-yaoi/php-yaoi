@@ -3,7 +3,7 @@
 abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver implements Mock_Able {
     public function query($statement)
     {
-        $queryMock = $this->mock->branch($statement, self::QUERY);
+        $queryMock = $this->mock->branch2(self::QUERY, $statement);
         return $queryMock;
     }
 
@@ -12,7 +12,7 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function lastInsertId($queryMock)
     {
-        return $queryMock->get(self::LAST_INSERT_ID);
+        return $queryMock->get2(self::LAST_INSERT_ID);
     }
 
     /**
@@ -20,13 +20,13 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function rowsAffected($queryMock)
     {
-        return $queryMock->get(self::ROWS_AFFECTED);
+        return $queryMock->get2(self::ROWS_AFFECTED);
     }
 
 
     public function escape($value)
     {
-        return $this->mock->get($value, self::ESCAPE);
+        return $this->mock->branch2(self::ESCAPE)->get2($value);
     }
 
     /**
@@ -34,7 +34,7 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function rewind($queryMock)
     {
-        return $queryMock->get(null, self::REWIND);
+        return $queryMock->branch2(self::REWIND)->get2();
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function fetchAssoc($queryMock)
     {
-        return $queryMock->get(null, self::ASSOC_ROWS);
+        return $queryMock->branch2(self::ASSOC_ROWS)->get2();
     }
 
 
@@ -65,7 +65,7 @@ abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver impleme
      */
     public function queryErrorMessage($queryMock)
     {
-        return $queryMock->get(self::ERROR_MESSAGE);
+        return $queryMock->get2(self::ERROR_MESSAGE);
     }
 
 }

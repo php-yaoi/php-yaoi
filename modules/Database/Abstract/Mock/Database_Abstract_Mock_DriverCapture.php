@@ -15,7 +15,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
 
     public function query($statement)
     {
-        $queryMock = $this->mock->branch($statement, self::QUERY);
+        $queryMock = $this->mock->branch2(self::QUERY, $statement);
         $queryMock->temp(self::RESULT, $this->driver->query($statement));
         return $queryMock;
     }
@@ -27,7 +27,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function lastInsertId($queryMock)
     {
         $res = $this->driver->lastInsertId($queryMock->temp(self::RESULT));
-        $queryMock->add(self::LAST_INSERT_ID, $res);
+        $queryMock->add2($res, self::LAST_INSERT_ID);
         return $res;
     }
 
@@ -38,7 +38,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function rowsAffected($queryMock)
     {
         $res = $this->driver->rowsAffected($queryMock->temp(self::RESULT));
-        $queryMock->add(self::ROWS_AFFECTED, $res);
+        $queryMock->add2($res, self::ROWS_AFFECTED);
         return $res;
     }
 
@@ -46,7 +46,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function escape($value)
     {
         $res = $this->driver->escape($value);
-        $this->mock->add($value, $res, self::ESCAPE);
+        $this->mock->branch2(self::ESCAPE)->add2($res, $value);
         return $res;
     }
 
@@ -57,7 +57,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function rewind($queryMock)
     {
         $res = $this->driver->rewind($queryMock->temp(self::RESULT));
-        $queryMock->add(null, $res, self::REWIND);
+        $queryMock->branch2(self::REWIND)->add2($res);
         return $res;
     }
 
@@ -67,7 +67,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function fetchAssoc($queryMock)
     {
         $row = $this->driver->fetchAssoc($queryMock->temp(self::RESULT));
-        $queryMock->add(null, $row, self::ASSOC_ROWS);
+        $queryMock->branch2(self::ASSOC_ROWS)->add2($row);
         return $row;
     }
 
@@ -92,7 +92,7 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
     public function queryErrorMessage($queryMock)
     {
         $err = $this->driver->queryErrorMessage($queryMock->temp(self::RESULT));
-        $queryMock->add(self::ERROR_MESSAGE, $err);
+        $queryMock->add2($err, self::ERROR_MESSAGE);
         return $err;
     }
 
