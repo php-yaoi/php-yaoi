@@ -83,14 +83,14 @@ class Date_Source implements Mock_Able {
             else {
                 $m = $this->month;
             }
-            if ($m < 10) {
+
+            if (strlen($m) < 2) {
                 $m = '0' . $m;
             }
-
         }
 
 
-        if ($d < 10) {
+        if (strlen($d) < 2) {
             $d = '0' . $d;
         }
 
