@@ -19,31 +19,9 @@ class Mock_DataSetBase implements Mock_DataSet {
     }
 
     /**
-     * @param $key
-     * @param null $section
-     * @return static
-     * @deprecated
-     */
-    public function branch($key, $section = null) {
-        /**
-         * @var Mock_DataSetBase $mock
-         */
-        $mock = new static($this->storage);
-        $branchKey = $this->branchKey;
-
-        $mock->branchKey = $this->branchKey;
-        if ($section) {
-            $mock->branchKey []= $section;
-        }
-        $mock->branchKey []= $key;
-        $mock->sequenceId = &$this->sequenceId;
-        return $mock;
-    }
-
-    /**
      * @return static
      */
-    public function branch2() {
+    public function branch() {
         $key = func_get_args();
         if (!$key) {
             return $this;

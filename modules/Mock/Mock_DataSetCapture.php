@@ -1,30 +1,18 @@
 <?php
 
 class Mock_DataSetCapture extends Mock_DataSetBase {
-    public function add2($value, $key = null) {
-        return $this->add($key, $value);
-    }
-
     /**
-     * @deprecated
-     * @param $key
      * @param $value
-     * @param null $section
+     * @param $key
      */
-    public function add($key, $value, $section = null) {
+    public function add($value, $key = null) {
         if (null === $key) {
             $key = $this->sequenceId++;
         }
 
-        if (null !== $section) {
-            $key = array($section, $key);
-        }
-
         if ($this->branchKey) {
-            $key = array_merge($this->branchKey, is_array($key) ? $key : array($key));
+            $key = array_merge($this->branchKey, array($key));
         }
-
-
 
         $this->storage->set($key, $value);
     }

@@ -2,29 +2,18 @@
 
 class Mock_DataSetPlay extends Mock_DataSetBase {
 
-
-    public function get2($key = null) {
-        return $this->get($key);
-    }
-
     /**
      * @param null $key
-     * @param null $section
      * @return mixed
      * @throws Mock_Exception
-     * @deprecated
      */
-    public function get($key = null, $section = null) {
+    public function get($key = null) {
         if (null === $key) {
             $key = $this->sequenceId++;
         }
 
-        if (null !== $section) {
-            $key = array($section, $key);
-        }
-
         if ($this->branchKey) {
-            $key = array_merge($this->branchKey, is_array($key) ? $key : array($key));
+            $key = array_merge($this->branchKey, array($key));
         }
 
         $result = $this->storage->get($key);

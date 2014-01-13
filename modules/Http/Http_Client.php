@@ -154,11 +154,11 @@ class Http_Client {
 
         if ($this->mock) {
             $response = '';
-            $mock = $this->mock->branch2($this->url, hash('crc32b', serialize($driver->getRequest())));
+            $mock = $this->mock->branch($this->url, hash('crc32b', serialize($driver->getRequest())));
             if ($mock instanceof Mock_DataSetPlay) {
                 try {
-                    $response = $mock->branch2('response')->get2();
-                    $this->responseHeaders = $mock->branch2('responseHeaders')->get2();
+                    $response = $mock->branch('response')->get();
+                    $this->responseHeaders = $mock->branch('responseHeaders')->get();
                 }
                 catch (Mock_Exception $e) {
                     if ($this->logError) {
@@ -182,8 +182,8 @@ class Http_Client {
                     throw $e;
                 }
 
-                $mock->branch2('response')->add2($response);
-                $mock->branch2('responseHeaders')->add2($this->responseHeaders);
+                $mock->branch('response')->add($response);
+                $mock->branch('responseHeaders')->add($this->responseHeaders);
             }
         }
         else {

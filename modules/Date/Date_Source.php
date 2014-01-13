@@ -9,11 +9,11 @@ class Date_Source implements Mock_Able {
     public function now() {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch2(static::MOCK_NOW)->get2();
+                return $this->mock->branch(static::MOCK_NOW)->get();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
                 $now = time();
-                $this->mock->branch2(static::MOCK_NOW)->add2($now);
+                $this->mock->branch(static::MOCK_NOW)->add($now);
                 return $now;
             }
         }
@@ -23,11 +23,11 @@ class Date_Source implements Mock_Able {
     public function microNow() {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch2(static::MOCK_MICRO_NOW)->get2();
+                return $this->mock->branch(static::MOCK_MICRO_NOW)->get();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
                 $now = microtime(1);
-                $this->mock->branch2(static::MOCK_MICRO_NOW)->add2($now);
+                $this->mock->branch(static::MOCK_MICRO_NOW)->add($now);
                 return $now;
             }
         }
@@ -37,11 +37,11 @@ class Date_Source implements Mock_Able {
     public function strToTime($string) {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch2(static::MOCK_STR_TO_TIME, $string)->get2();
+                return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
                 $ut = strtotime($string);
-                $this->mock->branch2(static::MOCK_STR_TO_TIME, $string)->add2($ut);
+                $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->add($ut);
                 //$this->mock->add(array(null, $string), $ut, static::MOCK_STR_TO_TIME);
                 return $ut;
             }
