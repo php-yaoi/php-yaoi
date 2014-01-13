@@ -13,7 +13,7 @@ class Log_File extends Log {
     }
 
     public function push($message) {
-        $message = App::time('log')->date('Y-m-d H:i:s') . "\t" . $message . "\n";
+        $message = App::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
 
         if (++$this->hits > 5) {
             if (is_null($this->handle)) {
