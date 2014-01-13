@@ -68,8 +68,9 @@ abstract class Abstract_App {
             file_put_contents($app->logPath . 'php-errors-' . $errno . '.log',
                 date('r') . "\t" . App::instance()->path
                 . "\t" . $errno . "\t" . $errstr . "\t" . $errfile . ':' . $errline . "\t"
-                . PHP_EOL,
-
+                . PHP_EOL
+                //. Debug::backTrace(0, Debug::TRACE_TEXT)
+                ,
                 FILE_APPEND);
         };
 
