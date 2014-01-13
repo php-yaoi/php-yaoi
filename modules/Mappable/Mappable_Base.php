@@ -1,11 +1,12 @@
 <?php
 
-class MappableBase extends Base_Class implements Mappable {
+abstract class Mappable_Base extends Base_Class implements Mappable {
     protected static $mappedProperties = array();
+    protected $fromProperties;
 
     /**
      * @param array $row
-     * @param MappableBase $object
+     * @param Mappable_Base $object
      * @return static
      */
     static public function fromArray(array $row, $object = null) {
@@ -13,10 +14,15 @@ class MappableBase extends Base_Class implements Mappable {
             $object = new static;
         }
 
-        foreach ($row as $key => $value) {
-            static::$mappedProperties[$key] = $key;
-            $object->$key = $value;
+        $object->fromProperties = array();
+
+        foreach (static::$mappedProperties as $property) {
+            if (array_key_exists($property, $row)) {
+                $object->fromProperties []= $property;
+                $object->$property = $row[$property];
+            }
         }
+
         return $object;
     }
 
@@ -53,11 +59,18 @@ class MappableBase extends Base_Class implements Mappable {
 
     public function toArray() {
         $result = array();
-        foreach (static::$mappedProperties as $key) {
-            $result[$key] = $this->$key;
+        if (null !== $this->fromProperties) {
+            foreach ($this->fromProperties as $property) {
+                $result [$property] = $this->$property;
+            }
+        }
+        else {
+            foreach (static::$mappedProperties as $key) {
+                $result[$key] = $this->$key;
+            }
         }
         return $result;
     }
 }
-MappableBase::__init();
+Mappable_Base::__init();
 
