@@ -34,10 +34,11 @@ class Database_Client extends Base_Class implements Mock_Able {
         if (null !== $binds && !is_array($binds)) {
             $binds = array($binds);
         }
+        $query = new Database_Query($statement, $binds, $this->driver);
         if (null !== $this->log) {
-            $this->log->push(array($statement, $binds));
+            $query->log($this->log);
         }
-        $query = new Database_Query($statement, $binds, $this);
+
         return $query;
     }
 
@@ -97,7 +98,8 @@ class Database_Client extends Base_Class implements Mock_Able {
      * @var Log
      */
     private $log;
-    public function log(Log $log) {
+    public function log(Log $log = null) {
         $this->log = $log;
     }
+
 }

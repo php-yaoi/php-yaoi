@@ -7,10 +7,12 @@ class Log_Null extends Log {
 
     /**
      * @param $message
+     * @param string $type
      * @return $this
      */
-    public function push($message)
+    public function push($message, $type = Log::TYPE_MESSAGE)
     {
+        return $this;
     }
 
 } 

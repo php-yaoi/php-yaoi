@@ -1,6 +1,10 @@
 <?php
 
 abstract class Log {
+    const TYPE_MESSAGE = 'm';
+    const TYPE_ERROR = 'e';
+    const TYPE_SUCCESS = 's';
+
     public static $conf = array();
 
     /**
@@ -50,8 +54,9 @@ abstract class Log {
 
     /**
      * @param $message
+     * @param string $type
      * @return $this
      */
-    abstract public function push($message);
+    abstract public function push($message, $type = Log::TYPE_MESSAGE);
 
 }

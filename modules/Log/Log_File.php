@@ -12,7 +12,12 @@ class Log_File extends Log {
             : App::instance()->logPath . $this->fileName;
     }
 
-    public function push($message) {
+    /**
+     * @param $message
+     * @param string $type
+     * @return $this
+     */
+    public function push($message, $type = Log::TYPE_MESSAGE) {
         $message = App::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
 
         if (++$this->hits > 5) {
