@@ -56,7 +56,13 @@ class View_HTMLElement extends Base_Class implements View_Renderer {
         }
     }
 
+    protected $headRendered = false;
     protected function renderHead() {
+        $this->headRendered = true;
+        if (null === $this->tag) {
+            return;
+        }
+
         echo '<' . $this->tag
             . (isset($this->id) ? ' id="' . $this->id . '"': '')
             . (empty($this->classes) ? '' : ' class="' . implode(' ', $this->classes) .'"')
@@ -74,7 +80,7 @@ class View_HTMLElement extends Base_Class implements View_Renderer {
         if (($content instanceof Is_Empty) && !$content->isEmpty()) {
             $contentExists = true;
         }
-        elseif ($content = (string)$content) {
+        elseif ($content !== null) {
             $contentExists = true;
         }
 
@@ -88,7 +94,14 @@ class View_HTMLElement extends Base_Class implements View_Renderer {
         }
     }
 
+    protected $tailRendered = false;
     protected function renderTail() {
+        $this->tailRendered = true;
+
+        if (null === $this->tag) {
+            return;
+        }
+
         if ($this->contentExists) {
             echo '</' . $this->tag . '>';
         }

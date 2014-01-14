@@ -1,13 +1,13 @@
 <?php
 
-class View_HTMLTable extends View_TableRenderer {
+class View_Table_HTML extends View_Table_Stream {
     public $optionEscapeHTML = false;
 
     protected $tag = 'table';
 
     protected $keys = array();
-    public function push($row) {
-        ob_start();
+
+    protected function renderRow($row) {
         if (!$this->keys) {
             echo '<tr>';
             foreach ($row as $key => $value) {
@@ -28,19 +28,6 @@ class View_HTMLTable extends View_TableRenderer {
             echo '<td>', $value, '</td>';
         }
         echo '</tr>', "\n";
-        $tr = ob_get_contents();
-        ob_end_clean();
-        $this->renderContentChunk($tr);
     }
 
-    public function render() {
-        $this->renderHead();
-
-        foreach ($this->rows as $row) {
-            $this->push($row);
-        }
-
-        $this->renderTail();
-        return $this;
-    }
-} 
+}
