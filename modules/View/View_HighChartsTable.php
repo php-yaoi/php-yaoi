@@ -8,12 +8,10 @@ class View_HighChartsTable extends View_Table_Renderer {
     protected $tag = 'div';
     protected $content = '';
 
-    public function __construct(&$rows = null, $dataType = self::DATA_TYPE_REGULAR) {
+    public function __construct(&$rows = null) {
         if (null !== $rows) {
             $this->setRows($rows);
         }
-
-        $this->dataType = $dataType;
 
         $this->options = array(
             'title' => false,
@@ -71,12 +69,12 @@ class View_HighChartsTable extends View_Table_Renderer {
         parent::renderHead();
     }
 
-    public function isRegular() {
+    public function withRegularSeries() {
         $this->dataType = self::DATA_TYPE_REGULAR;
         return $this;
     }
 
-    public function isNamed() {
+    public function withNamedSeries() {
         $this->dataType = self::DATA_TYPE_NAMED;
         return $this;
     }
@@ -113,13 +111,15 @@ class View_HighChartsTable extends View_Table_Renderer {
         foreach ($this->rows as $row) {
             if (!$keys) {
                 $keys = array_keys($row);
-                $xAxis = array_shift($keys);
-                $name = array_shift($keys);
-                $value = array_shift($keys);
+                $xAxis = $keys[0];
+                $name = $keys[1];
+                $value = $keys[2];
+
+                echo $xAxis, $name, $value;
             }
 
-            if (!isset($series[$row['name']])) {
-                $this->series[$row['name']] = array(
+            if (!isset($series[$row[$name]])) {
+                $this->series[$row[$name]] = array(
                     'name' => $row[$name],
                     'type' => 'spline',
                     'data' => array()
