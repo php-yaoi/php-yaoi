@@ -38,8 +38,6 @@ abstract class Abstract_App {
             }
         });
 
-        require_once './conf/Main.php';
-
         self::$instance = new static;
 
         // TODO properly detect CLI mode and show "Usage" message by default
@@ -57,6 +55,7 @@ abstract class Abstract_App {
             self::$instance->mode = self::MODE_CLI;
         }
 
+        require_once './conf/Main.php';
 
         self::$instance->setUpErrorHandling();
 
