@@ -1,6 +1,6 @@
 <?php
 
-class View_HTMLElement implements  View_Renderer {
+class View_HTMLElement extends Base_Class implements View_Renderer {
     protected $id;
     protected $classes = array();
     protected $attributes;
@@ -21,10 +21,30 @@ class View_HTMLElement implements  View_Renderer {
         return $this;
     }
 
-
-    public function render() {
-        echo $this->__toString();
+    public function setId($id = null) {
+        $this->id = $id;
         return $this;
+    }
+
+    public function setAttribute($name, $value = null) {
+        if (null === $value) {
+            if (array_key_exists($name, $this->attributes)) {
+                unset($this->attributes[$name]);
+            }
+        }
+        else {
+            $this->attributes[$name] = $value;
+        }
+        return $this;
+    }
+
+
+    public function __toString() {
+        ob_start();
+        $this->render();
+        $result = ob_get_contents();
+        ob_end_clean();
+        return $result;
     }
 
     public function isEmpty() {
@@ -36,24 +56,51 @@ class View_HTMLElement implements  View_Renderer {
         }
     }
 
-    public function __toString() {
-        $code = '<' . $this->tag
+    protected function renderHead() {
+        echo '<' . $this->tag
             . (isset($this->id) ? ' id="' . $this->id . '"': '')
-            . (empty($this->classes) ? '' : ' class="' . $this->id .'"')
+            . (empty($this->classes) ? '' : ' class="' . implode(' ', $this->classes) .'"')
         ;
         if ($this->attributes) {
             foreach ($this->attributes as $attribute => $value) {
-                $code .= ' ' . $attribute . '="' . $value . '"';
+                echo ' ' . $attribute . '="' . $value . '"';
             }
         }
-        if ($content = (string)$this->content) {
-            $code .= '>';
-            $code .= $content;
-            $code .= '</' . $this->tag . '>';
+    }
+
+    private $contentExists;
+    protected function renderContentChunk($content) {
+        $contentExists = false;
+        if (($content instanceof Is_Empty) && !$content->isEmpty()) {
+            $contentExists = true;
+        }
+        elseif ($content = (string)$content) {
+            $contentExists = true;
+        }
+
+        if ($contentExists) {
+            if (!$this->contentExists) {
+                $this->contentExists = 1;
+                echo '>';
+            }
+
+            echo $content;
+        }
+    }
+
+    protected function renderTail() {
+        if ($this->contentExists) {
+            echo '</' . $this->tag . '>';
         }
         else {
-            $code .= ' />';
+            echo ' />';
         }
-        return $code;
+    }
+
+    public function render() {
+        $this->renderHead();
+        $this->renderContentChunk($this->content);
+        $this->renderTail();
+        return $this;
     }
 } 
