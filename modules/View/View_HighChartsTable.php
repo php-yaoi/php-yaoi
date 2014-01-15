@@ -82,6 +82,7 @@ class View_HighChartsTable extends View_Table_Renderer {
 
     public function withDateAxis() {
         $this->options['xAxis']['type'] = 'datetime';
+        return $this;
     }
 
     private function seriesFillRegular() {
