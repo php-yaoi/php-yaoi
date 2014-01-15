@@ -21,4 +21,9 @@ class View_Raw extends Base_Class implements View_Renderer {
         echo $this->data;
     }
 
+    public function __toString()
+    {
+        return $this->data;
+    }
+
 } 
