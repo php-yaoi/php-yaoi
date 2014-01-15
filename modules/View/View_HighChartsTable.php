@@ -119,7 +119,7 @@ class View_HighChartsTable extends View_Table_Renderer {
                 $name = $keys[2];
             }
 
-            if (!isset($series[$row[$name]])) {
+            if (!isset($this->series[$row[$name]])) {
                 $this->series[$row[$name]] = array(
                     'name' => $row[$name],
                     'type' => 'spline',
