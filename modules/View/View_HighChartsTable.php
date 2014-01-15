@@ -65,7 +65,9 @@ class View_HighChartsTable extends View_Table_Renderer {
 
 
     protected function renderHead() {
-        $this->id = 'hc-container-' . ++self::$uniqueId;
+        if (null === $this->id) {
+            $this->id = 'hc-container-' . ++self::$uniqueId;
+        }
         parent::renderHead();
     }
 
@@ -114,8 +116,6 @@ class View_HighChartsTable extends View_Table_Renderer {
                 $xAxis = $keys[0];
                 $name = $keys[1];
                 $value = $keys[2];
-
-                echo $xAxis, $name, $value;
             }
 
             if (!isset($series[$row[$name]])) {
