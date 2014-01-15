@@ -7,6 +7,7 @@ class View_HighChartsTable extends View_Table_Renderer {
     public $dataType = self::DATA_TYPE_REGULAR;
     protected $tag = 'div';
     protected $content = '';
+    private $options;
 
     public function __construct(&$rows = null) {
         if (null !== $rows) {
