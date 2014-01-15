@@ -174,7 +174,7 @@ class View_HighChartsTable extends View_Table_Renderer {
         }
     });
 
-    $('#<?=$this->id?>').highcharts(<?= json_encode($this->options) ?>);
+    $('#<?php echo $this->id?>').highcharts(<?php echo json_encode($this->options) ?>);
 })();
 </script><?php
     }
