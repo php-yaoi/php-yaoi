@@ -115,8 +115,8 @@ class View_HighChartsTable extends View_Table_Renderer {
             if (!$keys) {
                 $keys = array_keys($row);
                 $xAxis = $keys[0];
-                $name = $keys[1];
-                $value = $keys[2];
+                $value = $keys[1];
+                $name = $keys[2];
             }
 
             if (!isset($series[$row[$name]])) {
