@@ -116,4 +116,14 @@ class View_HTMLElement extends Base_Class implements View_Renderer {
         $this->renderTail();
         return $this;
     }
+
+
+    public static function escapeContent($s) {
+        return str_replace('<', '&lt;', $s);
+    }
+
+    public static function escapeValue($s) {
+        return str_replace(array('"', "'"), array('&quot;', '&#39;'), $s);
+    }
+
 } 
