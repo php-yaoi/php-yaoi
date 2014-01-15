@@ -10,7 +10,7 @@ abstract class View_Table_Renderer extends View_HTMLElement {
     }
 
     public function setRows(&$rows) {
-        if (!is_array($rows) || $rows instanceof Iterator) {
+        if (!is_array($rows) && !$rows instanceof Iterator) {
             throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
         }
         $this->rows = &$rows;
