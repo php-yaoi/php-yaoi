@@ -57,10 +57,11 @@ class Http_ClientDriver_FileGetContents implements Http_ClientDriver_Interface {
         $this->responseResult = @file_get_contents($this->url, false, $ctx);
         //echo $this->responseResult;
         //die();
-        foreach ($http_response_header as $hdr) {
-            $this->responseHeaders []= $hdr;
+        if (isset($http_response_header)) {
+            foreach ($http_response_header as $hdr) {
+                $this->responseHeaders []= $hdr;
+            }
         }
-
     }
 
     public function getResponseContent() {
