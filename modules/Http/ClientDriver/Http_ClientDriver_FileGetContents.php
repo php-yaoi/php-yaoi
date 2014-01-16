@@ -54,6 +54,9 @@ class Http_ClientDriver_FileGetContents implements Http_ClientDriver_Interface {
         $ctx = stream_context_create($this->context);
         //var_export($this->url);
         //var_export($this->context);
+        if (!$this->url) {
+            throw new Http_ClientException('Empty url', Http_ClientException::EMPTY_URL);
+        }
         $this->responseResult = @file_get_contents($this->url, false, $ctx);
         //echo $this->responseResult;
         //die();
