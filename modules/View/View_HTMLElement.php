@@ -74,7 +74,7 @@ class View_HTMLElement extends Base_Class implements View_Renderer {
         }
     }
 
-    private $contentExists;
+    protected $contentExists;
     protected function renderContentChunk($content) {
         $contentExists = false;
         if (($content instanceof Is_Empty) && !$content->isEmpty()) {
