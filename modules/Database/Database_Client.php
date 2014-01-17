@@ -79,6 +79,7 @@ class Database_Client extends Base_Class implements Mock_Able {
         elseif (null === $dataSet && null !== $this->originalDriver) {
             $this->driver = $this->originalDriver;
         }
+        return $this;
     }
 
     public static function createById($id = 'default') {
