@@ -58,6 +58,11 @@ class Database_Client extends Base_Class implements Mock_Able {
 
 
     protected $originalDriver;
+
+    /**
+     * @param Mock_DataSet $dataSet
+     * @return $this
+     */
     public function mock(Mock_DataSet $dataSet = null)
     {
         if ($dataSet instanceof Mock_DataSetPlay) {
