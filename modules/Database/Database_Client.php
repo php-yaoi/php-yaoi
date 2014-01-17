@@ -61,7 +61,7 @@ class Database_Client extends Base_Class implements Mock_Able {
 
     /**
      * @param Mock_DataSet $dataSet
-     * @return $this
+     * @return Database_Client
      */
     public function mock(Mock_DataSet $dataSet = null)
     {
