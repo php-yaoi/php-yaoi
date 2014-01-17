@@ -67,7 +67,9 @@ class Database_Client extends Base_Class implements Mock_Able {
     {
         if ($dataSet instanceof Mock_DataSetPlay) {
             $driver = new Database_Mock_DriverPlay();
-            $this->originalDriver = $this->driver;
+            if (null === $this->originalDriver) {
+                $this->originalDriver = $this->driver;
+            }
             $driver->mock($dataSet);
             $this->driver = $driver;
         }
@@ -77,12 +79,15 @@ class Database_Client extends Base_Class implements Mock_Able {
                 $this->driver = $this->originalDriver;
             }
             $driver->setOriginalDriver($this->driver);
-            $this->originalDriver = $this->driver;
+            if (null === $this->originalDriver) {
+                $this->originalDriver = $this->driver;
+            }
             $driver->mock($dataSet);
             $this->driver = $driver;
         }
         elseif (null === $dataSet && null !== $this->originalDriver) {
             $this->driver = $this->originalDriver;
+            $this->originalDriver = null;
         }
         return $this;
     }
