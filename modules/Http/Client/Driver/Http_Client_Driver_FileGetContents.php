@@ -1,6 +1,6 @@
 <?php
 
-class Http_ClientDriver_FileGetContents implements Http_ClientDriver_Interface {
+class Http_Client_Driver_FileGetContents implements Http_Client_Driver {
     private $context = array();
 
     private $url;
@@ -55,7 +55,7 @@ class Http_ClientDriver_FileGetContents implements Http_ClientDriver_Interface {
         //var_export($this->url);
         //var_export($this->context);
         if (!$this->url) {
-            throw new Http_ClientException('Empty url', Http_ClientException::EMPTY_URL);
+            throw new Http_Client_Exception('Empty url', Http_Client_Exception::EMPTY_URL);
         }
         $this->responseResult = @file_get_contents($this->url, false, $ctx);
         //echo $this->responseResult;

@@ -3,8 +3,9 @@
 /**
  * Class Http_Client
  * TODO detect response charset
+ * @method Http_Client_Driver getDriver
  */
-class Http_Client {
+class Http_Client extends Client implements Mock_Able {
     public static $globalSettings = array();
 
     const XML_HTTP_REQUEST = 'XMLHttpRequest';
@@ -29,15 +30,16 @@ class Http_Client {
         'Connection' => 'close',
     );
 
-    public function __construct($ignoreGlobalSettings = false) {
+    public function __construct(Http_Client_Dsn $dsn = null) {
+        parent::__construct($dsn);
         $this->reset();
-        if (!$ignoreGlobalSettings) {
-            if (isset(self::$globalSettings['proxy'])) {
-                $this->setProxy(self::$globalSettings['proxy']);
+        if ($dsn) {
+            if ($dsn->proxy) {
+                $this->setProxy($dsn->proxy);
             }
 
-            if (isset(self::$globalSettings['defaultHeaders'])) {
-                $this->defaultHeaders = array_merge($this->defaultHeaders, self::$globalSettings['defaultHeaders']);
+            if ($dsn->defaultHeaders) {
+                $this->defaultHeaders = array_merge($this->defaultHeaders, $dsn->defaultHeaders);
             }
         }
     }
@@ -105,8 +107,15 @@ class Http_Client {
     }
 
 
-    public function fetch() {
-        $driver = new Http_ClientDriver_FileGetContents();
+    public function fetch($url = null) {
+        if (null !== $url) {
+            $this->url = $url;
+        }
+
+        $driver = $this->getDriver();
+        if (null === $driver) {
+            $driver = new Http_Client_Driver_FileGetContents();
+        }
 
         if ($this->proxy) {
             $driver->setProxy($this->proxy);
@@ -175,7 +184,7 @@ class Http_Client {
                 $this->responseHeaders = $driver->getResponseHeaders();
 
                 if (!$this->skipBadRequestException && false === $response) {
-                    $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                    $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
                     $e->request = $driver->getRequest();
                     $e->responseHeaders = $this->responseHeaders;
                     $e->url = $this->url;
@@ -192,7 +201,7 @@ class Http_Client {
             $this->responseHeaders = $driver->getResponseHeaders();
 
             if (!$this->skipBadRequestException && false === $response) {
-                $e = new Http_ClientException('Bad request', Http_ClientException::BAD_REQUEST);
+                $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
                 $e->request = $driver->getRequest();
                 $e->responseHeaders = $this->responseHeaders;
                 $e->url = $this->url;

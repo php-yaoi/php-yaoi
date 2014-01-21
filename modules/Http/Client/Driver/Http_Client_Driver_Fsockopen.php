@@ -1,6 +1,6 @@
 <?php
 
-class Http_ClientDriver_Fsockopen implements Http_ClientDriver_Interface {
+class Http_Client_Driver_Fsockopen implements Http_Client_Driver {
     public function setUrl($url)
     {
         // TODO: Implement setUrl() method.

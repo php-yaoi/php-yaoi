@@ -8,7 +8,11 @@ class String_Dsn extends Base_Class {
     public $port;
     public $path;
 
-    public function __construct($dsnUrl) {
+    public function __construct($dsnUrl = null) {
+        if (null === $dsnUrl) {
+            return;
+        }
+
         if (false === ($pos = strpos($dsnUrl, '://'))) {
             $this->scheme = $dsnUrl;
             return;
