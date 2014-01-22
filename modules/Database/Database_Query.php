@@ -139,6 +139,9 @@ class Database_Query implements Iterator {
             $this->execute();
         }
         $result = $this->db()->fetchAssoc($this->result);
+        if (null === $result) {
+            return null;
+        }
         return null === $field ? $result : $result[$field];
     }
 
