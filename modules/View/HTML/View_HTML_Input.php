@@ -1,6 +1,6 @@
 <?php
 
-class View_HTML_Input extends View_HTMLElement {
+class View_HTML_Input extends View_HTML_Element {
     protected $tag = 'input';
     protected $value;
 
@@ -10,6 +10,7 @@ class View_HTML_Input extends View_HTMLElement {
 
     public function setValue($value) {
         $this->value = $value;
+        $this->setAttribute('value', $value);
         return $this;
     }
 
@@ -18,7 +19,7 @@ class View_HTML_Input extends View_HTMLElement {
             $source = &$_REQUEST;
         }
         if (isset($source[$this->attributes['name']])) {
-            $this->value = $source[$this->attributes['name']];
+            $this->setValue($source[$this->attributes['name']]);
         }
         return $this;
     }

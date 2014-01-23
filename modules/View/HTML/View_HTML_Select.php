@@ -5,6 +5,9 @@ class View_HTML_Select extends View_HTML_Input {
     protected $options = array();
 
     public function setOptions($options) {
+        if (!is_array($options) && !$options instanceof Traversable) {
+            throw new View_Exception('Traversable or array required', View_Exception::WRONG_DATA_TYPE);
+        }
         $this->options = $options;
         return $this;
     }

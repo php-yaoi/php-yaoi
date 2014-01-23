@@ -1,6 +1,6 @@
 <?php
 
-abstract class View_Table_Renderer extends View_HTMLElement {
+abstract class View_Table_Renderer extends View_HTML_Element {
     protected $rows = array();
 
     public function __construct(&$rows = null) {

@@ -1,6 +1,6 @@
 <?php
 
-class View_HTMLElement extends Base_Class implements View_Renderer {
+class View_HTML_Element extends Base_Class implements View_Renderer {
     protected $id;
     protected $classes = array();
     protected $attributes;
