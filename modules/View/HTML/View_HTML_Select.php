@@ -13,6 +13,10 @@ class View_HTML_Select extends View_HTML_Input {
     }
 
     public function render() {
+        if (isset($this->attributes['value'])) {
+            unset($this->attributes['value']);
+        }
+
         $this->renderHead();
         echo '>';
         $this->contentExists = true;
