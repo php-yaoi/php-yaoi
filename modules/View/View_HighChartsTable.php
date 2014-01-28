@@ -61,7 +61,28 @@ class View_HighChartsTable extends View_Table_Renderer {
 
     private $series = array();
 
+    public function setTitle($title) {
+        if ($title) {
+            $this->options['title']['text'] = $title;
+        }
+        else {
+            $this->options['title'] = false;
+        }
+        return $this;
+    }
 
+    public function setYTitle($title) {
+        if ($title) {
+            $this->options['yAxis']['title']['text'] = $title;
+        }
+        else {
+            $this->options['yAxis']['title']['text'] = null;
+        }
+    }
+
+    public function addSeries() {
+
+    }
 
     protected function renderHead() {
         if (null === $this->id) {
