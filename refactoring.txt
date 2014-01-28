@@ -1,0 +1,1 @@
+rename View_HighChartsTable to View_HighCharts
