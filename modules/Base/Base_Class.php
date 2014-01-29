@@ -23,4 +23,13 @@ class Base_Class {
         }
         return new static;
     }
+
+
+    /**
+     * @return static
+     */
+    public function copy() {
+        return clone $this;
+    }
+
 }
