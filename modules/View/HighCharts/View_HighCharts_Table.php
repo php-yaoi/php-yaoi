@@ -56,6 +56,13 @@ class View_HighCharts_Table extends View_Table_Renderer {
         }
     }
 
+    /**
+     * @return View_HighCharts
+     */
+    public function getHighCharts() {
+        return $this->highCharts;
+    }
+
     private function seriesFillNamed() {
         $keys = array();
         $xAxis = false;

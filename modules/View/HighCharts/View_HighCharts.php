@@ -28,7 +28,6 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
             'chart' => array(
                 'renderTo' => '',
-                'zoomType' => 'y',
                 'resetZoomButton' => array(
                     'position' => array(
                         'align' => 'left', // by default
