@@ -1,5 +1,6 @@
 <?php
 
+
 class View_HighCharts_Table extends View_Table_Renderer {
     const DATA_TYPE_REGULAR = 'regular';
     const DATA_TYPE_NAMED = 'named';

@@ -1,5 +1,6 @@
 <?php
 
+
 class View_HighCharts_Series extends Base_Class {
     const TYPE_AREA = 'area';
     const TYPE_AREA_SPLINE = 'areaspline';
