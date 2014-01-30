@@ -7,7 +7,6 @@ class View_HighCharts_Table extends View_Table_Renderer {
     public $dataType = self::DATA_TYPE_REGULAR;
     protected $tag = 'div';
     protected $content = '';
-    private $options;
 
     /**
      * @var View_HighCharts
@@ -15,7 +14,11 @@ class View_HighCharts_Table extends View_Table_Renderer {
     private $highCharts;
 
     public function __construct(&$rows = null) {
-        $this->highCharts = new View_HighCharts($rows);
+        if (null !== $rows) {
+            $this->setRows($rows);
+        }
+
+        $this->highCharts = new View_HighCharts();
     }
 
     static $uniqueId = 0;
@@ -24,6 +27,7 @@ class View_HighCharts_Table extends View_Table_Renderer {
         if (null === $this->id) {
             $this->id = 'hc-container-' . ++self::$uniqueId;
         }
+        $this->highCharts->addOptions(array('chart' => array('renderTo' => $this->id)));
         parent::renderHead();
     }
 
@@ -65,6 +69,8 @@ class View_HighCharts_Table extends View_Table_Renderer {
                 $name = $keys[2];
             }
 
+
+
             $this->highCharts->addRow($row[$xAxis], $row[$value], $row[$name]);
         }
     }
@@ -74,6 +80,13 @@ class View_HighCharts_Table extends View_Table_Renderer {
 
     protected function renderTail() {
         parent::renderTail();
+
+        switch ($this->dataType) {
+            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
+            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
+            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
+        }
+
         $this->highCharts->render();
     }
 

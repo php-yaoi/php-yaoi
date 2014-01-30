@@ -3,29 +3,31 @@
 class View_HighCharts extends Base_Class implements View_Renderer{
     public function isEmpty()
     {
-        // TODO: Implement isEmpty() method.
-    }
-
-    public function render()
-    {
-        // TODO: Implement render() method.
+        return empty($this->series);
     }
 
     public function __toString()
     {
-        // TODO: Implement __toString() method.
+        ob_start();
+        $this->render();
+        $result = ob_get_contents();
+        ob_end_clean();
+        return $result;
     }
 
     private $options;
+    /**
+     * @var View_HighCharts_Series[]
+     */
     private $series = array();
 
 
-    public function __construct($id) {
+    public function __construct() {
         $this->options = array(
             'title' => false,
 
             'chart' => array(
-                'renderTo' => $id,
+                'renderTo' => '',
                 'zoomType' => 'y',
                 'resetZoomButton' => array(
                     'position' => array(
@@ -112,6 +114,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
 
     public function addRow($x, $y, $id = 'default') {
+        //echo 'row added';
         if (!$series = &$this->series[$id]) {
             if ($this->defaultSeries) {
                 $series = clone $this->defaultSeries;
@@ -127,30 +130,31 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
 
 
-    protected function renderData() {
 
-        switch ($this->dataType) {
-            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
-            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
-            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
+    public function render() {
+        $renderTo = $this->options['chart']['renderTo'];
+        $this->options['chart']['renderTo'] = null;
+
+        $this->options['series'] = array();
+        //var_dump($this->series);
+        foreach ($this->series as $series) {
+            $this->options['series'] []= $series->exportOptions();
         }
 
-        $this->options['series'] = array_values($this->series);
-
         ?>
-        <script src="http://code.highcharts.com/stock/highstock.js"></script>
-        <script src="http://code.highcharts.com/highcharts.js"></script>
-        <script>
-            (function(){
-                Highcharts.setOptions({
-                    global: {
-                        useUTC: false
-                    }
-                });
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script>
+(function(){
+    Highcharts.setOptions({
+        global: {
+            useUTC: false
+        }
+    });
 
-                $('#<?php echo $this->id?>').highcharts(<?php echo json_encode($this->options) ?>);
-            })();
-        </script><?php
+    $('#<?php echo $renderTo ?>').highcharts(<?php echo json_encode($this->options) ?>);
+})();
+</script><?php
     }
 
 

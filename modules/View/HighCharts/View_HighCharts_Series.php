@@ -56,6 +56,9 @@ class View_HighCharts_Series extends Base_Class {
     public function setId($id)
     {
         $this->id = $id;
+        if (null === $this->name) {
+            $this->setName($id);
+        }
         return $this;
     }
 
@@ -100,6 +103,12 @@ class View_HighCharts_Series extends Base_Class {
     }
 
     public function exportOptions() {
-        return get_object_vars($this);
+        $result = get_object_vars($this);
+        foreach ($result as $k => $v) {
+            if (null === $v) {
+                unset($result[$k]);
+            }
+        }
+        return $result;
     }
 }
