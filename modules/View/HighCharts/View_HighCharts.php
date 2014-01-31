@@ -91,6 +91,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         else {
             $this->options['yAxis']['title']['text'] = null;
         }
+        return $this;
     }
 
     public function setXTitle($title) {
@@ -100,6 +101,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         else {
             $this->options['xAxis']['title']['text'] = null;
         }
+        return $this;
     }
 
 
