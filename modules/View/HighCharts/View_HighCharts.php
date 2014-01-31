@@ -124,7 +124,23 @@ class View_HighCharts extends Base_Class implements View_Renderer{
             }
             $series->setId($id);
         }
-        $series->addRow($x, $y);
+        if (isset($this->ranges[$id])) {
+            $series->addRangeRow($x, $y, $this->ranges[$id]);
+        }
+        else {
+            $series->addRow($x, $y);
+        }
+        return $this;
+    }
+
+    private $ranges = array();
+    public function addSeries(View_HighCharts_Series $series, $rangeHighId = null) {
+        $this->series[$rangeLowId = $series->getId()] = $series;
+        if (null !== $rangeHighId) {
+            $this->series[$rangeHighId] = $series;
+            $this->ranges[$rangeLowId] = View_HighCharts_Series::VALUE_LOW;
+            $this->ranges[$rangeHighId] = View_HighCharts_Series::VALUE_HIGH;
+        }
         return $this;
     }
 
@@ -137,7 +153,10 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
         $this->options['series'] = array();
         //var_dump($this->series);
-        foreach ($this->series as $series) {
+        foreach ($this->series as $id => $series) {
+            if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
+                continue;
+            }
             $this->options['series'] []= $series->exportOptions();
         }
 

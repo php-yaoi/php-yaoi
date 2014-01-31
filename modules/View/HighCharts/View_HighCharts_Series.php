@@ -40,11 +40,25 @@ class View_HighCharts_Series extends Base_Class {
         return $this;
     }
 
+
+    const VALUE_LOW = 1;
+    const VALUE_HIGH = 2;
+    public function addRangeRow($x, $y, $i = self::VALUE_LOW) {
+        if (!isset($this->data[$x])) {
+            $this->data[$x] = array($x, null, null);
+        }
+        $this->data [$x][$i] = $y;
+    }
+
     public function setZIndex($zIndex) {
         $this->zIndex = $zIndex;
         return $this;
     }
 
+    /**
+     * @param string $type
+     * @return $this
+     */
     public function setType($type = self::TYPE_LINE) {
         $this->type = $type;
         return $this;
@@ -61,6 +75,11 @@ class View_HighCharts_Series extends Base_Class {
             $this->setName($id);
         }
         return $this;
+    }
+
+
+    public function getId() {
+        return $this->id;
     }
 
     /**
@@ -105,6 +124,7 @@ class View_HighCharts_Series extends Base_Class {
 
     public function exportOptions() {
         $result = get_object_vars($this);
+        $result['data'] = array_values($result['data']);
         foreach ($result as $k => $v) {
             if (null === $v) {
                 unset($result[$k]);
