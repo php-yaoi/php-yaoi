@@ -93,6 +93,15 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         }
     }
 
+    public function setXTitle($title) {
+        if ($title) {
+            $this->options['xAxis']['title']['text'] = $title;
+        }
+        else {
+            $this->options['xAxis']['title']['text'] = null;
+        }
+    }
+
 
     public function withDateAxis() {
         $this->options['xAxis']['type'] = 'datetime';
