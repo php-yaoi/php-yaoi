@@ -44,9 +44,9 @@ class View_HighCharts_Series extends Base_Class {
     const VALUE_HIGH = 2;
     public function addRangeRow($x, $y, $i = self::VALUE_LOW) {
         if (!isset($this->data[$x])) {
-            $this->data[$x] = array($x, null, null);
+            $this->data[$x] = array(1 * $x, null, null);
         }
-        $this->data [$x][$i] = $y;
+        $this->data [$x][$i] = 1 * $y;
     }
 
     public function setZIndex($zIndex) {
