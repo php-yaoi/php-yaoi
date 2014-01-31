@@ -68,6 +68,12 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
 
 
+    public function setType($type = View_HighCharts_Series::TYPE_LINE) {
+        $this->options['chaer']['type'] = $type;
+        return $this;
+    }
+
+
     public function setTitle($title) {
         if ($title) {
             $this->options['title']['text'] = $title;
