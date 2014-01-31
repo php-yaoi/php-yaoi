@@ -64,6 +64,7 @@ class View_HighCharts_Series extends Base_Class {
         return $this;
     }
 
+
     /**
      * @param mixed $id
      * @return $this
