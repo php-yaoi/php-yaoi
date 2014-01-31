@@ -28,7 +28,7 @@ class View_HighCharts_Table extends View_Table_Renderer {
         if (null === $this->id) {
             $this->id = 'hc-container-' . ++self::$uniqueId;
         }
-        $this->highCharts->addOptions(array('chart' => array('renderTo' => $this->id)));
+        $this->highCharts->renderToSelector('#' . $this->id);
         parent::renderHead();
     }
 

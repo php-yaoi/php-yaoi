@@ -27,8 +27,8 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         $this->options = array(
             'title' => false,
 
+            /*
             'chart' => array(
-                'renderTo' => '',
                 'resetZoomButton' => array(
                     'position' => array(
                         'align' => 'left', // by default
@@ -38,6 +38,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
                     )
                 )
             ),
+            */
 
             'legend' => array(
                 'enabled' => true,
@@ -145,12 +146,16 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
+    private $renderToSelector;
+    public function renderToSelector($id) {
+        $this->renderToSelector = $id;
+        return $this;
+    }
+
+
 
 
     public function render() {
-        $renderTo = $this->options['chart']['renderTo'];
-        $this->options['chart']['renderTo'] = null;
-
         $this->options['series'] = array();
         //var_dump($this->series);
         foreach ($this->series as $id => $series) {
@@ -161,9 +166,10 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         }
 
         ?>
-<script src="http://code.highcharts.com/stock/highstock.js"></script>
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script>
+<script type="text/javascript" src="http://code.highcharts.com/stock/highstock.js"></script>
+<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
+<script type="text/javascript">
 (function(){
     Highcharts.setOptions({
         global: {
@@ -171,7 +177,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         }
     });
 
-    $('#<?php echo $renderTo ?>').highcharts(<?php echo json_encode($this->options) ?>);
+    $('<?php echo $this->renderToSelector ?>').highcharts(<?php echo json_encode($this->options) ?>);
 })();
 </script><?php
     }
