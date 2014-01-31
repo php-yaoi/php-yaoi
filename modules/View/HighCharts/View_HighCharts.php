@@ -69,7 +69,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
 
     public function setType($type = View_HighCharts_Series::TYPE_LINE) {
-        $this->options['chaer']['type'] = $type;
+        $this->options['chart']['type'] = $type;
         return $this;
     }
 
