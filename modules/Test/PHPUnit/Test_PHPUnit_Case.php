@@ -10,6 +10,6 @@ class Test_PHPUnit_Case  extends PHPUnit_Framework_TestCase {
         parent::runTest();
         $s = microtime(1) - $s;
         self::$totalRuntime += $s;
-        echo "\t", round(1000 * $s), " ms., tot. \t", round(1000 * $s), " ms.\n";
+        echo "\t", round(1000 * $s), " ms.,\t tot. ", round(1000 * self::$totalRuntime), " ms.\n";
     }
 } 
