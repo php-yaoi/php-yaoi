@@ -4,9 +4,9 @@ class Test_PHPUnit_Case  extends PHPUnit_Framework_TestCase {
     public static $settings = array();
 
     public function runTest() {
-        echo 'testing ' , get_called_class(), '->', $this->getName();
+        echo 'testing ' , str_pad(get_called_class() . '->' . $this->getName() . ',', 30, ' ');
         $s = microtime(1);
         parent::runTest();
-        echo ', ', microtime(1) - $s, " s.\n";
+        echo "\t", round(1000 * (microtime(1) - $s)), " ms.\n";
     }
 } 
