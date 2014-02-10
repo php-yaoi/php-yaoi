@@ -1,6 +1,5 @@
 <?php
 
-
 class View_HighCharts extends Base_Class implements View_Renderer{
     public function isEmpty()
     {
