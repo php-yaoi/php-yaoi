@@ -1,7 +1,7 @@
 <?php
 
-class Storage_Var extends Storage_Client {
+class Storage_Var extends Storage {
     public function __construct() {
-        $this->driver = new Storage_Driver_PhpVar();
+        $this->forceDriver(new Storage_Driver_PhpVar());
     }
 } 

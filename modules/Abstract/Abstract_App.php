@@ -63,14 +63,40 @@ abstract class Abstract_App {
 
     protected function setUpErrorHandling() {
         $app = $this;
-        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext) use ($app) {
-            file_put_contents($app->logPath . 'php-errors-' . $errno . '.log',
+        $errorLevels = array(
+            E_ERROR => 'error',
+            E_WARNING => 'warning',
+            E_PARSE => 'parse',
+            E_NOTICE => 'notice',
+            E_CORE_ERROR => 'core-error',
+            E_CORE_WARNING => 'core-warning',
+            E_COMPILE_ERROR => 'compile-error',
+            E_COMPILE_WARNING => 'compile-warning',
+            E_USER_ERROR => 'user-error',
+            E_USER_WARNING => 'user-warning',
+            E_USER_NOTICE => 'user-notice',
+            E_STRICT => 'strict',
+            E_RECOVERABLE_ERROR => 'recoverable-error',
+            E_DEPRECATED => 'deprecated',
+            E_USER_DEPRECATED => 'user-deprecated',
+            E_ALL => 'all',
+        );
+
+
+        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext) use ($app, $errorLevels) {
+
+            file_put_contents($app->logPath . 'php-errors-' . $errorLevels[$errno] . '.log',
                 date('r') . "\t" . App::instance()->path
                 . "\t" . $errno . "\t" . $errstr . "\t" . $errfile . ':' . $errline . "\t"
                 . PHP_EOL
                 //. Debug::backTrace(0, Debug::TRACE_TEXT)
                 ,
                 FILE_APPEND);
+
+            if (E_RECOVERABLE_ERROR == $errno) {
+                throw new Exception($errstr, $errno);
+            }
+
         };
 
         register_shutdown_function(function() use ($errorHandler) {
@@ -112,19 +138,7 @@ abstract class Abstract_App {
     }
 
     static function cache($id = 'default') {
-        $resource = &self::$resources['st_' . $id];
-        if (!isset($resource)) {
-            if (isset(Storage_Conf::$dsn[$id])) {
-                $resource = new Storage_Client(Storage_Conf::$dsn[$id]);
-            }
-            elseif ('default' == $id) {
-                throw new Storage_Exception('Default storage connection not configured', Storage_Exception::DEFAULT_NOT_SET);
-            }
-            else {
-                $resource = static::cache();
-            }
-        }
-        return $resource;
+        return Storage::getInstance($id);
     }
 
     /**
@@ -145,11 +159,7 @@ abstract class Abstract_App {
      * @return Log
      */
     static function log($id = 'default') {
-        $resource = &self::$resources['log_' . $id];
-        if (!isset($resource)) {
-            $resource = Log::createById($id);
-        }
-        return $resource;
+        return Log::getInstance($id);
     }
 
 }

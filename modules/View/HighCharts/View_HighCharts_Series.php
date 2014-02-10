@@ -47,6 +47,7 @@ class View_HighCharts_Series extends Base_Class {
             $this->data[$x] = array(1 * $x, null, null);
         }
         $this->data [$x][$i] = 1 * $y;
+        return $this;
     }
 
     public function setZIndex($zIndex) {

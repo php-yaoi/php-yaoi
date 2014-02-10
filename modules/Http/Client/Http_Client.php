@@ -32,6 +32,9 @@ class Http_Client extends Client implements Mock_Able {
 
     public function __construct(Http_Client_Dsn $dsn = null) {
         parent::__construct($dsn);
+        if (null === $dsn) {
+            $dsn = $this->dsn = new Http_Client_Dsn();
+        }
         $this->reset();
         if ($dsn) {
             if ($dsn->proxy) {
@@ -113,9 +116,7 @@ class Http_Client extends Client implements Mock_Able {
         }
 
         $driver = $this->getDriver();
-        if (null === $driver) {
-            $driver = new Http_Client_Driver_FileGetContents();
-        }
+        $driver->reset();
 
         if ($this->proxy) {
             $driver->setProxy($this->proxy);

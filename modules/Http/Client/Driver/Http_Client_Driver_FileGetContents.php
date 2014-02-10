@@ -8,6 +8,10 @@ class Http_Client_Driver_FileGetContents implements Http_Client_Driver {
     private $responseResult;
 
     public function __construct() {
+        $this->reset();
+    }
+
+    public function reset() {
         $this->context = array(
             'http' => array(
                 'method' => 'GET',
@@ -19,6 +23,7 @@ class Http_Client_Driver_FileGetContents implements Http_Client_Driver {
             ),
         );
     }
+
 
     public function setUrl($url) {
         $this->url = $url;

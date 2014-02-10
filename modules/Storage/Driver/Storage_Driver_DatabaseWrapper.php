@@ -5,7 +5,16 @@
  * TODO implement, WIP!
  */
 
-class Storage_Driver_DatabaseWrapper extends Storage_Driver {
+class Storage_Driver_DatabaseWrapper implements  Storage_Driver {
+    /**
+     * @var Storage_Dsn
+     */
+    protected $dsn;
+
+    public function __construct(Storage_Dsn $dsn = null)
+    {
+        $this->dsn = $dsn;
+    }
 
     private $table;
     private $clientId;

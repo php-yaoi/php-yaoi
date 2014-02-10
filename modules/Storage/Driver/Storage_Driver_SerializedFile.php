@@ -1,6 +1,16 @@
 <?php
 
-class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar implements Storage_ArrayKey {
+class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar {
+
+    /**
+     * @var Storage_Dsn
+     */
+    protected $dsn;
+
+    public function __construct(Storage_Dsn $dsn = null)
+    {
+        $this->dsn = $dsn;
+    }
 
     protected $fileName;
     protected $loaded;

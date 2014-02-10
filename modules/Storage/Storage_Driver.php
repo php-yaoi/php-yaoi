@@ -4,10 +4,11 @@
  * Class Storage_Driver
  * TODO string only high performance cache
  */
-abstract class Storage_Driver {
+interface Storage_Driver {
     /**
      * @var Storage_Dsn
      */
+    /*
     protected $dsn;
     public function __construct(Storage_Dsn $dsn = null) {
         $this->dsn = $dsn;
@@ -19,10 +20,12 @@ abstract class Storage_Driver {
 
         }
     }
+    */
 
-    abstract function get($key);
-    abstract function keyExists($key);
-    abstract function set($key, $value, $ttl);
-    abstract function delete($key);
-    abstract function deleteAll();
+    public function __construct(Storage_Dsn $dsn = null);
+    public function get($key);
+    public function keyExists($key);
+    public function set($key, $value, $ttl);
+    public function delete($key);
+    public function deleteAll();
 }

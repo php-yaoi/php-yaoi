@@ -14,7 +14,7 @@ class Mock_DataSetBase implements Mock_DataSet {
 
     protected $branchKey = array();
 
-    public function __construct(Storage_Client $storage) {
+    public function __construct(Storage $storage) {
         $this->storage = $storage;
     }
 

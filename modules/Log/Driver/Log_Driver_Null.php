@@ -1,7 +1,7 @@
 <?php
 
-class Log_Null extends Log {
-    public function __construct(String_Dsn $dsn)
+class Log_Driver_Null implements Log_Driver {
+    public function __construct(Log_Dsn $dsn = null)
     {
     }
 

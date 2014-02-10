@@ -1,6 +1,15 @@
 <?php
 
-class Storage_Driver_Memcache extends Storage_Driver {
+class Storage_Driver_Memcache implements  Storage_Driver {
+    /**
+     * @var Storage_Dsn
+     */
+    protected $dsn;
+
+    public function __construct(Storage_Dsn $dsn = null)
+    {
+        $this->dsn = $dsn;
+    }
 
     /**
      * @var Memcache
@@ -21,14 +30,23 @@ class Storage_Driver_Memcache extends Storage_Driver {
                 $port = 11211;
             }
         }
-        $this->memcache->connect($hostname, $port, $this->dsn->connectionTimeout);
+        $timeout = $this->dsn->connectionTimeout;
+        $result = $this->memcache->connect($hostname, $port, $timeout);
+        if (!$result) {
+            throw new Storage_Exception("Connection failed ($hostname, $port, $timeout)", Storage_Exception::CONNECTION_FAILED);
+        }
+        return $result;
     }
 
     public function set($key, $value, $ttl) {
         if (null === $this->memcache) {
             $this->connect();
         }
-        return $this->memcache->set($key, $value, 0, $ttl);
+        $result = $this->memcache->set($key, $value, 0, $ttl);
+        if (!$result) {
+            throw new Storage_Exception('Set failed', Storage_Exception::SET_FAILED);
+        }
+        return $result;
     }
 
     function keyExists($key) {

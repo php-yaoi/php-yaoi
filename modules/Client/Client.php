@@ -3,7 +3,29 @@
 abstract class Client extends Base_Class {
     public static $conf = array();
 
-    public function __construct(String_Dsn $dsn = null) {
+    /**
+     * @param String_Dsn|string|Closure|null $dsn
+     */
+    public function __construct($dsn = null) {
+        if (null === $dsn) {
+            return;
+        }
+
+        if (!$dsn instanceof String_Dsn) {
+            if ($dsn instanceof Closure) {
+                $dsn = $dsn();
+            }
+            else {
+                /**
+                 * @see String_Dsn descendants
+                 */
+                $class = get_called_class() . '_Dsn';
+                //$dsn = new String_Dsn($dsn);
+                $dsn = new $class($dsn);
+            }
+        }
+
+
         $this->dsn = $dsn;
     }
 
@@ -33,20 +55,11 @@ abstract class Client extends Base_Class {
     }
 
     /**
-     * @param String_Dsn $dsn
+     * @param String_Dsn|string|Closure $dsn
      * @return static
      * @throws Client_Exception
      */
     public static function createByDsn($dsn) {
-        if (!$dsn instanceof String_Dsn) {
-            if ($dsn instanceof Closure) {
-                $dsn = $dsn();
-            }
-            else {
-                $dsn = new String_Dsn($dsn);
-            }
-        }
-
         $resource = new static($dsn);
         return $resource;
     }
@@ -71,9 +84,6 @@ abstract class Client extends Base_Class {
     private $driver;
     protected function getDriver() {
         if (null === $this->driver) {
-            if (null === $this->dsn) {
-                return null;
-            }
             $driverClass = get_called_class() . '_Driver_' . String_Utils::toCamelCase($this->dsn->scheme, '-');
             if (!class_exists($driverClass)) {
                 throw new Client_Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Client_Exception::NO_DRIVER);
@@ -82,6 +92,10 @@ abstract class Client extends Base_Class {
         }
 
         return $this->driver;
+    }
+
+    protected function forceDriver($driver) {
+        $this->driver = $driver;
     }
 
 

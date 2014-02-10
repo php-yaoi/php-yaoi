@@ -5,6 +5,26 @@ class Debug {
     const TRACE_FILE = 'file';
     const TRACE_TEXT = 'text';
 
+    public static $errorLevels = array(
+        E_ERROR => 'error',
+        E_WARNING => 'warning',
+        E_PARSE => 'parse',
+        E_NOTICE => 'notice',
+        E_CORE_ERROR => 'core-error',
+        E_CORE_WARNING => 'core-warning',
+        E_COMPILE_ERROR => 'compile-error',
+        E_COMPILE_WARNING => 'compile-warning',
+        E_USER_ERROR => 'user-error',
+        E_USER_WARNING => 'user-warning',
+        E_USER_NOTICE => 'user-notice',
+        E_STRICT => 'strict',
+        E_RECOVERABLE_ERROR => 'recoverable-error',
+        E_DEPRECATED => 'deprecated',
+        E_USER_DEPRECATED => 'user-deprecated',
+        E_ALL => 'all',
+    );
+
+
     public static $isActive = false;
 
     public static function backTrace($skip = 0, $return = self::TRACE_HTML) {

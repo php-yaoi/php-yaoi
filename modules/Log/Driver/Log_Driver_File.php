@@ -1,11 +1,15 @@
 <?php
 
-class Log_File extends Log {
+class Log_Driver_File implements Log_Driver {
     private $handle;
     private $hits = 0;
     private $fileName;
 
-    public function __construct(String_Dsn $dsn) {
+    public function __construct(Log_Dsn $dsn = null) {
+        if (null === $dsn) {
+            throw new Client_Exception('Log filename required in config dsn', Client_Exception::DSN_REQUIRED);
+        }
+
         $this->fileName = $dsn->path;
         $this->fileName = '/' == $this->fileName[0]
             ? $this->fileName

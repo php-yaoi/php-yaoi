@@ -1,6 +1,9 @@
 <?php
 
-class Storage_Driver_PhpVar extends Storage_Driver implements Storage_ArrayKey, Storage_ExportImportArray {
+class Storage_Driver_PhpVar implements Storage_Driver, Storage_ArrayKey, Storage_ExportImportArray {
+    public function __construct(Storage_Dsn $dsn = null) {
+    }
+
     protected $data = array();
     protected $modified = false;
 
