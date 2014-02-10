@@ -3,12 +3,12 @@
 class Mock_DataSetBase implements Mock_DataSet {
     protected $sequenceId = 0;
     /**
-     * @var Storage_Client
+     * @var Storage
      */
     protected $branches;
 
     /**
-     * @var Storage_Client
+     * @var Storage
      */
     protected $storage;
 
