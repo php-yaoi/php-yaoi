@@ -173,7 +173,24 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
+    public $globalOptions = array(
+        'global' => array(
+            'useUTC' => false
+        ),
+    );
 
+    public function langRussian()
+    {
+        $this->globalOptions['lang'] = array(
+            'shortMonths' => array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'),
+            'rangeSelectorFrom' => 'C',
+            'rangeSelectorTo' => 'по',
+            'rangeSelectorZoom' => 'Период',
+            'thousandsSep' => '',
+            'weekdays' => array('Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота')
+        );
+        return $this;
+    }
 
     public function render() {
         $this->options['series'] = array();
@@ -191,11 +208,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 <script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
 <script type="text/javascript">
 (function(){
-    Highcharts.setOptions({
-        global: {
-            useUTC: false
-        }
-    });
+    Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
     $('<?php echo $this->renderToSelector ?>').highcharts(<?php echo json_encode($this->options) ?>);
 })();

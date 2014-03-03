@@ -56,6 +56,12 @@ class View_HighCharts_Table extends View_Table_Renderer {
         }
     }
 
+    public function withChartDo(Closure $closure) {
+        $closure($this->highCharts);
+        return $this;
+    }
+
+
     /**
      * @return View_HighCharts
      */
