@@ -5,4 +5,5 @@ class Client_Exception extends Exception {
     const NO_ANSWER = 3;
     const BAD_ANSWER = 4;
     const DSN_REQUIRED = 5;
+    const INVALID_ARGUMENT = 6;
 }

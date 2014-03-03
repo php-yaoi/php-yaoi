@@ -5,26 +5,26 @@ abstract class Client extends Base_Class {
 
     /**
      * @param String_Dsn|string|Closure|null $dsn
+     * @throws Client_Exception
      */
     public function __construct($dsn = null) {
+        if ($dsn instanceof Closure) {
+            $dsn = $dsn();
+        }
+
         if (null === $dsn) {
             return;
         }
-
-        if (!$dsn instanceof String_Dsn) {
-            if ($dsn instanceof Closure) {
-                $dsn = $dsn();
-            }
-            else {
-                /**
-                 * @see String_Dsn descendants
-                 */
-                $class = get_called_class() . '_Dsn';
-                //$dsn = new String_Dsn($dsn);
-                $dsn = new $class($dsn);
-            }
+        elseif (is_string($dsn)) {
+            /**
+             * @see String_Dsn descendants
+             */
+            $class = get_called_class() . '_Dsn';
+            $dsn = new $class($dsn);
         }
-
+        elseif (!$dsn instanceof String_Dsn) {
+            throw new Client_Exception('Invalid argument', Client_Exception::INVALID_ARGUMENT);
+        }
 
         $this->dsn = $dsn;
     }
@@ -36,13 +36,13 @@ abstract class Client extends Base_Class {
      * @return static
      * @throws Client_Exception
      */
-    public static function createByConfId($id = 'default', $originalId = null) {
+    private static function createByConfId($id = 'default', $originalId = null) {
         if (isset(static::$conf[$id])) {
             $dsn = static::$conf[$id];
             if ($originalId) {
                 $dsn->originalId = $originalId;
             }
-            $resource = static::createByDsn($dsn);
+            $resource = new static($dsn);
         }
         elseif ('default' == $id) {
             throw new Client_Exception('Default ' . get_called_class() . ' not configured',
@@ -54,30 +54,40 @@ abstract class Client extends Base_Class {
         return $resource;
     }
 
-    /**
-     * @param String_Dsn|string|Closure $dsn
-     * @return static
-     * @throws Client_Exception
-     */
-    public static function createByDsn($dsn) {
-        $resource = new static($dsn);
-        return $resource;
-    }
-
-
     private static $instances = array();
 
     /**
      * @param string $id
-     * @return static
+     * @param bool $reuse
+     * @return Client|string|static
+     * @throws Client_Exception
      */
-    public static function getInstance($id = 'default') {
-        $resource = &self::$instances[$id];
-        if (!isset($resource)) {
+    public static function getInstance($id = 'default', $reuse = true) {
+        if (is_string($id)) {
+            if ($reuse) {
+                $resource = &self::$instances[$id];
+                if (!isset($resource)) {
+                    $resource = static::createByConfId($id);
+                }
+            }
+
             $resource = static::createByConfId($id);
+
+            return $resource;
         }
-        return $resource;
+
+        if ($id instanceof Client) {
+            return $id;
+        }
+
+        if ($id instanceof String_Dsn || $id instanceof Closure) {
+            return new static($id);
+        }
+
+        throw new Client_Exception('Invalid argument', Client_Exception::INVALID_ARGUMENT);
     }
+
+
 
     protected $dsn;
 
