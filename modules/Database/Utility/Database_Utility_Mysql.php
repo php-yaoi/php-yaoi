@@ -3,7 +3,7 @@
 class Database_Utility_Mysql extends Base_Class {
     private $client;
 
-    public function __construct(Database_Client $client) {
+    public function __construct(Database $client) {
         if ($client->getDriver() instanceof Database_Server_Mysql) {
             throw new Database_Exception('Wrong server type', Database_Exception::WRONG_SERVER_TYPE);
         }

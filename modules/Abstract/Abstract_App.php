@@ -132,7 +132,7 @@ abstract class Abstract_App {
     static function &db($id = 'default') {
         $resource = &self::$resources['db_' . $id];
         if (!isset($resource)) {
-            $resource = Database_Client::createById($id);
+            $resource = Database::createById($id);
         }
         return $resource;
     }

@@ -22,3 +22,10 @@ class Client {
     public static function createByConfId() {}
 }
 //*/
+
+
+// 2014.03.04
+// rename Database_Client to Database
+/*
+class Database_Client {}
+//*/

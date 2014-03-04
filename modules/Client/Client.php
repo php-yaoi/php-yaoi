@@ -92,7 +92,7 @@ abstract class Client extends Base_Class {
     protected $dsn;
 
     private $driver;
-    protected function getDriver() {
+    public function getDriver() {
         if (null === $this->driver) {
             $driverClass = get_called_class() . '_Driver_' . String_Utils::toCamelCase($this->dsn->scheme, '-');
             if (!class_exists($driverClass)) {

@@ -20,7 +20,7 @@ class Storage_Driver_DatabaseWrapper implements  Storage_Driver {
     private $clientId;
 
     /**
-     * @return Database_Client
+     * @return Database
      */
     private function client() {
         if (null === $this->clientId) {

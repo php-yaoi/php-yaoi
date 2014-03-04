@@ -10,7 +10,7 @@ class Sql_Expression {
     private $binds;
     private $client;
 
-    public function setDbClient(Database_Client $client) {
+    public function setDbClient(Database $client) {
         $this->client = $client;
     }
 
