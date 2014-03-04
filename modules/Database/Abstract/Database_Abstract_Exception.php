@@ -8,4 +8,7 @@ abstract class Database_Abstract_Exception extends Exception {
     const QUERY_ERROR = 5;
     const PLACEHOLDER_NOT_FOUND = 6;
     const PLACEHOLDER_REDUNDANT = 7;
+
+
+    public $query;
 }
