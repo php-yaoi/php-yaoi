@@ -1,9 +1,11 @@
 <?php
 
-class Debug {
+class Debug extends Client {
     const TRACE_HTML = 'html';
     const TRACE_FILE = 'file';
     const TRACE_TEXT = 'text';
+
+    const LOG = 'debug';
 
     public static $errorLevels = array(
         E_ERROR => 'error',
@@ -65,4 +67,5 @@ class Debug {
             $result[self::TRACE_HTML] . '</div>';
         return $return ? $result[$return] : $result;
     }
-} 
+
+}
