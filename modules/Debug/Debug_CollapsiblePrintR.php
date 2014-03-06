@@ -11,105 +11,13 @@ class Debug_CollapsiblePrintR extends View_HTML_Element {
         $this->content = print_r($var, 1);
     }
 
-
+    /**
+     * @link https://github.com/vearutop/javascript-print_r-tree
+     */
     public function renderTail() {
         parent::renderTail();
         ?>
-<script>
-    (function(){
-        var ss=document.getElementsByTagName('script');var c = (ss[ss.length-1]).previousSibling;
-
-        function prepareString(s) {
-            return s.replace(/(Array|Object)\n(\s*)\(/g,
-                    '<span class="debug-controls"><a class="toggle-display" href="#">$1</a> ' +
-                        '<a class="toggle-children" href="#" title="toggle children">\\</a> ' +
-                        '<a class="toggle-recursive" href="#" title="toggle recursive">*</a> ' +
-                        '</span><span class="debug-data" style="display:none"> ' +
-                        '\n$2(')
-                .replace(/\n(\s*?)\)\n/g, '\n$1)\n</span>');
-        }
-
-        function toggleDisplay(e, show) {
-            if ('undefined' == typeof show) {
-                show = autoShow(e, 0);
-            }
-
-            e.style.display = show ? '' : 'none';
-            return show;
-        }
-
-        function autoShow(e, level) {
-            var show;
-            if (!level) {
-                return e.style.display == 'none';
-            }
-            else {
-                for (var i = 0; i < e.childNodes.length; ++i) {
-                    if ('debug-data' == e.childNodes[i].className) {
-                        show = autoShow(e.childNodes[i], level - 1);
-                        if (-1 != show) {
-                            return show;
-                        }
-                    }
-                }
-            }
-            return -1;
-        }
-
-
-        function toggleChildren(e, recursive, show) {
-            if ('undefined' == typeof show) {
-                show = autoShow(e, recursive ? 2 : 1);
-                if (-1 == show) {
-                    if (recursive) {
-                        toggleChildren(e, false);
-                        return;
-                    }
-                    else {
-                        toggleDisplay(e);
-                        return;
-                    }
-                }
-            }
-            for (var i = 0; i < e.childNodes.length; ++i) {
-                if ('debug-data' == e.childNodes[i].className) {
-                    toggleDisplay(e.childNodes[i], show);
-                    if (recursive) {
-                        toggleChildren(e.childNodes[i], true, show);
-                    }
-                }
-            }
-            if (show) {
-                toggleDisplay(e, show);
-            }
-        }
-
-        function prepare(e) {
-            e.innerHTML = prepareString(e.innerHTML);
-            var a = e.getElementsByTagName('a');
-            for (var i = 0; i < a.length; ++i) {
-                a[i].onclick = function() {
-                    var cls = this.className, element = this.parentNode.nextSibling;
-                    if (cls == 'toggle-display') {
-                        toggleDisplay(element);
-                    }
-                    else if (cls == 'toggle-children') {
-                        toggleChildren(element, false);
-                    }
-                    else if (cls == 'toggle-recursive') {
-                        toggleChildren(element, true);
-                    }
-
-
-                    return false;
-                };
-            }
-        }
-
-        prepare(c);
-
-    })();
-</script>
+<script type="text/javascript">(function(e){function n(e){return e.replace(/(Array|Object)\n(\s*)\(/g,'<span class="debug-controls"><a class="toggle-display" href="#">$1</a> '+'<a class="toggle-children" href="#" title="toggle children">\\</a> '+'<a class="toggle-recursive" href="#" title="toggle recursive">*</a> '+'</span><span class="debug-data" style="display:none"> '+"\n$2(").replace(/\n(\s*?)\)\n/g,"\n$1)\n</span>")}function r(e,t){if("undefined"==typeof t){t=i(e,0)}e.style.display=t?"":"none";return t}function i(e,t){var n;if(!t){return e.style.display=="none"}else{for(var r=0;r<e.childNodes.length;++r){if("debug-data"==e.childNodes[r].className){n=i(e.childNodes[r],t-1);if(-1!=n){return n}}}}return-1}function s(e,t,n){if("undefined"==typeof n){n=i(e,t?2:1);if(-1==n){if(t){s(e,false);return}else{r(e);return}}}for(var o=0;o<e.childNodes.length;++o){if("debug-data"==e.childNodes[o].className){r(e.childNodes[o],n);if(t){s(e.childNodes[o],true,n)}}}if(n){r(e,n)}}function o(e){e.innerHTML=n(e.innerHTML);var t=e.getElementsByTagName("a");for(var i=0;i<t.length;++i){t[i].onclick=function(){var e=this.className,t=this.parentNode.nextSibling;if(e=="toggle-display"){r(t)}else if(e=="toggle-children"){s(t,false)}else if(e=="toggle-recursive"){s(t,true)}return false}}if("none"==e.style.display){e.style.display=""}}if("undefined"==typeof e){var t=document.getElementsByTagName("script");e=t[t.length-1].previousSibling}o(e)})()</script>
     <?php
     }
 }
