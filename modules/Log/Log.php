@@ -3,6 +3,7 @@
 /**
  * Class Log
  * @method Log_Driver getDriver()
+ * @method static Log getInstance($id = 'default', $reuse = true)
  */
 class Log extends Client {
     const TYPE_MESSAGE = 'm';

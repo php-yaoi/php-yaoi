@@ -3,7 +3,7 @@
 class Log_Driver_Storage implements Log_Driver {
     public function __construct(Log_Dsn $dsn = null)
     {
-        $this->storage = Storage::getInstance($dsn->scheme);
+        $this->storage = Storage::getInstance($dsn->storage);
     }
 
     /**
