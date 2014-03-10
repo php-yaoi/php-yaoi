@@ -1,6 +1,7 @@
 <?php
 
 class Database extends Client implements Mock_Able {
+    public static $conf = array();
 
     /**
      * @param null $statement
