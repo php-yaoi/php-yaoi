@@ -1,6 +1,6 @@
 <?php
 
-class Debug extends Client {
+class Debug {
     const TRACE_HTML = 'html';
     const TRACE_FILE = 'file';
     const TRACE_TEXT = 'text';
