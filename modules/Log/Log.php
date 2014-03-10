@@ -6,6 +6,8 @@
  * @method static Log getInstance($id = 'default', $reuse = true)
  */
 class Log extends Client {
+    public static $conf = array();
+
     const TYPE_MESSAGE = 'm';
     const TYPE_ERROR = 'e';
     const TYPE_SUCCESS = 's';

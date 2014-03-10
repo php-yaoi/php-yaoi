@@ -90,6 +90,7 @@ class Database extends Client implements Mock_Able {
     private $log;
     public function log(Log $log = null) {
         $this->log = $log;
+        return $this;
     }
 
 }

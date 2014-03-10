@@ -1,7 +1,7 @@
 <?php
 
 abstract class Client extends Base_Class {
-    public static $conf = array();
+    //public static $conf = array();
 
     /**
      * @param String_Dsn|string|Closure|null $dsn
@@ -44,7 +44,7 @@ abstract class Client extends Base_Class {
             }
             $resource = new static($dsn);
         }
-        elseif ('default' == $id) {
+        elseif ('default' === $id) {
             throw new Client_Exception('Default ' . get_called_class() . ' not configured',
                 Client_Exception::DEFAULT_NOT_SET);
         }
@@ -54,24 +54,25 @@ abstract class Client extends Base_Class {
         return $resource;
     }
 
-    private static $instances = array();
+    protected static $instances = array();
 
     /**
      * @param string $id
      * @param bool $reuse
-     * @return Client|string|static
+     * @return static
      * @throws Client_Exception
      */
     public static function getInstance($id = 'default', $reuse = true) {
         if (is_string($id)) {
             if ($reuse) {
-                $resource = &self::$instances[$id];
+                $resource = &static::$instances[$id];
                 if (!isset($resource)) {
                     $resource = static::createByConfId($id);
                 }
             }
-
-            $resource = static::createByConfId($id);
+            else {
+                $resource = static::createByConfId($id);
+            }
 
             return $resource;
         }

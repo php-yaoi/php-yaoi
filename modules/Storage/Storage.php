@@ -5,6 +5,8 @@
  * @method Storage_Driver|Storage_ExportImportArray|Storage_ArrayKey getDriver()
  */
 class Storage extends Client {
+    public static $conf = array();
+
     public function get($key)
     {
         $this->prepareKey($key);

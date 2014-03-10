@@ -16,7 +16,12 @@ class Storage_Driver_PhpVar implements Storage_Driver, Storage_ArrayKey, Storage
             $kk = $value;
         }
         else {
-            $this->data[$key] = $value;
+            if (null === $key) {
+                $this->data []= $value;
+            }
+            else {
+                $this->data[$key] = $value;
+            }
         }
 
         $this->modified = true;
