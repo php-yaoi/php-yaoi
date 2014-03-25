@@ -22,7 +22,7 @@ class Log_Driver_File implements Log_Driver {
      * @return $this
      */
     public function push($message, $type = Log::TYPE_MESSAGE) {
-        $message = App::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
+        $message = Yaoi::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
 
         if (++$this->hits > 5) {
             if (is_null($this->handle)) {

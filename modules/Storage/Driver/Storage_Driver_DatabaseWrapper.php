@@ -24,7 +24,7 @@ class Storage_Driver_DatabaseWrapper implements  Storage_Driver {
      */
     private function client() {
         if (null === $this->clientId) {
-            $client = App::db($this->dsn->instanceId);
+            $client = Yaoi::db($this->dsn->instanceId);
             $this->clientId = DependencyRepository::add($client);
         }
         return DependencyRepository::$items[$this->clientId];
