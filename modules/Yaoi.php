@@ -80,7 +80,7 @@ class Yaoi {
      * @param string $id
      * @return Database
      */
-    static function &db($id = 'default') {
+    static function db($id = 'default') {
         return Database::getInstance($id);
     }
 

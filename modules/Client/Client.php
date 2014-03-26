@@ -4,16 +4,17 @@ abstract class Client extends Base_Class {
     //public static $conf = array();
 
     /**
-     * @param String_Dsn|string|Closure|null $dsn
+     * @param null $dsn
+     * @return null|String_Dsn
      * @throws Client_Exception
      */
-    public function __construct($dsn = null) {
+    public static function dsn($dsn = null) {
         if ($dsn instanceof Closure) {
             $dsn = $dsn();
         }
 
         if (null === $dsn) {
-            return;
+            return $dsn;
         }
         elseif (is_string($dsn)) {
             /**
@@ -25,8 +26,16 @@ abstract class Client extends Base_Class {
         elseif (!$dsn instanceof String_Dsn) {
             throw new Client_Exception('Invalid argument', Client_Exception::INVALID_ARGUMENT);
         }
+        return $dsn;
+    }
 
-        $this->dsn = $dsn;
+
+    /**
+     * @param String_Dsn|string|Closure|null $dsn
+     * @throws Client_Exception
+     */
+    public function __construct($dsn = null) {
+        $this->dsn = static::dsn($dsn);
     }
 
 
@@ -38,7 +47,7 @@ abstract class Client extends Base_Class {
      */
     private static function createByConfId($id = 'default', $originalId = null) {
         if (isset(static::$conf[$id])) {
-            $dsn = static::$conf[$id];
+            $dsn = static::dsn(static::$conf[$id]);
             if ($originalId) {
                 $dsn->originalId = $originalId;
             }
