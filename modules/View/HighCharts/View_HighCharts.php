@@ -109,8 +109,10 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
-    public function withDateAxis() {
+    private $literalDateAxis;
+    public function withDateAxis($literal = false) {
         $this->options['xAxis']['type'] = 'datetime';
+        $this->literalDateAxis = $literal;
         return $this;
     }
 
@@ -136,6 +138,10 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
 
     public function addRow($x, $y, $id = 'default') {
+        if ($this->literalDateAxis) {
+            $x = 1000 * strtotime($x);
+        }
+
         //echo 'row added';
         if (!$series = &$this->series[$id]) {
             if ($this->defaultSeries) {
