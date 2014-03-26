@@ -72,19 +72,6 @@ class Database extends Client implements Mock_Able {
         return $this;
     }
 
-    public static function createById($id = 'default') {
-        if (isset(Database_Conf::$dsn[$id])) {
-            $resource = new Database(Database_Conf::$dsn[$id]);
-        }
-        elseif ('default' == $id) {
-            throw new Database_Exception('Default database connection not configured', Database_Exception::DEFAULT_NOT_SET);
-        }
-        else {
-            $resource = self::createById('default');
-        }
-        return $resource;
-    }
-
     /**
      * @var Log
      */
