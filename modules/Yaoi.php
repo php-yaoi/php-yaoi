@@ -75,12 +75,13 @@ class Yaoi {
 
 
     private static $resources = array();
+
+    /**
+     * @param string $id
+     * @return Database
+     */
     static function &db($id = 'default') {
-        $resource = &self::$resources['db_' . $id];
-        if (!isset($resource)) {
-            $resource = Database::createById($id);
-        }
-        return $resource;
+        return Database::getInstance($id);
     }
 
     static function cache($id = 'default') {
