@@ -42,16 +42,11 @@ class View_HighCharts_Table extends View_Table_Renderer {
     }
 
     private function seriesFillRegular() {
-        $keys = array();
-        $xAxis = false;
         foreach ($this->rows as $row) {
-            if (!$keys) {
-                $keys = array_keys($row);
-                $xAxis = array_shift($keys);
-            }
 
-            foreach ($keys as $key) {
-                $this->highCharts->addRow($row[$xAxis], $row[$key], $key);
+            $xValue = array_shift($row);
+            foreach ($row as $key => $value) {
+                $this->highCharts->addRow($xValue, $value, $key);
             }
         }
     }
