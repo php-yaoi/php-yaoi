@@ -29,3 +29,12 @@ class Client {
 /*
 class Database_Client {}
 //*/
+
+
+
+// rename Abstact_App to Yaoi
+/*
+class Abstract_App {}
+//*/
+
+
