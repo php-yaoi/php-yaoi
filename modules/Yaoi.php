@@ -120,7 +120,7 @@ class Yaoi_Conf {
 
     public function register() {
         if (null === $this->modulesPath) {
-            $this->modulesPath = __DIR__ . '\..\..\modules';
+            $this->modulesPath = __DIR__ . '/../../modules';
         }
 
         if (null === $this->yaoiPath) {
