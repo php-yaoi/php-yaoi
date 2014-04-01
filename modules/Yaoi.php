@@ -120,11 +120,11 @@ class Yaoi_Conf {
 
     public function register() {
         if (null === $this->modulesPath) {
-            $this->modulesPath = './modules';
+            $this->modulesPath = __DIR__ . '\..\..\modules';
         }
 
         if (null === $this->yaoiPath) {
-            $this->yaoiPath = './php-yaoi/modules';
+            $this->yaoiPath = __DIR__;
         }
 
         $includePath = get_include_path()
