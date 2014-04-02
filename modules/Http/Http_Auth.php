@@ -10,7 +10,7 @@ class Http_Auth extends Base_Class {
     public $title;
 
     const AREA_NOT_SET = 1;
-    public static $areas = array();
+    public static $conf = array();
 
     public function __construct($salt, $users = array(), $title = 'Restricted Area') {
         $this->salt = $salt;
@@ -28,7 +28,21 @@ class Http_Auth extends Base_Class {
         return $this;
     }
 
-    public function check($logout = false) {
+    public function isProvided() {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            return false;
+        } else {
+            if (!array_key_exists($_SERVER['PHP_AUTH_USER'], $this->users)) {
+                return false;
+            } elseif ($this->users[$_SERVER['PHP_AUTH_USER']]
+                != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'], $this->salt)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function demand($logout = false) {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             header('WWW-Authenticate: Basic realm="' . $this->title . '"');
             header('HTTP/1.0 401 Unauthorized');
@@ -39,7 +53,7 @@ class Http_Auth extends Base_Class {
             if (!array_key_exists($_SERVER['PHP_AUTH_USER'], $this->users)) {
                 $this->fatal('Unknown user');
             } elseif ($this->users[$_SERVER['PHP_AUTH_USER']]
-                != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+                != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'], $this->salt)) {
                 $this->fatal('Bad password');
             }
 
@@ -50,12 +64,12 @@ class Http_Auth extends Base_Class {
     }
 
     public function logout() {
-        $this->check(true);
+        $this->demand(true);
     }
 
 
-    public function hash($login, $password) {
-        return md5($login . $this->salt . $password);
+    public static function hash($login, $password, $salt) {
+        return md5($login . $salt . $password);
     }
 
     private function fatal($message) {
