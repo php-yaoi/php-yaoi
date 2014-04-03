@@ -1,5 +1,22 @@
 <?php
 //rename View_HighChartsTable to View_HighCharts_Table
+/*
+class View_HighChartsTable {}
+//*/
+
+// move View_HighCharts_Table->addOptions() to View_HighCharts_Table->getHighCharts()->addOptions()
+// ->withChartDo(function(View_HighCharts $chart)use($options){$chart->addOptions($options);})
+/*
+class View_HighCharts_Table {
+    public static function addOptions(){}
+}
+//*/
+
+
+// rename Http_ClientException to Http_Client_Exception
+/*
+class Http_ClientException {}
+//*/
 
 
 // 2014.02.10 rename Storage_Client to Storage
