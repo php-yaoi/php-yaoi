@@ -41,6 +41,20 @@ class Http_Auth extends Client {
         return true;
     }
 
+    public function isProvidedDemandOnWrong() {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            return false;
+        } else {
+            if (!array_key_exists($_SERVER['PHP_AUTH_USER'], $this->dsn->users)) {
+                $this->fatal('Unknown user ' . $_SERVER['PHP_AUTH_USER'] . print_r($this->dsn, 1));
+            } elseif ($this->dsn->users[$_SERVER['PHP_AUTH_USER']]
+                != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+                $this->fatal('Bad password');
+            }
+        }
+        return true;
+    }
+
     public function demand($logout = false) {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             header('WWW-Authenticate: Basic realm="' . $this->dsn->title . '"');
