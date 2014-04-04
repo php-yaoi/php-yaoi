@@ -1,8 +1,11 @@
 <?php
 
 class Log_Driver_Stdout implements Log_Driver {
+    private $dsn;
+
     public function __construct(Log_Dsn $dsn = null)
     {
+        $this->dsn = null === $dsn ? new Log_Dsn : $dsn;
     }
 
     /**
@@ -12,7 +15,7 @@ class Log_Driver_Stdout implements Log_Driver {
      */
     public function push($message, $type = Log::TYPE_MESSAGE)
     {
-        echo print_r($message, 1), "\r\n";
+        echo $this->dsn->prefix, print_r($message, 1), "\r\n";
         return $this;
     }
 
