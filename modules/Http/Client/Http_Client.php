@@ -111,6 +111,9 @@ class Http_Client extends Client implements Mock_Able {
     }
 
 
+
+    private $redirectsCount = 0;
+
     public function fetch($url = null) {
         if (null !== $url) {
             $this->url = $url;
@@ -227,6 +230,9 @@ class Http_Client extends Client implements Mock_Able {
             if (!empty($this->parsedHeaders['location'])) {
                 $this->post = null;
                 $this->url = $this->parsedHeaders['location']['value'];
+                if (++$this->redirectsCount > 5) {
+                    return false;
+                }
                 return $this->fetch();
             }
         }
@@ -234,7 +240,7 @@ class Http_Client extends Client implements Mock_Able {
 
         if (!empty($this->parsedHeaders['content-encoding'])) {
 
-            if ('gzip' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
+            if ($response && 'gzip' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
                 if (!function_exists('gzdecode')) {
                     $response = gzinflate(substr($response, 10, -8));
                 }
