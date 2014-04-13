@@ -122,6 +122,21 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         return $this;
     }
 
+
+    /**
+     * @return $this
+     */
+    public function addOption() {
+        $args = func_get_args();
+        $value = array_pop($args);
+        $t = &$this->options;
+        foreach ($args as $arg) {
+            $t = &$t[$arg];
+        }
+        $t = $value;
+        return $this;
+    }
+
     /**
      * @var View_HighCharts_Series
      */
