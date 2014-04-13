@@ -64,7 +64,7 @@ class Http_Auth extends Client {
         } else {
 
             if (!array_key_exists($_SERVER['PHP_AUTH_USER'], $this->dsn->users)) {
-                $this->fatal('Unknown user ' . $_SERVER['PHP_AUTH_USER'] . print_r($this->dsn, 1));
+                $this->fatal('Unknown user ' . $_SERVER['PHP_AUTH_USER'] );
             } elseif ($this->dsn->users[$_SERVER['PHP_AUTH_USER']]
                 != $this->hash($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
                 $this->fatal('Bad password');
