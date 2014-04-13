@@ -2,7 +2,6 @@
 
 /**
  * Class Http_Auth
- * @method static Http_Auth create($salt, $users = array(), $title = 'Restricted Area')
  */
 class Http_Auth extends Client {
     private $salt;
@@ -17,13 +16,19 @@ class Http_Auth extends Client {
      */
     protected $dsn;
 
+
+    public function setSalt($salt) {
+        $this->dsn->salt = $salt;
+        return $this;
+    }
+
     public function addUser($login, $passwordHash) {
         $this->dsn->users[$login] = $passwordHash;
         return $this;
     }
 
     public function addUsers($users) {
-        $this->users = array_merge($this->users, $users);
+        $this->dsn->users = array_merge($this->users, $users);
         return $this;
     }
 
