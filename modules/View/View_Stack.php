@@ -24,7 +24,12 @@ class View_Stack extends Base_Class implements View_Renderer {
 
     public function __toString() {
         ob_start();
-        $this->render();
+        try {
+            $this->render();
+        }
+        catch (Exception $e) {
+            echo $e->getMessage();
+        }
         $result = ob_get_contents();
         ob_end_clean();
         return $result;
