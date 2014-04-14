@@ -229,7 +229,8 @@ class Http_Client extends Client implements Mock_Able {
         if ($this->followLocation) {
             if (!empty($this->parsedHeaders['location'])) {
                 $this->post = null;
-                $this->url = $this->parsedHeaders['location']['value'];
+                $redirectUrl = $this->parsedHeaders['location']['value'];
+                $this->url = $redirectUrl;
                 if (++$this->redirectsCount > 5) {
                     return false;
                 }
@@ -255,6 +256,12 @@ class Http_Client extends Client implements Mock_Able {
         }
 
         return $response;
+    }
+
+
+    public function getAbsoluteUrl($url) {
+        // TODO //host/path, /path, scheme://host/path, path, ?query
+        //if ('//' == )
     }
 
 
