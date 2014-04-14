@@ -13,10 +13,7 @@ abstract class Client extends Base_Class {
             $dsn = $dsn();
         }
 
-        if (null === $dsn) {
-            return $dsn;
-        }
-        elseif (is_string($dsn)) {
+        if (null === $dsn || is_string($dsn)) {
             /**
              * @see String_Dsn descendants
              */
