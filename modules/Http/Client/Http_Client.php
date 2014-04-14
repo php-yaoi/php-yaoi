@@ -230,7 +230,7 @@ class Http_Client extends Client implements Mock_Able {
             if (!empty($this->parsedHeaders['location'])) {
                 $this->post = null;
                 $redirectUrl = $this->parsedHeaders['location']['value'];
-                $this->url = $redirectUrl;
+                $this->url = $this->getAbsoluteUrl($redirectUrl);
                 if (++$this->redirectsCount > 5) {
                     return false;
                 }
@@ -260,8 +260,41 @@ class Http_Client extends Client implements Mock_Able {
 
 
     public function getAbsoluteUrl($url) {
+        $parsed = parse_url($this->url);
+
         // TODO //host/path, /path, scheme://host/path, path, ?query
-        //if ('//' == )
+
+        // "//host/..."
+        if ('//' == substr($url, 0, 2)) {
+            $url = $parsed['scheme'] . ':' . $url;
+        }
+
+        // "/path..."
+        elseif ('/' == $url[0]) {
+            $base = substr($this->url, 0, strpos($this->url, '/', 8));
+            $url = $base . $url;
+        }
+
+        // "http(s)://...."
+        elseif (strpos($url, '://')) {
+
+        }
+
+        // "?query..."
+        elseif ('?' == $url[0]) {
+            $pos = strpos($this->url, '?');
+            $base = $pos ? substr($this->url, 0, $pos) : $this->url;
+            $url = $base . $url;
+        }
+
+        // "path..."
+        else {
+            $pos = strrpos($this->url, '/');
+            $base = $pos ? substr($this->url, 0, $pos + 1) : $this->url;
+            $url = $base . $url;
+        }
+
+        return $url;
     }
 
 
