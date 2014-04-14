@@ -1,4 +1,10 @@
 <?php
 
-class Database_Dsn extends Database_Abstract_Dsn {
+class Database_Dsn extends String_Dsn {
+    public $persistent = false;
+    public $reconnect = false;
+    public $logQueries = false;
+    public $unixSocket;
+    public $charset;
+    public $timezone;
 }
