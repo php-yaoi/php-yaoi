@@ -43,7 +43,7 @@ class Database_Query implements Iterator {
 
             // check binds array type
             foreach ($this->binds as $key => $value) {
-                if ($unnamed && $key != $i++) {
+                if ($unnamed && $key !== $i++) {
                     $unnamed = false;
                     break;
                 }
