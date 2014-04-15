@@ -18,7 +18,12 @@ abstract class Client extends Base_Class {
              * @see String_Dsn descendants
              */
             $class = get_called_class() . '_Dsn';
-            $dsn = new $class($dsn);
+            if (null === $dsn && !class_exists($class, true)) {
+                $dsn = null;
+            }
+            else {
+                $dsn = new $class($dsn);
+            }
         }
         elseif (!$dsn instanceof String_Dsn) {
             throw new Client_Exception('Invalid argument', Client_Exception::INVALID_ARGUMENT);
