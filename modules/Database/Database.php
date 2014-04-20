@@ -18,6 +18,7 @@ class Database extends Client implements Mock_Able {
             $binds = array($binds);
         }
         $query = new Database_Query($statement, $binds, $this->getDriver());
+        $query->setDatabaseClient($this);
         if (null !== $this->log) {
             $query->log($this->log);
         }

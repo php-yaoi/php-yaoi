@@ -12,6 +12,14 @@ class Database_Query implements Iterator {
     protected $statement;
     protected $binds;
 
+    /**
+     * @var Database
+     */
+    private $client;
+    public function setDatabaseClient(Database $client = null) {
+        $this->client = $client;
+    }
+
     private $dbResourceId;
 
     public function __construct(&$statement, $binds = null, Database_Driver $driver) {
@@ -35,49 +43,7 @@ class Database_Query implements Iterator {
      */
     public function build() {
         if ($this->binds) {
-            $driver = $this->db();
-
-            $replace = array();
-            $unnamed = true;
-            $i = 0;
-
-            // check binds array type
-            foreach ($this->binds as $key => $value) {
-                if ($unnamed && $key !== $i++) {
-                    $unnamed = false;
-                    break;
-                }
-            }
-
-            if ($unnamed) {
-                $statement = $this->statement;
-                $pos = 0;
-                foreach ($this->binds as $value) {
-                    $pos = strpos($statement, '?', $pos);
-                    if ($pos !== false) {
-                        $value = $driver->quote($value);
-                        $statement = substr_replace($statement, $value, $pos, 1);
-                        $pos += strlen($value);
-                    }
-                    else {
-                        throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
-                    }
-                }
-
-                if (strpos($statement, '?', $pos) !== false) {
-                    throw new Database_Exception('Redundant placeholder: "' . $this->statement . '", binds: ' . var_export($this->binds), Database_Exception::PLACEHOLDER_REDUNDANT);
-                }
-
-                return $statement;
-            }
-
-
-            else {
-                foreach ($this->binds as $key => $value) {
-                    $replace [':' . $key] = $driver->quote($value);
-                }
-                return strtr($this->statement, $replace);
-            }
+            return $this->client->buildString($this->statement, $this->binds);
         }
         return $this->statement;
     }
