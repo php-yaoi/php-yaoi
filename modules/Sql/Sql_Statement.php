@@ -1,6 +1,6 @@
 <?php
 
-class Sql_Statement {
+class Sql_Statement extends  Base_Class {
     /*
     select
     from

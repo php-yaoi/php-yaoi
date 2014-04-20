@@ -81,4 +81,56 @@ class Database extends Client implements Mock_Able {
         return $this;
     }
 
+
+    /**
+     * @param $statement
+     * @param array $binds
+     * @return mixed|string
+     * @throws Client_Exception
+     * @throws Database_Exception
+     */
+    public function buildString($statement, array $binds) {
+        $replace = array();
+        $unnamed = true;
+        $i = 0;
+
+        // check binds array type
+        foreach ($binds as $key => $value) {
+            if ($unnamed && $key !== $i++) {
+                $unnamed = false;
+                break;
+            }
+        }
+
+        $driver = $this->getDriver();
+
+        if ($unnamed) {
+            $pos = 0;
+            foreach ($binds as $value) {
+                $pos = strpos($statement, '?', $pos);
+                if ($pos !== false) {
+                    $value = $driver->quote($value);
+                    $statement = substr_replace($statement, $value, $pos, 1);
+                    $pos += strlen($value);
+                } else {
+                    throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
+                }
+            }
+
+            if (strpos($statement, '?', $pos) !== false) {
+                throw new Database_Exception('Redundant placeholder: "' . $statement . '", binds: '
+                    . var_export($binds),
+                    Database_Exception::PLACEHOLDER_REDUNDANT);
+            }
+
+            return $statement;
+        } else {
+            foreach ($binds as $key => $value) {
+                $replace [':' . $key] = $driver->quote($value);
+            }
+            return strtr($statement, $replace);
+        }
+
+    }
+
 }
