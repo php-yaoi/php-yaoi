@@ -11,53 +11,48 @@ having
 order by
 limit
 */
-    protected $select = array();
+    protected $select = null;
 
     protected $from = array();
 
     protected $where = array(); // array of ored expressions
 
 
-    public function __construct($columns = null) {
-        if (null !== $columns) {
-            $this->select($columns);
+    public function __construct($from = null) {
+        if (null !== $from) {
+            $this->from($from);
         }
     }
 
-    private function setExpression($expression, $as, &$store) {
-        if ($as) {
-            $store [$as]= $expression;
-        }
-        else {
-            $store []= $expression;
-        }
+    private function setExpression($expression, &$store) {
+        $store []= $expression;
     }
 
-    public function select($expression, $as = null) {
-        $this->setExpression($expression, $as, $this->select);
+    public function columns($expression) {
+        $this->setExpression($expression, $this->select);
         return $this;
     }
 
 
-    public function from($expression, $as = null) {
-        $this->setExpression($expression, $as, $this->from);
+    public function from($expression) {
+        $this->setExpression($expression, $this->from);
         return $this;
     }
 
-    public function where($expression, $as = null) {
-        $this->setExpression($expression, $as, $this->where);
+    public function where($expression) {
+        $this->setExpression($expression, $this->where);
         return $this;
     }
 
     protected $union = array();
     const UNION_TYPE_ALL = 'a';
     public function unionAll(Sql_SelectStatement $select, $as = null) {
-        $this->setExpression(array(self::UNION_TYPE_ALL, $select), $as, $this->union);
+        $this->setExpression(array(self::UNION_TYPE_ALL, $select), $this->union);
     }
 
     const UNION_TYPE_UNIQUE = 'u';
     public function union(Sql_SelectStatement $select, $as = null) {
-        $this->setExpression(array(self::UNION_TYPE_UNIQUE, $select), $as, $this->union);
+        $this->setExpression(array(self::UNION_TYPE_UNIQUE, $select), $this->union);
     }
 
 

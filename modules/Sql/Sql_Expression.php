@@ -1,7 +1,7 @@
 <?php
 
 class Sql_Expression extends Base_Class {
-    public function __construct($literal, $binds = null) {
+    public function __construct($statement, $binds = null) {
         if (func_num_args() > 2) {
             $arguments = func_get_args();
             array_shift($arguments);
@@ -11,20 +11,29 @@ class Sql_Expression extends Base_Class {
             $binds = array($binds);
         }
 
-        $this->literal = $literal;
+        $this->statement = $statement;
         $this->binds = $binds;
     }
 
-    private $literal;
+    private $statement;
     private $binds;
-    private $client;
 
+
+    /**
+     * @var Database
+     */
+    private $client;
     public function setDbClient(Database $client) {
         $this->client = $client;
     }
 
 
     public function __toString() {
-        return (string)$this->literal;
+        if ($this->binds) {
+            return $this->client->buildString($this->statement, $this->binds);
+        }
+        else {
+            return $this->statement;
+        }
     }
 }
