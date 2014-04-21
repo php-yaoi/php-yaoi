@@ -134,4 +134,11 @@ class Database extends Client implements Mock_Able {
 
     }
 
+
+    public function expr($statement, $binds = null) {
+        $expr = new Sql_Expression($statement, $binds);
+        $expr->setDbClient($this);
+        return $expr;
+    }
+
 }

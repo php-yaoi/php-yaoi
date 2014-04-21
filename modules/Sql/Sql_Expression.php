@@ -25,6 +25,21 @@ class Sql_Expression extends Base_Class {
     private $client;
     public function setDbClient(Database $client) {
         $this->client = $client;
+        return $this;
+    }
+
+    public function opAnd($expression) {
+        return $this;
+    }
+
+
+    public function opOr($expression) {
+        return $this;
+    }
+
+
+    public function opXor($expression) {
+        return $this;
     }
 
 
