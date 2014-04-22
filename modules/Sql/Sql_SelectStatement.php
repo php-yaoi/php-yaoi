@@ -14,27 +14,22 @@ limit
 
     protected $from = array();
 
-
-
     public function __construct($from = null) {
         if (null !== $from) {
             $this->from($from);
         }
     }
 
-    private function setExpression($expression, &$store) {
-        $store []= $expression;
-    }
 
     protected $columns = array();
-    public function columns($expression) {
-        $this->setExpression($expression, $this->columns);
+    public function columns($expression, $binds = null) {
+        $this->columns []= $expression;
         return $this;
     }
 
 
-    public function from($expression, $as) {
-        $this->setExpression($expression, $this->from);
+    public function from($expression) {
+        $this->from []= $expression;
         return $this;
     }
 
