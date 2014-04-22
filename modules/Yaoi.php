@@ -78,7 +78,7 @@ class Yaoi {
 
     /**
      * @param string $id
-     * @return Database
+     * @return Database_Interface
      */
     static function db($id = 'default') {
         return Database::getInstance($id);

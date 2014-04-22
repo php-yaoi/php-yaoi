@@ -1,6 +1,6 @@
 <?php
 
-class Sql_Statement extends  Base_Class {
+class Sql_Statement extends Base_Class {
     /*
     select
     from
@@ -14,13 +14,13 @@ class Sql_Statement extends  Base_Class {
     /**
      * @var string
      */
-    protected $literalStatement;
 
-    public function __construct($literalStatement = null) {
-        $this->literalStatement = $literalStatement;
-    }
-
-    public function __toString() {
-        return $this->literalStatement;
+    /**
+     * @var Database
+     */
+    protected $client;
+    public function setClient(Database $client = null) {
+        $this->client = $client;
+        return $this;
     }
 }

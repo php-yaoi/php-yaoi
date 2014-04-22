@@ -11,11 +11,9 @@ having
 order by
 limit
 */
-    protected $columns = null;
 
     protected $from = array();
 
-    protected $where = array(); // array of ored expressions
 
 
     public function __construct($from = null) {
@@ -28,20 +26,29 @@ limit
         $store []= $expression;
     }
 
+    protected $columns = array();
     public function columns($expression) {
         $this->setExpression($expression, $this->columns);
         return $this;
     }
 
 
-    public function from($expression) {
+    public function from($expression, $as) {
         $this->setExpression($expression, $this->from);
         return $this;
     }
 
-    public function where($expression) {
-        $this->setExpression($expression, $this->where);
-        return $this;
+    /**
+     * @var Sql_Expression
+     */
+    protected $where;
+    public function where($expression, $binds = null) {
+        if (null === $this->where) {
+            $this->where = Sql_Expression::createFromFuncArguments(func_get_args());
+        }
+        else {
+            $this->where->andExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+        }
     }
 
     protected $union = array();
@@ -57,7 +64,7 @@ limit
 
 
     // TODO continue later
-    public function build() {
+    public function build(Database $client) {
         $q = "SELECT ";
         if ($this->from) {
             foreach ($this->from as $as => $expression) {
@@ -68,6 +75,8 @@ limit
         }
     }
 }
+
+
 
 return;
 // TODO continue

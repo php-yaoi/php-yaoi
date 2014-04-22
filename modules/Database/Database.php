@@ -1,6 +1,6 @@
 <?php
 
-class Database extends Client implements Mock_Able {
+class Database extends Client implements Database_Interface {
     public static $conf = array();
 
     /**
@@ -134,7 +134,11 @@ class Database extends Client implements Mock_Able {
 
     }
 
-
+    /**
+     * @param $statement
+     * @param null $binds
+     * @return Sql_Expression
+     */
     public function expr($statement, $binds = null) {
         $expr = new Sql_Expression($statement, $binds);
         $expr->setDbClient($this);

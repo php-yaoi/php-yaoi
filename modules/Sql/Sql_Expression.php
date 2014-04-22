@@ -1,54 +1,123 @@
 <?php
 
-class Sql_Expression extends Base_Class {
-    public function __construct($statement, $binds = null) {
-        if (func_num_args() > 2) {
-            $arguments = func_get_args();
-            array_shift($arguments);
-            $binds = $arguments;
+class Sql_Expression extends Base_Class implements Is_Empty {
+    /**
+     * @param $arguments
+     * @return Sql_Expression
+     * @throws Sql_Exception
+     */
+    public static function createFromFuncArguments($arguments) {
+        if (empty($arguments[0])) {
+            throw new Sql_Exception('Literal statement or Sql_Expression required as first argument',
+                Sql_Exception::STATEMENT_REQUIRED);
         }
-        if (null !== $binds && !is_array($binds)) {
-            $binds = array($binds);
+        if ($arguments[0] instanceof Sql_Expression) {
+            return $arguments[0];
         }
 
-        $this->statement = $statement;
-        $this->binds = $binds;
+        $expression = new self;
+        $expression->setFromFuncArguments($arguments);
+        return $expression;
     }
 
+    public function setFromFuncArguments($arguments) {
+        $this->statement = $arguments[0];
+
+        $count = count($arguments);
+        if ($count > 2) {
+            array_shift($arguments);
+            $this->binds = $arguments;
+        }
+        elseif (isset($arguments[1])) {
+            if (is_array($arguments[1])) {
+                $this->binds = $arguments[1];
+            }
+            else {
+                $this->binds = array($arguments[1]);
+            }
+        }
+    }
+
+    public function __construct($statement = null, $binds = null) {
+        if (null !== $statement) {
+            $this->setFromFuncArguments(func_get_args());
+        }
+    }
+
+    private $as;
     private $statement;
     private $binds;
+    private $queue = array();
 
 
-    /**
-     * @var Database
-     */
-    private $client;
-    public function setDbClient(Database $client) {
-        $this->client = $client;
-        return $this;
-    }
-
-    public function opAnd($expression) {
+    public function asExpr($as) {
+        $this->as = $as;
         return $this;
     }
 
 
-    public function opOr($expression) {
+    const OP_AND = 'AND';
+    public function andExpr($expression) {
+        $this->queue []= array(self::OP_AND, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
 
-    public function opXor($expression) {
+    const OP_OR = 'OR';
+    public function orExpr($expression) {
+        $this->queue []= array(self::OP_OR, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
 
-    public function __toString() {
+    const OP_XOR = 'XOR';
+    public function xorExpr($expression) {
+        $this->queue []= array(self::OP_XOR, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+
+    public function build(Database $client) {
+        if ($this->isEmpty()) {
+            return '';
+        }
+
         if ($this->binds) {
-            return $this->client->buildString($this->statement, $this->binds);
+            $result = $client->buildString($this->statement, $this->binds);
         }
         else {
-            return $this->statement;
+            $result = $this->statement;
         }
+
+        foreach ($this->queue as $item) {
+            /**
+             * @var Sql_Expression $expression
+             */
+            $expression = $item[1];
+
+            if (!$expression->isEmpty()) {
+                $result .= ' ' . $item[0] . ' ' . $expression->build($client);
+            }
+        }
+
+        return $this->as ? '(' . $result . ') AS ' . $this->as  : $result;
+    }
+
+
+    private $disabled = false;
+    public function disable() {
+        $this->disabled = true;
+        return $this;
+    }
+
+    public function enable() {
+        $this->disabled = false;
+        return $this;
+    }
+
+
+    public function isEmpty()
+    {
+        return $this->disabled;
     }
 }
