@@ -1,6 +1,6 @@
 <?php
 
-class Sql_SelectStatement extends Sql_Statement {
+class Sql_SelectStatement extends Sql_Expression {
     /*
 select
 from
@@ -51,39 +51,20 @@ limit
     }
 
 
-
-
-
+    /**
+     * @var Sql_Expression[]
+     */
     protected $from = array();
-    public function from($fromExpression, $as = null) {
-        $this->from []= array($fromExpression, $as);
+    public function from($expression, $binds = null) {
+        $this->from []= Sql_Expression::createFromFuncArguments(func_get_args());
         return $this;
     }
 
     protected function buildFrom(Database $client) {
         $from = '';
         if ($this->from) {
-            foreach ($this->from as $item) {
-                $expression = $item[0];
-                $as = $item[1];
-
-                if ($expression instanceof Closure) {
-                    $expression = $expression();
-                }
-
-                if ($expression instanceof Sql_SelectStatement) {
-                    if ($expression->isEmpty()) {
-                        continue;
-                    }
-                    $from .= '(' . $expression->build($client) . ')';
-                }
-                else {
-                    $from .= $expression;
-                }
-
-                if ($as) {
-                    $from .= ' AS ' . $as;
-                }
+            foreach ($this->from as $expression) {
+                $from .= $expression->build($client);
                 $from .= ', ';
             }
 
@@ -101,8 +82,8 @@ limit
     const JOIN_RIGHT = 'RIGHT';
     const JOIN_INNER = 'INNER';
     protected $join = array();
-    public function leftJoin($fromExpression, $as = null, $on = null) {
-        $this->join []= array($fromExpression, $as, $on, self::JOIN_LEFT);
+    public function leftJoin($expression, $binds) {
+        $this->join []= array(self::JOIN_LEFT, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
     public function rightJoin($fromExpression, $as = null, $on = null) {

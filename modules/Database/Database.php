@@ -155,6 +155,8 @@ class Database extends Client implements Database_Interface {
         return Sql_Expression::createFromFuncArguments(func_get_args());
     }
 
+
+
     public function statement($statement, $binds = null) {
         // TODO needed? no!
         return Sql_Statement::create();
