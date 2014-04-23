@@ -14,13 +14,21 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         if ($arguments[0] instanceof Sql_Expression) {
             return $arguments[0];
         }
+        if ($arguments[0] instanceof Closure) {
+            $expression = $arguments[0]();
+            if (!$expression instanceof Sql_Expression) {
+                throw new Sql_Exception('Closure argument should return Sql_Expression',
+                    Sql_Exception::CLOSURE_MISTYPE);
+            }
+            return $expression;
+        }
 
         $expression = new self;
         $expression->setFromFuncArguments($arguments);
         return $expression;
     }
 
-    public function setFromFuncArguments($arguments) {
+    private function setFromFuncArguments($arguments) {
         $this->statement = $arguments[0];
 
         $count = count($arguments);

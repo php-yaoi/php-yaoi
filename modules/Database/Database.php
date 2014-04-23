@@ -110,7 +110,12 @@ class Database extends Client implements Database_Interface {
             foreach ($binds as $value) {
                 $pos = strpos($statement, '?', $pos);
                 if ($pos !== false) {
-                    $value = $driver->quote($value);
+                    if ($value instanceof Sql_Expression) {
+                        $value = '(' . $value->build($this) . ')';
+                    }
+                    else {
+                        $value = $driver->quote($value);
+                    }
                     $statement = substr_replace($statement, $value, $pos, 1);
                     $pos += strlen($value);
                 } else {
@@ -127,22 +132,32 @@ class Database extends Client implements Database_Interface {
             return $statement;
         } else {
             foreach ($binds as $key => $value) {
-                $replace [':' . $key] = $driver->quote($value);
+                if ($value instanceof Sql_Expression) {
+                    $value = '(' . $value->build($this) . ')';
+                }
+                else {
+                    $value = $driver->quote($value);
+                }
+
+                $replace [':' . $key] = $value;
             }
             return strtr($statement, $replace);
         }
-
     }
 
     /**
-     * @param $statement
+     * @param $expression
      * @param null $binds
      * @return Sql_Expression
+     * @throws Sql_Exception
      */
-    public function expr($statement, $binds = null) {
-        $expr = new Sql_Expression($statement, $binds);
-        $expr->setDbClient($this);
-        return $expr;
+    public function expr($expression, $binds = null) {
+        return Sql_Expression::createFromFuncArguments(func_get_args());
+    }
+
+    public function statement($statement, $binds = null) {
+        // TODO needed? no!
+        return Sql_Statement::create();
     }
 
 }
