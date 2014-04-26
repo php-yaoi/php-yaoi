@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * TODO catch and repair crashed table
+ * TODO reconnect on gone away
+ *
+ * Class Database
+ */
 class Database extends Client implements Database_Interface {
     public static $conf = array();
 
