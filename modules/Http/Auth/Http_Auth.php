@@ -4,12 +4,14 @@
  * Class Http_Auth
  */
 class Http_Auth extends Client {
+    public static $conf = array();
+    protected static $instances = array();
+
     private $salt;
     private $users = array();
     public $title;
 
     const AREA_NOT_SET = 1;
-    public static $conf = array();
 
     /**
      * @var Http_Auth_Dsn

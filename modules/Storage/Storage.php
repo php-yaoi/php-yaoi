@@ -6,6 +6,7 @@
  */
 class Storage extends Client {
     public static $conf = array();
+    protected static $instances = array();
 
     public function get($key)
     {

@@ -7,6 +7,7 @@
  */
 class Http_Client extends Client implements Mock_Able {
     public static $conf = array();
+    protected static $instances = array();
     public static $globalSettings = array();
 
     const XML_HTTP_REQUEST = 'XMLHttpRequest';

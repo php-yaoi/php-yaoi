@@ -8,6 +8,7 @@
  */
 class Database extends Client implements Database_Interface {
     public static $conf = array();
+    protected static $instances = array();
 
     /**
      * @param null $statement

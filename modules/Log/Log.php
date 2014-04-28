@@ -7,6 +7,7 @@
  */
 class Log extends Client {
     public static $conf = array();
+    protected static $instances = array();
 
     const TYPE_MESSAGE = 'm';
     const TYPE_ERROR = 'e';

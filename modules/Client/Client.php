@@ -65,7 +65,7 @@ abstract class Client extends Base_Class {
         return $resource;
     }
 
-    protected static $instances = array();
+    //protected static $instances = array();
 
     /**
      * @param string $id
