@@ -1,6 +1,6 @@
 <?php
 
-class Sql_SelectStatement extends Sql_Expression {
+class Sql_Select extends Sql_Statement {
     /*
 select
 from
@@ -110,6 +110,10 @@ limit
      */
     protected $where;
     public function where($expression, $binds = null) {
+        if (null === $expression) {
+            return $this;
+        }
+
         if (null === $this->where) {
             $this->where = Sql_Expression::createFromFuncArguments(func_get_args());
         }
@@ -130,17 +134,12 @@ limit
     }
 
 
-
-
-
-
-
-    public function build(Database $client) {
+    public function build(Database $client = null) {
         $q = "SELECT";
 
         $q .= $this->buildColumns($client);
         $q .= $this->buildFrom($client);
-        $q .= $this->buildJoin($client);
+        //$q .= $this->buildJoin($client);
         $q .= $this->buildWhere($client);
 
 

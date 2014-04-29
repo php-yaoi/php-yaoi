@@ -1,8 +1,12 @@
 <?php
 
-abstract class Client extends Base_Class {
-    //public static $conf = array();
 
+/**
+ * Class Client
+ * @property array $conf
+ * @property array $instances
+ */
+abstract class Client extends Base_Class {
     /**
      * @param null $dsn
      * @return null|String_Dsn
@@ -65,7 +69,6 @@ abstract class Client extends Base_Class {
         return $resource;
     }
 
-    //protected static $instances = array();
 
     /**
      * @param string $id

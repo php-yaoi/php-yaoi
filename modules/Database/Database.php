@@ -163,10 +163,12 @@ class Database extends Client implements Database_Interface {
     }
 
 
-
-    public function statement($statement, $binds = null) {
-        // TODO needed? no!
-        return Sql_Statement::create();
+    /**
+     * @param null $from
+     * @return Sql_Select
+     */
+    public function select($from = null) {
+        return Sql_Select::create($from)->bindDatabase($this);
     }
 
 }
