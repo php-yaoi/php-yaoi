@@ -123,6 +123,19 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
+    private $unquote = false;
+    public function addCallbackOption() {
+        $this->unquote = true;
+        $args = func_get_args();
+        $value = 'unquoted' . array_pop($args) . 'unquoted';
+        $t = &$this->options;
+        foreach ($args as $arg) {
+            $t = &$t[$arg];
+        }
+        $t = $value;
+        return $this;
+    }
+
     /**
      * @return $this
      */
@@ -215,11 +228,6 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
-    private $unquote = false;
-    public function unquote($unquote = true) {
-        $this->unquote = $unquote;
-        return $this;
-    }
 
     public function render() {
         $this->options['series'] = array();
