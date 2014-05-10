@@ -214,6 +214,13 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         return $this;
     }
 
+
+    private $unquote = false;
+    public function unquote($unquote = true) {
+        $this->unquote = $unquote;
+        return $this;
+    }
+
     public function render() {
         $this->options['series'] = array();
         //var_dump($this->series);
@@ -222,6 +229,10 @@ class View_HighCharts extends Base_Class implements View_Renderer{
                 continue;
             }
             $this->options['series'] []= $series->exportOptions();
+        }
+        $options = json_encode($this->options);
+        if ($this->unquote) {
+            $options = str_replace(array("'unquote", "unquote'"), '', $options);
         }
 
         ?>
@@ -232,7 +243,8 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 (function(){
     Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
-    $('<?php echo $this->renderToSelector ?>').highcharts(<?php echo json_encode($this->options) ?>);
+
+    $('<?php echo $this->renderToSelector ?>').highcharts(<?php echo $options ?>);
 })();
 </script><?php
     }
