@@ -240,7 +240,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         }
         $options = json_encode($this->options);
         if ($this->unquote) {
-            $options = str_replace(array('"unquote', 'unquote"'), '', $options);
+            $options = str_replace(array('"unquoted', 'unquoted"'), '', $options);
         }
 
         ?>
