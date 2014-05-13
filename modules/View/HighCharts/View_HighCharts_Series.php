@@ -23,6 +23,11 @@ class View_HighCharts_Series extends Base_Class {
     private $xAxis;
     private $yAxis;
     private $zIndex;
+    public $count = 0;
+    public $minX;
+    public $maxX;
+    public $minY;
+    public $maxY;
 
     public function setName($name) {
         $this->name = $name;
@@ -35,7 +40,20 @@ class View_HighCharts_Series extends Base_Class {
     }
 
     public function addRow($x, $y) {
-        $this->data []= array(1 * $x, 1 * $y);
+        $x = 1 * $x;
+        $y = 1 * $y;
+        if (!$this->count) {
+            $this->minX = $this->maxX = $x;
+            $this->minY = $this->maxY = $y;
+        }
+        else {
+            $this->minX = min($this->minX, $x);
+            $this->maxX = max($this->maxX, $x);
+            $this->minY = min($this->minY, $y);
+            $this->maxY = max($this->maxY, $y);
+        }
+        $this->data []= array($x, $y);
+        ++$this->count;
         return $this;
     }
 
@@ -43,10 +61,25 @@ class View_HighCharts_Series extends Base_Class {
     const VALUE_LOW = 1;
     const VALUE_HIGH = 2;
     public function addRangeRow($x, $y, $i = self::VALUE_LOW) {
-        if (!isset($this->data[$x])) {
-            $this->data[$x] = array(1 * $x, null, null);
+        $x = 1 * $x;
+        $y = 1 * $y;
+
+        if (!$this->count) {
+            $this->minX = $this->maxX = $x;
+            $this->minY = $this->maxY = $y;
         }
-        $this->data [$x][$i] = 1 * $y;
+        else {
+            $this->minX = min($this->minX, $x);
+            $this->maxX = max($this->maxX, $x);
+            $this->minY = min($this->minY, $y);
+            $this->maxY = max($this->maxY, $y);
+        }
+
+        if (!isset($this->data[$x])) {
+            $this->data[$x] = array($x, null, null);
+        }
+        $this->data [$x][$i] = $y;
+        ++$this->count;
         return $this;
     }
 

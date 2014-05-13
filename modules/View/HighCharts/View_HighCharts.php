@@ -228,8 +228,39 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
+    private $withJsonZoom;
+    private $jsonUrl;
+    public function withJsonZoom($jsonUrl = null) {
+        $this->withJsonZoom = true;
+        $this->jsonUrl = $jsonUrl;
+        return $this;
+    }
+
+
 
     public function render() {
+        if ($this->withJsonZoom) {
+            $this->addCallbackOption('xAxis', 'events', 'afterSetExtremes', 'loadPoints');
+            $this->addCallbackOption('xAxis', 'events', 'setExtremes', 'setExtremesCallback');
+            if (null === $this->jsonUrl) {
+                $this->jsonUrl = $_SERVER['REQUEST_URI'];
+                if (strpos($this->jsonUrl, '?') !== false) {
+                    $this->jsonUrl .= '&';
+                }
+                else {
+                    $this->jsonUrl .= '?';
+                }
+                $this->jsonUrl .= 'min=:min&max=:max&callback=?';
+            }
+            $minX = $this->series[0]->minX;
+            $maxX = $this->series[0]->maxX;
+            foreach ($this->series as $series) {
+                $minX = min($minX, $series->minX);
+                $maxX = max($maxX, $series->maxX);
+            }
+
+        }
+
         $this->options['series'] = array();
         //var_dump($this->series);
         $options = json_encode($this->options);
@@ -243,6 +274,57 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 <script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
 <script type="text/javascript">
 (function(){
+    <?php
+    if ($this->withJsonZoom) {
+    ?>
+    var isReset = false;
+
+    function setExtremesCallback(e) {
+        if (e.max == null || e.min == null) {
+            isReset = true;
+        }
+        else {
+            isReset = false;
+        }
+    }
+
+    function loadPoints(e) {
+
+        var url = '$jsonUrl',
+            chart = $('#hc-container-1').highcharts();
+
+        var min = <?=$minX?>;
+        var max = <?=$maxX?>;
+
+        if(!isReset)
+        {
+            min = e.min;
+            max = e.max;
+        }
+        chart.showLoading('Loading data from server...');
+
+        url = url.replace(/:min/g, min).replace(/:max/g, max);
+
+        $.getJSON(url, function (data) {
+            var seriesOptions, series;
+            for (var i in data) {
+                if (data.hasOwnProperty(i)) {
+                    seriesOptions = data[i];
+                    if (series = chart.get(seriesOptions.id)) {
+                        series.setData(seriesOptions.data, false);
+                    }
+                    else {
+                        chart.addSeries(seriesOptions, false);
+                    }
+                }
+            }
+            chart.redraw();
+            chart.hideLoading();
+        });
+    }
+    <?php
+    }
+    ?>
     Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
     var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>).highcharts();
@@ -254,12 +336,32 @@ class View_HighCharts extends Base_Class implements View_Renderer{
             ?>
     chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
     <?php
-            $this->options['series'] []= $series->exportOptions();
         }
     ?>
     chart.redraw();
 })();
 </script><?php
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getData() {
+        $data = array();
+        foreach ($this->series as $series) {
+            $data []= $series->exportOptions();
+        }
+        return $data;
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function renderJson() {
+        View_Jsonp::create($_GET['callback'], $this->getData())->render();
+        return $this;
     }
 
 
