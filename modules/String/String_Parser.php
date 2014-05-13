@@ -13,7 +13,7 @@ class String_Parser extends Base_Class implements Is_Empty {
     /**
      * @param null $start
      * @param null $end
-     * @return bool|String_Parser
+     * @return String_Parser
      */
     public function inner($start = null, $end = null) {
         if (is_null($this->string)) {
