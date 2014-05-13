@@ -337,14 +337,20 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
     var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>).highcharts();
     <?php
-            foreach ($this->series as $id => $series) {
+    if ($this->withJsonZoom && empty($this->series)) {
+        ?>isReset = true;loadPoints();<?php
+    }
+    else {
+        foreach ($this->series as $id => $series) {
             if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
                 continue;
             }
-            ?>
-    chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
+        ?>chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
+
     <?php
         }
+    }
+
     ?>
     chart.redraw();
 })();
