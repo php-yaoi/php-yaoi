@@ -232,12 +232,6 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     public function render() {
         $this->options['series'] = array();
         //var_dump($this->series);
-        foreach ($this->series as $id => $series) {
-            if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
-                continue;
-            }
-            $this->options['series'] []= $series->exportOptions();
-        }
         $options = json_encode($this->options);
         if ($this->unquote) {
             $options = str_replace(array('"unquoted', 'unquoted"'), '', $options);
@@ -251,7 +245,19 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 (function(){
     Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
-    $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>);
+    var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>);
+    <?php
+            foreach ($this->series as $id => $series) {
+            if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
+                continue;
+            }
+            ?>
+    chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
+    <?php
+            $this->options['series'] []= $series->exportOptions();
+        }
+    ?>
+    chart.redraw();
 })();
 </script><?php
     }
