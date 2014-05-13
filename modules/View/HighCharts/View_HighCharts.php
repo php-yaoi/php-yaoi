@@ -201,9 +201,9 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
-    private $renderToSelector;
-    public function renderToSelector($id) {
-        $this->renderToSelector = $id;
+    private $containerSelector;
+    public function setContainerSelector($id) {
+        $this->containerSelector = $id;
         return $this;
     }
 
@@ -251,8 +251,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 (function(){
     Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
-
-    $('<?php echo $this->renderToSelector ?>').highcharts(<?php echo $options ?>);
+    $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>);
 })();
 </script><?php
     }

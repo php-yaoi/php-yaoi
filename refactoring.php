@@ -55,3 +55,14 @@ class Abstract_App {}
 //*/
 
 
+// 2014.05.13
+// rename renderToSelector to setContainerSelector
+/*
+class View_Highcharts
+{
+    public function renderToSelector($id)
+    {
+
+    }
+}
+//*/
