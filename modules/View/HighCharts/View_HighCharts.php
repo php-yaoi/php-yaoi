@@ -237,6 +237,19 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
 
 
+    private $minX;
+    private $maxX;
+    private function countExtremes() {
+        foreach ($this->series as $series) {
+            $this->minX = $series->minX;
+            $this->maxX = $series->maxX;
+            break;
+        }
+        foreach ($this->series as $series) {
+            $this->minX = min($this->minX, $series->minX);
+            $this->maxX = max($this->maxX, $series->maxX);
+        }
+    }
 
     public function render() {
         if ($this->withJsonZoom) {
@@ -252,17 +265,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
                 }
                 $this->jsonUrl .= 'min=:min&max=:max&callback=?';
             }
-
-            $minX = $maxX = null;
-            foreach ($this->series as $series) {
-                $minX = $series->minX;
-                $maxX = $series->maxX;
-                break;
-            }
-            foreach ($this->series as $series) {
-                $minX = min($minX, $series->minX);
-                $maxX = max($maxX, $series->maxX);
-            }
+            $this->countExtremes();
 
         }
 
@@ -295,11 +298,11 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 
     function loadPoints(e) {
 
-        var url = '$jsonUrl',
+        var url = '<?=$this->jsonUrl?>',
             chart = $('#hc-container-1').highcharts();
 
-        var min = <?=$minX?>;
-        var max = <?=$maxX?>;
+        var min = <?=$this->minX?>;
+        var max = <?=$this->maxX?>;
 
         if(!isReset)
         {
