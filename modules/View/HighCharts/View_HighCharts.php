@@ -240,6 +240,8 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     private $minX;
     private $maxX;
     private function countExtremes() {
+        $this->minX = 0;
+        $this->maxX = 0;
         foreach ($this->series as $series) {
             $this->minX = $series->minX;
             $this->maxX = $series->maxX;
@@ -301,8 +303,8 @@ class View_HighCharts extends Base_Class implements View_Renderer{
         var url = '<?=$this->jsonUrl?>',
             chart = $('#hc-container-1').highcharts();
 
-        var min = <?=$this->minX?>;
-        var max = <?=$this->maxX?>;
+        var min = <?= $this->minX ?>;
+        var max = <?= $this->maxX ?>;
 
         if(!isReset)
         {
