@@ -245,7 +245,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
 (function(){
     Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
-    var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>);
+    var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>).highcharts();
     <?php
             foreach ($this->series as $id => $series) {
             if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
