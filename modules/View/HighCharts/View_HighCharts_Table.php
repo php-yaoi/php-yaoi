@@ -98,4 +98,23 @@ class View_HighCharts_Table extends View_Table_Renderer {
         $this->highCharts->render();
     }
 
+
+    public function getData() {
+        switch ($this->dataType) {
+            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
+            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
+            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
+        }
+        return $this->highCharts->getData();
+    }
+
+    public function renderJson() {
+        switch ($this->dataType) {
+            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
+            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
+            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
+        }
+        $this->highCharts->renderJson();
+    }
+
 }
