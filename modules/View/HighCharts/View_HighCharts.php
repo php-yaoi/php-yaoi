@@ -252,8 +252,13 @@ class View_HighCharts extends Base_Class implements View_Renderer{
                 }
                 $this->jsonUrl .= 'min=:min&max=:max&callback=?';
             }
-            $minX = $this->series[0]->minX;
-            $maxX = $this->series[0]->maxX;
+
+            $minX = $maxX = null;
+            foreach ($this->series as $series) {
+                $minX = $series->minX;
+                $maxX = $series->maxX;
+                break;
+            }
             foreach ($this->series as $series) {
                 $minX = min($minX, $series->minX);
                 $maxX = max($maxX, $series->maxX);
