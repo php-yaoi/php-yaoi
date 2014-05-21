@@ -126,4 +126,10 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         return str_replace(array('"', "'"), array('&quot;', '&#39;'), $s);
     }
 
+
+    public function onClick($jsCode) {
+        return $this->setAttribute('onclick', $jsCode);
+    }
+
+
 } 
