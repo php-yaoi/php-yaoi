@@ -229,8 +229,8 @@ class Http_Client extends Client implements Mock_Able {
             $this->logResponseHeaders->push(print_r($this->responseHeaders, 1));
         }
 
-        if ($this->logResponseBody) {
-            $this->logResponseBody->push(print_r($response, 1));
+        if ($this->logRawResponseBody) {
+            $this->logRawResponseBody->push($response);
         }
 
 
@@ -263,6 +263,10 @@ class Http_Client extends Client implements Mock_Able {
             elseif ('deflate' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
                 $response = gzinflate($response);
             }
+        }
+
+        if ($this->logResponseBody) {
+            $this->logResponseBody->push($response);
         }
 
         return $response;
@@ -367,10 +371,20 @@ class Http_Client extends Client implements Mock_Able {
     /**
      * @var Log
      */
+    private $logRawResponseBody;
+    public function logRawResponseBody(Log $log = null) {
+        $this->logRawResponseBody = $log;
+        return $this;
+    }
+
+    /**
+     * @var Log
+     */
     private $logResponseBody;
     public function logResponseBody(Log $log = null) {
         $this->logResponseBody = $log;
         return $this;
     }
+
 
 }
