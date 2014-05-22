@@ -46,6 +46,15 @@ class Http_Client extends Client implements Mock_Able {
             if ($dsn->defaultHeaders) {
                 $this->defaultHeaders = array_merge($this->defaultHeaders, $dsn->defaultHeaders);
             }
+
+            if ($dsn->log) {
+                $log = Log::getInstance($dsn->log);
+                $this->logUrl($log);
+                $this->logContext($log);
+                $this->logResponseHeaders($log);
+                $this->logResponseBody($log);
+                $this->logError($log);
+            }
         }
     }
 
