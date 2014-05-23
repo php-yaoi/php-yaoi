@@ -334,8 +334,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
     }
     <?php
     }
-    ?>
-    Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
+    ?>Highcharts.setOptions(<?php echo json_encode($this->globalOptions)?>);
 
     var chart = $('<?php echo $this->containerSelector ?>').highcharts(<?php echo $options ?>).highcharts();
     <?php
@@ -348,13 +347,11 @@ class View_HighCharts extends Base_Class implements View_Renderer{
                 continue;
             }
         ?>chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
-
     <?php
         }
     }
 
-    ?>
-    chart.redraw();
+?>chart.redraw();
 })();
 </script><?php
     }

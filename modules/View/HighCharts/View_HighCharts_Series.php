@@ -14,6 +14,9 @@ class View_HighCharts_Series extends Base_Class {
     const TYPE_AREA_SPLINE_RANGE = 'areasplinerange';
     const TYPE_COLUMN_RANGE = 'columnrange';
 
+    private static $export = array(
+        'id', 'index', 'legendIndex', 'name', 'type', 'xAxis', 'yAxis', 'zIndex'
+    );
     private $data = array();
     private $id;
     private $index;
@@ -157,11 +160,11 @@ class View_HighCharts_Series extends Base_Class {
     }
 
     public function exportOptions() {
-        $result = get_object_vars($this);
-        $result['data'] = array_values($result['data']);
-        foreach ($result as $k => $v) {
-            if (null === $v) {
-                unset($result[$k]);
+        $result = array();
+        $result['data'] = array_values($this->data);
+        foreach (self::$export as $field) {
+            if (null !== $this->$field) {
+                $result[$field] = $this->$field;
             }
         }
         return $result;
