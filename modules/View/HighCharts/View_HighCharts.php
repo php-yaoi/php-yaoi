@@ -346,7 +346,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
             if (isset($this->ranges[$id]) && View_HighCharts_Series::VALUE_HIGH == $this->ranges[$id]) {
                 continue;
             }
-        ?>chart.addSeries(<?=json_encode($series->exportOptions())?>, false);
+        ?>chart.addSeries(<?php echo json_encode($series->exportOptions())?>, false);
     <?php
         }
     }
