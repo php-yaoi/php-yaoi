@@ -1,6 +1,6 @@
 <?php
 
-class Base_Class {
+abstract class Base_Class {
     /**
      * @return static
      */

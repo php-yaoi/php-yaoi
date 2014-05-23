@@ -98,8 +98,6 @@ abstract class Client extends Base_Class {
         if ($id instanceof String_Dsn || $id instanceof Closure) {
             return new static($id);
         }
-
-        throw new Client_Exception('Invalid argument', Client_Exception::INVALID_ARGUMENT);
     }
 
 
