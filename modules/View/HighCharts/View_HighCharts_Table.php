@@ -36,12 +36,20 @@ class View_HighCharts_Table extends View_Table_Renderer {
         return $this;
     }
 
+    /**
+     * @return $this
+     * @deprecated use
+     */
     public function withNamedSeries() {
         $this->dataType = self::DATA_TYPE_NAMED;
         return $this;
     }
 
-    private function seriesFillRegular() {
+    private function seriesFill() {
+        if (self::DATA_TYPE_NAMED === $this->dataType) {
+            $this->rows = Rows_Processor::create($this->rows)->combineOffset(2, 1);
+        }
+
         foreach ($this->rows as $row) {
 
             $xValue = array_shift($row);
@@ -64,56 +72,22 @@ class View_HighCharts_Table extends View_Table_Renderer {
         return $this->highCharts;
     }
 
-    private function seriesFillNamed() {
-        $keys = array();
-        $xAxis = false;
-        $name = '';
-        $value = '';
-        foreach ($this->rows as $row) {
-            if (!$keys) {
-                $keys = array_keys($row);
-                $xAxis = $keys[0];
-                $value = $keys[1];
-                $name = $keys[2];
-            }
-
-
-
-            $this->highCharts->addRow($row[$xAxis], $row[$value], $row[$name]);
-        }
-    }
-
-
-
-
     protected function renderTail() {
         parent::renderTail();
 
-        switch ($this->dataType) {
-            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
-            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
-            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
-        }
+        $this->seriesFill();
 
         $this->highCharts->render();
     }
 
 
     public function getData() {
-        switch ($this->dataType) {
-            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
-            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
-            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
-        }
+        $this->seriesFill();
         return $this->highCharts->getData();
     }
 
     public function renderJson() {
-        switch ($this->dataType) {
-            case self::DATA_TYPE_REGULAR: $this->seriesFillRegular();break;
-            case self::DATA_TYPE_NAMED: $this->seriesFillNamed();break;
-            default: throw new View_Exception('Wrong data type', View_Exception::WRONG_DATA_TYPE);
-        }
+        $this->seriesFill();
         $this->highCharts->renderJson();
     }
 

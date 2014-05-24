@@ -300,11 +300,11 @@ class View_HighCharts extends Base_Class implements View_Renderer {
 
     function loadPoints(e) {
 
-        var url = '<?=$this->jsonUrl?>',
+        var url = '<?php echo $this->jsonUrl?>',
             chart = $('#hc-container-1').highcharts();
 
-        var min = <?= $this->minX ?>;
-        var max = <?= $this->maxX ?>;
+        var min = <?php echo $this->minX ?>;
+        var max = <?php echo $this->maxX ?>;
 
         if(!isReset)
         {

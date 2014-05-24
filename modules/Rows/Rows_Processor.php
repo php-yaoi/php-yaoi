@@ -21,7 +21,11 @@ class Rows_Processor extends ArrayIterator {
         return $this;
     }
 
-
+    private $combineOffset = array();
+    public function combineOffset($offsetKey, $offsetValue) {
+        $this->combineOffset [$offsetKey] = $offsetValue;
+        return $this;
+    }
 
     public function __construct(&$rows = null) {
         parent::__construct($rows);
@@ -37,6 +41,17 @@ class Rows_Processor extends ArrayIterator {
             }
         }
 
+        $keys = null;
+
+        if ($this->combineOffset) {
+            foreach ($this->combineOffset as $offsetKey => $offsetValue) {
+                $keys = array_keys($row);
+                $row[$row[$keys[$offsetKey]]] = $row[$keys[$offsetValue]];
+                unset($row[$keys[$offsetKey]]);
+                unset($row[$keys[$offsetValue]]);
+            }
+        }
+
         if ($this->combineFields) {
             foreach ($this->combineFields as $fieldKey => $fieldValue) {
                 $row[$row[$fieldKey]] = $row[$fieldValue];
@@ -46,7 +61,9 @@ class Rows_Processor extends ArrayIterator {
         }
 
         if ($this->changeKeys) {
-            $keys = array_keys($row);
+            if (!$keys) {
+                $keys = array_keys($row);
+            }
             foreach ($keys as &$key) {
                 if (isset($this->changeKeys[$key])) {
                     $key = $this->changeKeys[$key];
