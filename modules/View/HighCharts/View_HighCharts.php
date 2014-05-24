@@ -1,6 +1,6 @@
 <?php
 
-class View_HighCharts extends Base_Class implements View_Renderer{
+class View_HighCharts extends Base_Class implements View_Renderer {
     
     public function isEmpty()
     {
@@ -258,7 +258,7 @@ class View_HighCharts extends Base_Class implements View_Renderer{
             $this->addCallbackOption('xAxis', 'events', 'afterSetExtremes', 'loadPoints');
             $this->addCallbackOption('xAxis', 'events', 'setExtremes', 'setExtremesCallback');
             if (null === $this->jsonUrl) {
-                $this->jsonUrl = $_SERVER['REQUEST_URI'];
+                $this->jsonUrl = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
                 if (strpos($this->jsonUrl, '?') !== false) {
                     $this->jsonUrl .= '&';
                 }
