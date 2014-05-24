@@ -83,5 +83,12 @@ class Rows_Processor extends ArrayIterator {
     }
 
 
+    public function exportArray() {
+        $result = array();
+        foreach ($this as $row) {
+            $result []= $row;
+        }
+        return $result;
+    }
 
 } 

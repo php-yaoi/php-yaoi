@@ -31,6 +31,10 @@ class View_HighCharts_Table extends View_Table_Renderer {
         parent::renderHead();
     }
 
+    /**
+     * @return $this
+     * @deprecated see withNamedSeries
+     */
     public function withRegularSeries() {
         $this->dataType = self::DATA_TYPE_REGULAR;
         return $this;
@@ -38,7 +42,7 @@ class View_HighCharts_Table extends View_Table_Renderer {
 
     /**
      * @return $this
-     * @deprecated use
+     * @deprecated use Rows_Processor::create($rows)->combineOffset(2, 1) instead of rows
      */
     public function withNamedSeries() {
         $this->dataType = self::DATA_TYPE_NAMED;
