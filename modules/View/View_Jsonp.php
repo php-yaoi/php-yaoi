@@ -28,6 +28,10 @@ class View_Jsonp extends Base_Class implements View_Renderer {
 
     public function __toString()
     {
+        if (null === $this->callback && !empty($_GET['callback'])) {
+            $this->callback = $_GET['callback'];
+        }
+
         $result = $this->callback . '(' . json_encode($this->data) . ');';
         return $result;
     }
