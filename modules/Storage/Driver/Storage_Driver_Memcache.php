@@ -18,7 +18,11 @@ class Storage_Driver_Memcache implements  Storage_Driver {
 
     protected function connect() {
         $this->memcache = new Memcache();
-        $hostname = $this->dsn->unixSocket ? 'unix://' . $this->dsn->unixSocket : $this->dsn->hostname;
+        $hostname = $this->dsn->unixSocket
+            ? 'unix://' . $this->dsn->unixSocket
+            : ($this->dsn->hostname
+                ? $this->dsn->hostname
+                : '127.0.0.1');
         if ($this->dsn->unixSocket) {
             $port = 0;
         }
