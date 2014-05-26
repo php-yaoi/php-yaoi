@@ -373,7 +373,7 @@ class View_HighCharts extends Base_Class implements View_Renderer {
      * @return $this
      */
     public function renderJson() {
-        View_Jsonp::create($_GET['callback'], $this->getData())->render();
+        View_Jsonp::create($this->getData(), $_GET['callback'])->render();
         return $this;
     }
 

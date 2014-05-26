@@ -2,14 +2,14 @@
 
 /**
  * Class View_Jsonp
- * @method static View_Jsonp create($callback, $data = null)
+ * @method static View_Jsonp create($data = null, $callback = null)
  */
 class View_Jsonp extends Base_Class implements View_Renderer {
     private $callback;
     private $data;
 
 
-    public function __construct($callback, $data = null) {
+    public function __construct($data = null, $callback = null) {
         $this->data = $data;
         $this->callback = $callback;
     }
