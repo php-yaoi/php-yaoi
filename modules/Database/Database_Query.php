@@ -53,14 +53,6 @@ class Database_Query implements Iterator {
     public function execute() {
         $query = $this->build();
         $start = microtime(1);
-        if (null !== $this->logResourceId) {
-            /**
-             * @var Log $log
-             */
-            $log = DependencyRepository::$items[$this->logResourceId];
-            $log->push($query);
-        }
-
 
         if (!$this->result = $this->db()->query($query)) {
             $error = $this->db()->queryErrorMessage($this->result);
@@ -69,7 +61,7 @@ class Database_Query implements Iterator {
                  * @var Log $log
                  */
                 $log = DependencyRepository::$items[$this->logResourceId];
-                $log->push($error, Log::TYPE_ERROR);
+                $log->push($error . ' ' . $query, Log::TYPE_ERROR);
             }
             $exception = new Database_Exception($error, Database_Exception::QUERY_ERROR);
             $exception->query = $query;
@@ -82,7 +74,7 @@ class Database_Query implements Iterator {
              * @var Log $log
              */
             $log = DependencyRepository::$items[$this->logResourceId];
-            $log->push(round(microtime(1) - $start, 4) . ' s. (' . $this->rowsAffected() . ' rows)');
+            $log->push(round(microtime(1) - $start, 4) . ' s. (' . $this->rowsAffected() . ') ' . $query);
         }
 
         return $this;
