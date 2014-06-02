@@ -53,16 +53,16 @@ class Database_Query implements Iterator {
     public function execute() {
         $query = $this->build();
         $start = microtime(1);
+        if (null !== $this->logResourceId) {
+            /**
+             * @var Log $log
+             */
+            $log = DependencyRepository::$items[$this->logResourceId];
+            $log->push($query);
+        }
+
 
         if (!$this->result = $this->db()->query($query)) {
-            if (null !== $this->logResourceId) {
-                /**
-                 * @var Log $log
-                 */
-                $log = DependencyRepository::$items[$this->logResourceId];
-                $log->push($query, Log::TYPE_ERROR);
-            }
-
             $error = $this->db()->queryErrorMessage($this->result);
             if (null !== $this->logResourceId) {
                 /**
@@ -82,7 +82,7 @@ class Database_Query implements Iterator {
              * @var Log $log
              */
             $log = DependencyRepository::$items[$this->logResourceId];
-            $log->push(round(microtime(1) - $start, 4) . ' s. (' . $this->rowsAffected() . ') ' . $query, $query);
+            $log->push(round(microtime(1) - $start, 4) . ' s. (' . $this->rowsAffected() . ' rows)');
         }
 
         return $this;
