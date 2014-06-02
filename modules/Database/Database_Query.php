@@ -55,13 +55,21 @@ class Database_Query implements Iterator {
         $start = microtime(1);
 
         if (!$this->result = $this->db()->query($query)) {
+            if (null !== $this->logResourceId) {
+                /**
+                 * @var Log $log
+                 */
+                $log = DependencyRepository::$items[$this->logResourceId];
+                $log->push($query, Log::TYPE_ERROR);
+            }
+
             $error = $this->db()->queryErrorMessage($this->result);
             if (null !== $this->logResourceId) {
                 /**
                  * @var Log $log
                  */
                 $log = DependencyRepository::$items[$this->logResourceId];
-                $log->push($error . ' ' . $query, Log::TYPE_ERROR);
+                $log->push($error, Log::TYPE_ERROR);
             }
             $exception = new Database_Exception($error, Database_Exception::QUERY_ERROR);
             $exception->query = $query;
