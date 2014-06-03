@@ -1,6 +1,6 @@
 <?php
 
-class Rows_Processor extends ArrayIterator {
+class Rows_Processor extends IteratorIterator {
     protected $rows = array();
     private $skipFields = array();
     public function skipField($field) {
@@ -28,7 +28,12 @@ class Rows_Processor extends ArrayIterator {
     }
 
     public function __construct(&$rows = null) {
-        parent::__construct($rows);
+        if (is_array($rows)) {
+            parent::__construct(new ArrayIterator($rows));
+        }
+        else {
+            parent::__construct($rows);
+        }
     }
 
     public function current() {
