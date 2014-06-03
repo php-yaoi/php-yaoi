@@ -175,6 +175,9 @@ class Database_Query implements Iterator {
      */
     public function valid()
     {
+        if (null === $this->current) {
+            $this->next();
+        }
         return $this->valid;
     }
 
