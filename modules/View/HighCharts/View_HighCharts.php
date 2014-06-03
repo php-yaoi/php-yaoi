@@ -222,12 +222,17 @@ class View_HighCharts extends Base_Class implements View_Renderer {
             'rangeSelectorTo' => 'по',
             'rangeSelectorZoom' => 'Период',
             'thousandsSep' => '',
+            'resetZoom' => 'Сбросить масштаб',
+            'resetZoomTitle' => 'Установить масштаб 1:1',
             'weekdays' => array('Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота')
         );
+        $this->jsonLoadingText = 'Загрузка...';
+
         return $this;
     }
 
 
+    private $jsonLoadingText = 'Loading data from server...';
     private $withJsonZoom;
     private $jsonUrl;
     public function withJsonZoom($jsonUrl = null) {
@@ -311,7 +316,7 @@ class View_HighCharts extends Base_Class implements View_Renderer {
             min = e.min;
             max = e.max;
         }
-        chart.showLoading('Loading data from server...');
+        chart.showLoading('<?=$this->jsonLoadingText?>');
 
         url = url.replace(/:min/g, min).replace(/:max/g, max);
 
