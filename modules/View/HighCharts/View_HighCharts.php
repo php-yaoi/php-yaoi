@@ -316,7 +316,7 @@ class View_HighCharts extends Base_Class implements View_Renderer {
             min = e.min;
             max = e.max;
         }
-        chart.showLoading('<?=$this->jsonLoadingText?>');
+        chart.showLoading('<?php echo $this->jsonLoadingText?>');
 
         url = url.replace(/:min/g, min).replace(/:max/g, max);
 
