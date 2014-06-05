@@ -66,3 +66,13 @@ class View_Highcharts
     }
 }
 //*/
+
+
+// 2014.06.05
+// remove Mappable_Base::iterate in favour of ::iterator
+/*
+class Mappable_Base {
+    static public function iterate(Iterator $rows) {
+    }
+}
+//*/

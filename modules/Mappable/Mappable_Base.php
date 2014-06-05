@@ -28,36 +28,6 @@ abstract class Mappable_Base extends Base_Class implements Mappable {
 
 
     /**
-     * @var SplObjectStorage
-     */
-    static private $activeIterators;
-    public static function __init() {
-        self::$activeIterators = new SplObjectStorage();
-    }
-
-    /**
-     * @param Iterator $rows
-     * @return bool|static
-     */
-    static public function iterate(Iterator $rows) {
-        if (!self::$activeIterators->contains($rows)) {
-            self::$activeIterators->attach($rows);
-            $rows->rewind();
-        }
-
-        if (!$rows->valid()) {
-            self::$activeIterators->detach($rows);
-            return false;
-        }
-
-        $row = $rows->current();
-        $rows->next();
-
-        return static::fromArray($row);
-    }
-
-
-    /**
      * @param $rows
      * @return static[]
      */
@@ -81,5 +51,4 @@ abstract class Mappable_Base extends Base_Class implements Mappable {
         return $result;
     }
 }
-Mappable_Base::__init();
 
