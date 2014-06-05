@@ -258,6 +258,9 @@ class View_HighCharts extends Base_Class implements View_Renderer {
         }
     }
 
+    private static $autoContainerId = 0;
+    private static $jsLoaded = false;
+
     public function render() {
         if ($this->withJsonZoom) {
             $this->addCallbackOption('xAxis', 'events', 'afterSetExtremes', 'loadPoints');
@@ -283,10 +286,24 @@ class View_HighCharts extends Base_Class implements View_Renderer {
             $options = str_replace(array('"unquoted', 'unquoted"'), '', $options);
         }
 
-        ?>
+        if (!$this->containerSelector) {
+            $this->containerSelector = 'highcharts-' . self::$autoContainerId++;
+            ?>
+<div id="<?=$this->containerSelector?>"></div>
+        <?php
+            $this->containerSelector = '#' . $this->containerSelector;
+        }
+
+        if (!self::$jsLoaded) {
+?>
 <script type="text/javascript" src="http://code.highcharts.com/stock/highstock.js"></script>
 <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
 <script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
+<?php
+            self::$jsLoaded = true;
+        }
+
+        ?>
 <script type="text/javascript">
 (function(){
     <?php
