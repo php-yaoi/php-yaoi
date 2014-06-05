@@ -80,13 +80,20 @@ class Database_Query implements Iterator {
         return $this;
     }
 
-    public function fetchAll() {
+    public function fetchAll($keyField = null) {
         $this->rewind();
 
         $result = array();
 
-        while ($r = $this->db()->fetchAssoc($this->result)) {
-            $result []= $r;
+        if ($keyField !== null) {
+            while ($r = $this->db()->fetchAssoc($this->result)) {
+                $result [$r[$keyField]]= $r;
+            }
+        }
+        else {
+            while ($r = $this->db()->fetchAssoc($this->result)) {
+                $result []= $r;
+            }
         }
         return $result;
     }
