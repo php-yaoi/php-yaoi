@@ -57,6 +57,15 @@ abstract class Mappable_Base extends Base_Class implements Mappable {
     }
 
 
+    /**
+     * @param $rows
+     * @return static[]
+     */
+    static public function iterator(&$rows) {
+        return new Mappable_Iterator($rows, get_called_class());
+    }
+
+
     public function toArray() {
         $result = array();
         if (null !== $this->fromProperties) {
