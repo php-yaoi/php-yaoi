@@ -2,6 +2,9 @@
 
 class Mappable_Iterator extends IteratorIterator {
 
+    /**
+     * @var Mappable|string
+     */
     private $class;
 
     public function __construct(&$rows = null, $class) {
