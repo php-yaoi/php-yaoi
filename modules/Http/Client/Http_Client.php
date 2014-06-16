@@ -66,7 +66,7 @@ class Http_Client extends Client implements Mock_Able {
         return $this;
     }
 
-    public function parseResponseCookies() {
+    protected function parseResponseCookies() {
         $cookies = array();
         $this->parsedHeaders = array();
         foreach ($this->responseHeaders as $hdr) {
@@ -141,7 +141,48 @@ class Http_Client extends Client implements Mock_Able {
             $headers['Cookie'] = http_build_query($this->cookies, null, '; ');
         }
 
+
+        $uploadingFiles = false;
         if ($this->post) {
+            foreach ($this->post as $item) {
+                if ($item instanceof Http_Client_UploadFile) {
+                    $uploadingFiles = true;
+                    break;
+                }
+            }
+        }
+
+
+        if ($uploadingFiles) {
+            $driver->setMethod('POST');
+
+            $multipartBoundary = '--------------------------' . Yaoi::time()->microNow();
+            $content = '';
+
+            foreach ($this->post as $name => $value) {
+                if ($value instanceof Http_Client_UploadFile) {
+                    $content .=  "--".$multipartBoundary."\r\n"
+                        . "Content-Disposition: form-data; name=\"" . $name . "\"; filename=\"" . $value->getFileName() . "\"\r\n"
+                        . "Content-Type: " . $value->mimeType . "\r\n\r\n"
+                        . $value->getContents()."\r\n";
+                }
+
+                else {
+                    $content .= "--".$multipartBoundary."\r\n"
+                        . "Content-Disposition: form-data; name=\"$name\"\r\n\r\n"
+                        . "$value\r\n";
+                }
+            }
+            $content .= "--".$multipartBoundary."--\r\n";
+
+            $driver->setRequestContent($content);
+            $headers['Content-Type'] = 'multipart/form-data; boundary=' . $multipartBoundary;
+            //$headers['Content-Length'] = strlen($content);
+            unset($content);
+        }
+
+
+        elseif ($this->post) {
             $driver->setMethod('POST');
             $content = http_build_query($this->post);
             $driver->setRequestContent($content);
@@ -159,7 +200,7 @@ class Http_Client extends Client implements Mock_Able {
         }
         $this->referrer = $this->url;
 
-        if (isset($headers['Content-Type'])) {
+        if (isset($headers['Content-Type']) && !$uploadingFiles) {
             $headers['Content-Type'] .= '; charset=' . $this->requestCharset;
         }
 
