@@ -289,7 +289,7 @@ class View_HighCharts extends Base_Class implements View_Renderer {
         if (!$this->containerSelector) {
             $this->containerSelector = 'highcharts-' . self::$autoContainerId++;
             ?>
-<div id="<?=$this->containerSelector?>"></div>
+<div id="<?php echo $this->containerSelector?>"></div>
         <?php
             $this->containerSelector = '#' . $this->containerSelector;
         }
