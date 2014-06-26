@@ -32,4 +32,10 @@ abstract class Base_Class {
         return clone $this;
     }
 
+
+    public static function className() {
+        return get_called_class();
+    }
+
+
 }
