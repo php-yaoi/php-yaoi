@@ -85,7 +85,7 @@ class String_Parser extends Base_Class implements Is_Empty {
     /**
      * @param null $start
      * @param null $end
-     * @return String_Parser[]
+     * @return String_Parser[]|Traversable
      */
     public function innerAll($start = null, $end = null) {
         return new String_ParserIterator($this, $start, $end);
