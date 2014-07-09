@@ -47,7 +47,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
     public function get($key)
     {
         if ($res = $this->collection->findOne(array('k' => $key))) {
-            if ($res['t'] && $res['t'] < App::time()->now()) {
+            if ($res['t'] && $res['t'] < Yaoi::time()->now()) {
                 $this->delete($key);
                 return null;
             }
@@ -82,7 +82,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
             $v = new MongoBinData($v);
         }
 
-        $this->collection->insert(array('k' => $key, 'v' => $v, 't' => $ttl ? Yaoi::time()->now() + $ttl : null));
+        $this->collection->save(array('k' => $key, 'v' => $v, 't' => $ttl ? Yaoi::time()->now() + $ttl : null));
     }
 
     public function delete($key)
