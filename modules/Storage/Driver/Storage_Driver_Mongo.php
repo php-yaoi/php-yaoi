@@ -78,7 +78,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
             $v = $value;
         }
 
-        if ($this->dsn->binary) {
+        if ($this->dsn->binary || $this->dsn->compression) {
             $v = new MongoBinData($v);
         }
 
