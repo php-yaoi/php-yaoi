@@ -57,4 +57,43 @@ class String_Dsn extends Base_Class {
             $this->port = $p['port'];
         }
     }
+
+
+    public function __toString() {
+        // http://user:password@host:port/path?query
+        $result = $this->scheme;
+
+        $h = $this->hostname;
+        if ($h) {
+            if ($this->port) {
+                $h .= ':' . $this->port;
+            }
+            if ($this->username) {
+                $h = '@' . $h;
+                if ($this->password) {
+                    $h = ':' . $this->password . $h;
+                }
+                $h = $this->username . $h;
+            }
+        }
+
+
+        $result .= '://' . $h . '/' . $this->path;
+
+        $params = (array)$this;
+        unset($params['scheme']);
+        unset($params['username']);
+        unset($params['password']);
+        unset($params['hostname']);
+        unset($params['port']);
+        unset($params['path']);
+
+        if ($params) {
+            $queryString = http_build_query($params);
+            $result .= '?' . $queryString;
+        }
+
+        return $result;
+    }
+
 }
