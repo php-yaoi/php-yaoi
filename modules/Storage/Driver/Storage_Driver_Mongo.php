@@ -16,7 +16,14 @@ class Storage_Driver_Mongo implements Storage_Driver {
      */
     private $collection;
 
+    /**
+     * @var Storage_Dsn
+     */
+    private $dsn;
+
     public function __construct(Storage_Dsn $dsn = null) {
+        $this->dsn = $dsn;
+
         $host = $dsn->hostname ? $dsn->hostname : 'localhost';
         $port = $dsn->port ? $dsn->port : 27017;
 
@@ -44,7 +51,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
                 $this->delete($key);
                 return null;
             }
-            return $res['v'];
+            return $this->dsn->compression ? gzuncompress($res['v']) : $res['v'];
         }
         return null;
     }
@@ -59,7 +66,23 @@ class Storage_Driver_Mongo implements Storage_Driver {
 
     public function set($key, $value, $ttl)
     {
-        $this->collection->insert(array('k' => $key, 'v' => $value, 't' => $ttl ? Yaoi::time()->now() + $ttl : null));
+        if (($this->dsn->compression || $this->dsn->binary) && !is_string($value)) {
+            throw new Storage_Exception('String data required for binary or compression',
+                Storage_Exception::STRING_REQUIRED);
+        }
+
+        if ($this->dsn->compression) {
+            $v = gzcompress($value);
+        }
+        else {
+            $v = $value;
+        }
+
+        if ($this->dsn->binary) {
+            $v = new MongoBinData($v);
+        }
+
+        $this->collection->insert(array('k' => $key, 'v' => $v, 't' => $ttl ? Yaoi::time()->now() + $ttl : null));
     }
 
     public function delete($key)

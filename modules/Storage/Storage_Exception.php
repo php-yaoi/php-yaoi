@@ -7,4 +7,5 @@ class Storage_Exception extends Exception {
     const CONNECTION_FAILED = 4;
     const SET_FAILED = 5;
     const GET_FAILED = 6;
+    const STRING_REQUIRED = 7;
 } 
