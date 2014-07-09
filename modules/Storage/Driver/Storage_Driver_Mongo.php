@@ -51,7 +51,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
                 $this->delete($key);
                 return null;
             }
-            return $this->dsn->compression ? gzuncompress($res['v']) : $res['v'];
+            return $this->dsn->compression ? gzuncompress($res['v']->bin) : $res['v'];
         }
         return null;
     }
