@@ -6,6 +6,8 @@ class Storage_Driver_Http implements Storage_Driver {
      */
     private $dsn;
 
+    private $dsnUrl;
+
     /**
      * @var Http_Client
      */
@@ -14,37 +16,46 @@ class Storage_Driver_Http implements Storage_Driver {
     public function __construct(Storage_Dsn $dsn = null)
     {
         $this->dsn = $dsn;
+        $this->dsnUrl = (string)$dsn;
         $this->http = new Http_Client();
-
-    }
-
-    private function keyUrl($key) {
-
     }
 
     public function get($key)
     {
-
+        $result = $this->http->reset()->fetch($this->dsnUrl . $key);
+        return $result;
     }
 
     public function keyExists($key)
     {
-        // TODO: Implement keyExists() method.
+        $result = $this->http->reset()->fetch($this->dsnUrl . $key);
+        return (bool)$result;
     }
 
     public function set($key, $value, $ttl)
     {
-        // TODO: Implement set() method.
+        $this->http->reset()->post = array(
+            'cmd' => 'set',
+            'value' => $value,
+            'ttl' => $ttl
+        );
+        $this->http->fetch($this->dsnUrl . $key);
     }
 
     public function delete($key)
     {
-
+        $this->http->reset()->post = array(
+            'cmd' => 'delete',
+        );
+        $this->http->fetch($this->dsnUrl . $key);
     }
 
     public function deleteAll()
     {
-        // TODO: Implement deleteAll() method.
+        $this->http->reset()->post = array(
+            'deleteAll'
+        );
+        $this->http->fetch($this->dsnUrl);
     }
 
 } 

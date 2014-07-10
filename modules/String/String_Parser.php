@@ -46,14 +46,6 @@ class String_Parser extends Base_Class implements Is_Empty {
     }
 
 
-    /**
-     * @return $this
-     * @deprecated, use setOffset()
-     */
-    public function resetPosition() {
-        $this->offset = 0;
-        return $this;
-    }
 
     public function getOffset() {
         return $this->offset;
@@ -68,15 +60,6 @@ class String_Parser extends Base_Class implements Is_Empty {
         return (string)$this->string;
     }
 
-    /**
-     * @param null $var
-     * @return bool
-     * @deprecated, use iterate()
-     */
-    public function assignTo(&$var = null) {
-        $var = $this;
-        return null !== $this->string;
-    }
 
     public function isEmpty() {
         return null === $this->string;
