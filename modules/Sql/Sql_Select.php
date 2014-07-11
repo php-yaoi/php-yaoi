@@ -134,6 +134,36 @@ limit
     }
 
 
+    /**
+     * @var Sql_Expression
+     */
+    protected $order;
+    public function order($expression, $binds = null) {
+        if (null === $expression) {
+            return $this;
+        }
+
+        if (null === $this->order) {
+            $this->order = Sql_Expression::createFromFuncArguments(func_get_args());
+        }
+        else {
+            $this->order->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+        }
+        return $this;
+    }
+
+    protected function buildOrder(Database $client) {
+        $order = '';
+
+        if ($this->order && !$this->order->isEmpty()) {
+            $order = ' ORDER BY ' . $this->order->build($client);
+        }
+
+        return $order;
+    }
+
+
+
     public function build(Database $client = null) {
         $q = "SELECT";
 
@@ -141,7 +171,7 @@ limit
         $q .= $this->buildFrom($client);
         //$q .= $this->buildJoin($client);
         $q .= $this->buildWhere($client);
-
+        $q .= $this->buildOrder($client);
 
         return $q;
     }

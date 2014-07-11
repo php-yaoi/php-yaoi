@@ -64,23 +64,29 @@ class Sql_Expression extends Base_Class implements Is_Empty {
     }
 
 
-    const OP_AND = 'AND';
+    const OP_AND = ' AND ';
     public function andExpr($expression) {
         $this->queue []= array(self::OP_AND, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
 
-    const OP_OR = 'OR';
+    const OP_OR = ' OR ';
     public function orExpr($expression) {
         $this->queue []= array(self::OP_OR, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
 
-    const OP_XOR = 'XOR';
+    const OP_XOR = ' XOR ';
     public function xorExpr($expression) {
         $this->queue []= array(self::OP_XOR, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+    const OP_COMMA = ', ';
+    public function commaExpr($expression) {
+        $this->queue []= array(self::OP_COMMA, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -104,7 +110,7 @@ class Sql_Expression extends Base_Class implements Is_Empty {
             $expression = $item[1];
 
             if (!$expression->isEmpty()) {
-                $result .= ' ' . $item[0] . ' ' . $expression->build($client);
+                $result .= $item[0] . $expression->build($client);
             }
         }
 
