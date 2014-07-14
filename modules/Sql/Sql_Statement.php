@@ -5,7 +5,7 @@ class Sql_Statement extends Sql_Expression {
     /**
      * @var Database
      */
-    private $database;
+    protected $database;
     public function bindDatabase(Database $client = null) {
         $this->database = $client;
         return $this;

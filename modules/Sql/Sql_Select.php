@@ -165,6 +165,10 @@ limit
 
 
     public function build(Database $client = null) {
+        if (null === $client) {
+            $client = $this->database;
+        }
+
         $q = "SELECT";
 
         $q .= $this->buildColumns($client);
