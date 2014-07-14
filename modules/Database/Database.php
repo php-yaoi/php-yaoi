@@ -10,6 +10,14 @@ class Database extends Client implements Database_Interface {
     public static $conf = array();
     protected static $instances = array();
 
+    public function __construct(Database_Dsn $dsn = null) {
+        parent::__construct($dsn);
+        if ($dsn->logQueries) {
+            $this->log(Log::getInstance($dsn->logQueries));
+        }
+    }
+
+
     /**
      * @param null $statement
      * @param null $binds
