@@ -13,7 +13,7 @@ class Log_Driver_File implements Log_Driver {
         $this->fileName = $dsn->path;
         $this->fileName = '/' == $this->fileName[0]
             ? $this->fileName
-            : Acme::instance()->logPath . $this->fileName;
+            : Yaoi::instance()->logPath . $this->fileName;
     }
 
     /**
