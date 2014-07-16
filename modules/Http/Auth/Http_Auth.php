@@ -62,7 +62,7 @@ class Http_Auth extends Client {
         return true;
     }
 
-    public function demand($logout = false) {
+    public function demand($logout = false, $redirectOnLogoutUrl = null) {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             header('WWW-Authenticate: Basic realm="' . $this->dsn->title . '"');
             header('HTTP/1.0 401 Unauthorized');
@@ -78,6 +78,9 @@ class Http_Auth extends Client {
             }
 
             if ($logout) {
+                if ($redirectOnLogoutUrl) {
+                    Yaoi::redirect($redirectOnLogoutUrl);
+                }
                 $this->fatal('Logout');
             }
         }
