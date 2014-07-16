@@ -79,9 +79,12 @@ class Http_Auth extends Client {
 
             if ($logout) {
                 if ($redirectOnLogoutUrl) {
-                    Yaoi::redirect($redirectOnLogoutUrl);
+                   $message = '<html><head><meta http-equiv="refresh" content="0;'.$redirectOnLogoutUrl.'"/></head><body>Logout</body></html>';
                 }
-                $this->fatal('Logout');
+                else {
+                    $message = 'Logout';
+                }
+                $this->fatal($message);
             }
         }
     }
