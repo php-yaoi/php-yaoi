@@ -62,11 +62,11 @@ class Yaoi {
     protected static $instance;
 
     /**
-     * @return static
+     * @return Yaoi
      * @throws Exception
      */
     static function instance() {
-        if (is_null(self::$instance)) {
+        if (null === self::$instance) {
             throw new Exception('Application is not initialized');
         }
 
@@ -108,6 +108,21 @@ class Yaoi {
     static function log($id = 'default') {
         return Log::getInstance($id);
     }
+
+    public function stop($errorCode = 0) {
+        die($errorCode);
+    }
+
+    public static function redirect($url, $permanent = false, $stop = true) {
+        if ($permanent) {
+            header('HTTP/1.1 301 Moved Permanently');
+        }
+        header('Location: ' . $url);
+        if ($stop) {
+            Yaoi::instance()->stop();
+        }
+    }
+
 
 }
 
@@ -213,7 +228,6 @@ class Yaoi_Conf {
 
         set_error_handler($errorHandler);
     }
-
 
 }
 
