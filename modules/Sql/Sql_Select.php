@@ -163,6 +163,30 @@ limit
     }
 
 
+    private $limit;
+    private $offset;
+    public function limit($limit, $offset = null) {
+        $this->limit = $limit;
+        if (null !== $offset) {
+            $this->offset = $offset;
+        }
+        return $this;
+    }
+    public function offset($offset) {
+        $this->offset = $offset;
+        return $this;
+    }
+    private function buildLimit() {
+        if ($this->limit) {
+            return ' LIMIT ' . $this->limit . ($this->offset ? ' OFFSET ' . $this->offset : '');
+        }
+        else {
+            return '';
+        }
+    }
+
+
+
 
     public function build(Database $client = null) {
         if (null === $client) {
@@ -176,6 +200,7 @@ limit
         //$q .= $this->buildJoin($client);
         $q .= $this->buildWhere($client);
         $q .= $this->buildOrder($client);
+        $q .= $this->buildLimit();
 
         return $q;
     }
