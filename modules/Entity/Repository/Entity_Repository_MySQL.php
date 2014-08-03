@@ -1,9 +1,20 @@
 <?php
 
-abstract class Entity_Repository_Database implements Entity_Repository, Entity_Repository_DatabaseRequirements {
+abstract class Entity_Repository_MySQL implements Entity_Repository, Entity_Repository_DatabaseRequirements {
     public function add(Entity $entity)
     {
+        $data = $entity->toArray();
         $db = static::getDatabase();
+        $table = static::getTableName();
+        $fields = '';
+        $values = '';
+        foreach ($data as $k => $v) {
+            $fields .= "`$k`,";
+            $values .= $db->expr('?', $v) . ',';
+        }
+        $fields = substr($fields, 0, -1);
+        $values = substr($values, 0, -1);
+        $db->query('INSERT INTO `' . $table . '` (' . $fields . ') VALUES (' . $values . ')');
     }
 
     public function byPrimaryKey($key)
