@@ -1,22 +1,27 @@
 <?php
 
 abstract class Database_Abstract_Mock_DriverPlay extends Database_Driver implements Mock_Able {
+    /**
+     * @var Mock_DataSetPlay
+     */
+    private $lastQuery;
+
     public function query($statement)
     {
         $queryMock = $this->mock->branch(self::QUERY, $statement);
+        $this->lastQuery = $queryMock;
         return $queryMock;
     }
 
-    /**
-     * @param Mock_DataSetPlay $queryMock
-     */
-    public function lastInsertId($queryMock)
+    public function lastInsertId()
     {
+        $queryMock = $this->lastQuery;
         return $queryMock->get(self::LAST_INSERT_ID);
     }
 
     /**
      * @param Mock_DataSetPlay $queryMock
+     * @return integer
      */
     public function rowsAffected($queryMock)
     {

@@ -10,11 +10,17 @@ abstract class Entity_Repository_MySQL implements Entity_Repository, Entity_Repo
         $values = '';
         foreach ($data as $k => $v) {
             $fields .= "`$k`,";
-            $values .= $db->expr('?', $v) . ',';
+            $values .= $db->quote($v) . ',';
         }
         $fields = substr($fields, 0, -1);
         $values = substr($values, 0, -1);
         $db->query('INSERT INTO `' . $table . '` (' . $fields . ') VALUES (' . $values . ')');
+        if (static::isAutoPrimaryKey()) {
+            $primaryKey = static::getPrimaryKey();
+            if (is_string($primaryKey)) {
+                $entity->$primaryKey = $db->lastInsertId();
+            }
+        }
     }
 
     public function byPrimaryKey($key)

@@ -13,19 +13,25 @@ abstract class Database_Abstract_Mock_DriverCapture extends Database_Driver impl
         $this->driver = $driver;
     }
 
+    /**
+     * @var Mock_DataSetCapture
+     */
+    private $lastQuery;
+
     public function query($statement)
     {
         $queryMock = $this->mock->branch(self::QUERY, $statement);
         $queryMock->temp(self::RESULT, $this->driver->query($statement));
+        $this->lastQuery = $queryMock;
         return $queryMock;
     }
 
     /**
-     * @param Mock_DataSetCapture $queryMock
      * @return mixed
      */
-    public function lastInsertId($queryMock)
+    public function lastInsertId()
     {
+        $queryMock = $this->lastQuery;
         $res = $this->driver->lastInsertId($queryMock->temp(self::RESULT));
         $queryMock->add($res, self::LAST_INSERT_ID);
         return $res;

@@ -5,15 +5,19 @@
  * TODO reconnect on gone away
  *
  * Class Database
+ * @property Database_Dsn $dsn
  */
 class Database extends Client implements Database_Interface {
     public static $conf = array();
     protected static $instances = array();
 
-    public function __construct(Database_Dsn $dsn = null) {
+    /**
+     * @param string|Database_Dsn $dsn
+     */
+    public function __construct($dsn = null) {
         parent::__construct($dsn);
-        if ($dsn->logQueries) {
-            $this->log(Log::getInstance($dsn->logQueries));
+        if ($this->dsn->logQueries) {
+            $this->log(Log::getInstance($this->dsn->logQueries));
         }
     }
 
@@ -50,6 +54,14 @@ class Database extends Client implements Database_Interface {
 
     public function quote($s) {
         return $this->getDriver()->quote($s);
+    }
+
+    /**
+     * @return integer
+     */
+    public function lastInsertId()
+    {
+        return $this->getDriver()->lastInsertId();
     }
 
 

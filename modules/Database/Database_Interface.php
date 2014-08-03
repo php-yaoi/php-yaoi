@@ -26,4 +26,15 @@ interface Database_Interface extends Mock_Able {
      * @return Sql_Select
      */
     public function select($from = null);
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function quote($value);
+
+    /**
+     * @return integer
+     */
+    public function lastInsertId();
 }

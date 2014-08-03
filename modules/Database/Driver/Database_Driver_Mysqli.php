@@ -81,7 +81,7 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
     }
 
 
-    public function lastInsertId($result) {
+    public function lastInsertId() {
         return $this->mysqli->insert_id;
     }
 

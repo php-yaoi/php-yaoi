@@ -17,4 +17,9 @@ interface Entity_Repository_DatabaseRequirements {
      * @return string[]
      */
     public static function getFields();
+
+    /**
+     * @return bool
+     */
+    public static function isAutoPrimaryKey();
 }

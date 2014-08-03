@@ -6,7 +6,7 @@ class Database_Driver_Sqlite implements Database_Server_Mysql  {
         // TODO: Implement query() method.
     }
 
-    public function lastInsertId($result)
+    public function lastInsertId()
     {
         return sqlite_last_insert_rowid($this->db);
         // TODO: Implement lastInsertId() method.
