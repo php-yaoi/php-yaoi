@@ -1,7 +1,7 @@
 <?php
 
 interface Entity_Repository {
-    public function add(Entity $entity);
+    public static function add(Entity $entity);
 
     public function byPrimaryKey($key);
     public function byEntity();

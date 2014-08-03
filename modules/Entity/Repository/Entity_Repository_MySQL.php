@@ -1,7 +1,7 @@
 <?php
 
 abstract class Entity_Repository_MySQL implements Entity_Repository, Entity_Repository_DatabaseRequirements {
-    public function add(Entity $entity)
+    public static function add(Entity $entity)
     {
         $data = $entity->toArray();
         $db = static::getDatabase();
@@ -22,6 +22,8 @@ abstract class Entity_Repository_MySQL implements Entity_Repository, Entity_Repo
             }
         }
     }
+
+
 
     public function byPrimaryKey($key)
     {

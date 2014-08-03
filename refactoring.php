@@ -76,3 +76,11 @@ class Mappable_Base {
     }
 }
 //*/
+
+// 2014.08.03
+// rename Sql_Statement->columns to Sql_Statement->select
+/*
+class Sql_Statement {
+    public function columns($expression, $binds = null) {}
+}
+//*/
