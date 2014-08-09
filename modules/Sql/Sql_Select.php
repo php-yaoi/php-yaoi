@@ -46,6 +46,8 @@ limit
         $q .= $this->buildFrom($client);
         $q .= $this->buildJoin($client);
         $q .= $this->buildWhere($client);
+        $q .= $this->buildGroupBy($client);
+        $q .= $this->buildHaving($client);
         $q .= $this->buildOrder($client);
         $q .= $this->buildLimit();
 

@@ -166,4 +166,87 @@ class Sql_ComplexStatement extends Sql_Expression {
         }
     }
 
-} 
+    /**
+     * @var Sql_Expression
+     */
+    private $groupBy;
+    public function groupBy($expression, $binds = null) {
+        if (null === $expression) {
+            return $this;
+        }
+
+        if (null === $this->groupBy) {
+            $this->groupBy = Sql_Expression::createFromFuncArguments(func_get_args());
+        }
+        else {
+            $this->groupBy->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+        }
+
+        return $this;
+    }
+
+    protected  function buildGroupBy(Database $client) {
+        if ($this->groupBy && !$this->groupBy->isEmpty()) {
+            return ' GROUP BY ' . $this->groupBy->build($client);
+        }
+        else {
+            return '';
+        }
+    }
+
+
+
+    /**
+     * @var Sql_Expression
+     */
+    private $having;
+    public function having($expression, $binds = null) {
+        if (null === $expression) {
+            return $this;
+        }
+
+        if (null === $this->having) {
+            $this->having = Sql_Expression::createFromFuncArguments(func_get_args());
+        }
+        else {
+            $this->having->andExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+        }
+
+        return $this;
+    }
+
+    protected  function buildHaving(Database $client) {
+        if ($this->having && !$this->having->isEmpty()) {
+            return ' HAVING ' . $this->having->build($client);
+        }
+        else {
+            return '';
+        }
+    }
+
+    /**
+     * @var Sql_Expression
+     */
+    private $set;
+    public function set($expression, $binds) {
+        if (null === $expression) {
+            return $this;
+        }
+
+        if (is_array($expression)) {
+
+        }
+
+        if (null === $this->set) {
+            $this->set = Sql_Expression::createFromFuncArguments(func_get_args());
+        }
+        else {
+            $this->set->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+        }
+
+        return $this;
+    }
+
+
+
+}

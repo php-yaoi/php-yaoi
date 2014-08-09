@@ -85,4 +85,31 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
+
+    public function build(Database $client) {
+        if ($this->command === self::CMD_SELECT) {
+            if (null === $client) {
+                $client = $this->database;
+            }
+
+            $q = self::CMD_SELECT;
+            $q .= $this->buildSelect($client);
+            $q .= $this->buildFrom($client);
+            $q .= $this->buildJoin($client);
+            $q .= $this->buildWhere($client);
+            $q .= $this->buildGroupBy($client);
+            $q .= $this->buildHaving($client);
+            $q .= $this->buildOrder($client);
+            $q .= $this->buildLimit();
+            return $q;
+        }
+
+        elseif ($this->command === self::CMD_UPDATE) {
+
+        }
+    }
+
+
+
+
 }
