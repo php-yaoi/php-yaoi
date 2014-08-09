@@ -52,28 +52,38 @@ class Sql_ComplexStatement extends Sql_Expression {
     const JOIN_LEFT = 'LEFT';
     const JOIN_RIGHT = 'RIGHT';
     const JOIN_INNER = 'INNER';
+    /**
+     * @var Sql_Expression[]
+     */
     protected $join = array();
-    public function leftJoin($expression, $binds) {
+    public function leftJoin($expression, $binds = null) {
         $this->join []= array(self::JOIN_LEFT, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
-    public function rightJoin($fromExpression, $as = null, $on = null) {
-        $this->join []= array($fromExpression, $as, $on, self::JOIN_RIGHT);
+    public function rightJoin($expression, $binds = null) {
+        $this->join []= array(self::JOIN_RIGHT, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
-    public function innerJoin($fromExpression, $as = null, $on = null) {
-        $this->join []= array($fromExpression, $as, $on, self::JOIN_INNER);
+    public function innerJoin($expression, $binds = null) {
+        $this->join []= array(self::JOIN_INNER, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
     protected function buildJoin(Database $client) {
+        $join = '';
         foreach ($this->join as $item) {
+            $direction = $item[0];
+            /**
+             * @var Sql_Expression $expression
+             */
+            $expression = $item[1];
+            if ($expression && !$expression->isEmpty()) {
+                $join .= ' ' . $direction . ' JOIN ' . $expression->build($client);
+            }
 
         }
-        return '';
+        return $join;
     }
-
-
 
 
     /**
