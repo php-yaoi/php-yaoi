@@ -229,12 +229,19 @@ class Sql_ComplexStatement extends Sql_Expression {
      */
     private $set;
     public function set($expression, $binds) {
+
+        // TODO implement
         if (null === $expression) {
             return $this;
         }
 
         if (is_array($expression)) {
-
+            $e = '';
+            $binds = array();
+            foreach ($expression as $key => $value) {
+                $e .= '`' . $key . '` = ?, ';
+                $binds []= $value;
+            }
         }
 
         if (null === $this->set) {
