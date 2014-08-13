@@ -3,7 +3,7 @@
 class View_HTML_Element extends Base_Class implements View_Renderer {
     protected $id;
     protected $classes = array();
-    protected $attributes;
+    protected $attributes = array();
     protected $tag;
     protected $content;
 
