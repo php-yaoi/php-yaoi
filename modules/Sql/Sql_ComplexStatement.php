@@ -31,7 +31,7 @@ class Sql_ComplexStatement extends Sql_Expression {
         return $this;
     }
 
-    protected function buildFrom(Database $client) {
+    protected function buildFrom(Database $client, $command = ' FROM ') {
         $from = '';
         if ($this->from) {
             foreach ($this->from as $expression) {
@@ -40,7 +40,7 @@ class Sql_ComplexStatement extends Sql_Expression {
             }
 
             if ($from) {
-                $from = ' FROM ' . substr($from, 0, -2);
+                $from = $command . substr($from, 0, -2);
             }
         }
 
@@ -228,7 +228,7 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     private $set;
-    public function set($expression, $binds) {
+    public function set($expression, $b) {
 
         // TODO implement
         if (null === $expression) {
@@ -237,11 +237,12 @@ class Sql_ComplexStatement extends Sql_Expression {
 
         if (is_array($expression)) {
             $e = '';
-            $binds = array();
+            $b = array();
             foreach ($expression as $key => $value) {
                 $e .= '`' . $key . '` = ?, ';
-                $binds []= $value;
+                $b []= $value;
             }
+            $expression = new Sql_Expression($e, $b);
         }
 
         if (null === $this->set) {
@@ -252,6 +253,15 @@ class Sql_ComplexStatement extends Sql_Expression {
         }
 
         return $this;
+    }
+
+    protected function buildSet(Database $client) {
+        if ($this->set && !$this->set->isEmpty()) {
+            return ' SET ' . $this->set->build($client);
+        }
+        else {
+            return '';
+        }
     }
 
 

@@ -87,11 +87,11 @@ class Sql_Statement extends Sql_ComplexStatement {
 
 
     public function build(Database $client) {
-        if ($this->command === self::CMD_SELECT) {
-            if (null === $client) {
-                $client = $this->database;
-            }
+        if (null === $client) {
+            $client = $this->database;
+        }
 
+        if ($this->command === self::CMD_SELECT) {
             $q = self::CMD_SELECT;
             $q .= $this->buildSelect($client);
             $q .= $this->buildFrom($client);
@@ -105,7 +105,11 @@ class Sql_Statement extends Sql_ComplexStatement {
         }
 
         elseif ($this->command === self::CMD_UPDATE) {
+            $q = self::CMD_UPDATE;
+            $q .= $this->buildFrom($client, '');
+            $q .= $this->buildSet($client);
 
+            return $q;
         }
     }
 
