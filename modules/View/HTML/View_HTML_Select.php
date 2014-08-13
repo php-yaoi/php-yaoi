@@ -19,7 +19,7 @@ class View_HTML_Select extends View_HTML_Input {
 
         $this->renderHead();
         echo '>';
-        $this->contentExists = true;
+        $this->contentRendered = true;
         foreach ($this->options as $value => $title) {
             echo '<option value="', self::escapeValue($value),
             ($this->value !== null && $this->value == $value ? '" selected="selected' : ''),

@@ -74,7 +74,7 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         }
     }
 
-    protected $contentExists;
+    protected $contentRendered;
     protected function renderContentChunk($content) {
         $contentExists = false;
         if (($content instanceof Is_Empty) && !$content->isEmpty()) {
@@ -85,8 +85,8 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         }
 
         if ($contentExists) {
-            if (!$this->contentExists) {
-                $this->contentExists = 1;
+            if (!$this->contentRendered) {
+                $this->contentRendered = 1;
                 echo '>';
             }
 
@@ -102,7 +102,7 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
             return;
         }
 
-        if ($this->contentExists) {
+        if ($this->contentRendered) {
             echo '</' . $this->tag . '>';
         }
         else {
@@ -112,6 +112,9 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
 
     public function render() {
         $this->headRendered = false;
+        $this->contentRendered = false;
+        $this->tailRendered = false;
+
         $this->renderHead();
         $this->renderContentChunk($this->content);
         $this->renderTail();
