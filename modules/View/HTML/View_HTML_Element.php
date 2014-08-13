@@ -111,6 +111,7 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
     }
 
     public function render() {
+        $this->headRendered = false;
         $this->renderHead();
         $this->renderContentChunk($this->content);
         $this->renderTail();
