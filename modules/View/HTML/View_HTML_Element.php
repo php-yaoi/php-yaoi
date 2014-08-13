@@ -47,6 +47,11 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         return $result;
     }
 
+    public function setContent($content) {
+        $this->content = $content;
+        return $this;
+    }
+
     public function isEmpty() {
         if ($this->content instanceof Is_Empty) {
             return $this->content->isEmpty();
@@ -69,7 +74,7 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         ;
         if ($this->attributes) {
             foreach ($this->attributes as $attribute => $value) {
-                echo ' ' . $attribute . '="' . $value . '"';
+                echo ' ' . $attribute . '="' . $this->escapeValue($value) . '"';
             }
         }
     }
@@ -87,7 +92,9 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         if ($contentExists) {
             if (!$this->contentRendered) {
                 $this->contentRendered = 1;
-                echo '>';
+                if ($this->tag) {
+                    echo '>';
+                }
             }
 
             echo $content;
