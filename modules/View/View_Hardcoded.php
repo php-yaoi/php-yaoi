@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class View_Hardcoded
+ * @method static View_Hardcoded create
+ */
 abstract class View_Hardcoded extends Base_Class implements View_Renderer {
     public function isEmpty() {
         return false;
