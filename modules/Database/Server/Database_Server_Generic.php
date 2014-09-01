@@ -10,4 +10,5 @@ interface Database_Server_Generic {
     public function fetchAssoc($result);
     public function quote($value);
     public function queryErrorMessage($result);
+    public function disconnect();
 }

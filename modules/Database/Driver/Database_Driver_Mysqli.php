@@ -76,7 +76,13 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
 
     public function disconnect() {
         if ($this->mysqli) {
-            $this->mysqli->close();
+            $result = $this->mysqli->close();
+            if (!$result) {
+                throw new Database_Exception('Disconnect failed', Database_Exception::DISCONNECT_ERROR);
+            }
+            else {
+                $this->mysqli = null;
+            }
         }
     }
 

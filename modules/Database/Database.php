@@ -65,6 +65,11 @@ class Database extends Client implements Database_Interface {
     }
 
 
+    public function disconnect() {
+        $this->getDriver()->disconnect();
+    }
+
+
     protected $originalDriver;
 
     /**
@@ -190,5 +195,6 @@ class Database extends Client implements Database_Interface {
     public function select($from = null) {
         return Sql_Select::create($from)->bindDatabase($this);
     }
+
 
 }

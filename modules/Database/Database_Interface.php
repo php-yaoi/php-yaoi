@@ -37,4 +37,9 @@ interface Database_Interface extends Mock_Able {
      * @return integer
      */
     public function lastInsertId();
+
+    /**
+     * @return $this
+     */
+    public function disconnect();
 }
