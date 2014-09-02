@@ -90,7 +90,11 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         return $this;
     }
 
-
+    /**
+     * @param Database|Database_Interface $client
+     * @return mixed|string
+     * @throws Database_Exception
+     */
     public function build(Database $client) {
         if ($this->isEmpty()) {
             return '';
