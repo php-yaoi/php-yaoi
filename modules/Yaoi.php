@@ -22,7 +22,7 @@ class Yaoi {
     public static function init($conf = null) {
 
         self::$instance = new static;
-        self::$instance->logPath = __DIR__ . '/../logs/';
+        self::$instance->logPath = __DIR__ . '/../../logs/';
         self::$instance->conf = $conf;
 
         if ($conf instanceof Closure) {
