@@ -11,7 +11,7 @@ class Yaoi {
     public $path;
     public $mode;
 
-    public $logPath = 'logs/';
+    public $logPath;
     public $logErrors = true;
 
     /**
@@ -20,7 +20,9 @@ class Yaoi {
     protected $conf;
 
     public static function init($conf = null) {
+
         self::$instance = new static;
+        self::$instance->logPath = __DIR__ . '/../logs/';
         self::$instance->conf = $conf;
 
         if ($conf instanceof Closure) {
@@ -122,9 +124,8 @@ class Yaoi {
             Yaoi::instance()->stop();
         }
     }
-
-
 }
+
 
 class Yaoi_Conf {
     public $modulesPath;
