@@ -23,7 +23,7 @@ limit
     }
 
     /**
-     * @deprecated
+     * @deprecated use $this->select()
      * @param $expression
      * @param null $binds
      * @return $this
