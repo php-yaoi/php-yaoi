@@ -28,6 +28,11 @@ interface Database_Interface extends Mock_Able {
     public function select($from = null);
 
     /**
+     * @return Sql_Statement
+     */
+    public function statement();
+
+    /**
      * @param $value
      * @return string
      */

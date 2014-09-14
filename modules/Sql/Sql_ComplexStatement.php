@@ -31,7 +31,7 @@ class Sql_ComplexStatement extends Sql_Expression {
         return $this;
     }
 
-    protected function buildFrom(Database $client, $command = ' FROM ') {
+    protected function buildFrom(Database $client) {
         $from = '';
         if ($this->from) {
             foreach ($this->from as $expression) {
@@ -40,7 +40,7 @@ class Sql_ComplexStatement extends Sql_Expression {
             }
 
             if ($from) {
-                $from = $command . substr($from, 0, -2);
+                $from = ' FROM ' . substr($from, 0, -2);
             }
         }
 
@@ -228,7 +228,7 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     private $set;
-    public function set($expression, $b) {
+    public function set($expression, $binds = null) {
 
         // TODO implement
         if (null === $expression) {
@@ -236,20 +236,31 @@ class Sql_ComplexStatement extends Sql_Expression {
         }
 
         if (is_array($expression)) {
+            if (is_string($binds)) {
+                $table = '`' . $binds . '`.';
+            }
+            else {
+                $table = '';
+            }
+
             $e = '';
             $b = array();
             foreach ($expression as $key => $value) {
-                $e .= '`' . $key . '` = ?, ';
+                $e .= $table . '`' . $key . '` = ?, ';
                 $b []= $value;
             }
+            $e = substr($e, 0, -2);
             $expression = new Sql_Expression($e, $b);
+        }
+        else {
+            $expression = Sql_Expression::createFromFuncArguments(func_get_args());
         }
 
         if (null === $this->set) {
-            $this->set = Sql_Expression::createFromFuncArguments(func_get_args());
+            $this->set = $expression;
         }
         else {
-            $this->set->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+            $this->set->commaExpr($expression);
         }
 
         return $this;

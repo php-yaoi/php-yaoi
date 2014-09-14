@@ -145,6 +145,9 @@ class Database extends Client implements Database_Interface {
                     if ($value instanceof Sql_Expression) {
                         $value = '(' . $value->build($this) . ')';
                     }
+                    elseif ($value instanceof Sql_DefaultValue) {
+                        $value = 'DEFAULT';
+                    }
                     else {
                         $value = $driver->quote($value);
                     }
@@ -196,5 +199,11 @@ class Database extends Client implements Database_Interface {
         return Sql_Select::create($from)->bindDatabase($this);
     }
 
+    /**
+     * @return Sql_Statement
+     */
+    public function statement() {
+        return Sql_Statement::create()->bindDatabase($this);
+    }
 
 }

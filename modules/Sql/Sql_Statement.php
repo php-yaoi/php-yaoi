@@ -27,13 +27,13 @@ class Sql_Statement extends Sql_ComplexStatement {
     const CMD_UPDATE = 'UPDATE';
     private $command;
 
-    protected $set = array();
-    public function update($set, $binds) {
+    protected $tables = array();
+    public function update($table) {
         // TODO implement
         // UPDATE t1 LEFT JOIN t2 ON t1.e = t2.e SET t1.c = t2.cc WHERE t1.ff = 45
         // UPDATE t1 SET dd = 1 WHERE ddd = 2
         $this->command = self::CMD_UPDATE;
-        $this->set []= Sql_Expression::createFromFuncArguments(func_get_args());
+        $this->tables[]= $table;
         return $this;
     }
 
@@ -43,9 +43,10 @@ class Sql_Statement extends Sql_ComplexStatement {
         return $this;
     }
 
-    public function delete() {
+    public function delete($table = null) {
         // TODO implement
         $this->command = self::CMD_DELETE;
+        $this->tables []= $table;
         return $this;
     }
 
@@ -106,10 +107,38 @@ class Sql_Statement extends Sql_ComplexStatement {
 
         elseif ($this->command === self::CMD_UPDATE) {
             $q = self::CMD_UPDATE;
-            $q .= $this->buildFrom($client, '');
+            $q .= $this->buildTable();
+            $q .= $this->buildJoin($client);
             $q .= $this->buildSet($client);
+            $q .= $this->buildWhere($client);
+            $q .= $this->buildOrder($client);
+            $q .= $this->buildLimit();
 
             return $q;
+        }
+
+        elseif ($this->command === self::CMD_DELETE) {
+            $q = self::CMD_DELETE;
+            $q .= $this->buildTable();
+            $q .= $this->buildFrom($client);
+            $q .= $this->buildJoin($client);
+            $q .= $this->buildWhere($client);
+            $q .= $this->buildOrder($client);
+            $q .= $this->buildLimit();
+
+            return $q;
+        }
+
+        return '';
+    }
+
+
+    private function buildTable() {
+        if ($this->tables) {
+            return ' ' . implode(', ', $this->tables);
+        }
+        else {
+            return '';
         }
     }
 

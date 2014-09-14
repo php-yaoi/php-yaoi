@@ -40,4 +40,8 @@ abstract class Database_Driver implements Database_Server_Generic {
             return "'" . $this->escape($value) . "'";
         }
     }
+
+    public function quoteSymbol($symbol) {
+        return '"' . $symbol . '"';
+    }
 }
