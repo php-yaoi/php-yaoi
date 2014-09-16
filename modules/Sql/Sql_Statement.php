@@ -37,9 +37,10 @@ class Sql_Statement extends Sql_ComplexStatement {
         return $this;
     }
 
-    public function insert() {
+    public function insert($table) {
         // TODO insert is totally different, no join, no where
         $this->command = self::CMD_INSERT;
+        $this->tables []= $table;
         return $this;
     }
 

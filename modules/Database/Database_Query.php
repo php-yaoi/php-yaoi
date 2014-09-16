@@ -98,14 +98,14 @@ class Database_Query implements Iterator {
         return $result;
     }
 
-    public function fetchPairs() {
+    public function fetchPairs($key = 0, $value = 1) {
         $this->rewind();
 
         $result = array();
 
         while ($r = $this->db()->fetchAssoc($this->result)) {
             $r = array_values($r);
-            $result [$r[0]]= $r[1];
+            $result [$r[$key]]= $r[$value];
         }
         return $result;
     }
