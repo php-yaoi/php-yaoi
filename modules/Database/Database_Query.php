@@ -61,7 +61,7 @@ class Database_Query implements Iterator {
                  * @var Log $log
                  */
                 $log = DependencyRepository::$items[$this->logResourceId];
-                $log->push($error . ' ' . $query, Log::TYPE_ERROR);
+                $log->push($query . ': ' . $error . ' ' . $query, Log::TYPE_ERROR);
             }
             $exception = new Database_Exception($error, Database_Exception::QUERY_ERROR);
             $exception->query = $query;
