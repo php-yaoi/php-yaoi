@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: poturaev
- * Date: 18.09.2014
- * Time: 18:07
- */
 
 class Entity_SimpleMysql {
 
