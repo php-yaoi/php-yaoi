@@ -1,8 +1,7 @@
 <?php
 
 class Entity_SimpleMysql {
-
-    static public $tableName = 'adplace_prices';
+    static public $tableName = null;
     static public $idField = 'id';
 
     private $fetched = false;
@@ -10,14 +9,24 @@ class Entity_SimpleMysql {
 
     private static $columns = array();
 
+    private static function tableName() {
+        if (null === self::$tableName) {
+            return get_called_class();
+        }
+        else {
+            return self::$tableName;
+        }
+    }
+
+
     public static function getColumns() {
-        $tableName = self::$tableName;
-        if (!isset(static::$columns[$tableName])) {
-            static::$columns[$tableName] = Yaoi::db()
+        $tableName = self::tableName();
+        if (!isset(self::$columns[$tableName])) {
+            self::$columns[$tableName] = Yaoi::db()
                 ->query("DESC `$tableName`")
                 ->fetchPairs(0, 0);
         }
-        return static::$columns[$tableName];
+        return self::$columns[$tableName];
     }
 
 
@@ -65,19 +74,24 @@ class Entity_SimpleMysql {
         $insert->insert(self::$tableName);
         $data = array();
         foreach (static::getColumns() as $column) {
-            $data[$column] = $this->$column;
+            $data[$column] = isset($this->$column) ? $this->$column : null;
         }
         $insert->set($data);
         if (!isset($data[static::$idField])) {
-            $id = $insert->query()->lastInsertId();
+            echo $insert;
+            //$id = $insert->query()->lastInsertId();
+            //$this->id = $id;
         }
 
         return $this;
     }
 
     public function save() {
-        if (null !== $this->{self::$idField}) {
-
+        if (!isset($this->{self::$idField})) {
+            $this->insert();
+        }
+        else {
+            $this->update();
         }
     }
 
