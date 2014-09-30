@@ -137,7 +137,7 @@ class Sql_Statement extends Sql_ComplexStatement {
         elseif ($this->command === self::CMD_INSERT) {
             $q = self::CMD_INSERT;
             $q .= $this->buildTable();
-            $q .= $this->buildSet($client);
+            $q .= $this->buildValues($client);
             return $q;
         }
 
@@ -156,5 +156,9 @@ class Sql_Statement extends Sql_ComplexStatement {
 
 
 
+    public function expr($expression, $binds = null) {
+        $e = Sql_Expression::createFromFuncArguments(func_get_args());
+        return $e;
+    }
 
 }

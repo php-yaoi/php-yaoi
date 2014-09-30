@@ -53,7 +53,16 @@ class Database extends Client implements Database_Interface {
 
 
     public function quote($s) {
-        return $this->getDriver()->quote($s);
+        if ($s instanceof Sql_Expression) {
+            return $s->build($this);
+        }
+        else {
+            return $this->getDriver()->quote($s);
+        }
+    }
+
+    public function symbol($s) {
+        return $this->getDriver()->quoteSymbol($s);
     }
 
     /**

@@ -36,6 +36,9 @@ abstract class Database_Driver implements Database_Server_Generic {
             }
             return substr($result, 0, -2);
         }
+        elseif ($value instanceof Sql_DefaultValue) {
+            return 'DEFAULT';
+        }
         else {
             return "'" . $this->escape($value) . "'";
         }

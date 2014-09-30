@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Database_Mock_DriverPlay
+ * TODO proxy quote
+ * TODO proxy quoteSymbol
+ */
 class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
     /**
      * @var Mock_DataSetPlay

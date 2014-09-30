@@ -297,4 +297,64 @@ class Sql_ComplexStatement extends Sql_Expression
         }
     }
 
+
+    private $values;
+    public function valuesRow($array) {
+        if (null === $this->values) {
+            $this->values = array();
+        }
+        $this->values []= $array;
+        return $this;
+    }
+
+    public function valuesRows($collection) {
+        if (null === $this->values) {
+            $this->values = array();
+        }
+        foreach ($collection as $array) {
+            $this->values []= $array;
+        }
+        return $this;
+    }
+
+    protected function buildValues(Database $client) {
+        $result = '';
+        if ($this->values) {
+            $fields = array();
+            foreach ($this->values as $row) {
+                foreach (array_keys($row) as $field) {
+                    $fields[$field] = $field;
+                }
+            }
+            if (!$fields) {
+                return $result;
+            }
+            $result .= '(';
+            foreach ($fields as $field) {
+                $result .= $client->symbol($field) . ', ';
+            }
+            $result = substr($result, 0, -2) . ') VALUES ';
+
+            foreach ($this->values as $row) {
+                $rowString = '';
+                foreach ($fields as $field) {
+                    if (array_key_exists($field, $row)) {
+                        $value = $row[$field];
+                    }
+                    else {
+                        $value = new Sql_DefaultValue();
+                    }
+
+                    $rowString .= $client->quote($value) . ', ';
+                }
+                $result .= '(' . substr($rowString, 0, -2) . '), ';
+            }
+            $result = substr($result, 0, -2);
+            return $result;
+        }
+        else {
+            return $result;
+        }
+    }
+
 }

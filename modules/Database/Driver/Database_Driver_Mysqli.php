@@ -130,6 +130,8 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
         return $this->mysqli->errno . ' ' . $this->mysqli->error;
     }
 
-
+    public function quoteSymbol($s) {
+        return '`' . $s . '`';
+    }
 
 }
