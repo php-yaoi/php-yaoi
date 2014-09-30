@@ -87,6 +87,10 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
+    public function lowPriority() {
+
+    }
+
 
     public function build(Database $client) {
         if (null === $client) {
@@ -127,6 +131,13 @@ class Sql_Statement extends Sql_ComplexStatement {
             $q .= $this->buildOrder($client);
             $q .= $this->buildLimit();
 
+            return $q;
+        }
+
+        elseif ($this->command === self::CMD_INSERT) {
+            $q = self::CMD_INSERT;
+            $q .= $this->buildTable();
+            $q .= $this->buildSet($client);
             return $q;
         }
 

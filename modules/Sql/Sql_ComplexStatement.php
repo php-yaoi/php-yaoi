@@ -20,18 +20,22 @@ drop table test1
 drop table test2
  */
 
-class Sql_ComplexStatement extends Sql_Expression {
+class Sql_ComplexStatement extends Sql_Expression
+{
 
     /**
      * @var Sql_Expression[]
      */
     protected $from = array();
-    public function from($expression, $binds = null) {
-        $this->from []= Sql_Expression::createFromFuncArguments(func_get_args());
+
+    public function from($expression, $binds = null)
+    {
+        $this->from [] = Sql_Expression::createFromFuncArguments(func_get_args());
         return $this;
     }
 
-    protected function buildFrom(Database $client) {
+    protected function buildFrom(Database $client)
+    {
         $from = '';
         if ($this->from) {
             foreach ($this->from as $expression) {
@@ -48,7 +52,6 @@ class Sql_ComplexStatement extends Sql_Expression {
     }
 
 
-
     const JOIN_LEFT = 'LEFT';
     const JOIN_RIGHT = 'RIGHT';
     const JOIN_INNER = 'INNER';
@@ -56,20 +59,27 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression[]
      */
     protected $join = array();
-    public function leftJoin($expression, $binds = null) {
-        $this->join []= array(self::JOIN_LEFT, Sql_Expression::createFromFuncArguments(func_get_args()));
-        return $this;
-    }
-    public function rightJoin($expression, $binds = null) {
-        $this->join []= array(self::JOIN_RIGHT, Sql_Expression::createFromFuncArguments(func_get_args()));
-        return $this;
-    }
-    public function innerJoin($expression, $binds = null) {
-        $this->join []= array(self::JOIN_INNER, Sql_Expression::createFromFuncArguments(func_get_args()));
+
+    public function leftJoin($expression, $binds = null)
+    {
+        $this->join [] = array(self::JOIN_LEFT, Sql_Expression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
-    protected function buildJoin(Database $client) {
+    public function rightJoin($expression, $binds = null)
+    {
+        $this->join [] = array(self::JOIN_RIGHT, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+    public function innerJoin($expression, $binds = null)
+    {
+        $this->join [] = array(self::JOIN_INNER, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+    protected function buildJoin(Database $client)
+    {
         $join = '';
         foreach ($this->join as $item) {
             $direction = $item[0];
@@ -90,21 +100,23 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     protected $where;
-    public function where($expression, $binds = null) {
+
+    public function where($expression, $binds = null)
+    {
         if (null === $expression) {
             return $this;
         }
 
         if (null === $this->where) {
             $this->where = Sql_Expression::createFromFuncArguments(func_get_args());
-        }
-        else {
+        } else {
             $this->where->andExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
         }
         return $this;
     }
 
-    protected function buildWhere(Database $client) {
+    protected function buildWhere(Database $client)
+    {
         $where = '';
 
         if ($this->where && !$this->where->isEmpty()) {
@@ -119,21 +131,23 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     protected $order;
-    public function order($expression, $binds = null) {
+
+    public function order($expression, $binds = null)
+    {
         if (null === $expression) {
             return $this;
         }
 
         if (null === $this->order) {
             $this->order = Sql_Expression::createFromFuncArguments(func_get_args());
-        }
-        else {
+        } else {
             $this->order->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
         }
         return $this;
     }
 
-    protected function buildOrder(Database $client) {
+    protected function buildOrder(Database $client)
+    {
         $order = '';
 
         if ($this->order && !$this->order->isEmpty()) {
@@ -146,22 +160,27 @@ class Sql_ComplexStatement extends Sql_Expression {
 
     private $limit;
     private $offset;
-    public function limit($limit, $offset = null) {
+
+    public function limit($limit, $offset = null)
+    {
         $this->limit = $limit;
         if (null !== $offset) {
             $this->offset = $offset;
         }
         return $this;
     }
-    public function offset($offset) {
+
+    public function offset($offset)
+    {
         $this->offset = $offset;
         return $this;
     }
-    protected  function buildLimit() {
+
+    protected function buildLimit()
+    {
         if ($this->limit) {
             return ' LIMIT ' . $this->limit . ($this->offset ? ' OFFSET ' . $this->offset : '');
-        }
-        else {
+        } else {
             return '';
         }
     }
@@ -170,56 +189,57 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     private $groupBy;
-    public function groupBy($expression, $binds = null) {
+
+    public function groupBy($expression, $binds = null)
+    {
         if (null === $expression) {
             return $this;
         }
 
         if (null === $this->groupBy) {
             $this->groupBy = Sql_Expression::createFromFuncArguments(func_get_args());
-        }
-        else {
+        } else {
             $this->groupBy->commaExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
         }
 
         return $this;
     }
 
-    protected  function buildGroupBy(Database $client) {
+    protected function buildGroupBy(Database $client)
+    {
         if ($this->groupBy && !$this->groupBy->isEmpty()) {
             return ' GROUP BY ' . $this->groupBy->build($client);
-        }
-        else {
+        } else {
             return '';
         }
     }
-
 
 
     /**
      * @var Sql_Expression
      */
     private $having;
-    public function having($expression, $binds = null) {
+
+    public function having($expression, $binds = null)
+    {
         if (null === $expression) {
             return $this;
         }
 
         if (null === $this->having) {
             $this->having = Sql_Expression::createFromFuncArguments(func_get_args());
-        }
-        else {
+        } else {
             $this->having->andExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
         }
 
         return $this;
     }
 
-    protected  function buildHaving(Database $client) {
+    protected function buildHaving(Database $client)
+    {
         if ($this->having && !$this->having->isEmpty()) {
             return ' HAVING ' . $this->having->build($client);
-        }
-        else {
+        } else {
             return '';
         }
     }
@@ -228,7 +248,12 @@ class Sql_ComplexStatement extends Sql_Expression {
      * @var Sql_Expression
      */
     private $set;
-    public function set($expression, $binds = null) {
+
+
+
+
+    public function set($expression, $binds = null)
+    {
 
         // TODO implement
         if (null === $expression) {
@@ -238,8 +263,7 @@ class Sql_ComplexStatement extends Sql_Expression {
         if (is_array($expression)) {
             if (is_string($binds)) {
                 $table = '`' . $binds . '`.';
-            }
-            else {
+            } else {
                 $table = '';
             }
 
@@ -247,34 +271,30 @@ class Sql_ComplexStatement extends Sql_Expression {
             $b = array();
             foreach ($expression as $key => $value) {
                 $e .= $table . '`' . $key . '` = ?, ';
-                $b []= $value;
+                $b [] = $value;
             }
             $e = substr($e, 0, -2);
             $expression = new Sql_Expression($e, $b);
-        }
-        else {
+        } else {
             $expression = Sql_Expression::createFromFuncArguments(func_get_args());
         }
 
         if (null === $this->set) {
             $this->set = $expression;
-        }
-        else {
+        } else {
             $this->set->commaExpr($expression);
         }
 
         return $this;
     }
 
-    protected function buildSet(Database $client) {
+    protected function buildSet(Database $client)
+    {
         if ($this->set && !$this->set->isEmpty()) {
             return ' SET ' . $this->set->build($client);
-        }
-        else {
+        } else {
             return '';
         }
     }
-
-
 
 }

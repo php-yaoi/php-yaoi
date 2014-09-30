@@ -9,6 +9,12 @@ class Entity_SimpleMysql {
 
     private static $columns = array();
 
+    private static $databases = array();
+    public static function bindDatabase(Database_Interface $db) {
+        self::$databases[get_called_class()] = $db;
+    }
+
+
     private static function tableName() {
         if (null === self::$tableName) {
             return get_called_class();
@@ -18,11 +24,23 @@ class Entity_SimpleMysql {
         }
     }
 
+    /**
+     * @return Database_Interface
+     */
+    private static function db() {
+        $class = get_called_class();
+        if (isset(self::$databases[$class])) {
+            return self::$databases[$class];
+        }
+        else {
+            return Yaoi::db($class);
+        }
+    }
 
     public static function getColumns() {
         $tableName = self::tableName();
         if (!isset(self::$columns[$tableName])) {
-            self::$columns[$tableName] = Yaoi::db()
+            self::$columns[$tableName] = self::db()
                 ->query("DESC `$tableName`")
                 ->fetchPairs(0, 0);
         }
@@ -37,7 +55,7 @@ class Entity_SimpleMysql {
     public static function getById($id) {
         $tableName = self::$tableName;
         $idField = self::$idField;
-        $row = Yaoi::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
+        $row = self::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
         if ($row) {
             $obj = new static();
             $obj->fetched = true;
@@ -54,7 +72,7 @@ class Entity_SimpleMysql {
 
 
     public function update() {
-        $update = Yaoi::db()->statement();
+        $update = self::db()->statement();
         $update->update(self::$tableName);
         $data = array();
         foreach (static::getColumns() as $column) {
@@ -70,7 +88,7 @@ class Entity_SimpleMysql {
     }
 
     public function insert() {
-        $insert = Yaoi::db()->statement();
+        $insert = self::db()->statement();
         $insert->insert(self::$tableName);
         $data = array();
         foreach (static::getColumns() as $column) {
