@@ -9,31 +9,19 @@
  * |db client
  */
 class Database_Query implements Iterator {
-    protected $statement;
-    protected $binds;
+    /**
+     * @var Sql_Expression
+     */
+    private $expression;
 
     /**
-     * @var Database
+     * @var Database_Driver
      */
-    private $client;
-    public function setDatabaseClient(Database $client = null) {
-        $this->client = $client;
-    }
+    private $driver;
 
-    private $dbResourceId;
-
-    public function __construct(&$statement, $binds = null, Database_Driver $driver) {
-        $this->statement = $statement;
-        $this->binds = $binds;
-
-        $this->dbResourceId = DependencyRepository::add($driver);
-    }
-
-    /**
-     * @return Database_Driver
-     */
-    private function db() {
-        return DependencyRepository::$items[$this->dbResourceId];
+    public function __construct(Sql_Expression $expression, Database_Driver $driver) {
+        $this->expression = $expression;
+        $this->driver = $driver;
     }
 
 
@@ -42,10 +30,7 @@ class Database_Query implements Iterator {
      * @throws Database_Exception
      */
     public function build() {
-        if ($this->binds) {
-            return $this->client->buildString($this->statement, $this->binds);
-        }
-        return $this->statement;
+        return $this->expression->build($this->driver);
     }
 
     protected $executed = false;
@@ -54,8 +39,8 @@ class Database_Query implements Iterator {
         $query = $this->build();
         $start = microtime(1);
 
-        if (!$this->result = $this->db()->query($query)) {
-            $error = $this->db()->queryErrorMessage($this->result);
+        if (!$this->result = $this->driver->query($query)) {
+            $error = $this->driver->queryErrorMessage($this->result);
             if (null !== $this->logResourceId) {
                 /**
                  * @var Log $log
@@ -86,12 +71,12 @@ class Database_Query implements Iterator {
         $result = array();
 
         if ($keyField !== null) {
-            while ($r = $this->db()->fetchAssoc($this->result)) {
+            while ($r = $this->driver->fetchAssoc($this->result)) {
                 $result [$r[$keyField]]= $r;
             }
         }
         else {
-            while ($r = $this->db()->fetchAssoc($this->result)) {
+            while ($r = $this->driver->fetchAssoc($this->result)) {
                 $result []= $r;
             }
         }
@@ -103,7 +88,7 @@ class Database_Query implements Iterator {
 
         $result = array();
 
-        while ($r = $this->db()->fetchAssoc($this->result)) {
+        while ($r = $this->driver->fetchAssoc($this->result)) {
             $r = array_values($r);
             $result [$r[$key]]= $r[$value];
         }
@@ -114,7 +99,7 @@ class Database_Query implements Iterator {
         if (!$this->executed) {
             $this->execute();
         }
-        $result = $this->db()->fetchAssoc($this->result);
+        $result = $this->driver->fetchAssoc($this->result);
         if (null === $result) {
             return null;
         }
@@ -149,7 +134,7 @@ class Database_Query implements Iterator {
      */
     public function next()
     {
-        if (is_null($this->current = $this->db()->fetchAssoc($this->result))) {
+        if (is_null($this->current = $this->driver->fetchAssoc($this->result))) {
             $this->valid = false;
             $this->position = null;
         }
@@ -200,7 +185,7 @@ class Database_Query implements Iterator {
             $this->execute();
         }
 
-        $this->db()->rewind($this->result);
+        $this->driver->rewind($this->result);
         $this->position = -1;
         $this->valid = true;
         $this->current = null;
@@ -216,7 +201,6 @@ class Database_Query implements Iterator {
         if (!$this->executed && !$this->skipAutoExecute) {
             $this->execute();
         }
-        unset(DependencyRepository::$items[$this->dbResourceId]);
     }
 
     public function lastInsertId() {
@@ -224,7 +208,7 @@ class Database_Query implements Iterator {
             $this->execute();
         }
 
-        return $this->db()->lastInsertId($this->result);
+        return $this->driver->lastInsertId($this->result);
     }
 
     public function lastInsertIdIn(&$var) {
@@ -236,7 +220,7 @@ class Database_Query implements Iterator {
         if (!$this->executed) {
             $this->execute();
         }
-        return $this->db()->rowsAffected($this->result);
+        return $this->driver->rowsAffected($this->result);
     }
 
     public function rowsAffectedIn(&$var) {

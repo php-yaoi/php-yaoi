@@ -20,7 +20,11 @@ drop table test1
 drop table test2
  */
 
-class Sql_ComplexStatement extends Sql_Expression
+abstract class Sql_ComplexStatement extends Sql_Expression implements
+    Sql_SelectInterface,
+    Sql_InsertInterface,
+    Sql_UpdateInterface,
+    Sql_DeleteInterface
 {
 
     /**
@@ -30,16 +34,16 @@ class Sql_ComplexStatement extends Sql_Expression
 
     public function from($expression, $binds = null)
     {
-        $this->from [] = Sql_Expression::createFromFuncArguments(func_get_args());
+        $this->from []= Sql_Expression::createFromFuncArguments(func_get_args());
         return $this;
     }
 
-    protected function buildFrom(Database $client)
+    protected function buildFrom(Database_Quoter $quoter)
     {
         $from = '';
         if ($this->from) {
             foreach ($this->from as $expression) {
-                $from .= $expression->build($client);
+                $from .= $expression->build($quoter);
                 $from .= ', ';
             }
 
@@ -78,7 +82,7 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildJoin(Database $client)
+    protected function buildJoin(Database_Quoter $quoter)
     {
         $join = '';
         foreach ($this->join as $item) {
@@ -88,7 +92,7 @@ class Sql_ComplexStatement extends Sql_Expression
              */
             $expression = $item[1];
             if ($expression && !$expression->isEmpty()) {
-                $join .= ' ' . $direction . ' JOIN ' . $expression->build($client);
+                $join .= ' ' . $direction . ' JOIN ' . $expression->build($quoter);
             }
 
         }
@@ -115,12 +119,12 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildWhere(Database $client)
+    protected function buildWhere(Database_Quoter $quoter)
     {
         $where = '';
 
         if ($this->where && !$this->where->isEmpty()) {
-            $where = ' WHERE ' . $this->where->build($client);
+            $where = ' WHERE ' . $this->where->build($quoter);
         }
 
         return $where;
@@ -146,12 +150,12 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildOrder(Database $client)
+    protected function buildOrder(Database_Quoter $quoter)
     {
         $order = '';
 
         if ($this->order && !$this->order->isEmpty()) {
-            $order = ' ORDER BY ' . $this->order->build($client);
+            $order = ' ORDER BY ' . $this->order->build($quoter);
         }
 
         return $order;
@@ -205,10 +209,10 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildGroupBy(Database $client)
+    protected function buildGroupBy(Database_Quoter $quoter)
     {
         if ($this->groupBy && !$this->groupBy->isEmpty()) {
-            return ' GROUP BY ' . $this->groupBy->build($client);
+            return ' GROUP BY ' . $this->groupBy->build($quoter);
         } else {
             return '';
         }
@@ -235,10 +239,10 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildHaving(Database $client)
+    protected function buildHaving(Database_Quoter $quoter)
     {
         if ($this->having && !$this->having->isEmpty()) {
-            return ' HAVING ' . $this->having->build($client);
+            return ' HAVING ' . $this->having->build($quoter);
         } else {
             return '';
         }
@@ -288,10 +292,10 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildSet(Database $client)
+    protected function buildSet(Database_Quoter $quoter)
     {
         if ($this->set && !$this->set->isEmpty()) {
-            return ' SET ' . $this->set->build($client);
+            return ' SET ' . $this->set->build($quoter);
         } else {
             return '';
         }
@@ -317,21 +321,18 @@ class Sql_ComplexStatement extends Sql_Expression
         return $this;
     }
 
-    protected function buildValues(Database $client) {
+    protected function buildValues(Database_Quoter $quoter) {
         $result = '';
         if ($this->values) {
             $fields = array();
             foreach ($this->values as $row) {
-                foreach (array_keys($row) as $field) {
+                foreach ($row as $field => $value) {
                     $fields[$field] = $field;
                 }
             }
-            if (!$fields) {
-                return $result;
-            }
             $result .= '(';
             foreach ($fields as $field) {
-                $result .= $client->symbol($field) . ', ';
+                $result .= $quoter->quote(new Sql_Symbol($field)) . ', ';
             }
             $result = substr($result, 0, -2) . ') VALUES ';
 
@@ -345,7 +346,7 @@ class Sql_ComplexStatement extends Sql_Expression
                         $value = new Sql_DefaultValue();
                     }
 
-                    $rowString .= $client->quote($value) . ', ';
+                    $rowString .= $quoter->quote($value) . ', ';
                 }
                 $result .= '(' . substr($rowString, 0, -2) . '), ';
             }

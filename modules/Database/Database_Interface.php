@@ -23,9 +23,28 @@ interface Database_Interface extends Mock_Able {
 
     /**
      * @param null $from
-     * @return Sql_Select
+     * @return Sql_SelectInterface
      */
     public function select($from = null);
+
+    /**
+     * @param null $from
+     * @return Sql_DeleteInterface
+     */
+    public function delete($from = null);
+
+    /**
+     * @param null $table
+     * @return Sql_UpdateInterface
+     */
+    public function update($table = null);
+
+    /**
+     * @param null $table
+     * @return Sql_InsertInterface
+     */
+    public function insert($table = null);
+
 
     /**
      * @return Sql_Statement

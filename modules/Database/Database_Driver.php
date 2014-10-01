@@ -36,6 +36,12 @@ abstract class Database_Driver implements Database_Server_Generic {
             }
             return substr($result, 0, -2);
         }
+        elseif ($value instanceof Sql_Expression) {
+            return '(' . $value->build($this) . ')';
+        }
+        elseif ($value instanceof Sql_Symbol) {
+            return $this->quoteSymbol($value->name);
+        }
         elseif ($value instanceof Sql_DefaultValue) {
             return 'DEFAULT';
         }

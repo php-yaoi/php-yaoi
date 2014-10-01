@@ -28,16 +28,9 @@ class Database extends Client implements Database_Interface {
      * @return Database_Query
      */
     public function query($statement = null, $binds = null) {
-        if (func_num_args() > 2) {
-            $arguments = func_get_args();
-            array_shift($arguments);
-            $binds = $arguments;
-        }
-        if (null !== $binds && !is_array($binds)) {
-            $binds = array($binds);
-        }
-        $query = new Database_Query($statement, $binds, $this->getDriver());
-        $query->setDatabaseClient($this);
+        $arguments = func_get_args();
+
+        $query = new Database_Query(Sql_Expression::createFromFuncArguments($arguments), $this->getDriver());
         if (null !== $this->log) {
             $query->log($this->log);
         }
@@ -53,12 +46,7 @@ class Database extends Client implements Database_Interface {
 
 
     public function quote($s) {
-        if ($s instanceof Sql_Expression) {
-            return $s->build($this);
-        }
-        else {
-            return $this->getDriver()->quote($s);
-        }
+        return $this->getDriver()->quote($s);
     }
 
     public function symbol($s) {
@@ -125,71 +113,6 @@ class Database extends Client implements Database_Interface {
 
 
     /**
-     * @param $statement
-     * @param array $binds
-     * @return mixed|string
-     * @throws Client_Exception
-     * @throws Database_Exception
-     */
-    public function buildString($statement, array $binds) {
-        $replace = array();
-        $unnamed = true;
-        $i = 0;
-
-        // check binds array type
-        foreach ($binds as $key => $value) {
-            if ($unnamed && $key !== $i++) {
-                $unnamed = false;
-                break;
-            }
-        }
-
-        $driver = $this->getDriver();
-
-        if ($unnamed) {
-            $pos = 0;
-            foreach ($binds as $value) {
-                $pos = strpos($statement, '?', $pos);
-                if ($pos !== false) {
-                    if ($value instanceof Sql_Expression) {
-                        $value = '(' . $value->build($this) . ')';
-                    }
-                    elseif ($value instanceof Sql_DefaultValue) {
-                        $value = 'DEFAULT';
-                    }
-                    else {
-                        $value = $driver->quote($value);
-                    }
-                    $statement = substr_replace($statement, $value, $pos, 1);
-                    $pos += strlen($value);
-                } else {
-                    throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
-                }
-            }
-
-            if (strpos($statement, '?', $pos) !== false) {
-                throw new Database_Exception('Redundant placeholder: "' . $statement . '", binds: '
-                    . var_export($binds),
-                    Database_Exception::PLACEHOLDER_REDUNDANT);
-            }
-
-            return $statement;
-        } else {
-            foreach ($binds as $key => $value) {
-                if ($value instanceof Sql_Expression) {
-                    $value = '(' . $value->build($this) . ')';
-                }
-                else {
-                    $value = $driver->quote($value);
-                }
-
-                $replace [':' . $key] = $value;
-            }
-            return strtr($statement, $replace);
-        }
-    }
-
-    /**
      * @param $expression
      * @param null $binds
      * @return Sql_Expression
@@ -202,11 +125,62 @@ class Database extends Client implements Database_Interface {
 
     /**
      * @param null $from
-     * @return Sql_Select
+     * @return Sql_SelectInterface
      */
     public function select($from = null) {
-        return Sql_Select::create($from)->bindDatabase($this);
+        $select = new Sql_Statement();
+        $select
+            ->bindDatabase($this)
+            ->select();
+
+        if (null !== $from) {
+            $select->from($from);
+        }
+        return $select;
     }
+
+    /**
+     * @param null $from
+     * @return Sql_DeleteInterface
+     */
+    public function delete($from = null)
+    {
+        $delete = new Sql_Statement();
+        $delete
+            ->bindDatabase($this)
+            ->delete($from);
+
+        return $delete;
+    }
+
+    /**
+     * @param null $table
+     * @return Sql_UpdateInterface
+     */
+    public function update($table = null)
+    {
+        $update = new Sql_Statement();
+        $update
+            ->bindDatabase($this)
+            ->update($table);
+
+        return $update;
+    }
+
+    /**
+     * @param null $table
+     * @return Sql_InsertInterface
+     */
+    public function insert($table = null)
+    {
+        $insert = new Sql_Statement();
+        $insert
+            ->bindDatabase($this)
+            ->insert($table);
+
+        return $insert;
+    }
+
 
     /**
      * @return Sql_Statement

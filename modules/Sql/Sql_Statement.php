@@ -6,17 +6,29 @@ class Sql_Statement extends Sql_ComplexStatement {
      * @var Database
      */
     protected $database;
-    public function bindDatabase(Database $client = null) {
+
+    public function bindDatabase(Database_Interface $client = null) {
         $this->database = $client;
         return $this;
     }
 
-    public function query() {
-        return $this->database->query($this);
+    public function query(Database_Interface $client = null) {
+        if (null === $client) {
+            return $this->database->query($this);
+        }
+        else {
+            return $client->query($this);
+        }
     }
 
     public function __toString() {
-        return $this->build($this->database);
+        try {
+            $res = $this->build($this->database->getDriver());
+            return $res;
+        }
+        catch (Exception $e) {
+            return '/* ERROR: ' . $e->getMessage() . ' */';
+        }
     }
 
 
@@ -28,26 +40,30 @@ class Sql_Statement extends Sql_ComplexStatement {
     private $command;
 
     protected $tables = array();
-    public function update($table) {
+    public function update($table = null) {
         // TODO implement
         // UPDATE t1 LEFT JOIN t2 ON t1.e = t2.e SET t1.c = t2.cc WHERE t1.ff = 45
         // UPDATE t1 SET dd = 1 WHERE ddd = 2
         $this->command = self::CMD_UPDATE;
-        $this->tables[]= $table;
+        if (null !== $table) {
+            $this->tables []= $table;
+        }
         return $this;
     }
 
     public function insert($table) {
-        // TODO insert is totally different, no join, no where
         $this->command = self::CMD_INSERT;
-        $this->tables []= $table;
+        if (null !== $table) {
+            $this->tables []= $table;
+        }
         return $this;
     }
 
     public function delete($table = null) {
-        // TODO implement
         $this->command = self::CMD_DELETE;
-        $this->tables []= $table;
+        if (null !== $table) {
+            $this->tables []= $table;
+        }
         return $this;
     }
 
@@ -58,18 +74,20 @@ class Sql_Statement extends Sql_ComplexStatement {
      * @var Sql_Expression[]
      */
     protected $select = array();
-    public function select($expression, $binds = null) {
+    public function select($expression = null, $binds = null) {
         $this->command = self::CMD_SELECT;
-        $this->select []= Sql_Expression::createFromFuncArguments(func_get_args());
+        if (null !== $expression) {
+            $this->select []= Sql_Expression::createFromFuncArguments(func_get_args());
+        }
         return $this;
     }
 
-    protected function buildSelect(Database $client) {
+    protected function buildSelect(Database_Quoter $quoter) {
         $columns = '';
         if ($this->select) {
             foreach ($this->select as $column) {
                 if (!$column->isEmpty()) {
-                    $columns .= $column->build($client) . ', ';
+                    $columns .= $column->build($quoter) . ', ';
                 }
             }
             if ($columns) {
@@ -87,61 +105,55 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
-    public function lowPriority() {
-
-    }
-
-
-    public function build(Database $client) {
-        if (null === $client) {
-            $client = $this->database;
+    public function build(Database_Quoter $quoter = null) {
+        if (null === $quoter) {
+            $quoter = $this->database->getDriver();
         }
+
+        $q = '';
 
         if ($this->command === self::CMD_SELECT) {
             $q = self::CMD_SELECT;
-            $q .= $this->buildSelect($client);
-            $q .= $this->buildFrom($client);
-            $q .= $this->buildJoin($client);
-            $q .= $this->buildWhere($client);
-            $q .= $this->buildGroupBy($client);
-            $q .= $this->buildHaving($client);
-            $q .= $this->buildOrder($client);
+            $q .= $this->buildSelect($quoter);
+            $q .= $this->buildFrom($quoter);
+            $q .= $this->buildJoin($quoter);
+            $q .= $this->buildWhere($quoter);
+            $q .= $this->buildGroupBy($quoter);
+            $q .= $this->buildHaving($quoter);
+            $q .= $this->buildOrder($quoter);
             $q .= $this->buildLimit();
-            return $q;
         }
 
         elseif ($this->command === self::CMD_UPDATE) {
             $q = self::CMD_UPDATE;
             $q .= $this->buildTable();
-            $q .= $this->buildJoin($client);
-            $q .= $this->buildSet($client);
-            $q .= $this->buildWhere($client);
-            $q .= $this->buildOrder($client);
+            $q .= $this->buildJoin($quoter);
+            $q .= $this->buildSet($quoter);
+            $q .= $this->buildWhere($quoter);
+            $q .= $this->buildOrder($quoter);
             $q .= $this->buildLimit();
-
-            return $q;
         }
 
         elseif ($this->command === self::CMD_DELETE) {
             $q = self::CMD_DELETE;
-            $q .= $this->buildTable();
-            $q .= $this->buildFrom($client);
-            $q .= $this->buildJoin($client);
-            $q .= $this->buildWhere($client);
-            $q .= $this->buildOrder($client);
+            $from = $this->buildTable();
+            if ($from) {
+                $from = ' FROM' . $from;
+            }
+            $q .= $from;
+            $q .= $this->buildJoin($quoter);
+            $q .= $this->buildWhere($quoter);
+            $q .= $this->buildOrder($quoter);
             $q .= $this->buildLimit();
-
-            return $q;
         }
 
         elseif ($this->command === self::CMD_INSERT) {
             $q = self::CMD_INSERT;
             $q .= $this->buildTable();
-            $q .= $this->buildValues($client);
-            return $q;
+            $q .= $this->buildValues($quoter);
         }
 
-        return '';
+        return $q;
     }
 
 

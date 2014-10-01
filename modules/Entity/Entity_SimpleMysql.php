@@ -50,10 +50,10 @@ class Entity_SimpleMysql {
 
     /**
      * @param $id
-     * @return null|static
+     * @return $this
      */
     public static function getById($id) {
-        $tableName = self::$tableName;
+        $tableName = self::tableName();
         $idField = self::$idField;
         $row = self::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
         if ($row) {
@@ -72,11 +72,12 @@ class Entity_SimpleMysql {
 
 
     public function update() {
-        $update = self::db()->statement();
-        $update->update(self::$tableName);
+        $update = self::db()->update(self::tableName());
         $data = array();
         foreach (static::getColumns() as $column) {
-            $data[$column] = $this->$column;
+            if (property_exists($this, $column)) {
+                $data[$column] = $this->$column;
+            }
         }
         $idField = static::$idField;
         $update->where("`$idField` = ?", $data[$idField]);
@@ -88,17 +89,17 @@ class Entity_SimpleMysql {
     }
 
     public function insert() {
-        $insert = self::db()->statement();
-        $insert->insert(self::$tableName);
+        $insert = self::db()->insert(self::tableName());
         $data = array();
         foreach (static::getColumns() as $column) {
-            $data[$column] = isset($this->$column) ? $this->$column : null;
+            if (property_exists($this, $column)) {
+                $data[$column] = $this->$column;
+            }
         }
-        $insert->set($data);
+        $insert->valuesRow($data);
         if (!isset($data[static::$idField])) {
-            echo $insert;
-            //$id = $insert->query()->lastInsertId();
-            //$this->id = $id;
+            $id = $insert->query()->lastInsertId();
+            $this->{static::$idField} = $id;
         }
 
         return $this;

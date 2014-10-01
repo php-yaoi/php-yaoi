@@ -1,6 +1,9 @@
 <?php
 
 class Sql_Expression extends Base_Class implements Is_Empty {
+
+
+
     /**
      * @param $arguments
      * @return Sql_Expression
@@ -17,7 +20,7 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         if ($arguments[0] instanceof Closure) {
             $expression = $arguments[0]();
             if (!$expression instanceof Sql_Expression) {
-                throw new Sql_Exception('Closure argument should return Sql_Expression',
+                throw new Sql_Exception('Closure should return Sql_Expression',
                     Sql_Exception::CLOSURE_MISTYPE);
             }
             return $expression;
@@ -90,18 +93,52 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         return $this;
     }
 
-    /**
-     * @param Database|Database_Interface $client
-     * @return mixed|string
-     * @throws Database_Exception
-     */
-    public function build(Database $client) {
+
+    public function build(Database_Quoter $quoter = null) {
         if ($this->isEmpty()) {
             return '';
         }
 
-        if ($this->binds) {
-            $result = $client->buildString($this->statement, $this->binds);
+        if ($this->binds && $quoter !== null) {
+            $statement = $this->statement;
+
+            $replace = array();
+            $unnamed = true;
+
+            // check binds array type
+            $i = 0;
+            foreach ($this->binds as $key => $value) {
+                if ($unnamed && $key !== $i++) {
+                    $unnamed = false;
+                    break;
+                }
+            }
+
+            if ($unnamed) {
+                $pos = 0;
+                foreach ($this->binds as $value) {
+                    $pos = strpos($statement, '?', $pos);
+                    if ($pos !== false) {
+                        $value = $quoter->quote($value);
+                        $statement = substr_replace($statement, $value, $pos, 1);
+                        $pos += strlen($value);
+                    } else {
+                        throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
+                    }
+                }
+
+                if (strpos($statement, '?', $pos) !== false) {
+                    throw new Database_Exception('Redundant placeholder: "' . $statement . '"',
+                        Database_Exception::PLACEHOLDER_REDUNDANT);
+                }
+
+                $result = $statement;
+            } else {
+                foreach ($this->binds as $key => $value) {
+                    $replace [':' . $key] = $quoter->quote($value);
+                }
+                $result = strtr($statement, $replace);
+            }
         }
         else {
             $result = $this->statement;
@@ -114,7 +151,7 @@ class Sql_Expression extends Base_Class implements Is_Empty {
             $expression = $item[1];
 
             if (!$expression->isEmpty()) {
-                $result .= $item[0] . $expression->build($client);
+                $result .= $item[0] . $expression->build($quoter);
             }
         }
 
@@ -136,6 +173,6 @@ class Sql_Expression extends Base_Class implements Is_Empty {
 
     public function isEmpty()
     {
-        return $this->disabled;
+        return $this->disabled || null === $this->statement || '' === $this->statement;
     }
 }
