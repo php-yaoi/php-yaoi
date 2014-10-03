@@ -1,6 +1,6 @@
 <?php
 
-interface Database_Interface extends Mock_Able {
+interface Database_Interface extends Mock_Able, Database_Quoter {
     /**
      * @param null $statement
      * @param null $binds
