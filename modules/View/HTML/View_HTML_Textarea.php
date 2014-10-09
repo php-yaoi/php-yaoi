@@ -1,16 +1,14 @@
 <?php
 
-class View_HTML_Input extends View_HTML_Element {
-    protected $tag = 'input';
-    protected $value;
+class View_HTML_Textarea extends View_HTML_Element {
+    protected $tag = 'textarea';
 
     public function setName($name) {
         return $this->setAttribute('name', $name);
     }
 
     public function setValue($value) {
-        $this->value = $value;
-        $this->setAttribute('value', $value);
+        $this->setContent($value);
         return $this;
     }
 
@@ -29,8 +27,4 @@ class View_HTML_Input extends View_HTML_Element {
         return $this;
     }
 
-    public function hidden() {
-        $this->setAttribute('type', 'hidden');
-        return $this;
-    }
-}
+} 

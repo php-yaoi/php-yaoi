@@ -52,6 +52,17 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         return $this;
     }
 
+    protected $children = array();
+    public function appendChild($child) {
+        $this->children []= $child;
+        return $this;
+    }
+
+    public function prependChild($child) {
+        array_unshift($this->children, $child);
+        return $this;
+    }
+
     public function isEmpty() {
         if ($this->content instanceof Is_Empty) {
             return $this->content->isEmpty();
