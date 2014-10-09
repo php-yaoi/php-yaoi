@@ -1,6 +1,6 @@
 <?php
 
-class Entity_SimpleMysql {
+class Entity_SimpleMysql extends Base_Class {
     static public $tableName = null;
     static public $idField = 'id';
 
