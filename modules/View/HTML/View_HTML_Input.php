@@ -23,7 +23,13 @@ class View_HTML_Input extends View_HTML_Element {
         if (null === $source) {
             $source = &$_REQUEST;
         }
-        if (isset($source[$this->attributes['name']])) {
+        if (is_object($source)) {
+            $field = $this->attributes['name'];
+            if (property_exists($source, $field) || isset($source->$field)) {
+                $this->setValue($source->$field);
+            }
+        }
+        elseif (isset($source[$this->attributes['name']])) {
             $this->setValue($source[$this->attributes['name']]);
         }
         return $this;
