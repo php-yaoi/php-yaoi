@@ -1,7 +1,10 @@
 <?php
 
 class Entity_SimpleMysql extends Base_Class {
-    static public $tableName = null;
+    /**
+     * @var string
+     */
+    static public $tableName;
     static public $idField = 'id';
 
     private $fetched = false;
@@ -15,13 +18,18 @@ class Entity_SimpleMysql extends Base_Class {
     }
 
 
-    private static function tableName() {
+    public static function getTableName() {
         if (null === self::$tableName) {
             return get_called_class();
         }
         else {
             return self::$tableName;
         }
+    }
+
+
+    public static function getIdName() {
+        return self::$idField;
     }
 
     /**
@@ -38,7 +46,7 @@ class Entity_SimpleMysql extends Base_Class {
     }
 
     public static function getColumns() {
-        $tableName = self::tableName();
+        $tableName = self::getTableName();
         if (!isset(self::$columns[$tableName])) {
             self::$columns[$tableName] = self::db()
                 ->query("DESC `$tableName`")
@@ -53,7 +61,7 @@ class Entity_SimpleMysql extends Base_Class {
      * @return $this
      */
     public static function getById($id) {
-        $tableName = self::tableName();
+        $tableName = self::getTableName();
         $idField = self::$idField;
         $row = self::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
         if ($row) {
@@ -72,7 +80,7 @@ class Entity_SimpleMysql extends Base_Class {
 
 
     public function update() {
-        $update = self::db()->update(self::tableName());
+        $update = self::db()->update(self::getTableName());
         $data = array();
         foreach (static::getColumns() as $column) {
             if (property_exists($this, $column)) {
@@ -89,7 +97,7 @@ class Entity_SimpleMysql extends Base_Class {
     }
 
     public function insert() {
-        $insert = self::db()->insert(self::tableName());
+        $insert = self::db()->insert(self::getTableName());
         $data = array();
         foreach (static::getColumns() as $column) {
             if (property_exists($this, $column)) {
@@ -112,6 +120,14 @@ class Entity_SimpleMysql extends Base_Class {
         else {
             $this->update();
         }
+    }
+
+    public static function fromArray($data) {
+        $instance = new static();
+        foreach ($data as $name => $value) {
+            $instance->$name = $value;
+        }
+        return $instance;
     }
 
 }
