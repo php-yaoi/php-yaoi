@@ -19,17 +19,17 @@ class Entity_SimpleMysql extends Base_Class {
 
 
     public static function getTableName() {
-        if (null === self::$tableName) {
+        if (null === static::$tableName) {
             return get_called_class();
         }
         else {
-            return self::$tableName;
+            return static::$tableName;
         }
     }
 
 
     public static function getIdName() {
-        return self::$idField;
+        return static::$idField;
     }
 
     /**
