@@ -93,6 +93,25 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         return $this;
     }
 
+    const OP_APPEND = ' ';
+    public function appendExpr($expression) {
+        $this->queue []= array(self::OP_APPEND, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+    public function prependExpr($expression) {
+        array_unshift(
+            $this->queue,
+            array(
+                self::OP_APPEND,
+                Sql_Expression::createFromFuncArguments(func_get_args())
+            )
+        );
+        return $this;
+    }
+
+
+
 
     public function build(Database_Quoter $quoter = null) {
         if ($this->isEmpty()) {
