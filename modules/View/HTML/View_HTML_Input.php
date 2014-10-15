@@ -35,8 +35,20 @@ class View_HTML_Input extends View_HTML_Element {
         return $this;
     }
 
+
+    const TYPE_TEXT = 'text';
+    const TYPE_CHECKBOX = 'checkbox';
+    const TYPE_RADIO = 'radio';
+    const TYPE_HIDDEN = 'hidden';
+    public function setType($type)
+    {
+        $this->setAttribute('type', $type);
+        return $this;
+    }
+
+
     public function hidden() {
-        $this->setAttribute('type', 'hidden');
+        $this->setAttribute('type', self::TYPE_HIDDEN);
         return $this;
     }
 }

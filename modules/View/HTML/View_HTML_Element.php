@@ -26,6 +26,11 @@ class View_HTML_Element extends Base_Class implements View_Renderer {
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $value
+     * @return static
+     */
     public function setAttribute($name, $value = null) {
         if (null === $value) {
             if (array_key_exists($name, $this->attributes)) {
