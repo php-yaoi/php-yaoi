@@ -62,7 +62,7 @@ class Entity_SimpleMysql extends Base_Class {
      */
     public static function getById($id) {
         $tableName = self::getTableName();
-        $idField = self::$idField;
+        $idField = static::$idField;
         $row = self::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
         if ($row) {
             $obj = new static();
