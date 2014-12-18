@@ -27,7 +27,12 @@ class Storage_Driver_SerializedFile extends Storage_Driver_PhpVar {
                 $this->data = @unserialize(file_get_contents($this->fileName));
             }
             if (false === $this->data) {
-                throw new Storage_Exception('Bad serialized data', Storage_Exception::BAD_SERIALIZED_DATA);
+                if (empty($this->dsn->ignoreErrors)) {
+                    throw new Storage_Exception('Bad serialized data', Storage_Exception::BAD_SERIALIZED_DATA);
+                }
+                else {
+                    $this->data = array();
+                }
             }
         }
         else {

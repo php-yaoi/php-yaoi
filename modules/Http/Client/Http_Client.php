@@ -96,7 +96,7 @@ class Http_Client extends Client implements Mock_Able {
             if (preg_match('/^Set-Cookie:\s*([^;]+)/', $hdr, $matches)) {
                 //echo $hdr;
                 parse_str($matches[1], $tmp);
-                $cookies += $tmp;
+                $cookies = array_merge($cookies, $tmp);
             }
 
             //Content-Type: text/html; charset=WINDOWS-1251

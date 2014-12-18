@@ -13,4 +13,5 @@ class Storage_Dsn extends String_Dsn {
     public $compression;
     public $binary;
     public $instanceId;
+    public $ignoreErrors;
 }
