@@ -54,7 +54,8 @@ class Database_Query implements Iterator {
         }
         $this->executed = true;
 
-        if (null !== $this->logResourceId) {
+        if (null !== $this->logResourceId
+            && isset(DependencyRepository::$items[$this->logResourceId])) {
             /**
              * @var Log $log
              */
