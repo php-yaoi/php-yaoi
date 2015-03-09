@@ -6,6 +6,7 @@ class Entity_SimpleMysql extends Base_Class {
      */
     static public $tableName;
     static public $idField = 'id';
+    static public $uniqueKey = array();
 
     private $fetched = false;
     private $originalData;
@@ -61,21 +62,56 @@ class Entity_SimpleMysql extends Base_Class {
      * @return $this
      */
     public static function getById($id) {
-        $tableName = self::getTableName();
         $idField = static::$idField;
-        $row = self::db()->query("SELECT * FROM `$tableName` WHERE `$idField` = ?", $id)->fetchRow();
+        $select = static::select();
+        $row = $select
+            ->where("? = ?", new Sql_Symbol($idField), $id)
+            ->query()
+            ->fetchRow();
+
         if ($row) {
-            $obj = new static();
+            $obj = static::fromArray($row);
             $obj->fetched = true;
-            foreach ($row as $key => $value) {
-                $obj->$key = $value;
-            }
 
             return $obj;
         }
         else {
             return null;
         }
+    }
+
+    /**
+     * @return Sql_SelectInterface
+     */
+    public static function select() {
+        $select = self::db()->select(self::getTableName());
+        return $select;
+    }
+
+    public static function getBy($columnValues) {
+        if ($columnValues instanceof static) {
+            $columnValues = $columnValues->toArray(true);
+        }
+
+        $columns = self::getColumns();
+
+        $select = static::select();
+        foreach ($columnValues as $column => $value) {
+            if (isset($columns[$column])) {
+                $select->where("? = ?", new Sql_Symbol($column), $value);
+            }
+        }
+
+        $result = array();
+        foreach ($select->query() as $row) {
+            $obj = new static();
+            $obj->fetched = true;
+            foreach ($row as $key => $value) {
+                $obj->$key = $value;
+            }
+            $result []= $obj;
+        }
+        return $result;
     }
 
 
@@ -129,5 +165,86 @@ class Entity_SimpleMysql extends Base_Class {
         }
         return $instance;
     }
+
+    public function toArray($skipUndefined = false) {
+        $columns = self::getColumns();
+        $result = array();
+        if ($skipUndefined) {
+            $data = (array)$this;
+            foreach ($columns as $column) {
+                if (array_key_exists($column, $data))
+                    $result[$column]= $this->$column;
+            }
+        }
+        else {
+            foreach ($columns as $column) {
+                $result[$column]= isset($this->$column) ? $this->$column : null;
+            }
+        }
+        return $result;
+    }
+
+
+    public function bindByUnique() {
+        if (static::$uniqueKey) {
+            if (!is_array(static::$uniqueKey)) {
+                static::$uniqueKey = array(static::$uniqueKey);
+            }
+
+            $select = static::select();
+            foreach (static::$uniqueKey as $uniqueField) {
+                if (!isset($this->$uniqueField)) {
+                    return false;
+                }
+                $select->where('? = ?', new Sql_Symbol($uniqueField), $this->$uniqueField);
+            }
+            $row = $select->query()->rowsAffectedIn($rowsCount)->fetchRow();
+            if ($rowsCount > 1 || !$rowsCount) {
+                return false;
+            }
+            if (!is_array($row)) {
+                var_dump($row);
+                die('F0ck');
+            }
+
+            foreach ($row as $key => $value) {
+                if (!isset($this->$key)) {
+                    $this->$key = $value;
+                }
+            }
+            $this->fetched = true;
+            return true;
+        }
+        return false;
+    }
+
+    public function getId() {
+        $idField = static::$idField;
+        if (!isset($this->$idField)) {
+            if (!$this->fetched) {
+                $this->bindByUnique();
+            }
+            if (!$this->fetched) {
+                $this->save();
+            }
+        }
+
+        return $this->$idField;
+    }
+
+    public function remove() {
+        if ($this->fetched) {
+            $idField = static::$idField;
+            static::removeById($this->$idField);
+            $this->fetched = false;
+        }
+    }
+
+    public static function removeById($id) {
+        self::db()->delete(static::$tableName)->where('? = ?', new Sql_Symbol(static::$idField), $id);
+    }
+
+
+    protected $relationData;
 
 }
