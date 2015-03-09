@@ -80,9 +80,14 @@ class String_ParserIterator implements Iterator {
     private $start;
     private $end;
     private $valid;
+    /**
+     * @var String_Parser
+     */
     private $current;
     private $position = -1;
-
+    /**
+     * @var String_Parser
+     */
     private $parser;
     private $offset;
 
@@ -153,7 +158,6 @@ class String_ParserIterator implements Iterator {
     {
         $this->parser->setOffset($this->offset);
         $this->position = -1;
-        $this->valid = true;
-        $this->current = null;
+        $this->next();
     }
 }
