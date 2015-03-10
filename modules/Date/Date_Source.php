@@ -34,20 +34,20 @@ class Date_Source implements Mock_Able {
         return microtime(1);
     }
 
-    public function strToTime($string) {
+    public function strToTime($string, $now = null) {
         if ($this->mock) {
             if ($this->mock instanceof Mock_DataSetPlay) {
                 return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get();
             }
             elseif ($this->mock instanceof Mock_DataSetCapture) {
-                $ut = strtotime($string);
+                $ut = strtotime($string, $now);
                 $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->add($ut);
                 //$this->mock->add(array(null, $string), $ut, static::MOCK_STR_TO_TIME);
                 return $ut;
             }
         }
 
-        $ut = strtotime($string);
+        $ut = strtotime($string, $now);
 
         return $ut;
     }
