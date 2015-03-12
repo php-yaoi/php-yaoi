@@ -88,7 +88,12 @@ class Entity_SimpleMysql extends Base_Class {
         return $select;
     }
 
-    public static function getBy($columnValues) {
+    /**
+     * @param $columnValues
+     * @param callable $withSelectDo
+     * @return static[]
+     */
+    public static function getBy($columnValues, Closure $withSelectDo = null) {
         if ($columnValues instanceof static) {
             $columnValues = $columnValues->toArray(true);
         }
@@ -100,6 +105,10 @@ class Entity_SimpleMysql extends Base_Class {
             if (isset($columns[$column])) {
                 $select->where("? = ?", new Sql_Symbol($column), $value);
             }
+        }
+
+        if ($withSelectDo) {
+            $withSelectDo($select);
         }
 
         $result = array();
