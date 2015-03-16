@@ -4,7 +4,7 @@
  * Class Storage_Dsn
  */
 
-class Storage_Dsn extends String_Dsn {
+class Storage_Dsn extends Client_Dsn {
     public $persistent = false;
     public $reconnect = false;
     public $logRequests = false;

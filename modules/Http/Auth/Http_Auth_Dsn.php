@@ -1,6 +1,6 @@
 <?php
 
-class Http_Auth_Dsn extends String_Dsn {
+class Http_Auth_Dsn extends Client_Dsn {
     public $salt;
     public $users;
     public $title = 'Restricted Area';
