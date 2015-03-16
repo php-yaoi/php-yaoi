@@ -39,6 +39,7 @@ class Database_Query implements Iterator {
         $query = $this->build();
         $start = microtime(1);
 
+        $this->executed = true;
         if (!$this->result = $this->driver->query($query)) {
             $error = $this->driver->queryErrorMessage($this->result);
             if (null !== $this->logResourceId) {
@@ -52,7 +53,6 @@ class Database_Query implements Iterator {
             $exception->query = $query;
             throw $exception;
         }
-        $this->executed = true;
 
         if (null !== $this->logResourceId
             && isset(DependencyRepository::$items[$this->logResourceId])) {

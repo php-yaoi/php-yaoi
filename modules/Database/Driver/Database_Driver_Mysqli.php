@@ -63,7 +63,7 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
      */
     public function rewind($result)
     {
-        return $result->data_seek(0);
+        return $result->num_rows > 0 ? $result->data_seek(0) : false;
     }
 
     /**
