@@ -8,6 +8,8 @@
  * @property Database_Dsn $dsn
  */
 class Database extends Client implements Database_Interface {
+    protected static $dsnClass = 'Database_Dsn';
+
     public static $conf = array();
     protected static $instances = array();
 

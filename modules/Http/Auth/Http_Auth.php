@@ -4,6 +4,7 @@
  * Class Http_Auth
  */
 class Http_Auth extends Client {
+    protected static $dsnClass = 'Http_Auth_Dsn';
     public static $conf = array();
     protected static $instances = array();
 

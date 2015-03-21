@@ -7,9 +7,11 @@
  * @property array $instances
  */
 abstract class Client extends Base_Class {
+    static protected $dsnClass = 'Client_Dsn';
+
     /**
      * @param null $dsn
-     * @return null|String_Dsn
+     * @return null|Client_Dsn
      * @throws Client_Exception
      */
     public static function dsn($dsn = null) {
@@ -19,10 +21,10 @@ abstract class Client extends Base_Class {
 
         if (null === $dsn || is_string($dsn)) {
             /**
-             * @see String_Dsn descendants
+             * @see Client_Dsn descendants
              */
-            $class = get_called_class() . '_Dsn';
-            if (null === $dsn && !class_exists($class, true)) {
+            $class = static::$dsnClass;
+            if (null === $dsn) {
                 $dsn = null;
             }
             else {
@@ -47,16 +49,13 @@ abstract class Client extends Base_Class {
 
     /**
      * @param string $id
-     * @param null $originalId
+     * @param Client_Dsn $originalId
      * @return static
      * @throws Client_Exception
      */
-    private static function createByConfId($id = 'default', $originalId = null) {
+    private static function createByConfId($id = 'default') {
         if (isset(static::$conf[$id])) {
             $dsn = static::dsn(static::$conf[$id]);
-            if ($originalId) {
-                $dsn->originalId = $originalId;
-            }
             $resource = new static($dsn);
         }
         elseif ('default' === $id) {
@@ -71,14 +70,21 @@ abstract class Client extends Base_Class {
 
 
     /**
-     * @param string $id
-     * @param bool $reuse
+     * Returns client instance
+     *
+     *
+     * @param string|Client|Client_Dsn|Closure $id
+     * @param bool $reuse return previously created instance if true, create new if false
      * @return static
      * @throws Client_Exception
      */
     public static function getInstance($id = 'default', $reuse = true) {
         if (is_string($id)) {
             if ($reuse) {
+                if (!isset(static::$conf[$id])) {
+                    $id = 'default';
+                }
+
                 $resource = &static::$instances[$id];
                 if (!isset($resource)) {
                     $resource = static::createByConfId($id);
@@ -95,7 +101,7 @@ abstract class Client extends Base_Class {
             return $id;
         }
 
-        if ($id instanceof String_Dsn || $id instanceof Closure) {
+        if ($id instanceof String_Dsn || $id instanceof Client_Dsn || $id instanceof Closure) {
             return new static($id);
         }
     }

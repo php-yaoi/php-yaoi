@@ -6,6 +6,7 @@
  * @method static Log getInstance($id = 'default', $reuse = true)
  */
 class Log extends Client {
+    protected static $dsnClass = 'Log_Dsn';
     public static $conf = array();
     protected static $instances = array();
 

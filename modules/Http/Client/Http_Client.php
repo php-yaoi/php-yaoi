@@ -6,6 +6,7 @@
  * @method Http_Client_Driver getDriver
  */
 class Http_Client extends Client implements Mock_Able {
+    protected static $dsnClass = 'Http_Client_Dsn';
     public static $conf = array();
     protected static $instances = array();
     public static $globalSettings = array();
