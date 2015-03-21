@@ -132,8 +132,13 @@ class Entity_SimpleMysql extends Base_Class {
                 $data[$column] = $this->$column;
             }
         }
-        $idField = static::$idField;
-        $update->where("`$idField` = ?", $data[$idField]);
+        $idFields = static::$idField;
+        if (!is_array($idFields)) {
+            $idFields = array($idFields);
+        }
+        foreach ($idFields as $idField) {
+            $update->where("`$idField` = ?", $data[$idField]);
+        }
         $update->set($data);
         unset($data[$idField]);
         $update->query();
@@ -150,20 +155,25 @@ class Entity_SimpleMysql extends Base_Class {
             }
         }
         $insert->valuesRow($data);
-        if (!isset($data[static::$idField])) {
-            $id = $insert->query()->lastInsertId();
-            $this->{static::$idField} = $id;
+        if (!is_array(static::$idField)) {
+            if (!isset($data[static::$idField])) {
+                $id = $insert->query()->lastInsertId();
+                $this->{static::$idField} = $id;
+            }
+        }
+        else {
+            $insert->query();
         }
 
         return $this;
     }
 
     public function save() {
-        if (!isset($this->{self::$idField})) {
-            $this->insert();
+        if ($this->fetched) {
+            $this->update();
         }
         else {
-            $this->update();
+            $this->insert();
         }
     }
 
@@ -195,6 +205,9 @@ class Entity_SimpleMysql extends Base_Class {
 
 
     public function bindByUnique() {
+        if ($this->fetched) {
+            return false;
+        }
         if (static::$uniqueKey) {
             if (!is_array(static::$uniqueKey)) {
                 static::$uniqueKey = array(static::$uniqueKey);
