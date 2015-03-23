@@ -1,14 +1,26 @@
 <?php
 
-class Database_Driver_Sqlite implements Database_Server_Mysql  {
+class Database_Driver_Sqlite extends Database_Driver {
+
+    private $dbHandle;
+
+    private function connect() {
+        if (null === $this->dbHandle) {
+            $this->dbHandle = sqlite_open($this->dsn->path);
+        }
+    }
+
+
     public function query($statement)
     {
-        // TODO: Implement query() method.
+        if (null === $this->dbHandle) {
+            $this->connect();
+        }
+        return sqlite_query($this->dbHandle, $statement);
     }
 
     public function lastInsertId()
     {
-        return sqlite_last_insert_rowid($this->db);
         // TODO: Implement lastInsertId() method.
     }
 
@@ -29,12 +41,7 @@ class Database_Driver_Sqlite implements Database_Server_Mysql  {
 
     public function fetchAssoc($result)
     {
-        // TODO: Implement fetchAssoc() method.
-    }
-
-    public function quote($value)
-    {
-        // TODO: Implement quote() method.
+        return sqlite_fetch_array($result, SQLITE_ASSOC);
     }
 
     public function queryErrorMessage($result)
@@ -42,4 +49,8 @@ class Database_Driver_Sqlite implements Database_Server_Mysql  {
         // TODO: Implement queryErrorMessage() method.
     }
 
-} 
+    public function disconnect()
+    {
+        // TODO: Implement disconnect() method.
+    }
+}
