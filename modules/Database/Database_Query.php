@@ -67,7 +67,10 @@ class Database_Query implements Iterator {
     }
 
     public function fetchAll($keyField = null) {
-        $this->rewind();
+        if (!$this->executed) {
+            $this->execute();
+        }
+        $this->driver->rewind($this->result);
 
         $result = array();
 
@@ -109,7 +112,7 @@ class Database_Query implements Iterator {
 
 
     protected $current;
-    protected $position;
+    protected $position = -1;
     protected $valid;
 
 
@@ -121,9 +124,6 @@ class Database_Query implements Iterator {
      */
     public function current()
     {
-        if (null === $this->current) {
-            $this->next();
-        }
         return $this->current;
     }
 
@@ -135,9 +135,10 @@ class Database_Query implements Iterator {
      */
     public function next()
     {
-        if (is_null($this->current = $this->driver->fetchAssoc($this->result))) {
+        $this->current = $this->driver->fetchAssoc($this->result);
+        if (null === $this->current) {
             $this->valid = false;
-            $this->position = null;
+            $this->position = -1;
         }
         else {
             $this->valid = true;
@@ -153,10 +154,7 @@ class Database_Query implements Iterator {
      */
     public function key()
     {
-        if (null === $this->current) {
-            return 0;
-        }
-        return $this->position;
+        return $this->position > 0 ? $this->position : 0;
     }
 
     /**
@@ -168,9 +166,6 @@ class Database_Query implements Iterator {
      */
     public function valid()
     {
-        if (null === $this->current) {
-            $this->next();
-        }
         return $this->valid;
     }
 
@@ -188,8 +183,7 @@ class Database_Query implements Iterator {
 
         $this->driver->rewind($this->result);
         $this->position = -1;
-        $this->valid = true;
-        $this->current = null;
+        $this->next();
     }
 
     protected $skipAutoExecute = 0;

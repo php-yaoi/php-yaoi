@@ -2,11 +2,14 @@
 
 class Database_Driver_Sqlite extends Database_Driver {
 
+    /**
+     * @var SQLite3
+     */
     private $dbHandle;
 
     private function connect() {
         if (null === $this->dbHandle) {
-            $this->dbHandle = sqlite_open($this->dsn->path);
+            $this->dbHandle = new SQLite3($this->dsn->path);
         }
     }
 
@@ -16,41 +19,54 @@ class Database_Driver_Sqlite extends Database_Driver {
         if (null === $this->dbHandle) {
             $this->connect();
         }
-        return sqlite_query($this->dbHandle, $statement);
+        return @$this->dbHandle->query($statement);
     }
 
     public function lastInsertId()
     {
-        // TODO: Implement lastInsertId() method.
+        return $this->dbHandle->lastInsertRowID();
     }
 
     public function rowsAffected($result)
     {
-        // TODO: Implement rowsAffected() method.
+        return $this->dbHandle->changes();
     }
 
     public function escape($value)
     {
-        return sqlite_escape_string($value);
+        if (null === $this->dbHandle) {
+            $this->connect();
+        }
+        return $this->dbHandle->escapeString($value);
     }
 
+    /**
+     * @param SQLite3Result $result
+     */
     public function rewind($result)
     {
-        // TODO: Implement rewind() method.
+        $result->reset();
     }
 
+    /**
+     * @param SQLite3Result $result
+     * @return array|false
+     */
     public function fetchAssoc($result)
     {
-        return sqlite_fetch_array($result, SQLITE_ASSOC);
+        $row = $result->fetchArray(SQLITE3_ASSOC);
+        return $row ? $row : null;
     }
 
     public function queryErrorMessage($result)
     {
-        // TODO: Implement queryErrorMessage() method.
+        return $this->dbHandle->lastErrorCode() . ' ' . $this->dbHandle->lastErrorMsg();
     }
 
     public function disconnect()
     {
-        // TODO: Implement disconnect() method.
+        if ($this->dbHandle) {
+            $this->dbHandle->close();
+        }
     }
 }
