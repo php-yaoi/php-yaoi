@@ -248,6 +248,62 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         }
     }
 
+
+    /**
+     * @var Sql_Expression
+     */
+    private $union;
+
+    /**
+     * @param $expression
+     * @param null $binds
+     * @return mixed
+     */
+    public function union($expression, $binds = null)
+    {
+        if (null === $expression) {
+            return $this;
+        }
+        if (null === $this->union) {
+            $this->union = new Sql_Expression();
+        }
+        $this->union->unionExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+
+        return $this;
+    }
+
+
+    /**
+     * @param $expression
+     * @param null $binds
+     * @return mixed
+     */
+    public function unionAll($expression, $binds = null)
+    {
+        if (null === $expression) {
+            return $this;
+        }
+
+        if (null === $this->union) {
+            $this->union = new Sql_Expression();
+        }
+        $this->union->unionAllExpr(Sql_Expression::createFromFuncArguments(func_get_args()));
+
+        return $this;
+    }
+
+    protected function buildUnion(Database_Quoter $quoter)
+    {
+        if ($this->union && !$this->union->isEmpty()) {
+            return $this->union->build($quoter);
+        } else {
+            return '';
+        }
+    }
+
+
+
+
     /**
      * @var Sql_Expression
      */

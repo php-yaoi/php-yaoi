@@ -99,6 +99,20 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         return $this;
     }
 
+    const OP_UNION = ' UNION ';
+    public function unionExpr($expression) {
+        $this->queue []= array(self::OP_UNION, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+    const OP_UNION_ALL = ' UNION ALL ';
+    public function unionAllExpr($expression) {
+        $this->queue []= array(self::OP_UNION_ALL, Sql_Expression::createFromFuncArguments(func_get_args()));
+        return $this;
+    }
+
+
+
     public function prependExpr($expression) {
         array_unshift(
             $this->queue,
@@ -178,7 +192,7 @@ class Sql_Expression extends Base_Class implements Is_Empty {
     }
 
 
-    private $disabled = false;
+    protected $disabled = false;
     public function disable() {
         $this->disabled = true;
         return $this;
@@ -192,6 +206,12 @@ class Sql_Expression extends Base_Class implements Is_Empty {
 
     public function isEmpty()
     {
-        return $this->disabled || null === $this->statement || '' === $this->statement;
+        if ($this->disabled) {
+            return true;
+        }
+        if ($this->queue || $this->statement) {
+            return false;
+        }
+        return true;
     }
 }

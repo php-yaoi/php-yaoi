@@ -122,6 +122,7 @@ class Sql_Statement extends Sql_ComplexStatement {
             $q .= $this->buildHaving($quoter);
             $q .= $this->buildOrder($quoter);
             $q .= $this->buildLimit();
+            $q .= $this->buildUnion($quoter);
         }
 
         elseif ($this->command === self::CMD_UPDATE) {
@@ -171,6 +172,13 @@ class Sql_Statement extends Sql_ComplexStatement {
     public function expr($expression, $binds = null) {
         $e = Sql_Expression::createFromFuncArguments(func_get_args());
         return $e;
+    }
+
+    public function isEmpty() {
+        if ($this->disabled) {
+            return true;
+        }
+        return false;
     }
 
 }

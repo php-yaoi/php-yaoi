@@ -71,5 +71,19 @@ interface Sql_SelectInterface extends Sql_StatementInterface
      * @return $this
      */
     public function offset($offset);
+
+    /**
+     * @param $expression
+     * @param null $binds
+     * @return $this
+     */
+    public function union($expression, $binds = null);
+
+    /**
+     * @param $expression
+     * @param null $binds
+     * @return $this
+     */
+    public function unionAll($expression, $binds = null);
 }
 
