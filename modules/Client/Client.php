@@ -118,7 +118,12 @@ abstract class Client extends Base_Class {
      */
     public function getDriver() {
         if (null === $this->driver) {
-            $driverClass = get_called_class() . '_Driver_' . String_Utils::toCamelCase($this->dsn->scheme, '-');
+            if ($this->dsn->driverClassName) {
+                $driverClass = $this->dsn->driverClassName;
+            }
+            else {
+                $driverClass = get_called_class() . '_Driver_' . String_Utils::toCamelCase($this->dsn->scheme, '-');
+            }
             if (!class_exists($driverClass)) {
                 throw new Client_Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Client_Exception::NO_DRIVER);
             }

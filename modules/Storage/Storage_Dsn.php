@@ -14,4 +14,5 @@ class Storage_Dsn extends Client_Dsn {
     public $binary;
     public $instanceId;
     public $ignoreErrors;
+    public $proxyClient;
 }
