@@ -2,7 +2,7 @@
 
 interface Migration_Required {
     /**
-     * @return Migration
+     * @return Migration|Migration_Rollback
      */
     public function getMigration();
 }
