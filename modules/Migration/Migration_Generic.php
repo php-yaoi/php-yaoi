@@ -9,40 +9,29 @@ class Migration_Generic implements Migration {
     /**
      * @var callable
      */
-    private $isAppliedCallable;
-    /**
-     * @var callable
-     */
     private $rollbackCallable;
 
-    public function __construct($id, callable $apply, callable $isApplied, callable $rollback = null) {
-        $this->$id = $id;
+    public function __construct($id, callable $apply, callable $rollback = null) {
+        $this->id = $id;
         $this->applyCallable = $apply;
-        $this->isAppliedCallable = $isApplied;
         $this->rollbackCallable = $rollback;
     }
 
     public function getId()
     {
-        return $this->getId();
+        return $this->id;
     }
 
     public function apply()
     {
         $f = $this->applyCallable;
-        $f();
-    }
-
-    public function isApplied()
-    {
-        $f = $this->isAppliedCallable;
-        return $f();
+        $f($this);
     }
 
     public function rollback()
     {
         $f = $this->rollbackCallable;
-        $f();
+        $f($this);
     }
 
 

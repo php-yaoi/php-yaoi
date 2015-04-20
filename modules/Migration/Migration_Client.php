@@ -7,62 +7,51 @@ class Migration_Client extends Client {
      */
     protected $dsn;
 
-    private $defaultIsApplied;
-    public function __construct() {
-        $storageDsn = $this->dsn->storage;
-        $this->defaultIsApplied = function (Migration $migration) use ($storageDsn) {
-            $storage = Storage::getInstance($storageDsn);
-            $id = $migration->getId();
-            if ($storage->get($id)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
+
+    public function isApplied($migrationId) {
+        $storage = Storage::getInstance($this->dsn->storage);
+        if ($storage->get($migrationId)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-    public function addMigration(Migration $migration) {
-        if (!$migration->isApplied()) {
+    public function applyMigration(Migration $migration) {
+        if (!$this->isApplied($migration->getId())) {
             $migration->apply();
+            Storage::getInstance($this->dsn->storage)->set($migration->getId(), 1);
         }
         return $this;
     }
 
-    public function add($id, callable $apply, callable $isApplied = null, callable $rollback = null) {
-        if (null === $isApplied) {
-            $isApplied = function () {
-                return false;
-            };
-        }
-
+    public function apply($id, callable $apply, callable $rollback = null) {
         $m = $rollback
-            ? new Migration_GenericRollback($id, $apply, $isApplied, $rollback)
-            : new Migration_Generic($id, $apply, $isApplied);
-        return $this->addMigration($m);
+            ? new Migration_GenericRollback($id, $apply, $rollback)
+            : new Migration_Generic($id, $apply);
+        return $this->applyMigration($m);
     }
 
-    public function remove($id, callable $apply, callable $isApplied = null, callable $rollback = null) {
-        if (null === $isApplied) {
-            $isApplied = function () {
-                return false;
-            };
-        }
-
+    public function rollback($id, callable $apply, callable $rollback = null) {
         $m = $rollback
-            ? new Migration_GenericRollback($id, $apply, $isApplied, $rollback)
-            : new Migration_Generic($id, $apply, $isApplied);
-        return $this->removeMigration($m);
+            ? new Migration_GenericRollback($id, $apply, $rollback)
+            : new Migration_Generic($id, $apply);
+        return $this->rollbackMigration($m);
     }
 
-    public function removeMigration(Migration_Rollback $migration) {
-        if (!$migration->isApplied()) {
+    public function rollbackMigration(Migration_Rollback $migration) {
+        if ($this->isApplied($migration->getId())) {
             $migration->rollback();
         }
         return $this;
     }
 
-    public function skip(Migration $migration) {
+    public function skip($id, callable $apply, callable $rollback = null) {
+        return $this;
+    }
+
+    public function skipMigration(Migration_Rollback $migration) {
         return $this;
     }
 
