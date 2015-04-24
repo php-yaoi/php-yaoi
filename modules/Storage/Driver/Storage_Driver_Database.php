@@ -1,6 +1,6 @@
 <?php
 
-class Storage_Driver_Database extends Base_Class implements Storage_Driver, Storage_ArrayKey, Migration_Required {
+class Storage_Driver_Database extends Base_Class implements Storage_Driver, Storage_ArrayKey {
     private $dsn;
     /**
      * @var Database
@@ -104,25 +104,5 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
             ->query()
             ->execute();
     }
-
-    /**
-     * @return Migration
-     */
-    public function getMigration()
-    {
-        return new Migration_GenericRollback(
-            '',
-            function(){
-
-            },
-            function(){
-
-            },
-            function(){
-
-            }
-        );
-    }
-
 
 }
