@@ -1,13 +1,30 @@
 <?php
 
-interface Migration {
+class Migration {
+    const APPLY = 'apply';
+    const ROLLBACK = 'rollback';
+    const SKIP = 'skip';
+
+    public $id;
     /**
-     * @return string
+     * @var Closure
      */
-    public function getId();
+    public $applyCallable;
+    /**
+     * @var Closure
+     */
+    public $rollbackCallable;
 
     /**
-     * @return void
+     * @var Closure
      */
-    public function apply();
+    public $isAppliedCallable;
+
+    public function __construct($id, Closure $apply, Closure $rollback = null, Closure $isApplied = null) {
+        $this->id = $id;
+        $this->applyCallable = $apply;
+        $this->rollbackCallable = $rollback;
+        $this->isAppliedCallable = $isApplied;
+    }
+
 }
