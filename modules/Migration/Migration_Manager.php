@@ -23,11 +23,6 @@ class Migration_Manager extends Client {
         return $this->storage;
     }
 
-    public function performProvider(Migration_Provider $provider, $action = Migration::APPLY) {
-        return $this->perform($provider->getMigration(), $action);
-    }
-
-
     public function perform(Migration $migration, $action = Migration::APPLY) {
         if ($action === Migration::SKIP) {
             return $this;
