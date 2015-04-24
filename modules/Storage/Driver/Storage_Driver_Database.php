@@ -1,12 +1,15 @@
 <?php
 
-class Storage_Driver_Database extends Base_Class implements Storage_Driver, Storage_ArrayKey {
+class Storage_Driver_Database extends Base_Class implements Storage_Driver, Storage_ArrayKey, Migration_Required {
     private $dsn;
     /**
      * @var Database
      */
     private $db;
 
+    /**
+     * @var Sql_Symbol
+     */
     private $table;
     /**
      * @var Sql_Symbol
@@ -21,26 +24,40 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
      */
     private $expireField;
 
-    /**
-     * @var Storage_Dsn
-     */
     public function __construct(Storage_Dsn $dsn = null)
     {
         $this->dsn = $dsn;
         if (empty($dsn->proxyClient)) {
             throw new Client_Exception('proxyClient required in dsn', Client_Exception::DSN_REQUIRED);
         }
-        $dsn->path;
+        $this->table = new Sql_Symbol($dsn->path);
+        $this->keyField = new Sql_Symbol('k');
+        $this->valueField = new Sql_Symbol('v');
+        $this->expireField = new Sql_Symbol('e');
+
 
         $this->db = Database::getInstance($this->dsn->proxyClient);
     }
 
     public function set($key, $value, $ttl) {
+        echo 'hooy';
         if ($this->keyExists($key)) {
-            $this->db->update($this->table)->set("? = ?", $this->keyField, $value);
+            echo 'hooo';
+            $this->db
+                ->update($this->table)
+                ->set("? = ?", $this->valueField, $value)
+                ->where('? = ?', $this->keyField, $key)
+                ->query();
         }
         else {
-            $this->db->insert($this->table)->valuesRow(array($this->keyField->name => $value));
+            echo 'h999';
+            $this->db->insert($this->table)->valuesRow(
+                array(
+                    $this->keyField->name => $key,
+                    $this->valueField->name => $value,
+                    $this->expireField->name => $ttl,
+                    ))
+                ->query();
         }
     }
 
@@ -51,8 +68,8 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
 
         $row = $this->db
             ->select($this->table)
-            ->select('?', new Sql_Symbol($this->valueField))
-            ->where('? = ?', new Sql_Symbol($this->keyField), $key)
+            ->select('?', $this->valueField)
+            ->where('? = ?', $this->keyField, $key)
             ->query()
             ->fetchRow();
 
@@ -60,7 +77,7 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
             return null;
         }
         else {
-            return $row[$this->valueField];
+            return $row[$this->valueField->name];
         }
     }
 
@@ -71,8 +88,8 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
 
         $row = $this->db
             ->select($this->table)
-            ->select('?, ?', new Sql_Symbol($this->valueField), new Sql_Symbol($this->expireField))
-            ->where('? = ?', new Sql_Symbol($this->keyField), $key)
+            ->select('?, ?', $this->valueField, $this->expireField)
+            ->where('? = ?', $this->keyField, $key)
             ->query()
             ->fetchRow();
 
@@ -92,7 +109,7 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
 
         $this->db
             ->delete($this->table)
-            ->where('? = ?', new Sql_Symbol($this->keyField), $key)
+            ->where('? = ?', $this->keyField, $key)
             ->query()
             ->execute();
     }
@@ -105,4 +122,28 @@ class Storage_Driver_Database extends Base_Class implements Storage_Driver, Stor
             ->execute();
     }
 
+    /**
+     * @return Migration
+     */
+    public function getMigration()
+    {
+        $migrationId = 'storage_db_wrapper'  . '_' . $this->table->name;
+        return new Migration($migrationId, function() {
+            //if ($this->db->getDriver() instanceof Database_Server_Mysql) {
+                $this->db->query("CREATE TABLE :table (
+:key VARCHAR(255) NOT NULL DEFAULT '',
+:value TEXT NOT NULL DEFAULT '',
+:expire INTEGER NOT NULL DEFAULT 0,
+PRIMARY KEY (:key)
+)",
+                    array(
+                        'table' => $this->table,
+                        'key' => $this->keyField,
+                        'value' => $this->valueField,
+                        'expire' => $this->expireField,
+                        ));
+            //}
+
+        });
+    }
 }

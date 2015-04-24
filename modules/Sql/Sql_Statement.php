@@ -127,7 +127,7 @@ class Sql_Statement extends Sql_ComplexStatement {
 
         elseif ($this->command === self::CMD_UPDATE) {
             $q = self::CMD_UPDATE;
-            $q .= $this->buildTable();
+            $q .= $this->buildTable($quoter);
             $q .= $this->buildJoin($quoter);
             $q .= $this->buildSet($quoter);
             $q .= $this->buildWhere($quoter);
@@ -137,7 +137,7 @@ class Sql_Statement extends Sql_ComplexStatement {
 
         elseif ($this->command === self::CMD_DELETE) {
             $q = self::CMD_DELETE;
-            $from = $this->buildTable();
+            $from = $this->buildTable($quoter);
             if ($from) {
                 $from = ' FROM' . $from;
             }
@@ -150,7 +150,7 @@ class Sql_Statement extends Sql_ComplexStatement {
 
         elseif ($this->command === self::CMD_INSERT) {
             $q = self::CMD_INSERT;
-            $q .= $this->buildTable();
+            $q .= $this->buildTable($quoter);
             $q .= $this->buildValues($quoter);
         }
 
@@ -158,9 +158,15 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
-    private function buildTable() {
+    private function buildTable(Database_Quoter $quoter) {
         if ($this->tables) {
-            return ' ' . implode(', ', $this->tables);
+            $tables = $this->tables;
+            foreach ($tables as &$table) {
+                if ($table instanceof Sql_Symbol) {
+                    $table = $quoter->quote($table);
+                }
+            }
+            return ' ' . implode(', ', $tables);
         }
         else {
             return '';

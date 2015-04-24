@@ -17,6 +17,9 @@ class Sql_Expression extends Base_Class implements Is_Empty {
         if ($arguments[0] instanceof Sql_Expression) {
             return $arguments[0];
         }
+        if ($arguments[0] instanceof Sql_Symbol) {
+            return new self('?', $arguments[0]);
+        }
         if ($arguments[0] instanceof Closure) {
             $expression = $arguments[0]();
             if (!$expression instanceof Sql_Expression) {

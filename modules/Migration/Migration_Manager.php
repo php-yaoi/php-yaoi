@@ -2,6 +2,7 @@
 
 class Migration_Manager extends Client {
     public static $conf = array();
+    protected static $instances = array();
     /**
      * @var Migration_Dsn
      */
