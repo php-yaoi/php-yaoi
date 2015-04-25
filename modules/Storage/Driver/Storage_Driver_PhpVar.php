@@ -1,7 +1,9 @@
 <?php
 
-class Storage_Driver_PhpVar implements Storage_Driver, Storage_ArrayKey, Storage_ExportImportArray {
+class Storage_Driver_PhpVar extends Base_Class implements Storage_Driver, Storage_ArrayKey, Storage_ExportImportArray {
     public function __construct(Storage_Dsn $dsn = null) {
+        $this->dsn = $dsn ? $dsn : new Storage_Dsn();
+        $this->time = Yaoi::time($this->dsn->dateSource); // TODO use getInstance after Date_Source refactoring
     }
 
     protected $data = array();

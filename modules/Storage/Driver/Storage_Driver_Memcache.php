@@ -1,6 +1,6 @@
 <?php
 
-class Storage_Driver_Memcache implements  Storage_Driver {
+class Storage_Driver_Memcache implements  Storage_Driver, Storage_Expire {
     /**
      * @var Storage_Dsn
      */

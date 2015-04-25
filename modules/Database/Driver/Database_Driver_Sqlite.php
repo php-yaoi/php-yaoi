@@ -69,4 +69,9 @@ class Database_Driver_Sqlite extends Database_Driver {
             $this->dbHandle->close();
         }
     }
+
+    public function quoteSymbol($symbol) {
+        return $symbol;
+    }
+
 }

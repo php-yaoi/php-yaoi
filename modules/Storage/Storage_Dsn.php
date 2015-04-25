@@ -15,4 +15,5 @@ class Storage_Dsn extends Client_Dsn {
     public $instanceId;
     public $ignoreErrors;
     public $proxyClient;
+    public $dateSource;
 }
