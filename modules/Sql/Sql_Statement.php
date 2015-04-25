@@ -35,7 +35,7 @@ class Sql_Statement extends Sql_ComplexStatement {
 
     const CMD_SELECT = 'SELECT';
     const CMD_DELETE = 'DELETE';
-    const CMD_INSERT = 'INSERT';
+    const CMD_INSERT = 'INSERT INTO';
     const CMD_UPDATE = 'UPDATE';
     private $command;
 

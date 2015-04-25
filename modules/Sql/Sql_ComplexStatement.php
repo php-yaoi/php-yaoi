@@ -386,7 +386,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
                     $fields[$field] = $field;
                 }
             }
-            $result .= '(';
+            $result .= ' (';
             foreach ($fields as $field) {
                 $result .= $quoter->quote(new Sql_Symbol($field)) . ', ';
             }
