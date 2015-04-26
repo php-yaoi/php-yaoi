@@ -141,7 +141,11 @@ class Storage_Driver_DatabaseProxy extends Base_Class implements Storage_Driver,
     public function getMigration()
     {
         $migrationId = 'storage_db_wrapper'  . '_' . get_class($this->db->getDriver()) . $this->table->name;
-        return new Migration($migrationId, function() {
+        $table = $this->table;
+        $keyField = $this->keyField;
+        $valueField = $this->valueField;
+        $expireField = $this->expireField;
+        return new Migration($migrationId, function() use ($table, $keyField, $valueField, $expireField) {
             //if ($this->db->getDriver() instanceof Database_Server_Mysql) {
                 $this->db->query("CREATE TABLE IF NOT EXISTS :table (
 :key VARCHAR(255) NOT NULL DEFAULT '',
@@ -150,10 +154,10 @@ class Storage_Driver_DatabaseProxy extends Base_Class implements Storage_Driver,
 PRIMARY KEY (:key)
 )",
                     array(
-                        'table' => $this->table,
-                        'key' => $this->keyField,
-                        'value' => $this->valueField,
-                        'expire' => $this->expireField,
+                        'table' => $table,
+                        'key' => $keyField,
+                        'value' => $valueField,
+                        'expire' => $expireField,
                         ));
             //}
 
