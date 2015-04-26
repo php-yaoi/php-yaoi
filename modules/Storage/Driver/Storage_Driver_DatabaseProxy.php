@@ -145,9 +145,10 @@ class Storage_Driver_DatabaseProxy extends Base_Class implements Storage_Driver,
         $keyField = $this->keyField;
         $valueField = $this->valueField;
         $expireField = $this->expireField;
-        return new Migration($migrationId, function() use ($table, $keyField, $valueField, $expireField) {
+        $db = $this->db;
+        return new Migration($migrationId, function() use ($table, $keyField, $valueField, $expireField, $db) {
             //if ($this->db->getDriver() instanceof Database_Server_Mysql) {
-                $this->db->query("CREATE TABLE IF NOT EXISTS :table (
+                $db->query("CREATE TABLE IF NOT EXISTS :table (
 :key VARCHAR(255) NOT NULL DEFAULT '',
 :value TEXT NOT NULL,
 :expire INTEGER NOT NULL DEFAULT 0,
