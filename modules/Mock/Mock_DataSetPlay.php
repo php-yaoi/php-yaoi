@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class Mock_DataSetPlay
+ * @deprecated
+ */
 class Mock_DataSetPlay extends Mock_DataSetBase {
 
     /**

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class Mock_DataSetCapture
+ * @deprecated
+ */
 class Mock_DataSetCapture extends Mock_DataSetBase {
     /**
      * @param $value
@@ -21,6 +25,8 @@ class Mock_DataSetCapture extends Mock_DataSetBase {
     protected $temp = array();
 
     /**
+     * Store or retrieve temporary data relevant to current mock/branch
+     *
      * @param $key
      * @param null $value
      * @return mixed|null
