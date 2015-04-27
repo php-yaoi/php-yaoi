@@ -163,6 +163,7 @@ PRIMARY KEY (:key)
             //}
 
         }, function () use ($table) {
+            //
             $this->db->query("DROP TABLE ?", $table);
         });
     }
