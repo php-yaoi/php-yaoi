@@ -9,10 +9,15 @@ class Storage extends Client {
     public static $conf = array();
     protected static $instances = array();
 
-    public function get($key)
+    public function get($key, Closure $setOnMiss = null, $ttl = null)
     {
         $this->prepareKey($key);
-        return $this->getDriver()->get($key);
+        $value = $this->getDriver()->get($key);
+        if (null === $value && $setOnMiss !== null) {
+            $value = $setOnMiss();
+            $this->set($key, $value, $ttl);
+        }
+        return $value;
     }
 
     public function keyExists($key) {
