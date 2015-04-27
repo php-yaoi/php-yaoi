@@ -84,3 +84,7 @@ class Sql_Statement {
     public function columns($expression, $binds = null) {}
 }
 //*/
+
+
+// 2015.04.27
+// Mock_DataSetPlay and Mock_DataSetCapture deprecated in favor of Mock

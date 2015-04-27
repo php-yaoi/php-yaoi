@@ -57,6 +57,8 @@ class Http_Client extends Client implements Mock_Able {
                 $this->logError($log);
             }
         }
+
+        $this->mock = new Mock(new Storage_Null());
     }
 
     public function reset() {
@@ -218,27 +220,13 @@ class Http_Client extends Client implements Mock_Able {
 
         $this->responseHeaders = array();
 
-        if ($this->mock) {
-            $response = '';
-            $mock = $this->mock->branch($this->url, hash('crc32b', serialize($driver->getRequest())));
-            if ($mock instanceof Mock_DataSetPlay) {
-                try {
-                    $response = $mock->branch('response')->get();
-                    $this->responseHeaders = $mock->branch('responseHeaders')->get();
-                }
-                catch (Mock_Exception $e) {
-                    if ($this->logError) {
-                        $this->logError->push($e->getMessage()
-                            . ', request: ' . print_r($driver->getRequest(), 1)
-                            . ', serialize: ' . base64_encode(serialize($driver->getRequest())));
-                    }
-                    throw $e;
-                }
-            }
-            elseif ($mock instanceof Mock_DataSetCapture) {
+        $mock = $this->mock->branch($this->url, hash('crc32b', serialize($driver->getRequest())));
+        $self = $this;
+        try {
+            list($response, $this->responseHeaders) = $mock->branch('responseData')->get(null, function()use($driver, $self, $mock){
                 $driver->fetch();
                 $response = $driver->getResponseContent();
-                $this->responseHeaders = $driver->getResponseHeaders();
+                $responseHeaders = $driver->getResponseHeaders();
 
                 if (!$this->skipBadRequestException && false === $response) {
                     $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
@@ -248,22 +236,16 @@ class Http_Client extends Client implements Mock_Able {
                     throw $e;
                 }
 
-                $mock->branch('response')->add($response);
-                $mock->branch('responseHeaders')->add($this->responseHeaders);
-            }
+                return array($response, $responseHeaders);
+            });
         }
-        else {
-            $driver->fetch();
-            $response = $driver->getResponseContent();
-            $this->responseHeaders = $driver->getResponseHeaders();
-
-            if (!$this->skipBadRequestException && false === $response) {
-                $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
-                $e->request = $driver->getRequest();
-                $e->responseHeaders = $this->responseHeaders;
-                $e->url = $this->url;
-                throw $e;
+        catch (Mock_Exception $e) {
+            if ($this->logError) {
+                $this->logError->push($e->getMessage()
+                    . ', request: ' . print_r($driver->getRequest(), 1)
+                    . ', serialize: ' . base64_encode(serialize($driver->getRequest())));
             }
+            throw $e;
         }
 
 

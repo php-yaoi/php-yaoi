@@ -5,16 +5,7 @@ class Mock extends Mock_DataSetBase {
     const MODE_PLAY = 1;
     const MODE_CAPTURE = 2;
 
-    protected $mode = self::MODE_COMBINED;
-
-    public function setMode($mode) {
-        $this->mode = $mode;
-        return $this;
-    }
-
-    public function getMode() {
-        return $this->mode;
-    }
+    public $mode = self::MODE_COMBINED;
 
     /**
      * @param null $key
@@ -39,7 +30,7 @@ class Mock extends Mock_DataSetBase {
 
         $result = $this->storage->get($fullKey);
         if ((null === $result) && !$this->storage->keyExists($fullKey)) {
-            if (null === $addOnMiss) {
+            if (null === $addOnMiss || $this->mode !== self::MODE_COMBINED) {
                 throw new Mock_Exception('Record not found: ' . print_r($fullKey, 1), Mock_Exception::KEY_NOT_FOUND);
             }
             else {
@@ -97,5 +88,46 @@ class Mock extends Mock_DataSetBase {
             return $value;
         }
     }
+
+    protected $sequenceId = 0;
+    /**
+     * @var Storage
+     */
+    protected $branches;
+
+    /**
+     * @var Storage
+     */
+    protected $storage;
+
+    protected $branchKey = array();
+
+    public function __construct(Storage $storage, $mode = self::MODE_COMBINED) {
+        $this->storage = $storage;
+    }
+
+    /**
+     * @return static
+     */
+    public function branch() {
+        $key = func_get_args();
+        if (!$key) {
+            return $this;
+        }
+
+        if (null === $this->branches) {
+            $this->branches = new Storage_Var();
+        }
+
+        if (!$mock = $this->branches->get($key)) {
+            $mock = new static($this->storage);
+            $mock->mode = $this->mode;
+            $mock->branchKey = array_merge($this->branchKey, $key);
+            $this->branches->set($key, $mock);
+        }
+
+        return $mock;
+    }
+
 
 }
