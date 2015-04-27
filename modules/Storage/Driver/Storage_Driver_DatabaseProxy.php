@@ -162,9 +162,8 @@ PRIMARY KEY (:key)
                         ));
             //}
 
-        }, function () use ($table) {
-            //
-            $this->db->query("DROP TABLE ?", $table);
+        }, function () use ($table, $db) {
+            $db->query("DROP TABLE ?", $table);
         });
     }
 }
