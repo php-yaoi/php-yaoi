@@ -1,6 +1,6 @@
 <?php
 
-class Mock extends Mock_DataSetBase {
+class Mock {
     const MODE_COMBINED = 0;
     const MODE_PLAY = 1;
     const MODE_CAPTURE = 2;
@@ -14,7 +14,7 @@ class Mock extends Mock_DataSetBase {
      * @throws Mock_Exception
      */
     public function get($key = null, Closure $addOnMiss = null) {
-        if ($this->mode === self::MODE_CAPTURE) {
+        if (null === $addOnMiss && $this->mode === self::MODE_CAPTURE) {
             throw new Mock_Exception('Reading disabled in capture mode', Mock_Exception::PLAY_REQUIRED);
         }
 
@@ -28,23 +28,30 @@ class Mock extends Mock_DataSetBase {
             $fullKey = array_merge($this->branchKey, array($key));
         }
 
-        $result = $this->storage->get($fullKey);
-        if ((null === $result) && !$this->storage->keyExists($fullKey)) {
-            if (null === $addOnMiss || $this->mode !== self::MODE_COMBINED) {
-                throw new Mock_Exception('Record not found: ' . print_r($fullKey, 1), Mock_Exception::KEY_NOT_FOUND);
-            }
-            else {
-                $result = $addOnMiss();
-                $this->add($result, $key);
-            }
-
+        if ($this->mode === Mock::MODE_CAPTURE) {
+            $result = $addOnMiss();
+            $this->add($result, $key);
         }
+        else {
+            $result = $this->storage->get($fullKey);
+            if ((null === $result) && !$this->storage->keyExists($fullKey)) {
+                if (null === $addOnMiss || $this->mode === self::MODE_PLAY) {
+                    throw new Mock_Exception('Record not found: ' . print_r($fullKey, 1), Mock_Exception::KEY_NOT_FOUND);
+                }
+                else {
+                    $result = $addOnMiss();
+                    $this->add($result, $key);
+                }
+            }
+        }
+
         return $result;
     }
 
     /**
      * @param $value
      * @param null $key
+     * @return $this
      * @throws Mock_Exception
      */
     public function add($value, $key = null) {
@@ -106,6 +113,8 @@ class Mock extends Mock_DataSetBase {
         $this->storage = $storage;
     }
 
+    public $isEmptyBranch;
+
     /**
      * @return static
      */
@@ -122,11 +131,24 @@ class Mock extends Mock_DataSetBase {
         if (!$mock = $this->branches->get($key)) {
             $mock = new static($this->storage);
             $mock->mode = $this->mode;
+            $mock->isEmptyBranch = true;
             $mock->branchKey = array_merge($this->branchKey, $key);
             $this->branches->set($key, $mock);
         }
 
         return $mock;
+    }
+
+    private static $nullMock;
+
+    /**
+     * @return Mock
+     */
+    public static function getNull() {
+        if (null === self::$nullMock) {
+            self::$nullMock = new self(new Storage_Null());
+        }
+        return self::$nullMock;
     }
 
 

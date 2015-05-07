@@ -73,6 +73,24 @@ class String_Parser extends Base_Class implements Is_Empty {
     public function innerAll($start = null, $end = null) {
         return new String_ParserIterator($this, $start, $end);
     }
+
+
+    public function toCamelCase($delimiter = '_') {
+        return implode('', array_map('ucfirst', explode($delimiter, $this->string)));
+    }
+
+    public function fromCamelCase($delimiter = '_') {
+        return strtolower(ltrim(preg_replace('/([A-Z])/', $delimiter . '$1', $this->string), $delimiter));
+    }
+
+    public function starts($needle) {
+        return substr($this->string, 0, strlen($needle)) === (string)$needle;
+    }
+
+    public function ends($needle) {
+        return substr($this->string, -strlen($needle)) === (string)$needle;
+    }
+
 }
 
 class String_ParserIterator implements Iterator {

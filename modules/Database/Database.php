@@ -72,35 +72,22 @@ class Database extends Client implements Database_Interface {
     protected $originalDriver;
 
     /**
-     * @param Mock_DataSet $dataSet
+     * @param Mock $dataSet
      * @return Database
      */
-    public function mock(Mock_DataSet $dataSet = null)
+    public function mock(Mock $dataSet = null)
     {
-        if ($dataSet instanceof Mock_DataSetPlay) {
-            $driver = new Database_Mock_DriverPlay();
-            if (null === $this->originalDriver) {
-                $this->originalDriver = $this->getDriver();
-            }
-            $driver->mock($dataSet);
-            $this->forceDriver($driver);
+        $driver = $this->getDriver();
+
+        if (null === $dataSet && $driver instanceof Database_Driver_MockProxy) {
+            $this->forceDriver($driver->driver);
         }
-        elseif ($dataSet instanceof Mock_DataSetCapture) {
-            $driver = new Database_Mock_DriverCapture();
-            if ($this->originalDriver) {
-                $this->forceDriver($this->originalDriver);
-            }
-            $driver->setOriginalDriver($this->getDriver());
-            if (null === $this->originalDriver) {
-                $this->originalDriver = $this->getDriver();
-            }
-            $driver->mock($dataSet);
-            $this->forceDriver($driver);
+        else {
+            $mockDriver = new Database_Driver_MockProxy($this->dsn);
+            $mockDriver->mock($dataSet);
+            $this->forceDriver($mockDriver);
         }
-        elseif (null === $dataSet && null !== $this->originalDriver) {
-            $this->forceDriver($this->originalDriver);
-            $this->originalDriver = null;
-        }
+
         return $this;
     }
 

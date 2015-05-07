@@ -1,55 +1,31 @@
 <?php
 
 class Date_Source implements Mock_Able {
+    public function __construct() {
+        $this->mock = Mock::getNull();
+    }
+
 
     const MOCK_NOW = 'now';
     const MOCK_STR_TO_TIME = 'str_to_time';
     const MOCK_MICRO_NOW = 'micro_now';
 
     public function now() {
-        if ($this->mock) {
-            if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch(static::MOCK_NOW)->get();
-            }
-            elseif ($this->mock instanceof Mock_DataSetCapture) {
-                $now = time();
-                $this->mock->branch(static::MOCK_NOW)->add($now);
-                return $now;
-            }
-        }
-        return time();
+        return $this->mock->branch(static::MOCK_NOW)->get(null, function(){
+            return time();
+        });
     }
 
     public function microNow() {
-        if ($this->mock) {
-            if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch(static::MOCK_MICRO_NOW)->get();
-            }
-            elseif ($this->mock instanceof Mock_DataSetCapture) {
-                $now = microtime(1);
-                $this->mock->branch(static::MOCK_MICRO_NOW)->add($now);
-                return $now;
-            }
-        }
-        return microtime(1);
+        return $this->mock->branch(static::MOCK_MICRO_NOW)->get(null, function(){
+            microtime(1);
+        });
     }
 
     public function strToTime($string, $now = null) {
-        if ($this->mock) {
-            if ($this->mock instanceof Mock_DataSetPlay) {
-                return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get();
-            }
-            elseif ($this->mock instanceof Mock_DataSetCapture) {
-                $ut = strtotime($string, $now);
-                $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->add($ut);
-                //$this->mock->add(array(null, $string), $ut, static::MOCK_STR_TO_TIME);
-                return $ut;
-            }
-        }
-
-        $ut = strtotime($string, $now);
-
-        return $ut;
+        return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get(null, function()use($string, $now){
+            return strtotime($string, $now);
+        });
     }
 
 
@@ -125,11 +101,14 @@ class Date_Source implements Mock_Able {
 
 
     /**
-     * @var Mock_DataSet
+     * @var Mock
      */
     protected $mock;
-    public function mock(Mock_DataSet $dataSet = null)
+    public function mock(Mock $dataSet = null)
     {
+        if ($dataSet === null) {
+            $dataSet = Mock::getNull();
+        }
         $this->mock = $dataSet;
         return $this;
     }

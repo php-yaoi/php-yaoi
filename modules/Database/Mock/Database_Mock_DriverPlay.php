@@ -7,7 +7,7 @@
  */
 class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
     /**
-     * @var Mock_DataSetPlay
+     * @var Mock
      */
     private $lastQuery;
 
@@ -60,9 +60,9 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
      * @var Mock_DataSetPlay $mock
      */
     protected $mock;
-    public function mock(Mock_DataSet $dataSet = null)
+    public function mock(Mock $dataSet = null)
     {
-        if ($dataSet instanceof Mock_DataSetPlay) {
+        if ($dataSet->mode === Mock::MODE_PLAY) {
             $this->mock = $dataSet;
         }
         else {

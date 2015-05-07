@@ -20,7 +20,7 @@ class Http_Client extends Client implements Mock_Able {
     public $url;
     public $referrer;
     public $xRequestedWith;
-    public $followLocation = false;
+    public $followLocation = true;
     public $skipBadRequestException = true;
     public $responseHeaders = array();
     public $parsedHeaders = array();
@@ -33,23 +33,29 @@ class Http_Client extends Client implements Mock_Able {
         'Connection' => 'close',
     );
 
-    public function __construct(Http_Client_Dsn $dsn = null) {
-        parent::__construct($dsn);
-        if (null === $dsn) {
-            $dsn = $this->dsn = new Http_Client_Dsn();
+    /**
+     * @var Http_Client_Dsn
+     */
+    protected $dsn;
+
+    public function __construct($dsn = null) {
+        if ($dsn === null) {
+            $dsn = new Http_Client_Dsn();
         }
+
+        parent::__construct($dsn);
         $this->reset();
-        if ($dsn) {
-            if ($dsn->proxy) {
-                $this->setProxy($dsn->proxy);
+        if ($this->dsn) {
+            if ($this->dsn->proxy) {
+                $this->setProxy($this->dsn->proxy);
             }
 
-            if ($dsn->defaultHeaders) {
-                $this->defaultHeaders = array_merge($this->defaultHeaders, $dsn->defaultHeaders);
+            if ($this->dsn->defaultHeaders) {
+                $this->defaultHeaders = array_merge($this->defaultHeaders, $this->dsn->defaultHeaders);
             }
 
-            if ($dsn->log) {
-                $log = Log::getInstance($dsn->log);
+            if ($this->dsn->log) {
+                $log = Log::getInstance($this->dsn->log);
                 $this->logUrl($log);
                 $this->logContext($log);
                 $this->logResponseHeaders($log);
@@ -58,7 +64,7 @@ class Http_Client extends Client implements Mock_Able {
             }
         }
 
-        $this->mock = new Mock(new Storage_Null());
+        $this->mock = Mock::getNull();
     }
 
     public function reset() {
@@ -221,6 +227,10 @@ class Http_Client extends Client implements Mock_Able {
         $this->responseHeaders = array();
 
         $mock = $this->mock->branch($this->url, hash('crc32b', serialize($driver->getRequest())));
+        if ($this->logContext) {
+            $this->logContext->push($driver->getRequest());
+        }
+
         $self = $this;
         try {
             list($response, $this->responseHeaders) = $mock->branch('responseData')->get(null, function()use($driver, $self, $mock){
@@ -337,10 +347,13 @@ class Http_Client extends Client implements Mock_Able {
 
 
     /**
-     * @var Mock_DataSetBase
+     * @var Mock
      */
     private $mock;
-    public function mock(Mock_DataSet $dataSet = null) {
+    public function mock(Mock $dataSet = null) {
+        if (null === $dataSet) {
+            $dataSet = Mock::getNull();
+        }
         $this->mock = $dataSet;
     }
 

@@ -87,9 +87,9 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
      * @var Mock_DataSetCapture
      */
     protected $mock;
-    public function mock(Mock_DataSet $dataSet = null)
+    public function mock(Mock $dataSet = null)
     {
-        if ($dataSet instanceof Mock_DataSetCapture) {
+        if ($dataSet->mode === Mock::MODE_CAPTURE) {
             $this->mock = $dataSet;
         }
         else {

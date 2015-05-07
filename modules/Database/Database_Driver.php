@@ -13,7 +13,7 @@ abstract class Database_Driver implements Database_Server_Generic {
     /**
      * @var Database_Dsn
      */
-    protected $dsn;
+    public $dsn;
     public function __construct(Database_Dsn $dsn = null) {
         $this->dsn = $dsn;
     }

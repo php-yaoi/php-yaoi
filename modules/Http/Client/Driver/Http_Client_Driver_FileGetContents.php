@@ -30,7 +30,11 @@ class Http_Client_Driver_FileGetContents implements Http_Client_Driver {
     }
 
     public function setProxy(String_Dsn $proxy) {
-        $this->context['http']['proxy'] = $proxy->scheme . '://' . $proxy->hostname
+        $scheme = $proxy->scheme;
+        if (!$scheme || 'http' === $scheme) {
+            $scheme = 'tcp';
+        }
+        $this->context['http']['proxy'] = $scheme . '://' . $proxy->hostname
             . ($proxy->port ? ':' . $proxy->port : '');
         $this->context['http']['request_fulluri'] = true;
         if ($proxy->username) {

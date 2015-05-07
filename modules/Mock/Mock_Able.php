@@ -1,8 +1,8 @@
 <?php
 interface Mock_Able {
     /**
-     * @param Mock_DataSet $dataSet
+     * @param Mock $dataSet
      * @return $this
      */
-    public function mock(Mock_DataSet $dataSet = null);
+    public function mock(Mock $dataSet = null);
 }

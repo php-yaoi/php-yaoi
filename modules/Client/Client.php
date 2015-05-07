@@ -17,6 +17,9 @@ abstract class Client extends Base_Class {
     public static function dsn($dsn = null) {
         if ($dsn instanceof Closure) {
             $dsn = $dsn();
+            if (!$dsn instanceof Client_Dsn) {
+                throw new Client_Exception('Closure should return dsn instance', Client_Exception::DSN_REQUIRED);
+            }
         }
 
         if (null === $dsn || is_string($dsn)) {
@@ -97,12 +100,16 @@ abstract class Client extends Base_Class {
             return $resource;
         }
 
-        if ($id instanceof Client) {
+        elseif ($id instanceof Client) {
             return $id;
         }
 
-        if ($id instanceof String_Dsn || $id instanceof Client_Dsn || $id instanceof Closure) {
+        elseif ($id instanceof String_Dsn || $id instanceof Client_Dsn || $id instanceof Closure) {
             return new static($id);
+        }
+
+        else {
+            throw new Client_Exception('Invalid argument, Client/Closure/Client_Dsn/string required', Client_Exception::INVALID_ARGUMENT);
         }
     }
 
@@ -118,7 +125,7 @@ abstract class Client extends Base_Class {
      */
     public function getDriver() {
         if (null === $this->driver) {
-            if ($this->dsn->driverClassName) {
+            if ($this->dsn && $this->dsn->driverClassName) {
                 $driverClass = $this->dsn->driverClassName;
             }
             else {
@@ -129,6 +136,12 @@ abstract class Client extends Base_Class {
             }
             $this->driver = new $driverClass($this->dsn);
         }
+
+        /*
+        if ($this->driver instanceof Migration_Required) {
+            Migration_Manager::getInstance()->perform($this->driver->getMigration());
+        }
+        */
 
         return $this->driver;
     }
