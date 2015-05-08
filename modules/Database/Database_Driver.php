@@ -1,15 +1,6 @@
 <?php
 
 abstract class Database_Driver implements Database_Server_Generic {
-    const RESULT = 'result';
-    const LAST_INSERT_ID = 'lid';
-    const QUERY = 'query';
-    const ESCAPE = 'escape';
-    const ERROR_MESSAGE = 'error';
-    const ASSOC_ROWS = 'assoc_rows';
-    const REWIND = 'rewind';
-    const ROWS_AFFECTED = 'rows_affected';
-
     /**
      * @var Database_Dsn
      */

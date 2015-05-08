@@ -25,8 +25,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
 
     public function query($statement)
     {
-        $queryMock = $this->mock->branch(self::QUERY, $statement);
-        $queryMock->temp(self::RESULT, $this->driver->query($statement));
+        $queryMock = $this->mock->branch(Database_Driver_MockProxy::QUERY, $statement);
+        $queryMock->temp(Database_Driver_MockProxy::RESULT, $this->driver->query($statement));
         $this->lastQuery = $queryMock;
         return $queryMock;
     }
@@ -37,8 +37,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
     public function lastInsertId()
     {
         $queryMock = $this->lastQuery;
-        $res = $this->driver->lastInsertId($queryMock->temp(self::RESULT));
-        $queryMock->add($res, self::LAST_INSERT_ID);
+        $res = $this->driver->lastInsertId($queryMock->temp(Database_Driver_MockProxy::RESULT));
+        $queryMock->add($res, Database_Driver_MockProxy::LAST_INSERT_ID);
         return $res;
     }
 
@@ -48,8 +48,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
      */
     public function rowsAffected($queryMock)
     {
-        $res = $this->driver->rowsAffected($queryMock->temp(self::RESULT));
-        $queryMock->add($res, self::ROWS_AFFECTED);
+        $res = $this->driver->rowsAffected($queryMock->temp(Database_Driver_MockProxy::RESULT));
+        $queryMock->add($res, Database_Driver_MockProxy::ROWS_AFFECTED);
         return $res;
     }
 
@@ -57,7 +57,7 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
     public function escape($value)
     {
         $res = $this->driver->escape($value);
-        $this->mock->branch(self::ESCAPE)->add($res, $value);
+        $this->mock->branch(Database_Driver_MockProxy::ESCAPE)->add($res, $value);
         return $res;
     }
 
@@ -67,8 +67,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
      */
     public function rewind($queryMock)
     {
-        $res = $this->driver->rewind($queryMock->temp(self::RESULT));
-        $queryMock->branch(self::REWIND)->add($res);
+        $res = $this->driver->rewind($queryMock->temp(Database_Driver_MockProxy::RESULT));
+        $queryMock->branch(Database_Driver_MockProxy::REWIND)->add($res);
         return $res;
     }
 
@@ -77,8 +77,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
      */
     public function fetchAssoc($queryMock)
     {
-        $row = $this->driver->fetchAssoc($queryMock->temp(self::RESULT));
-        $queryMock->branch(self::ASSOC_ROWS)->add($row);
+        $row = $this->driver->fetchAssoc($queryMock->temp(Database_Driver_MockProxy::RESULT));
+        $queryMock->branch(Database_Driver_MockProxy::ASSOC_ROWS)->add($row);
         return $row;
     }
 
@@ -102,8 +102,8 @@ class Database_Mock_DriverCapture extends Database_Driver implements Mock_Able {
      */
     public function queryErrorMessage($queryMock)
     {
-        $err = $this->driver->queryErrorMessage($queryMock->temp(self::RESULT));
-        $queryMock->add($err, self::ERROR_MESSAGE);
+        $err = $this->driver->queryErrorMessage($queryMock->temp(Database_Driver_MockProxy::RESULT));
+        $queryMock->add($err, Database_Driver_MockProxy::ERROR_MESSAGE);
         return $err;
     }
 

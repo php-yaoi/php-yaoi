@@ -13,7 +13,7 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
 
     public function query($statement)
     {
-        $queryMock = $this->mock->branch(self::QUERY, $statement);
+        $queryMock = $this->mock->branch(Database_Driver_MockProxy::QUERY, $statement);
         $this->lastQuery = $queryMock;
         return $queryMock;
     }
@@ -21,7 +21,7 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
     public function lastInsertId()
     {
         $queryMock = $this->lastQuery;
-        return $queryMock->get(self::LAST_INSERT_ID);
+        return $queryMock->get(Database_Driver_MockProxy::LAST_INSERT_ID);
     }
 
     /**
@@ -30,13 +30,13 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
      */
     public function rowsAffected($queryMock)
     {
-        return $queryMock->get(self::ROWS_AFFECTED);
+        return $queryMock->get(Database_Driver_MockProxy::ROWS_AFFECTED);
     }
 
 
     public function escape($value)
     {
-        return $this->mock->branch(self::ESCAPE)->get($value);
+        return $this->mock->branch(Database_Driver_MockProxy::ESCAPE)->get($value);
     }
 
     /**
@@ -44,7 +44,7 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
      */
     public function rewind($queryMock)
     {
-        return $queryMock->branch(self::REWIND)->get();
+        return $queryMock->branch(Database_Driver_MockProxy::REWIND)->get();
     }
 
     /**
@@ -52,7 +52,7 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
      */
     public function fetchAssoc($queryMock)
     {
-        return $queryMock->branch(self::ASSOC_ROWS)->get();
+        return $queryMock->branch(Database_Driver_MockProxy::ASSOC_ROWS)->get();
     }
 
 
@@ -75,7 +75,7 @@ class Database_Mock_DriverPlay extends Database_Driver implements Mock_Able {
      */
     public function queryErrorMessage($queryMock)
     {
-        return $queryMock->get(self::ERROR_MESSAGE);
+        return $queryMock->get(Database_Driver_MockProxy::ERROR_MESSAGE);
     }
 
 
