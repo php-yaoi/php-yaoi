@@ -233,21 +233,22 @@ class Http_Client extends Client implements Mock_Able {
 
         $self = $this;
         try {
-            list($response, $this->responseHeaders) = $mock->branch('responseData')->get(null, function()use($driver, $self, $mock){
-                $driver->fetch();
-                $response = $driver->getResponseContent();
-                $responseHeaders = $driver->getResponseHeaders();
+            list($response, $this->responseHeaders) = $mock->branch('responseData')
+                ->get(null, function () use ($driver, $self, $mock) {
+                    $driver->fetch();
+                    $response = $driver->getResponseContent();
+                    $responseHeaders = $driver->getResponseHeaders();
 
-                if (!$this->skipBadRequestException && false === $response) {
-                    $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
-                    $e->request = $driver->getRequest();
-                    $e->responseHeaders = $this->responseHeaders;
-                    $e->url = $this->url;
-                    throw $e;
-                }
+                    if (!$this->skipBadRequestException && false === $response) {
+                        $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
+                        $e->request = $driver->getRequest();
+                        $e->responseHeaders = $this->responseHeaders;
+                        $e->url = $self->url;
+                        throw $e;
+                    }
 
-                return array($response, $responseHeaders);
-            });
+                    return array($response, $responseHeaders);
+                });
         }
         catch (Mock_Exception $e) {
             if ($this->logError) {
