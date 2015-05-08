@@ -239,10 +239,10 @@ class Http_Client extends Client implements Mock_Able {
                     $response = $driver->getResponseContent();
                     $responseHeaders = $driver->getResponseHeaders();
 
-                    if (!$this->skipBadRequestException && false === $response) {
+                    if (!$self->skipBadRequestException && false === $response) {
                         $e = new Http_Client_Exception('Bad request', Http_Client_Exception::BAD_REQUEST);
                         $e->request = $driver->getRequest();
-                        $e->responseHeaders = $this->responseHeaders;
+                        $e->responseHeaders = $self->responseHeaders;
                         $e->url = $self->url;
                         throw $e;
                     }
