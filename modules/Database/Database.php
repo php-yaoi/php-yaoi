@@ -79,13 +79,21 @@ class Database extends Client implements Database_Interface {
     {
         $driver = $this->getDriver();
 
-        if (null === $dataSet && $driver instanceof Database_Driver_MockProxy) {
-            $this->forceDriver($driver->driver);
+        if (null === $dataSet) {
+            if ($driver instanceof Database_Driver_MockProxy) {
+                $this->forceDriver($driver->driver);
+            }
         }
         else {
-            $mockDriver = new Database_Driver_MockProxy($this->dsn);
-            $mockDriver->mock($dataSet);
-            $this->forceDriver($mockDriver);
+            if ($driver instanceof Database_Driver_MockProxy) {
+                $driver->mock($dataSet);
+            }
+            else {
+                $mockDriver = new Database_Driver_MockProxy($this->dsn);
+                $mockDriver->mock($dataSet);
+                $mockDriver->driver = $driver;
+                $this->forceDriver($mockDriver);
+            }
         }
 
         return $this;
