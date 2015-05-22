@@ -136,6 +136,12 @@ class Database_Query implements Iterator {
     public function next()
     {
         $this->current = $this->driver->fetchAssoc($this->result);
+        if ($this->resultClass) {
+            /** @var Mappable $class */
+            $class = $this->resultClass;
+            $this->current = $class::fromArray($this->current, null, true);
+        }
+
         if (null === $this->current) {
             $this->valid = false;
             $this->position = -1;
@@ -228,6 +234,12 @@ class Database_Query implements Iterator {
     public function log(Log $log = null) {
         $this->logResourceId = DependencyRepository::add($log);
         return $this;
+    }
+
+
+    protected $resultClass;
+    public function bindResultClass($resultClass = null) {
+        $this->resultClass = $resultClass;
     }
 
 

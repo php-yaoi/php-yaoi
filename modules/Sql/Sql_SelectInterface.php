@@ -85,5 +85,8 @@ interface Sql_SelectInterface extends Sql_StatementInterface
      * @return $this
      */
     public function unionAll($expression, $binds = null);
+
+
+    public function bindResultClass($resultClass = null);
 }
 

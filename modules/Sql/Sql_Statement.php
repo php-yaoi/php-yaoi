@@ -187,4 +187,11 @@ class Sql_Statement extends Sql_ComplexStatement {
         return false;
     }
 
+    protected $resultClass;
+    public function bindResultClass($resultClass = null)
+    {
+        $this->resultClass = $resultClass;
+    }
+
+
 }
