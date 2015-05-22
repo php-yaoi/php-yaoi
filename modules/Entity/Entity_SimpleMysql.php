@@ -136,13 +136,8 @@ class Entity_SimpleMysql extends Base_Class {
                 $data[$column] = $this->$column;
             }
         }
-        $idFields = static::$idField;
-        if (!is_array($idFields)) {
-            $idFields = array($idFields);
-        }
-        foreach ($idFields as $idField) {
-            $update->where("`$idField` = ?", $data[$idField]);
-        }
+        $idField = static::$idField;
+        $update->where("`$idField` = ?", $this->$idField);
         $update->set($data);
         unset($data[$idField]);
         $update->query();
@@ -168,6 +163,8 @@ class Entity_SimpleMysql extends Base_Class {
         else {
             $insert->query();
         }
+
+        $this->fetched = true;
 
         return $this;
     }
