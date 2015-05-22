@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class Entity_SimpleMysql
+ * @deprecated
+ */
 class Entity_SimpleMysql extends Base_Class {
     /**
      * @var string
