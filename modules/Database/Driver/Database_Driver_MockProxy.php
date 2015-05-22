@@ -28,8 +28,13 @@ class Database_Driver_MockProxy extends Database_Driver {
         $queryMock = $this->mock->branch(Database_Driver_MockProxy::QUERY, $statement);
         if ($queryMock->isEmptyBranch) {
             $queryMock->temp(Database_Driver_MockProxy::RESULT, $this->driver->query($statement));
+            $this->lastQuery = $queryMock;
+            $this->lastInsertId();
+            $this->rowsAffected($queryMock);
         }
-        $this->lastQuery = $queryMock;
+        else {
+            $this->lastQuery = $queryMock;
+        }
         return $queryMock;
     }
 
@@ -48,7 +53,7 @@ class Database_Driver_MockProxy extends Database_Driver {
 
 
     /**
-     * @param Mock_DataSetCapture $queryMock
+     * @param Mock $queryMock
      * @return mixed
      */
     public function rowsAffected($queryMock)

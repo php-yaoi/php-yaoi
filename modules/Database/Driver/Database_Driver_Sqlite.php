@@ -70,8 +70,16 @@ class Database_Driver_Sqlite extends Database_Driver {
         }
     }
 
-    public function quoteSymbol($symbol) {
-        return $symbol;
+    public function quoteSymbol(Sql_Symbol $symbol) {
+        $result = '';
+        foreach ($symbol->names as $name) {
+            $result .= $name . '.';
+        }
+        if ($result) {
+            $result = substr($result, 0, -1);
+        }
+
+        return $result;
     }
 
 }

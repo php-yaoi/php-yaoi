@@ -31,7 +31,7 @@ abstract class Database_Driver implements Database_Server_Generic {
             return '(' . $value->build($this) . ')';
         }
         elseif ($value instanceof Sql_Symbol) {
-            return $this->quoteSymbol($value->name);
+            return $this->quoteSymbol($value);
         }
         elseif ($value instanceof Sql_DefaultValue) {
             return 'DEFAULT';
@@ -41,7 +41,15 @@ abstract class Database_Driver implements Database_Server_Generic {
         }
     }
 
-    public function quoteSymbol($symbol) {
-        return '"' . $symbol . '"';
+    public function quoteSymbol(Sql_Symbol $symbol) {
+        $result = '';
+        foreach ($symbol->names as $name) {
+            $result .= '"' . $name . '".';
+        }
+        if ($result) {
+            $result = substr($result, 0, -1);
+        }
+
+        return $result;
     }
 }
