@@ -126,4 +126,14 @@ class Database_Driver_MockProxy extends Database_Driver {
     public function disconnect()
     {
     }
+
+    public function getColumns($tableName)
+    {
+        $driver = $this->driver;
+        return $this->mock->branch('columns')->get($tableName, function () use ($driver, $tableName) {
+            return $driver->getColumns($tableName);
+        });
+    }
+
+
 }

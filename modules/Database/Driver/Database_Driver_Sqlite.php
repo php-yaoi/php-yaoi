@@ -82,4 +82,14 @@ class Database_Driver_Sqlite extends Database_Driver {
         return $result;
     }
 
+    public function getColumns($tableName)
+    {
+        $columns = array();
+        $res = $this->query("PRAGMA table_info($tableName)");
+        while ($r = $this->fetchAssoc($res)) {
+            $columns[$r['name']] = Database::COLUMN_TYPE_AUTO;
+        }
+        return $columns;
+    }
+
 }

@@ -186,4 +186,13 @@ class Database extends Client implements Database_Interface {
         return Sql_Statement::create()->bindDatabase($this);
     }
 
+
+    const COLUMN_TYPE_INTEGER = 'int';
+    const COLUMN_TYPE_TIMESTAMP = 'datetime';
+    const COLUMN_TYPE_STRING = 'string';
+    const COLUMN_TYPE_FLOAT = 'float';
+    const COLUMN_TYPE_AUTO = 'auto';
+    public function getColumns($tableName) {
+        return $this->getDriver()->getColumns($tableName);
+    }
 }

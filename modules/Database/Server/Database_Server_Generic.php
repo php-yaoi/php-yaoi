@@ -9,5 +9,6 @@ interface Database_Server_Generic extends Database_Quoter {
     public function rewind($result);
     public function fetchAssoc($result);
     public function queryErrorMessage($result);
+    public function getColumns($tableName);
     public function disconnect();
 }
