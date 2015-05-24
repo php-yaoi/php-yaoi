@@ -82,14 +82,27 @@ class Database_Driver_Sqlite extends Database_Driver {
         return $result;
     }
 
-    public function getColumns($tableName)
+    public function getTableDefinition($tableName)
     {
-        $columns = array();
+        $definition = new Database_Definition_Table();
         $res = $this->query("PRAGMA table_info($tableName)");
+
         while ($r = $this->fetchAssoc($res)) {
-            $columns[$r['name']] = Database::COLUMN_TYPE_AUTO;
+            $field = $r['name'];
+            if ($r['pk']) {
+                $definition->primaryKey [$field]= $field;
+            }
+            $definition->defaults[$field] = $r['dflt_value'];
+            $definition->notNull[$field] = (bool)$r['notnull'];
+            $definition->columns[$field] = Database::COLUMN_TYPE_AUTO;
         }
-        return $columns;
+        return $definition;
     }
+
+    public function getLanguage()
+    {
+        return Database::LANG_SQLITE;
+    }
+
 
 }

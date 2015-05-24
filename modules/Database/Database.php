@@ -192,7 +192,21 @@ class Database extends Client implements Database_Interface {
     const COLUMN_TYPE_STRING = 'string';
     const COLUMN_TYPE_FLOAT = 'float';
     const COLUMN_TYPE_AUTO = 'auto';
-    public function getColumns($tableName) {
-        return $this->getDriver()->getColumns($tableName);
+
+    /**
+     * @param $tableName
+     * @return Database_Definition_Table
+     * @throws Client_Exception
+     */
+    public function getTableDefinition($tableName) {
+        return $this->getDriver()->getTableDefinition($tableName);
+    }
+
+
+    const LANG_MYSQL = 'mysql';
+    const LANG_SQLITE = 'sqlite';
+    const LANG_POSTGRESQL = 'postgresql';
+    public function getLanguage() {
+        return $this->getDriver()->getLanguage();
     }
 }

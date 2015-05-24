@@ -68,7 +68,7 @@ interface Database_Interface extends Mock_Able, Database_Quoter {
     public function disconnect();
 
     /**
-     * @return array
+     * @return Database_Definition_Table
      */
-    public function getColumns($tableName);
+    public function getTableDefinition($tableName);
 }

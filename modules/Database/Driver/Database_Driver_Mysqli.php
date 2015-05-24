@@ -141,14 +141,23 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
         return $result;
     }
 
-    public function getColumns($tableName)
+    public function getTableDefinition($tableName)
     {
         $res = $this->query("DESC `$tableName`");
-        $columns = array();
+        $definition = new Database_Definition_Table();
         while ($row = $res->fetch_assoc()) {
+            //print_r($row);
             $type = $row['Type'];
             $phpType = Database::COLUMN_TYPE_STRING;
             $field = $row['Field'];
+            if ('PRI' === $row['Key']) {
+                $definition->primaryKey [$field]= $field;
+            }
+            if ('auto_increment' === $row['Extra']) {
+                $definition->autoIncrement = $field;
+            }
+            $definition->defaults[$field] = $row['Default'];
+            $definition->notNull[$field] = $row['Null'] === 'NO';
             switch (true) {
                 case 'bigint' === substr($type, 0, 6):
                 case 'int' === substr($type, 0, 3):
@@ -171,9 +180,14 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
                     break;
             }
 
-            $columns[$field] = $phpType;
+            $definition->columns[$field] = $phpType;
         }
-        return $columns;
+        return $definition;
+    }
+
+    public function getLanguage()
+    {
+        return Database::LANG_MYSQL;
     }
 
 
