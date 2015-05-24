@@ -9,7 +9,7 @@ abstract class Mappable_Base extends Base_Class implements Mappable {
      * @param Mappable_Base $object
      * @return static
      */
-    static public function fromArray(array $row, $object = null) {
+    static public function fromArray(array $row, $object = null, $source = null) {
         if (is_null($object)) {
             $object = new static;
         }
@@ -36,7 +36,7 @@ abstract class Mappable_Base extends Base_Class implements Mappable {
     }
 
 
-    public function toArray() {
+    public function toArray($skipNotSetProperties = false) {
         $result = array();
         if (null !== $this->fromProperties) {
             foreach ($this->fromProperties as $property) {
