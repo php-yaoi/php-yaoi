@@ -186,4 +186,27 @@ class Database extends Client implements Database_Interface {
         return Sql_Statement::create()->bindDatabase($this);
     }
 
+
+    const COLUMN_TYPE_INTEGER = 'int';
+    const COLUMN_TYPE_TIMESTAMP = 'datetime';
+    const COLUMN_TYPE_STRING = 'string';
+    const COLUMN_TYPE_FLOAT = 'float';
+    const COLUMN_TYPE_AUTO = 'auto';
+
+    /**
+     * @param $tableName
+     * @return Database_Definition_Table
+     * @throws Client_Exception
+     */
+    public function getTableDefinition($tableName) {
+        return $this->getDriver()->getTableDefinition($tableName);
+    }
+
+
+    const LANG_MYSQL = 'mysql';
+    const LANG_SQLITE = 'sqlite';
+    const LANG_POSTGRESQL = 'postgresql';
+    public function getLanguage() {
+        return $this->getDriver()->getLanguage();
+    }
 }

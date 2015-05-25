@@ -126,4 +126,22 @@ class Database_Driver_MockProxy extends Database_Driver {
     public function disconnect()
     {
     }
+
+    public function getTableDefinition($tableName)
+    {
+        $driver = $this->driver;
+        return $this->mock->branch('definition')->get($tableName, function () use ($driver, $tableName) {
+            return $driver->getTableDefinition($tableName);
+        });
+    }
+
+    public function getLanguage()
+    {
+        $driver = $this->driver;
+        return $this->mock->get('language', function () use ($driver) {
+            return $driver->getLanguage();
+        });
+    }
+
+
 }

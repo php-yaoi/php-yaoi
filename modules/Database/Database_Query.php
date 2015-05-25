@@ -74,16 +74,35 @@ class Database_Query implements Iterator {
 
         $result = array();
 
-        if ($keyField !== null) {
-            while ($r = $this->driver->fetchAssoc($this->result)) {
-                $result [$r[$keyField]]= $r;
+        if ($this->resultClass) {
+            /** @var Mappable $class */
+            $class = $this->resultClass;
+
+            if ($keyField !== null) {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result [$r[$keyField]]= $class::fromArray($r, null, true);
+                }
             }
+            else {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result []= $class::fromArray($r, null, true);
+                }
+            }
+
         }
         else {
-            while ($r = $this->driver->fetchAssoc($this->result)) {
-                $result []= $r;
+            if ($keyField !== null) {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result [$r[$keyField]]= $r;
+                }
+            }
+            else {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result []= $r;
+                }
             }
         }
+
         return $result;
     }
 
@@ -107,7 +126,17 @@ class Database_Query implements Iterator {
         if (null === $result) {
             return null;
         }
-        return null === $field ? $result : $result[$field];
+        if ($field) {
+            return $result[$field];
+        }
+        else {
+            if ($this->resultClass) {
+                /** @var Mappable $class */
+                $class = $this->resultClass;
+                $result = $class::fromArray($result, null, true);
+            }
+            return $result;
+        }
     }
 
 
