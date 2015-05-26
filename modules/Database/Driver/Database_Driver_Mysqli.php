@@ -16,7 +16,7 @@
  *
  *
  */
-class Database_Driver_Mysqli extends Database_Driver  implements Database_Server_Mysql  {
+class Database_Driver_Mysqli extends Database_Driver implements Database_Driver_Interface  {
     /**
      * @var mysqli
      */
@@ -141,53 +141,17 @@ class Database_Driver_Mysqli extends Database_Driver  implements Database_Server
         return $result;
     }
 
-    public function getTableDefinition($tableName)
+    public function getDialect()
     {
-        $res = $this->query("DESC `$tableName`");
-        $definition = new Database_Definition_Table();
-        while ($row = $res->fetch_assoc()) {
-            //print_r($row);
-            $type = $row['Type'];
-            $phpType = Database::COLUMN_TYPE_STRING;
-            $field = $row['Field'];
-            if ('PRI' === $row['Key']) {
-                $definition->primaryKey [$field]= $field;
-            }
-            if ('auto_increment' === $row['Extra']) {
-                $definition->autoIncrement = $field;
-            }
-            $definition->defaults[$field] = $row['Default'];
-            $definition->notNull[$field] = $row['Null'] === 'NO';
-            switch (true) {
-                case 'bigint' === substr($type, 0, 6):
-                case 'int' === substr($type, 0, 3):
-                case 'mediumint' === substr($type, 0, 9):
-                case 'smallint' === substr($type, 0, 8):
-                case 'tinyint' === substr($type, 0, 7):
-                    $phpType = Database::COLUMN_TYPE_INTEGER;
-                    break;
-
-                case 'decimal' === substr($type, 0, 7):
-                case 'double' === $type:
-                case 'float' === $type:
-                    $phpType = Database::COLUMN_TYPE_FLOAT;
-                    break;
-
-                case 'date' === $type:
-                case 'datetime' === $type:
-                case 'timestamp' === $type:
-                    $phpType = Database::COLUMN_TYPE_TIMESTAMP;
-                    break;
-            }
-
-            $definition->columns[$field] = $phpType;
-        }
-        return $definition;
+        return Database::DIALECT_MYSQL;
     }
 
-    public function getLanguage()
+    /**
+     * @return Database_Utility_Interface
+     */
+    public function getUtility()
     {
-        return Database::LANG_MYSQL;
+        return new Database_Utility_Mysql();
     }
 
 

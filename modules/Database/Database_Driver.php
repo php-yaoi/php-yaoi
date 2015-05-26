@@ -1,6 +1,6 @@
 <?php
 
-abstract class Database_Driver implements Database_Server_Generic {
+abstract class Database_Driver implements Database_Driver_Interface {
     /**
      * @var Database_Dsn
      */

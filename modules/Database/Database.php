@@ -199,14 +199,22 @@ class Database extends Client implements Database_Interface {
      * @throws Client_Exception
      */
     public function getTableDefinition($tableName) {
-        return $this->getDriver()->getTableDefinition($tableName);
+        return $this->getUtility()->getTableDefinition($tableName);
     }
 
+    const DIALECT_MYSQL = 'Mysql';
+    const DIALECT_SQLITE = 'Sqlite';
+    const DIALECT_POSTGRESQL = 'Pgsql';
+    public function getDialect() {
+        return $this->getDriver()->getDialect();
+    }
 
-    const LANG_MYSQL = 'mysql';
-    const LANG_SQLITE = 'sqlite';
-    const LANG_POSTGRESQL = 'postgresql';
-    public function getLanguage() {
-        return $this->getDriver()->getLanguage();
+    private $utility;
+    public function getUtility() {
+        if (null === $this->utility) {
+            $this->utility = $this->getDriver()->getUtility();
+            $this->utility->setDatabase($this);
+        }
+        return $this->utility;
     }
 }

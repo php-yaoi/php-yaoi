@@ -89,37 +89,6 @@ class Database_Driver_Pgsql extends Database_Driver {
         return pg_last_error($result);
     }
 
-    public function getTableDefinition($tableName)
-    {
-        $def = new Database_Definition_Table();
-
-        $res = $this->query("select column_name, is_nullable, data_type, column_default
-from INFORMATION_SCHEMA.COLUMNS where table_name = 'test_def';");
-        while ($r = $this->fetchAssoc($res)) {
-            $field = $r['column_name'];
-            $type = $r['data_type'];
-            $phpType = Database::COLUMN_TYPE_AUTO;
-
-            switch (true) {
-                case 'integer' === substr($type, 0, 7):
-                    $phpType = Database::COLUMN_TYPE_INTEGER;
-                    break;
-
-
-
-
-            }
-
-            $def->columns[$field] = $phpType;
-            $def->notNull = (bool)$r['is_nullable'] === 'YES';
-            $def->primaryKey;
-
-
-        }
-        // TODO!
-        return new Database_Definition_Table();
-    }
-
     public function disconnect()
     {
         if (null !== $this->connection) {
@@ -127,9 +96,18 @@ from INFORMATION_SCHEMA.COLUMNS where table_name = 'test_def';");
         }
     }
 
-    public function getLanguage()
+    public function getDialect()
     {
-        return Database::LANG_POSTGRESQL;
+        return Database::DIALECT_POSTGRESQL;
     }
+
+    /**
+     * @return Database_Utility_Interface
+     */
+    public function getUtility()
+    {
+        return new Database_Utility_Pgsql();
+    }
+
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-interface Database_Server_Generic extends Database_Quoter {
+interface Database_Driver_Interface extends Database_Quoter {
     public function __construct(Database_Dsn $dsn);
     public function query($statement);
     public function lastInsertId();
@@ -9,7 +9,11 @@ interface Database_Server_Generic extends Database_Quoter {
     public function rewind($result);
     public function fetchAssoc($result);
     public function queryErrorMessage($result);
-    public function getTableDefinition($tableName);
     public function disconnect();
-    public function getLanguage();
+    public function getDialect();
+
+    /**
+     * @return Database_Utility_Interface
+     */
+    public function getUtility();
 }

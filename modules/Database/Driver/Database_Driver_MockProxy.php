@@ -135,11 +135,22 @@ class Database_Driver_MockProxy extends Database_Driver {
         });
     }
 
-    public function getLanguage()
+    public function getDialect()
     {
         $driver = $this->driver;
         return $this->mock->get('language', function () use ($driver) {
-            return $driver->getLanguage();
+            return $driver->getDialect();
+        });
+    }
+
+    /**
+     * @return Database_Utility_Interface
+     */
+    public function getUtility()
+    {
+        $driver = $this->driver;
+        return $this->mock->get('utility', function () use ($driver) {
+            return $driver->getUtility();
         });
     }
 
