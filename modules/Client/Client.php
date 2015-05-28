@@ -80,6 +80,7 @@ abstract class Client extends Base_Class {
      * @param bool $reuse return previously created instance if true, create new if false
      * @return static
      * @throws Client_Exception
+     * fallback instead default
      */
     public static function getInstance($id = 'default', $reuse = true) {
         if (is_string($id)) {
