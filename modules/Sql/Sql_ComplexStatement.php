@@ -321,20 +321,22 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         }
 
         if (is_array($expression)) {
+            $expressionString = '';
+            $bindsArray = array();
             if (is_string($binds)) {
-                $table = '`' . $binds . '`.';
+                $table = $binds;
             } else {
-                $table = '';
+                $table = null;
             }
 
-            $e = '';
-            $b = array();
             foreach ($expression as $key => $value) {
-                $e .= $table . '`' . $key . '` = ?, ';
-                $b [] = $value;
+                $expressionString .= '? = ?, ';
+                $bindsArray []= new Sql_Symbol($table, $key);
+                $bindsArray []= $value;
             }
-            $e = substr($e, 0, -2);
-            $expression = new Sql_Expression($e, $b);
+
+            $expressionString = substr($expressionString, 0, -2);
+            $expression = new Sql_Expression($expressionString, $bindsArray);
         } else {
             $expression = Sql_Expression::createFromFuncArguments(func_get_args());
         }
