@@ -23,21 +23,32 @@ abstract class Entity_Database extends Base_Class implements Mappable {
     protected $persistent;
 
     /**
-     * returns entity item if $id is provided
-     * returns Sql_Statement
+     * @param null $id
+     * @return null|Sql_SelectInterface|static
+     * @throws Entity_Exception
      */
     public static function find($id = null) {
-        $className = get_called_class();
-        $tableName = self::getTableName($className);
-        $statement = self::db($className)->select($tableName);
-        $statement->bindResultClass($className);
+        $definition = static::definition();
+        $tableDefinition = $definition->getTableDefinition();
+        $tableName = $definition->getTableName();
+        $statement = $definition->db()->select($tableName);
+        $statement->bindResultClass($definition->className);
+
         if ($id instanceof static) {
             foreach ($id->toArray(true) as $name => $value) {
                 $statement->where("? = ?", new Sql_Symbol($tableName, $name), $value);
             }
         }
         elseif ($id) {
-            $statement->where('? = ?', new Sql_Symbol(static::$tableName, static::$primaryKey), $id);
+            $args = func_get_args();
+            $i = 0;
+            foreach ($tableDefinition->primaryKey as $keyField) {
+                if (!isset($args[$i])) {
+                    throw new Entity_Exception('Full primary key required', Entity_Exception::KEY_MISSING);
+                }
+                $keyValue = $args[$i++];
+                $statement->where('? = ?', new Sql_Symbol($tableName, $keyField), $keyValue);
+            }
             return $statement->query()->fetchRow();
         }
         return $statement;
@@ -53,14 +64,17 @@ abstract class Entity_Database extends Base_Class implements Mappable {
 
     static function fromArray(array $row, $object = null, $source = null)
     {
+        $definition = static::definition();
+        $tableDefinition = $definition->getTableDefinition();
+
         if (is_null($object)) {
             $object = new static;
         }
 
-        $object->fromProperties = array();
-
-        foreach ($row as $property) {
-            $object->$property = $row[$property];
+        foreach ($tableDefinition->columns as $column => $columnType) {
+            if (array_key_exists($column, $row)) {
+                $object->$column = Database_Definition_Table::castField($row[$column], $columnType);
+            }
         }
 
         if ($source) {
@@ -155,6 +169,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
 
         if ($autoId = $tableDefinition->autoIncrement) {
             if (empty($this->$autoId)) {
+                echo 'AUTO IIIID222!';
                 $this->$autoId = $query->lastInsertId();
             }
         }

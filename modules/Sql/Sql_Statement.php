@@ -14,11 +14,15 @@ class Sql_Statement extends Sql_ComplexStatement {
 
     public function query(Database_Interface $client = null) {
         if (null === $client) {
-            return $this->database->query($this);
+            $query = $this->database->query($this);
         }
         else {
-            return $client->query($this);
+            $query = $client->query($this);
         }
+        if ($this->resultClass) {
+            $query->bindResultClass($this->resultClass);
+        }
+        return $query;
     }
 
     public function __toString() {
