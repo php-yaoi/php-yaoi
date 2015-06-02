@@ -10,31 +10,17 @@ abstract class Entity_Database extends Base_Class implements Mappable {
         $definition = &self::$definitions[$className];
         if (null === $definition) {
             $definition = new Entity_Database_Definition();
-            $definition->tableName = static::$tableName;
             $definition->className = $className;
+            $definition->tableName = static::$tableName;
         }
         return $definition;
     }
 
-    protected $fetched;
-
-    static private $databases = array();
-    public static function bindDatabase(Database $db = null) {
-        self::$databases[get_called_class()] = $db;
+    protected static function getTableName($className) {
+        return $tableName = null === static::$tableName ? $className : static::$tableName;
     }
 
-    /**
-     * @return Database
-     * @throws Client_Exception
-     */
-    private static function db($className) {
-        if (isset(self::$databases[$className])) {
-            return self::$databases[$className];
-        }
-        else {
-            return Database::getInstance();
-        }
-    }
+    protected $persistent;
 
     /**
      * returns entity item if $id is provided
@@ -78,7 +64,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
         }
 
         if ($source) {
-            $object->fetched = true;
+            $object->persistent = true;
         }
 
         return $object;
@@ -121,7 +107,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
     }
 
     public function save() {
-        if ($this->fetched) {
+        if ($this->persistent) {
             $this->update();
         }
         else {
@@ -132,47 +118,48 @@ abstract class Entity_Database extends Base_Class implements Mappable {
 
     public function update() {
         $def = static::definition();
+        $tableDefinition = $def->getTableDefinition();
         $update = $def->db()->update($def->getTableName());
         $data = array();
-        foreach ($def->getColumns() as $column) {
+        foreach ($tableDefinition->columns as $column => $columnType) {
             if (property_exists($this, $column)) {
-                $data[$column] = $this->$column;
+                $data[$column] = Database_Definition_Table::castField($this->$column, $columnType);
             }
         }
-        foreach ($def->getPrimaryKey() as $keyField) {
-
+        foreach ($tableDefinition->primaryKey as $keyField) {
+            if (!isset($data[$keyField])) {
+                throw new Entity_Exception('Primary key required for update', Entity_Exception::KEY_MISSING);
+            }
+            $update->where("? = ?", new Sql_Symbol($keyField), $this->$keyField);
+            unset($data[$keyField]);
         }
-        $idField = static::$idField;
-        $update->where("`$idField` = ?", $this->$idField);
         $update->set($data);
-        unset($data[$idField]);
         $update->query();
-        $this->fetched = true;
+        $this->persistent = true;
         return $this;
     }
 
     public function insert() {
-        $className = get_called_class();
-        $insert = self::db($className)->insert(self::getTableName($className));
+        $definition = static::definition();
+        $tableDefinition = $definition->getTableDefinition();
+        $insert = $definition->db()->insert($definition->getTableName());
         $data = array();
-        foreach (self::getColumns($className) as $column) {
+        foreach ($tableDefinition->columns as $column => $columnType) {
             if (property_exists($this, $column)) {
-                $data[$column] = $this->$column;
+                $data[$column] = Database_Definition_Table::castField($this->$column, $columnType);
             }
         }
         $insert->valuesRow($data);
-        if (!is_array(static::$idField)) {
-            if (!isset($data[static::$idField])) {
-                $id = $insert->query()->lastInsertId();
-                $this->{static::$idField} = $id;
+
+        $query = $insert->query();
+
+        if ($autoId = $tableDefinition->autoIncrement) {
+            if (empty($this->$autoId)) {
+                $this->$autoId = $query->lastInsertId();
             }
         }
-        else {
-            $insert->query();
-        }
 
-        $this->fetched = true;
-
+        $this->persistent = true;
         return $this;
     }
 

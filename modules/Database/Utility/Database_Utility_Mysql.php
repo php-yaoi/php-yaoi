@@ -19,7 +19,6 @@ class Database_Utility_Mysql extends Database_Utility {
         $res = $this->db->query("DESC ?", new Sql_Symbol($tableName));
         $definition = new Database_Definition_Table();
         while ($row = $res->fetchRow()) {
-            //print_r($row);
             $type = $row['Type'];
             $phpType = Database::COLUMN_TYPE_STRING;
             $field = $row['Field'];

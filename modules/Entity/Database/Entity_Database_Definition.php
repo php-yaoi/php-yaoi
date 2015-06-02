@@ -11,6 +11,7 @@ class Entity_Database_Definition extends Base_Class {
 
     public function bindDatabase(Database $db = null) {
         $this->db = $db;
+        $this->tableDefinition = null;
     }
 
     /**
@@ -31,19 +32,14 @@ class Entity_Database_Definition extends Base_Class {
         return $this->tableName;
     }
 
-    public function getColumns() {
+    /**
+     * @return Database_Definition_Table
+     */
+    public function getTableDefinition() {
         if (null === $this->tableDefinition) {
             $this->tableDefinition = $this->db()->getTableDefinition($this->getTableName());
         }
-        return $this->tableDefinition->columns;
+        return $this->tableDefinition;
     }
-
-    public function getPrimaryKey() {
-        if (null === $this->tableDefinition) {
-            $this->tableDefinition = $this->db()->getTableDefinition($this->getTableName());
-        }
-        return $this->tableDefinition->primaryKey;
-    }
-
 
 }

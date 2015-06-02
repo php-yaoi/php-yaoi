@@ -15,6 +15,10 @@ class Database_Utility_Sqlite extends Database_Utility {
             $definition->notNull[$field] = (bool)$r['notnull'];
             $definition->columns[$field] = Database::COLUMN_TYPE_AUTO;
         }
+        if (count($definition->primaryKey) === 1) {
+            $definition->autoIncrement = reset($definition->primaryKey);
+        }
+
         return $definition;
     }
 
