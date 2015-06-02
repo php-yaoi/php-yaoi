@@ -20,7 +20,6 @@ where c.table_name = '$tableName';
             $type = $r['data_type'];
             $phpType = Database::COLUMN_TYPE_AUTO;
 
-            echo $field, ' ', $type, "\n";
             switch (true) {
                 case 'integer' === substr($type, 0, 7):
                 case 'smallint' === substr($type, 0, 8):
