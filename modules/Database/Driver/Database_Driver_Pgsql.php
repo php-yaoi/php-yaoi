@@ -6,14 +6,6 @@ class Database_Driver_Pgsql extends Database_Driver {
     private function connect() {
         $host = $this->dsn->hostname;
 
-        if ($this->dsn->charset) {
-            $this->query("SET NAMES " . $this->dsn->charset);
-        }
-
-        if ($this->dsn->timezone) {
-            $this->query("SET time_zone = '" . $this->dsn->timezone . "'");
-        }
-
         // "host=sheep port=5432 dbname=mary user=lamb password=foo"
         // "host=localhost options='--client_encoding=UTF8'"
         $connectionString = '';
