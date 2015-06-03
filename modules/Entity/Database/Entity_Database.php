@@ -169,7 +169,6 @@ abstract class Entity_Database extends Base_Class implements Mappable {
 
         if ($autoId = $tableDefinition->autoIncrement) {
             if (empty($this->$autoId)) {
-                echo 'AUTO IIIID222!';
                 $this->$autoId = $query->lastInsertId();
             }
         }

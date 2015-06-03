@@ -52,9 +52,10 @@ class Database_Driver_Pgsql extends Database_Driver {
     }
 
     public function lastInsertId()
-    { // TODO!!!
-        // $result = pg_query($db, "INSERT INTO foo (bar) VALUES (123) RETURNING foo_id");
-        return null;
+    {
+        $res = pg_query("SELECT LASTVAL();");
+        $row = pg_fetch_assoc($res);
+        return $row['lastval'];
     }
 
     public function rowsAffected($result)
