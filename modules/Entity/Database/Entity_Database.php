@@ -163,6 +163,13 @@ abstract class Entity_Database extends Base_Class implements Mappable {
                 $data[$column] = Database_Definition_Table::castField($this->$column, $columnType);
             }
         }
+
+        if ($autoId = $tableDefinition->autoIncrement) {
+            if (empty($this->$autoId)) {
+                unset($data[$autoId]);
+            }
+        }
+
         $insert->valuesRow($data);
 
         $query = $insert->query();
