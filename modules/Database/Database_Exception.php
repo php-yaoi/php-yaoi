@@ -9,6 +9,7 @@ class Database_Exception extends Exception {
     const PLACEHOLDER_NOT_FOUND = 6;
     const PLACEHOLDER_REDUNDANT = 7;
     const DISCONNECT_ERROR = 8;
+    const REWIND_NOT_SUPPORTED = 9;
 
     public $query;
 }
