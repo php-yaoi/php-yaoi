@@ -187,12 +187,6 @@ class Database extends Client implements Database_Interface {
     }
 
 
-    const COLUMN_TYPE_INTEGER = 'int';
-    const COLUMN_TYPE_TIMESTAMP = 'datetime';
-    const COLUMN_TYPE_STRING = 'string';
-    const COLUMN_TYPE_FLOAT = 'float';
-    const COLUMN_TYPE_AUTO = 'auto';
-
     /**
      * @param $tableName
      * @return Database_Definition_Table

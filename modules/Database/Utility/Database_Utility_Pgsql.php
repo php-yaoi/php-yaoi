@@ -18,34 +18,34 @@ where c.table_name = '$tableName';
         while ($r = $res->fetchRow()) {
             $field = $r['column_name'];
             $type = $r['data_type'];
-            $phpType = Database::COLUMN_TYPE_AUTO;
+            $phpType = Database_Definition_Column::AUTO_TYPE;
 
             switch (true) {
                 case 'integer' === substr($type, 0, 7):
                 case 'smallint' === substr($type, 0, 8):
                 case 'bigint' === substr($type, 0, 6):
-                    $phpType = Database::COLUMN_TYPE_INTEGER;
+                    $phpType = Database_Definition_Column::INTEGER;
                     break;
 
                 case 'numeric' === substr($type, 0, 7):
                 case 'double' === substr($type, 0, 6):
                 case 'real' === substr($type, 0, 4):
-                    $phpType = Database::COLUMN_TYPE_FLOAT;
+                    $phpType = Database_Definition_Column::FLOAT;
                     break;
 
                 case 'character' === substr($type, 0, 9):
                 case 'text' === $type:
-                    $phpType = Database::COLUMN_TYPE_STRING;
+                    $phpType = Database_Definition_Column::STRING;
                     break;
 
                 case 'time' === $type:
                 case 'time ' === substr($type, 0, 5):
-                    $phpType = Database::COLUMN_TYPE_STRING;
+                    $phpType = Database_Definition_Column::STRING;
                     break;
 
                 case 'timestamp' === substr($type, 0, 9):
                 case 'date' === substr($type, 0, 4):
-                    $phpType = Database::COLUMN_TYPE_TIMESTAMP;
+                    $phpType = Database_Definition_Column::TIMESTAMP;
                     break;
 
             }

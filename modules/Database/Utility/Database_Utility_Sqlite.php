@@ -13,7 +13,7 @@ class Database_Utility_Sqlite extends Database_Utility {
             }
             $definition->defaults[$field] = $r['dflt_value'];
             $definition->notNull[$field] = (bool)$r['notnull'];
-            $definition->columns[$field] = Database::COLUMN_TYPE_AUTO;
+            $definition->columns[$field] = Database_Definition_Column::AUTO_TYPE;
         }
         if (count($definition->primaryKey) === 1) {
             $definition->autoIncrement = reset($definition->primaryKey);

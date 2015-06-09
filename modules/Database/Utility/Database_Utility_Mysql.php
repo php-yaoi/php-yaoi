@@ -20,7 +20,7 @@ class Database_Utility_Mysql extends Database_Utility {
         $definition = new Database_Definition_Table();
         while ($row = $res->fetchRow()) {
             $type = $row['Type'];
-            $phpType = Database::COLUMN_TYPE_STRING;
+            $phpType = Database_Definition_Column::STRING;
             $field = $row['Field'];
             if ('PRI' === $row['Key']) {
                 $definition->primaryKey [$field]= $field;
@@ -36,19 +36,19 @@ class Database_Utility_Mysql extends Database_Utility {
                 case 'mediumint' === substr($type, 0, 9):
                 case 'smallint' === substr($type, 0, 8):
                 case 'tinyint' === substr($type, 0, 7):
-                    $phpType = Database::COLUMN_TYPE_INTEGER;
+                    $phpType = Database_Definition_Column::INTEGER;
                     break;
 
                 case 'decimal' === substr($type, 0, 7):
                 case 'double' === $type:
                 case 'float' === $type:
-                    $phpType = Database::COLUMN_TYPE_FLOAT;
+                    $phpType = Database_Definition_Column::FLOAT;
                     break;
 
                 case 'date' === $type:
                 case 'datetime' === $type:
                 case 'timestamp' === $type:
-                    $phpType = Database::COLUMN_TYPE_TIMESTAMP;
+                    $phpType = Database_Definition_Column::TIMESTAMP;
                     break;
             }
 

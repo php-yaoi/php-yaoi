@@ -73,7 +73,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
 
         foreach ($tableDefinition->columns as $column => $columnType) {
             if (array_key_exists($column, $row)) {
-                $object->$column = Database_Definition_Table::castField($row[$column], $columnType);
+                $object->$column = Database_Definition_Column::castField($row[$column], $columnType);
             }
         }
 
@@ -97,13 +97,13 @@ abstract class Entity_Database extends Base_Class implements Mappable {
             }
             else {
                 switch ($type) {
-                    case Database::COLUMN_TYPE_STRING:
+                    case Database_Definition_Column::STRING:
                         $value = (string)$value;
                         break;
-                    case Database::COLUMN_TYPE_INTEGER:
+                    case Database_Definition_Column::INTEGER:
                         $value = (int)$value;
                         break;
-                    case Database::COLUMN_TYPE_FLOAT:
+                    case Database_Definition_Column::FLOAT:
                         $value = (float)$value;
                         break;
 
@@ -137,7 +137,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
         $data = array();
         foreach ($tableDefinition->columns as $column => $columnType) {
             if (property_exists($this, $column)) {
-                $data[$column] = Database_Definition_Table::castField($this->$column, $columnType);
+                $data[$column] = Database_Definition_Column::castField($this->$column, $columnType);
             }
         }
         foreach ($tableDefinition->primaryKey as $keyField) {
@@ -160,7 +160,7 @@ abstract class Entity_Database extends Base_Class implements Mappable {
         $data = array();
         foreach ($tableDefinition->columns as $column => $columnType) {
             if (property_exists($this, $column)) {
-                $data[$column] = Database_Definition_Table::castField($this->$column, $columnType);
+                $data[$column] = Database_Definition_Column::castField($this->$column, $columnType);
             }
         }
 
