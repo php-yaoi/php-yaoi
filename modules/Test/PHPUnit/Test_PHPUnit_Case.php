@@ -20,4 +20,11 @@ class Test_PHPUnit_Case  extends PHPUnit_Framework_TestCase {
         $actual = str_replace("\r\n", "\n", $actual);
         $this->assertSame($expected, $actual, $message);
     }
+
+
+    public function assertArrayBitwiseAnd($expected, $actual, $message = '') {
+        foreach ($expected as $key => $value) {
+            $this->assertNotEmpty($value & $actual[$key], $message);
+        }
+    }
 } 
