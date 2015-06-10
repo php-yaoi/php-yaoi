@@ -1,6 +1,9 @@
 <?php
 
-class String_Parser extends Base_Class implements Is_Empty {
+use Yaoi\BaseClass;
+use Yaoi\Is\Is_Empty;
+
+class String_Parser extends BaseClass implements Is_Empty {
     private $string;
 
     private $offset = 0;

@@ -20,6 +20,8 @@ drop table test1
 drop table test2
  */
 
+use Yaoi\Database\Quoter;
+
 abstract class Sql_ComplexStatement extends Sql_Expression implements
     Sql_SelectInterface,
     Sql_InsertInterface,
@@ -38,7 +40,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildFrom(Database_Quoter $quoter)
+    protected function buildFrom(Quoter $quoter)
     {
         $from = '';
         if ($this->from) {
@@ -82,7 +84,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildJoin(Database_Quoter $quoter)
+    protected function buildJoin(Quoter $quoter)
     {
         $join = '';
         foreach ($this->join as $item) {
@@ -119,7 +121,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildWhere(Database_Quoter $quoter)
+    protected function buildWhere(Quoter $quoter)
     {
         $where = '';
 
@@ -150,7 +152,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildOrder(Database_Quoter $quoter)
+    protected function buildOrder(Quoter $quoter)
     {
         $order = '';
 
@@ -209,7 +211,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildGroupBy(Database_Quoter $quoter)
+    protected function buildGroupBy(Quoter $quoter)
     {
         if ($this->groupBy && !$this->groupBy->isEmpty()) {
             return ' GROUP BY ' . $this->groupBy->build($quoter);
@@ -239,7 +241,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildHaving(Database_Quoter $quoter)
+    protected function buildHaving(Quoter $quoter)
     {
         if ($this->having && !$this->having->isEmpty()) {
             return ' HAVING ' . $this->having->build($quoter);
@@ -292,7 +294,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildUnion(Database_Quoter $quoter)
+    protected function buildUnion(Quoter $quoter)
     {
         if ($this->union && !$this->union->isEmpty()) {
             return $this->union->build($quoter);
@@ -350,7 +352,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildSet(Database_Quoter $quoter)
+    protected function buildSet(Quoter $quoter)
     {
         if ($this->set && !$this->set->isEmpty()) {
             return ' SET ' . $this->set->build($quoter);
@@ -379,7 +381,7 @@ abstract class Sql_ComplexStatement extends Sql_Expression implements
         return $this;
     }
 
-    protected function buildValues(Database_Quoter $quoter) {
+    protected function buildValues(Quoter $quoter) {
         $result = '';
         if ($this->values) {
             $fields = array();

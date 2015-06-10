@@ -1,10 +1,11 @@
 <?php
+use Yaoi\Client\Dsn;
 
 /**
  * Class Storage_Dsn
  */
 
-class Storage_Dsn extends Client_Dsn {
+class Storage_Dsn extends Dsn {
     public $persistent = false;
     public $reconnect = false;
     public $logRequests = false;

@@ -1,9 +1,11 @@
 <?php
 
+use Yaoi\Date\Source;
+
 class Storage_Driver_PhpVarExpire extends Storage_Driver_PhpVar implements Storage_Expire
 {
     /**
-     * @var Date_Source
+     * @var Source
      */
     protected $time;
 

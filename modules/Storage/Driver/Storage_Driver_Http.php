@@ -1,5 +1,7 @@
 <?php
 
+use Yaoi\Http\Client;
+
 class Storage_Driver_Http implements Storage_Driver {
     /**
      * @var Storage_Dsn
@@ -9,7 +11,7 @@ class Storage_Driver_Http implements Storage_Driver {
     private $dsnUrl;
 
     /**
-     * @var Http_Client
+     * @var Client
      */
     private $http;
 
@@ -17,7 +19,7 @@ class Storage_Driver_Http implements Storage_Driver {
     {
         $this->dsn = $dsn;
         $this->dsnUrl = (string)$dsn;
-        $this->http = new Http_Client();
+        $this->http = new Client();
     }
 
     public function get($key)

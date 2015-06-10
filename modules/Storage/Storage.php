@@ -1,4 +1,5 @@
 <?php
+use Yaoi\Client;
 
 /**
  * Class Storage_Client

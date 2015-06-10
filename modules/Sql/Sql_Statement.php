@@ -1,5 +1,9 @@
 <?php
 
+use Yaoi\Database;
+use Yaoi\Database\Contract;
+use Yaoi\Database\Quoter;
+
 class Sql_Statement extends Sql_ComplexStatement {
 
     /**
@@ -7,12 +11,12 @@ class Sql_Statement extends Sql_ComplexStatement {
      */
     protected $database;
 
-    public function bindDatabase(Database_Interface $client = null) {
+    public function bindDatabase(Contract $client = null) {
         $this->database = $client;
         return $this;
     }
 
-    public function query(Database_Interface $client = null) {
+    public function query(Contract $client = null) {
         if (null === $client) {
             $query = $this->database->query($this);
         }
@@ -86,7 +90,7 @@ class Sql_Statement extends Sql_ComplexStatement {
         return $this;
     }
 
-    protected function buildSelect(Database_Quoter $quoter) {
+    protected function buildSelect(Quoter $quoter) {
         $columns = '';
         if ($this->select) {
             foreach ($this->select as $column) {
@@ -109,7 +113,7 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
-    public function build(Database_Quoter $quoter = null) {
+    public function build(Quoter $quoter = null) {
         if (null === $quoter) {
             $quoter = $this->database->getDriver();
         }
@@ -162,7 +166,7 @@ class Sql_Statement extends Sql_ComplexStatement {
     }
 
 
-    private function buildTable(Database_Quoter $quoter) {
+    private function buildTable(Quoter $quoter) {
         if ($this->tables) {
             $tables = $this->tables;
             foreach ($tables as &$table) {

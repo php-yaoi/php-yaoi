@@ -3,6 +3,11 @@
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 
+use Yaoi\Database;
+use Yaoi\Database\Contract;
+use Yaoi\Date\Source;
+use Yaoi\Log;
+
 class Yaoi {
     const MODE_CLI = 'cli';
     const MODE_HTTP = 'http';
@@ -80,7 +85,7 @@ class Yaoi {
 
     /**
      * @param string $id
-     * @return Database_Interface
+     * @return Contract
      */
     static function db($id = 'default') {
         return Database::getInstance($id);
@@ -92,12 +97,12 @@ class Yaoi {
 
     /**
      * @param string $id
-     * @return Date_Source
+     * @return Source
      */
     static function time($id = 'default') {
         $resource = &self::$resources['time_' . $id];
         if (!isset($resource)) {
-            $resource = new Date_Source();
+            $resource = new Source();
         }
         return $resource;
     }

@@ -1,6 +1,8 @@
 <?php
 
-class View_HighCharts_Series extends Base_Class {
+use Yaoi\BaseClass;
+
+class View_HighCharts_Series extends BaseClass {
     const TYPE_AREA = 'area';
     const TYPE_AREA_SPLINE = 'areaspline';
     const TYPE_BAR = 'bar';

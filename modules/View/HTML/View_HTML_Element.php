@@ -1,6 +1,9 @@
 <?php
 
-class View_HTML_Element extends Base_Class implements View_Renderer {
+use Yaoi\BaseClass;
+use Yaoi\Is\Is_Empty;
+
+class View_HTML_Element extends BaseClass implements View_Renderer {
     protected $id;
     protected $classes = array();
     protected $attributes = array();

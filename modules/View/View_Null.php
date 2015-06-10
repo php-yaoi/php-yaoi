@@ -1,6 +1,8 @@
 <?php
 
-class View_Null extends Base_Class implements View_Renderer {
+use Yaoi\BaseClass;
+
+class View_Null extends BaseClass implements View_Renderer {
     public function isEmpty()
     {
         return true;

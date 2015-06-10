@@ -1,6 +1,11 @@
 <?php
 
-class Storage_Driver_DatabaseProxy extends Base_Class implements Storage_Driver, Storage_Expire, Migration_Required {
+use Yaoi\BaseClass;
+use Yaoi\Database;
+use Yaoi\Date\Source;
+use Yaoi\Migration;
+
+class Storage_Driver_DatabaseProxy extends BaseClass implements Storage_Driver, Storage_Expire, Required {
     private $dsn;
     /**
      * @var Database
@@ -8,7 +13,7 @@ class Storage_Driver_DatabaseProxy extends Base_Class implements Storage_Driver,
     private $db;
 
     /**
-     * @var Date_Source
+     * @var Source
      */
     private $time;
 

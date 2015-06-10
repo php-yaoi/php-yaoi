@@ -1,17 +1,21 @@
 <?php
 
+use Yaoi\Database\Contract;
+use Yaoi\Database\Quoter;
+use Yaoi\Database\Query;
+
 interface Sql_StatementInterface {
     /**
-     * @param Database_Quoter $quoter
+     * @param Quoter $quoter
      * @return string
      */
-    public function build(Database_Quoter $quoter);
+    public function build(Quoter $quoter);
 
     /**
-     * @param Database_Interface $client
-     * @return Database_Query
+     * @param Contract $client
+     * @return Query
      */
-    public function query(Database_Interface $client = null);
+    public function query(Contract $client = null);
 
     /**
      * @param null $table

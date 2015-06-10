@@ -1,6 +1,8 @@
 <?php
 
-class View_Stack extends Base_Class implements View_Renderer {
+use Yaoi\BaseClass;
+
+class View_Stack extends BaseClass implements View_Renderer {
     /**
      * @var View_Renderer[]
      */

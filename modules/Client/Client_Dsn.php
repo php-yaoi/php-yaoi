@@ -1,6 +1,10 @@
 <?php
 
-class Client_Dsn extends String_Dsn {
+namespace Yaoi\Client;
+use String_Dsn;
+
+class Dsn extends String_Dsn
+{
     public $id;
     public $driverClassName;
 }

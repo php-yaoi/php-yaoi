@@ -1,10 +1,11 @@
 <?php
+use Yaoi\BaseClass;
 
 /**
  * Class View_Raw
  * @method static View_Raw create($data)
  */
-class View_Raw extends Base_Class implements View_Renderer {
+class View_Raw extends BaseClass implements View_Renderer {
     public $data = '';
 
     public function __construct($data) {

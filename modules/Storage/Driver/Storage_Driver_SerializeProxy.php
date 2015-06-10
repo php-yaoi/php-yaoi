@@ -1,6 +1,8 @@
 <?php
 
-class Storage_Driver_SerializeProxy extends Base_Class implements Storage_Driver {
+use Yaoi\BaseClass;
+
+class Storage_Driver_SerializeProxy extends BaseClass implements Storage_Driver {
     public function get($key)
     {
         $value = $this->storage->get($key);

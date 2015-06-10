@@ -1,6 +1,11 @@
 <?php
 
-class Sql_Expression extends Base_Class implements Is_Empty {
+use Yaoi\BaseClass;
+use Yaoi\Database\Quoter;
+use Yaoi\Database\Exception;
+use Yaoi\Is\Is_Empty;
+
+class Sql_Expression extends BaseClass implements Is_Empty {
 
 
 
@@ -130,7 +135,7 @@ class Sql_Expression extends Base_Class implements Is_Empty {
 
 
 
-    public function build(Database_Quoter $quoter = null) {
+    public function build(Quoter $quoter = null) {
         if ($this->isEmpty()) {
             return '';
         }
@@ -159,13 +164,13 @@ class Sql_Expression extends Base_Class implements Is_Empty {
                         $statement = substr_replace($statement, $value, $pos, 1);
                         $pos += strlen($value);
                     } else {
-                        throw new Database_Exception('Placeholder \'?\' not found', Database_Exception::PLACEHOLDER_NOT_FOUND);
+                        throw new Exception('Placeholder \'?\' not found', Exception::PLACEHOLDER_NOT_FOUND);
                     }
                 }
 
                 if (strpos($statement, '?', $pos) !== false) {
-                    throw new Database_Exception('Redundant placeholder: "' . $statement . '"',
-                        Database_Exception::PLACEHOLDER_REDUNDANT);
+                    throw new Exception('Redundant placeholder: "' . $statement . '"',
+                        Exception::PLACEHOLDER_REDUNDANT);
                 }
 
                 $result = $statement;

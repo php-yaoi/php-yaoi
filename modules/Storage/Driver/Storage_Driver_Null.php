@@ -1,6 +1,8 @@
 <?php
 
-class Storage_Driver_Null extends Base_Class implements Storage_Driver {
+use Yaoi\BaseClass;
+
+class Storage_Driver_Null extends BaseClass implements Storage_Driver {
     /**
      * @var Storage_Dsn
      */

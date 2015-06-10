@@ -1,0 +1,27 @@
+<?php
+
+namespace Yaoi\Http\Client;
+use String_Dsn;
+
+interface Driver
+{
+    public function reset();
+
+    public function setUrl($url);
+
+    public function setProxy(String_Dsn $proxy);
+
+    public function setMethod($method);
+
+    public function setRequestContent($content);
+
+    public function setHeaders($headers);
+
+    public function fetch();
+
+    public function getResponseContent();
+
+    public function getResponseHeaders();
+
+    public function getRequest();
+}

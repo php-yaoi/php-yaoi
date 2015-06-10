@@ -1,10 +1,11 @@
 <?php
+use Yaoi\BaseClass;
 
 /**
  * Class View_Jsonp
  * @method static View_Jsonp create($data = null, $callback = null)
  */
-class View_Jsonp extends Base_Class implements View_Renderer {
+class View_Jsonp extends BaseClass implements View_Renderer {
     private $callback;
     private $data;
 

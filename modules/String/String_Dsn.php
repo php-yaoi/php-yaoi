@@ -1,6 +1,8 @@
 <?php
 
-class String_Dsn extends Base_Class {
+use Yaoi\BaseClass;
+
+class String_Dsn extends BaseClass {
     public $scheme;
     public $username;
     public $password;
