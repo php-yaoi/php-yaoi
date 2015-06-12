@@ -1,7 +1,7 @@
 <?php
 
 namespace Yaoi;
-interface Is_Empty
+interface IsEmpty
 {
     public function isEmpty();
 } 

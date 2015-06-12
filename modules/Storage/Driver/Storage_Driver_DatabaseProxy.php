@@ -4,8 +4,9 @@ use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Date\Source;
 use Yaoi\Migration;
+use Yaoi\Migration\Needed;
 
-class Storage_Driver_DatabaseProxy extends BaseClass implements Storage_Driver, Storage_Expire, Required {
+class Storage_Driver_DatabaseProxy extends BaseClass implements Storage_Driver, Storage_Expire, Needed {
     private $dsn;
     /**
      * @var Database

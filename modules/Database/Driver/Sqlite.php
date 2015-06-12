@@ -3,8 +3,6 @@
 namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
-use Yaoi\Database\Utility\Contract;
-use Yaoi\Database\Utility\Sqlite;
 use Sql_Symbol;
 use SQLite3;
 use SQLite3Result;

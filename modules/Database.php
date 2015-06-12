@@ -28,7 +28,7 @@ use Yaoi\Client\Exception;
  */
 class Database extends Client implements DatabaseContract
 {
-    protected static $dsnClass = 'Database_Dsn';
+    protected static $dsnClass = '\Yaoi\Database\Dsn';
 
     public static $conf = array();
     protected static $instances = array();

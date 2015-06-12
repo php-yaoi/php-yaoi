@@ -3,7 +3,6 @@ namespace Yaoi\Database;
 
 use DependencyRepository;
 use Yaoi\Log;
-use Yaoi\Mappable\Contract;
 use Sql_Expression;
 use Yaoi\Database\Driver;
 

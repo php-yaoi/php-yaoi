@@ -2,7 +2,6 @@
 
 namespace Yaoi\Log\Driver;
 
-use \Storage;
 use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Dsn;
@@ -15,7 +14,7 @@ class Storage implements Driver
     }
 
     /**
-     * @var Storage
+     * @var \Storage
      */
     private $storage;
 

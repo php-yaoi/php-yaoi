@@ -17,7 +17,7 @@ use Yaoi\BaseClass;
  */
 abstract class Client extends BaseClass
 {
-    static protected $dsnClass = 'Client_Dsn';
+    static protected $dsnClass = '\Yaoi\Client\Dsn';
 
     /**
      * @param null $dsn
@@ -132,7 +132,7 @@ abstract class Client extends BaseClass
             if ($this->dsn && $this->dsn->driverClassName) {
                 $driverClass = $this->dsn->driverClassName;
             } else {
-                $driverClass = get_called_class() . '_Driver_' . String_Utils::toCamelCase($this->dsn->scheme, '-');
+                $driverClass = get_called_class() . '\Driver\\' . String_Utils::toCamelCase($this->dsn->scheme, '-');
             }
             if (!class_exists($driverClass)) {
                 throw new Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Exception::NO_DRIVER);
@@ -153,6 +153,5 @@ abstract class Client extends BaseClass
     {
         $this->driver = $driver;
     }
-
 
 }

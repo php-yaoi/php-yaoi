@@ -2,14 +2,12 @@
 
 namespace Yaoi\Database;
 
-use Yaoi\Database\Dsn;
 use Iterator;
 use Sql_DefaultValue;
 use Sql_Expression;
 use Sql_Symbol;
-use Yaoi\Database\Driver\Contract;
 
-abstract class Driver implements Contract
+abstract class Driver implements \Yaoi\Database\Driver\Contract
 {
     /**
      * @var Dsn

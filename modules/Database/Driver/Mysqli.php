@@ -3,7 +3,6 @@ namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
 use Yaoi\Database\Exception;
-use Yaoi\Database\Utility\Contract;
 use Yaoi\Database\Utility\Mysql;
 use Sql_Symbol;
 use Yaoi\Database;
@@ -24,7 +23,7 @@ use Yaoi\Database;
  *
  *
  */
-class Mysqli extends Driver implements Contract
+class Mysqli extends Driver implements Driver\Contract
 {
     /**
      * @var \mysqli

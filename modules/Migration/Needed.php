@@ -1,8 +1,9 @@
 <?php
 
-use Yaoi\Migration;
+namespace Yaoi\Migration;
 
-interface Required {
+interface Needed
+{
     /**
      * @return Migration
      */

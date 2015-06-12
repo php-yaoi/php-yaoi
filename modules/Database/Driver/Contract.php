@@ -3,7 +3,6 @@
 namespace Yaoi\Database\Driver;
 use Yaoi\Database\Dsn;
 use Yaoi\Database\Quoter;
-use Yaoi\Database\Utility\Contract;
 
 interface Contract extends Quoter
 {

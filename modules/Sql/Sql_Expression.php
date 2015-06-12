@@ -3,9 +3,8 @@
 use Yaoi\BaseClass;
 use Yaoi\Database\Quoter;
 use Yaoi\Database\Exception;
-use Yaoi\Is\Is_Empty;
 
-class Sql_Expression extends BaseClass implements Is_Empty {
+class Sql_Expression extends BaseClass implements \Yaoi\IsEmpty {
 
 
 
