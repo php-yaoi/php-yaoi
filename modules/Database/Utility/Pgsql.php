@@ -16,7 +16,7 @@ class Pgsql extends Utility
     {
         $def = new Table();
 
-        $res = $this->db->query("select c.column_name, c.is_nullable, c.data_type, c.column_default, tc.constraint_type
+        $res = $this->database->query("select c.column_name, c.is_nullable, c.data_type, c.column_default, tc.constraint_type
 from INFORMATION_SCHEMA.COLUMNS AS c
   LEFT JOIN INFORMATION_SCHEMA.constraint_column_usage AS ccu ON c.column_name = ccu.column_name AND c.table_name = ccu.table_name
   LEFT JOIN INFORMATION_SCHEMA.table_constraints AS tc ON ccu.constraint_name = tc.constraint_name

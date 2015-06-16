@@ -3,12 +3,9 @@
 namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
-use Yaoi\Database\Exception;
-use Yaoi\Database\Utility\Contract;
-use Yaoi\Database\Utility\Pgsql;
+use Yaoi\Database;
 use PDO;
 use PDOStatement;
-use Yaoi\Database;
 
 class PdoPgsql extends Driver
 {
@@ -44,7 +41,7 @@ class PdoPgsql extends Driver
         }
 
         if (!$this->connection) {
-            throw new Exception('Connection failed', Exception::CONNECTION_ERROR);
+            throw new Database\Exception('Connection failed', Database\Exception::CONNECTION_ERROR);
         }
         return $this;
     }
@@ -62,8 +59,8 @@ class PdoPgsql extends Driver
     {
         $res = $this->connection->query("SELECT LASTVAL();");
         if (!$res) {
-            throw new Exception(implode(' ', $this->connection->errorInfo()),
-                Exception::QUERY_ERROR);
+            throw new Database\Exception(implode(' ', $this->connection->errorInfo()),
+                Database\Exception::QUERY_ERROR);
         }
         $row = $res->fetch(PDO::FETCH_ASSOC);
         return $row['lastval'];
@@ -99,7 +96,7 @@ class PdoPgsql extends Driver
         if (!empty($result->rewinded)) {
             $result->rewinded = true;
         } else {
-            throw new Exception('Can not rewind query result', Exception::REWIND_NOT_SUPPORTED);
+            throw new Database\Exception('Can not rewind query result', Database\Exception::REWIND_NOT_SUPPORTED);
         }
     }
 
@@ -134,11 +131,11 @@ class PdoPgsql extends Driver
     }
 
     /**
-     * @return Contract
+     * @return Database\Utility\Contract
      */
     public function getUtility()
     {
-        return new Pgsql();
+        return new Database\Utility\Pgsql();
     }
 
 

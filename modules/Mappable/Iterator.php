@@ -4,13 +4,12 @@ namespace Yaoi\Mappable;
 
 use ArrayIterator;
 use IteratorIterator;
-use Yaoi\Mappable\Contract;
 
 class Iterator extends IteratorIterator
 {
 
     /**
-     * @var Contract|string
+     * @var \Yaoi\Mappable\Contract|string
      */
     private $class;
 

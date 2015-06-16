@@ -1,11 +1,11 @@
 <?php
 
 namespace Yaoi\Http\Client\Driver;
-use Yaoi\Http\Client\Driver;
-use Yaoi\Http\Client\Exception;
+
+use Yaoi\Http\Client;
 use String_Dsn;
 
-class FileGetContents implements Driver
+class FileGetContents implements Client\Driver
 {
     private $context = array();
 
@@ -78,7 +78,7 @@ class FileGetContents implements Driver
         //var_export($this->url);
         //var_export($this->context);
         if (!$this->url) {
-            throw new Exception('Empty url', Exception::EMPTY_URL);
+            throw new Client\Exception('Empty url', Client\Exception::EMPTY_URL);
         }
         $this->responseResult = @file_get_contents($this->url, false, $ctx);
         //echo $this->responseResult;

@@ -27,7 +27,7 @@ interface Contract extends Quoter
     public function getDialect();
 
     /**
-     * @return Contract
+     * @return \Yaoi\Database\Utility\Contract
      */
     public function getUtility();
 }

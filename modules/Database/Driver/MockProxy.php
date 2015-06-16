@@ -2,9 +2,8 @@
 
 namespace Yaoi\Database\Driver;
 use Yaoi\Database\Driver;
-use Yaoi\Database\Utility\Contract;
-use Mock;
-use Mock_DataSetCapture;
+use Yaoi\Mock;
+use Yaoi\Mock\DataSetCapture;
 
 class MockProxy extends Driver
 {
@@ -22,7 +21,7 @@ class MockProxy extends Driver
     public $driver;
 
     /**
-     * @var Mock_DataSetCapture
+     * @var DataSetCapture
      */
     private $lastQuery;
 
@@ -80,7 +79,7 @@ class MockProxy extends Driver
     }
 
     /**
-     * @param Mock_DataSetCapture $queryMock
+     * @param DataSetCapture $queryMock
      * @return mixed
      */
     public function rewind($queryMock)
@@ -143,7 +142,7 @@ class MockProxy extends Driver
     }
 
     /**
-     * @return Contract
+     * @return \Yaoi\Database\Utility\Contract
      */
     public function getUtility()
     {

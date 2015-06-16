@@ -3,7 +3,7 @@
 namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
-use Sql_Symbol;
+use Yaoi\Sql\Symbol;
 use SQLite3;
 use SQLite3Result;
 use Yaoi\Database;
@@ -80,7 +80,7 @@ class Sqlite extends Driver
         }
     }
 
-    public function quoteSymbol(Sql_Symbol $symbol)
+    public function quoteSymbol(Symbol $symbol)
     {
         $result = '';
         foreach ($symbol->names as $name) {
@@ -103,7 +103,7 @@ class Sqlite extends Driver
      */
     public function getUtility()
     {
-        return new Sqlite();
+        return new Database\Utility\Sqlite();
     }
 
 

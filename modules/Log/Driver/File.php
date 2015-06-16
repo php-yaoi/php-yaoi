@@ -2,8 +2,8 @@
 
 namespace Yaoi\Log\Driver;
 
-use Yaoi;
-use Yaoi\Client\Exception;
+use Yaoi\App;
+use Yaoi\Client;
 use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Dsn;
@@ -17,13 +17,13 @@ class File implements Driver
     public function __construct(Dsn $dsn = null)
     {
         if (null === $dsn) {
-            throw new Exception('Log filename required in config dsn', Exception::DSN_REQUIRED);
+            throw new Client\Exception('Log filename required in config dsn', Client\Exception::DSN_REQUIRED);
         }
 
         $this->fileName = $dsn->path;
         $this->fileName = '/' == $this->fileName[0]
             ? $this->fileName
-            : Yaoi::instance()->logPath . $this->fileName;
+            : App::instance()->logPath . $this->fileName;
     }
 
     /**
@@ -33,7 +33,7 @@ class File implements Driver
      */
     public function push($message, $type = Log::TYPE_MESSAGE)
     {
-        $message = Yaoi::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
+        $message = App::time('log')->date('Y-m-d H:i:s') . "\t" . print_r($message, 1) . "\n";
 
         if (++$this->hits > 5) {
             if (is_null($this->handle)) {

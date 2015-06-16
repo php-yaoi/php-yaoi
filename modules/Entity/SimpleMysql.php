@@ -2,9 +2,9 @@
 namespace Yaoi\Entity;
 
 use Closure;
-use Sql_SelectInterface;
-use Sql_Symbol;
-use Yaoi;
+use Yaoi\Sql\SelectInterface;
+use Yaoi\Sql\Symbol;
+use App;
 use Yaoi\BaseClass;
 use Yaoi\Database\Contract;
 
@@ -58,7 +58,7 @@ class SimpleMysql extends BaseClass
         if (isset(self::$databases[$class])) {
             return self::$databases[$class];
         } else {
-            return Yaoi::db($class);
+            return App::database($class);
         }
     }
 
@@ -83,7 +83,7 @@ class SimpleMysql extends BaseClass
         $idField = static::$idField;
         $select = static::select();
         $row = $select
-            ->where("? = ?", new Sql_Symbol($idField), $id)
+            ->where("? = ?", new Symbol($idField), $id)
             ->query()
             ->fetchRow();
 
@@ -98,7 +98,7 @@ class SimpleMysql extends BaseClass
     }
 
     /**
-     * @return Sql_SelectInterface
+     * @return SelectInterface
      */
     public static function select()
     {
@@ -122,7 +122,7 @@ class SimpleMysql extends BaseClass
         $select = static::select();
         foreach ($columnValues as $column => $value) {
             if (isset($columns[$column])) {
-                $select->where("? = ?", new Sql_Symbol($column), $value);
+                $select->where("? = ?", new Symbol($column), $value);
             }
         }
 
@@ -237,7 +237,7 @@ class SimpleMysql extends BaseClass
                 if (!isset($this->$uniqueField)) {
                     return false;
                 }
-                $select->where('? = ?', new Sql_Symbol($uniqueField), $this->$uniqueField);
+                $select->where('? = ?', new Symbol($uniqueField), $this->$uniqueField);
             }
             $row = $select->query()->rowsAffectedIn($rowsCount)->fetchRow();
             if ($rowsCount > 1 || !$rowsCount) {
@@ -285,7 +285,7 @@ class SimpleMysql extends BaseClass
 
     public static function removeById($id)
     {
-        self::db()->delete(static::$tableName)->where('? = ?', new Sql_Symbol(static::$idField), $id);
+        self::db()->delete(static::$tableName)->where('? = ?', new Symbol(static::$idField), $id);
     }
 
 

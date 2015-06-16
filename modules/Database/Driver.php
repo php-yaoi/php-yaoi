@@ -3,9 +3,9 @@
 namespace Yaoi\Database;
 
 use Iterator;
-use Sql_DefaultValue;
-use Sql_Expression;
-use Sql_Symbol;
+use Yaoi\Sql\DefaultValue;
+use Yaoi\Sql\Expression;
+use Yaoi\Sql\Symbol;
 
 abstract class Driver implements \Yaoi\Database\Driver\Contract
 {
@@ -34,18 +34,18 @@ abstract class Driver implements \Yaoi\Database\Driver\Contract
                 $result .= $this->quote($item) . ', ';
             }
             return substr($result, 0, -2);
-        } elseif ($value instanceof Sql_Expression) {
+        } elseif ($value instanceof Expression) {
             return '(' . $value->build($this) . ')';
-        } elseif ($value instanceof Sql_Symbol) {
+        } elseif ($value instanceof Symbol) {
             return $this->quoteSymbol($value);
-        } elseif ($value instanceof Sql_DefaultValue) {
+        } elseif ($value instanceof DefaultValue) {
             return 'DEFAULT';
         } else {
             return "'" . $this->escape($value) . "'";
         }
     }
 
-    public function quoteSymbol(Sql_Symbol $symbol)
+    public function quoteSymbol(Symbol $symbol)
     {
         $result = '';
         foreach ($symbol->names as $name) {

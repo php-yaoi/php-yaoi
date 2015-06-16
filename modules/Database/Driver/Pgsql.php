@@ -3,9 +3,6 @@
 namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
-use Yaoi\Database\Exception;
-use Yaoi\Database\Utility\Contract;
-use Yaoi\Database\Utility\Pgsql;
 use Yaoi\Database;
 
 class Pgsql extends Driver
@@ -39,7 +36,7 @@ class Pgsql extends Driver
 
         $this->connection = pg_connect($connectionString);
         if (!$this->connection) {
-            throw new Exception('Connection failed', Exception::CONNECTION_ERROR);
+            throw new Database\Exception('Connection failed', Database\Exception::CONNECTION_ERROR);
         }
         return $this;
     }
@@ -105,11 +102,11 @@ class Pgsql extends Driver
     }
 
     /**
-     * @return Contract
+     * @return Database\Utility\Contract
      */
     public function getUtility()
     {
-        return new Pgsql();
+        return new Database\Utility\Pgsql();
     }
 
 

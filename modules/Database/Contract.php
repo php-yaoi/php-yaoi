@@ -5,16 +5,16 @@ namespace Yaoi\Database;
 use Yaoi\Database\Query;
 use Yaoi\Database\Quoter;
 use Yaoi\Log;
-use Mock_Able;
-use Sql_DeleteInterface;
-use Sql_Expression;
-use Sql_InsertInterface;
-use Sql_SelectInterface;
-use Sql_Statement;
-use Sql_UpdateInterface;
+use Yaoi\Mock\Able;
+use Yaoi\Sql\DeleteInterface;
+use Yaoi\Sql\Expression;
+use Yaoi\Sql\InsertInterface;
+use Yaoi\Sql\SelectInterface;
+use Yaoi\Sql\Statement;
+use Yaoi\Sql\UpdateInterface;
 use Yaoi\Database\Definition\Table;
 
-interface Contract extends Mock_Able, Quoter
+interface Contract extends Able, Quoter
 {
     /**
      * @param null $statement
@@ -32,37 +32,37 @@ interface Contract extends Mock_Able, Quoter
     /**
      * @param $statement
      * @param null $binds
-     * @return Sql_Expression
+     * @return Expression
      */
     public function expr($statement, $binds = null);
 
     /**
      * @param null $from
-     * @return Sql_SelectInterface
+     * @return SelectInterface
      */
     public function select($from = null);
 
     /**
      * @param null $from
-     * @return Sql_DeleteInterface
+     * @return DeleteInterface
      */
     public function delete($from = null);
 
     /**
      * @param null $table
-     * @return Sql_UpdateInterface
+     * @return UpdateInterface
      */
     public function update($table = null);
 
     /**
      * @param null $table
-     * @return Sql_InsertInterface
+     * @return InsertInterface
      */
     public function insert($table = null);
 
 
     /**
-     * @return Sql_Statement
+     * @return Statement
      */
     public function statement();
 

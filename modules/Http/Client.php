@@ -1,25 +1,23 @@
 <?php
 namespace Yaoi\Http;
 
-use Yaoi\Http\Client\Exception;
 use Yaoi\Http\Client\Dsn;
 use Yaoi\Http\Client\Driver;
 use Yaoi\Http\Client\UploadFile;
 use Yaoi\Log;
-use \Mock;
-use \Mock_Able;
+use Yaoi\Mock;
+use Yaoi\Mock\Able;
 use \String_Dsn;
-use \Mock_Exception;
-use \Yaoi;
+use \App;
 
 /**
  * Class Http_Client
  * TODO detect response charset
  * @method Driver getDriver
  */
-class Client extends \Yaoi\Client implements Mock_Able
+class Client extends \Yaoi\Client implements Able
 {
-    protected static $dsnClass = 'Http_Client_Dsn';
+    protected static $dsnClass = '\Yaoi\Http\Client\Dsn';
     public static $conf = array();
     protected static $instances = array();
     public static $globalSettings = array();
@@ -181,7 +179,7 @@ class Client extends \Yaoi\Client implements Mock_Able
         if ($uploadingFiles) {
             $driver->setMethod('POST');
 
-            $multipartBoundary = '--------------------------' . Yaoi::time()->microNow();
+            $multipartBoundary = '--------------------------' . App::time()->microNow();
             $content = '';
 
             foreach ($this->post as $name => $value) {
@@ -251,7 +249,7 @@ class Client extends \Yaoi\Client implements Mock_Able
                     $responseHeaders = $driver->getResponseHeaders();
 
                     if (!$self->skipBadRequestException && false === $response) {
-                        $e = new Exception('Bad request', Exception::BAD_REQUEST);
+                        $e = new Client\Exception('Bad request', Client\Exception::BAD_REQUEST);
                         $e->request = $driver->getRequest();
                         $e->responseHeaders = $self->responseHeaders;
                         $e->url = $self->url;
@@ -260,7 +258,7 @@ class Client extends \Yaoi\Client implements Mock_Able
 
                     return array($response, $responseHeaders);
                 });
-        } catch (Mock_Exception $e) {
+        } catch (Client\Exception $e) {
             if ($this->logError) {
                 $this->logError->push($e->getMessage()
                     . ', request: ' . print_r($driver->getRequest(), 1)

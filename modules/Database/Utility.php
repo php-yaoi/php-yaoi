@@ -11,11 +11,16 @@ abstract class Utility extends BaseClass implements UtilityContract
     /**
      * @var DatabaseContract
      */
-    protected $db;
+    protected $database;
 
-    public function setDatabase(DatabaseContract $db)
+    /**
+     * @param Contract $database
+     * @return $this
+     */
+    public function setDatabase(DatabaseContract $database)
     {
-        $this->db = $db;
+        $this->database = $database;
+        return $this;
     }
 
 }

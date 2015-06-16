@@ -1,6 +1,8 @@
 <?php
 
-class Utils {
+namespace Yaoi;
+class Utils
+{
 
     public static function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null)
     {

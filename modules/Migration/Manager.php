@@ -3,7 +3,7 @@
 namespace Yaoi\Migration;
 
 use Closure;
-use Storage;
+use Yaoi\Storage;
 use Yaoi\Client;
 use Yaoi\Migration;
 use Yaoi\Migration\Dsn;

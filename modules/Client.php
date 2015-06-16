@@ -7,7 +7,6 @@ use Closure;
 use Yaoi\Database\Driver;
 use String_Dsn;
 use String_Utils;
-use Yaoi\BaseClass;
 
 
 /**
@@ -29,7 +28,7 @@ abstract class Client extends BaseClass
         if ($dsn instanceof Closure) {
             $dsn = $dsn();
             if (!$dsn instanceof Dsn) {
-                throw new Exception('Closure should return dsn instance', Exception::DSN_REQUIRED);
+                throw new Client\Exception('Closure should return dsn instance', Client\Exception::DSN_REQUIRED);
             }
         }
 
@@ -44,7 +43,7 @@ abstract class Client extends BaseClass
                 $dsn = new $class($dsn);
             }
         } elseif (!$dsn instanceof String_Dsn) {
-            throw new Exception('Invalid argument', Exception::INVALID_ARGUMENT);
+            throw new Client\Exception('Invalid argument', Client\Exception::INVALID_ARGUMENT);
         }
         return $dsn;
     }
@@ -66,14 +65,15 @@ abstract class Client extends BaseClass
      * @return static
      * @throws Exception
      */
-    private static function createByConfId($id = 'default')
+    private static function createByConfId($id = 'default', $previousId = null)
     {
         if (isset(static::$conf[$id])) {
             $dsn = static::dsn(static::$conf[$id]);
+            $dsn->previousId = $previousId;
             $resource = new static($dsn);
         } elseif ('default' === $id) {
-            throw new Exception('Default ' . get_called_class() . ' not configured',
-                Exception::DEFAULT_NOT_SET);
+            throw new Client\Exception('Default ' . get_called_class() . ' not configured',
+                Client\Exception::DEFAULT_NOT_SET);
         } else {
             $resource = static::createByConfId('default', $id);
         }
@@ -113,7 +113,7 @@ abstract class Client extends BaseClass
         } elseif ($id instanceof String_Dsn || $id instanceof Dsn || $id instanceof Closure) {
             return new static($id);
         } else {
-            throw new Exception('Invalid argument, Client/Closure/Client_Dsn/string required', Exception::INVALID_ARGUMENT);
+            throw new Client\Exception('Invalid argument, Client/Closure/Client\Dsn/string required', Client\Exception::INVALID_ARGUMENT);
         }
     }
 
@@ -135,7 +135,7 @@ abstract class Client extends BaseClass
                 $driverClass = get_called_class() . '\Driver\\' . String_Utils::toCamelCase($this->dsn->scheme, '-');
             }
             if (!class_exists($driverClass)) {
-                throw new Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Exception::NO_DRIVER);
+                throw new Client\Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Client\Exception::NO_DRIVER);
             }
             $this->driver = new $driverClass($this->dsn);
         }

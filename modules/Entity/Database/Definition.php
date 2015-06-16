@@ -3,7 +3,6 @@
 namespace Yaoi\Entity\Database;
 
 use Yaoi\BaseClass;
-use Yaoi\Client\Exception;
 use Yaoi\Database;
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Table;
@@ -26,9 +25,9 @@ class Definition extends BaseClass
 
     /**
      * @return Contract
-     * @throws Exception
+     * @throws \Yaoi\Client\Exception
      */
-    public function db()
+    public function database()
     {
         if (null === $this->db) {
             $this->db = Database::getInstance();
@@ -50,7 +49,7 @@ class Definition extends BaseClass
     public function getTableDefinition()
     {
         if (null === $this->tableDefinition) {
-            $this->tableDefinition = $this->db()->getTableDefinition($this->getTableName());
+            $this->tableDefinition = $this->database()->getTableDefinition($this->getTableName());
         }
         return $this->tableDefinition;
     }

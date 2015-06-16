@@ -7,7 +7,7 @@ use Yaoi\Database\Definition\Table;
 
 interface Contract
 {
-    public function setDatabase(DatabaseContract $db);
+    public function setDatabase(DatabaseContract $database);
 
     /**
      * @param $tableName

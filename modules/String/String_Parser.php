@@ -1,9 +1,9 @@
 <?php
 
 use Yaoi\BaseClass;
-use Yaoi\Is\Is_Empty;
+use Yaoi\IsEmpty;
 
-class String_Parser extends BaseClass implements Is_Empty {
+class String_Parser extends BaseClass implements IsEmpty {
     private $string;
 
     private $offset = 0;

@@ -1,10 +1,10 @@
 <?php
 
 namespace Yaoi\Date;
-use Mock;
-use Mock_Able;
+use Yaoi\Mock;
+use Yaoi\Mock\Able;
 
-class Source implements Mock_Able
+class Source implements Able
 {
     public function __construct()
     {

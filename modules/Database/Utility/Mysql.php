@@ -2,7 +2,7 @@
 
 namespace Yaoi\Database\Utility;
 
-use Sql_Symbol;
+use Yaoi\Sql\Symbol;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
@@ -11,9 +11,9 @@ class Mysql extends Utility
 {
     public function killSleepers($timeout = 30)
     {
-        foreach ($this->db->query("SHOW PROCESSLIST") as $row) {
+        foreach ($this->database->query("SHOW PROCESSLIST") as $row) {
             if ($row['Time'] > $timeout) {
-                $this->db->query("KILL $row[Id]");
+                $this->database->query("KILL $row[Id]");
             }
         }
         return $this;
@@ -25,7 +25,7 @@ class Mysql extends Utility
      */
     public function getTableDefinition($tableName)
     {
-        $res = $this->db->query("DESC ?", new Sql_Symbol($tableName));
+        $res = $this->database->query("DESC ?", new Symbol($tableName));
         $definition = new Table();
         while ($row = $res->fetchRow()) {
             $type = $row['Type'];

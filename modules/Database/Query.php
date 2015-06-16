@@ -2,8 +2,9 @@
 namespace Yaoi\Database;
 
 use DependencyRepository;
+use Yaoi\Database;
 use Yaoi\Log;
-use Sql_Expression;
+use Yaoi\Sql\Expression;
 use Yaoi\Database\Driver;
 
 /**
@@ -18,7 +19,7 @@ use Yaoi\Database\Driver;
 class Query implements \Iterator
 {
     /**
-     * @var Sql_Expression
+     * @var Expression
      */
     private $expression;
 
@@ -27,7 +28,7 @@ class Query implements \Iterator
      */
     private $driver;
 
-    public function __construct(Sql_Expression $expression, Driver $driver)
+    public function __construct(Expression $expression, Driver $driver)
     {
         $this->expression = $expression;
         $this->driver = $driver;
@@ -61,7 +62,7 @@ class Query implements \Iterator
                 $log = DependencyRepository::$items[$this->logResourceId];
                 $log->push('(-1) ' . $query . "\n: " . $error . ' ' . $query, Log::TYPE_ERROR);
             }
-            $exception = new Exception($error, Exception::QUERY_ERROR);
+            $exception = new Database\Exception($error, Database\Exception::QUERY_ERROR);
             $exception->query = $query;
             throw $exception;
         }

@@ -11,7 +11,7 @@ class Sqlite extends Utility
     public function getTableDefinition($tableName)
     {
         $definition = new Table();
-        $res = $this->db->query("PRAGMA table_info($tableName)");
+        $res = $this->database->query("PRAGMA table_info($tableName)");
 
         while ($r = $res->fetchRow()) {
             $field = $r['name'];

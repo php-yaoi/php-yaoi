@@ -10,11 +10,11 @@ class Storage implements Driver
 {
     public function __construct(Dsn $dsn = null)
     {
-        $this->storage = \Storage::getInstance($dsn->storage);
+        $this->storage = \Yaoi\Storage::getInstance($dsn->storage);
     }
 
     /**
-     * @var \Storage
+     * @var \Yaoi\Storage
      */
     private $storage;
 

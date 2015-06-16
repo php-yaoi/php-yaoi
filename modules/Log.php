@@ -11,7 +11,7 @@ use Yaoi\Client;
  */
 class Log extends Client
 {
-    protected static $dsnClass = 'Log_Dsn';
+    protected static $dsnClass = '\Yaoi\Log\Dsn';
     public static $conf = array();
     protected static $instances = array();
 

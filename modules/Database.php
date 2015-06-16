@@ -8,16 +8,14 @@ use Yaoi\Database\Contract as DatabaseContract;
 use Yaoi\Database\Query;
 use Yaoi\Log;
 use Yaoi\Mappable\Contract;
-use Mock;
-use Sql_DeleteInterface;
-use Sql_Exception;
-use Sql_Expression;
-use Sql_InsertInterface;
-use Sql_SelectInterface;
-use Sql_Statement;
-use Sql_UpdateInterface;
+use Yaoi\Mock;
+use Yaoi\Sql\DeleteInterface;
+use Yaoi\Sql\Expression;
+use Yaoi\Sql\InsertInterface;
+use Yaoi\Sql\SelectInterface;
+use Yaoi\Sql\Statement;
+use Yaoi\Sql\UpdateInterface;
 use Yaoi\Client;
-use Yaoi\Client\Exception;
 
 /**
  * TODO catch and repair crashed table
@@ -54,7 +52,7 @@ class Database extends Client implements DatabaseContract
     {
         $arguments = func_get_args();
 
-        $query = new Query(Sql_Expression::createFromFuncArguments($arguments), $this->getDriver());
+        $query = new Query(Expression::createFromFuncArguments($arguments), $this->getDriver());
         if (null !== $this->log) {
             $query->log($this->log);
         }
@@ -138,22 +136,22 @@ class Database extends Client implements DatabaseContract
     /**
      * @param $expression
      * @param null $binds
-     * @return Sql_Expression
-     * @throws Sql_Exception
+     * @return Expression
+     * @throws Sql\Exception
      */
     public function expr($expression, $binds = null)
     {
-        return Sql_Expression::createFromFuncArguments(func_get_args());
+        return Expression::createFromFuncArguments(func_get_args());
     }
 
 
     /**
      * @param null $from
-     * @return Sql_SelectInterface
+     * @return SelectInterface
      */
     public function select($from = null)
     {
-        $select = new Sql_Statement();
+        $select = new Statement();
         $select
             ->bindDatabase($this)
             ->select();
@@ -166,11 +164,11 @@ class Database extends Client implements DatabaseContract
 
     /**
      * @param null $from
-     * @return Sql_DeleteInterface
+     * @return DeleteInterface
      */
     public function delete($from = null)
     {
-        $delete = new Sql_Statement();
+        $delete = new Statement();
         $delete
             ->bindDatabase($this)
             ->delete($from);
@@ -180,11 +178,11 @@ class Database extends Client implements DatabaseContract
 
     /**
      * @param null $table
-     * @return Sql_UpdateInterface
+     * @return UpdateInterface
      */
     public function update($table = null)
     {
-        $update = new Sql_Statement();
+        $update = new Statement();
         $update
             ->bindDatabase($this)
             ->update($table);
@@ -194,11 +192,11 @@ class Database extends Client implements DatabaseContract
 
     /**
      * @param null $table
-     * @return Sql_InsertInterface
+     * @return InsertInterface
      */
     public function insert($table = null)
     {
-        $insert = new Sql_Statement();
+        $insert = new Statement();
         $insert
             ->bindDatabase($this)
             ->insert($table);
@@ -208,18 +206,18 @@ class Database extends Client implements DatabaseContract
 
 
     /**
-     * @return Sql_Statement
+     * @return Statement
      */
     public function statement()
     {
-        return Sql_Statement::create()->bindDatabase($this);
+        return Statement::create()->bindDatabase($this);
     }
 
 
     /**
      * @param $tableName
      * @return Table
-     * @throws Exception
+     * @throws Database\Exception
      */
     public function getTableDefinition($tableName)
     {

@@ -2,9 +2,7 @@
 namespace Yaoi\Database\Driver;
 
 use Yaoi\Database\Driver;
-use Yaoi\Database\Exception;
-use Yaoi\Database\Utility\Mysql;
-use Sql_Symbol;
+use Yaoi\Sql\Symbol;
 use Yaoi\Database;
 
 /**
@@ -50,8 +48,8 @@ class Mysqli extends Driver implements Driver\Contract
         );
 
         if ($this->mysqli->connect_error) {
-            throw new Exception('Connection error: (' . $this->mysqli->connect_errno . ') '
-                . $this->mysqli->connect_error, Exception::CONNECTION_ERROR);
+            throw new Database\Exception('Connection error: (' . $this->mysqli->connect_errno . ') '
+                . $this->mysqli->connect_error, Database\Exception::CONNECTION_ERROR);
         }
 
         if ($this->dsn->charset) {
@@ -89,7 +87,7 @@ class Mysqli extends Driver implements Driver\Contract
         if ($this->mysqli) {
             $result = $this->mysqli->close();
             if (!$result) {
-                throw new Exception('Disconnect failed', Exception::DISCONNECT_ERROR);
+                throw new Database\Exception('Disconnect failed', Database\Exception::DISCONNECT_ERROR);
             } else {
                 $this->mysqli = null;
             }
@@ -146,7 +144,7 @@ class Mysqli extends Driver implements Driver\Contract
         return $this->mysqli->errno . ' ' . $this->mysqli->error;
     }
 
-    public function quoteSymbol(Sql_Symbol $symbol)
+    public function quoteSymbol(Symbol $symbol)
     {
         $result = '';
         foreach ($symbol->names as $name) {
@@ -164,11 +162,11 @@ class Mysqli extends Driver implements Driver\Contract
     }
 
     /**
-     * @return Contract
+     * @return Database\Utility\Mysql
      */
     public function getUtility()
     {
-        return new Mysql();
+        return new Database\Utility\Mysql();
     }
 
 
