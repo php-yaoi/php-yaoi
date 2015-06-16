@@ -1,6 +1,17 @@
 <?php
 
-class Storage_Driver_Mongo implements Storage_Driver {
+namespace Yaoi\Storage\Driver;
+
+use MongoBinData;
+use MongoClient;
+use MongoCollection;
+use MongoDB;
+use Yaoi\Storage\Contract\Driver;
+use App;
+use Yaoi\Storage\Dsn;
+
+class Mongo implements Driver
+{
     /**
      * @var MongoClient
      */
@@ -17,11 +28,12 @@ class Storage_Driver_Mongo implements Storage_Driver {
     private $collection;
 
     /**
-     * @var Storage_Dsn
+     * @var Dsn
      */
     private $dsn;
 
-    public function __construct(Storage_Dsn $dsn = null) {
+    public function __construct(Dsn $dsn = null)
+    {
         $this->dsn = $dsn;
 
         $host = $dsn->hostname ? $dsn->hostname : 'localhost';
@@ -47,7 +59,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
     public function get($key)
     {
         if ($res = $this->collection->findOne(array('k' => $key))) {
-            if ($res['t'] && $res['t'] < Yaoi::time()->now()) {
+            if ($res['t'] && $res['t'] < App::time()->now()) {
                 $this->delete($key);
                 return null;
             }
@@ -67,14 +79,13 @@ class Storage_Driver_Mongo implements Storage_Driver {
     public function set($key, $value, $ttl)
     {
         if (($this->dsn->compression || $this->dsn->binary) && !is_string($value)) {
-            throw new Storage_Exception('String data required for binary or compression',
-                Storage_Exception::STRING_REQUIRED);
+            throw new \Yaoi\Storage\Exception('String data required for binary or compression',
+                \Yaoi\Storage\Exception::SCALAR_REQUIRED);
         }
 
         if ($this->dsn->compression) {
             $v = gzcompress($value);
-        }
-        else {
+        } else {
             $v = $value;
         }
 
@@ -82,7 +93,7 @@ class Storage_Driver_Mongo implements Storage_Driver {
             $v = new MongoBinData($v);
         }
 
-        $this->collection->save(array('k' => $key, 'v' => $v, 't' => $ttl ? Yaoi::time()->now() + $ttl : null));
+        $this->collection->save(array('k' => $key, 'v' => $v, 't' => $ttl ? App::time()->now() + $ttl : null));
     }
 
     public function delete($key)
@@ -95,4 +106,4 @@ class Storage_Driver_Mongo implements Storage_Driver {
         $this->collection->remove(array());
     }
 
-} 
+}

@@ -12,5 +12,4 @@ class Exception extends \Exception
     const GET_FAILED = 6;
     const SCALAR_REQUIRED = 7;
     const PROXY_REQUIRED = 8;
-
 } 
