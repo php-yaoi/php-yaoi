@@ -6,7 +6,7 @@ use Yaoi\Storage\Contract\Driver;
 use Yaoi\BaseClass;
 use Yaoi\Storage\Dsn;
 
-class Null extends BaseClass implements Driver
+class Void extends BaseClass implements Driver
 {
     /**
      * @var Dsn
