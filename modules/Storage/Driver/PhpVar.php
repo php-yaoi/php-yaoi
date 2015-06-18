@@ -14,7 +14,7 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function __construct(Dsn $dsn = null)
     {
         $this->dsn = $dsn ? $dsn : new Dsn();
-        $this->time = App::time($this->dsn->dateSource); // TODO use getInstance after Date_Source refactoring
+        $this->time = \Yaoi\App::time($this->dsn->dateSource); // TODO use getInstance after Date_Source refactoring
     }
 
     protected $data = array();

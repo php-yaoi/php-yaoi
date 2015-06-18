@@ -3,7 +3,7 @@
 namespace Yaoi\Http\Client\Driver;
 
 use Yaoi\Http\Client;
-use String_Dsn;
+use Yaoi\String\Dsn;
 
 class FileGetContents implements Client\Driver
 {
@@ -38,7 +38,7 @@ class FileGetContents implements Client\Driver
         $this->url = $url;
     }
 
-    public function setProxy(String_Dsn $proxy)
+    public function setProxy(Dsn $proxy)
     {
         $scheme = $proxy->scheme;
         if (!$scheme || 'http' === $scheme) {

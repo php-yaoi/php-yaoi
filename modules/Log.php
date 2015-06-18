@@ -2,14 +2,14 @@
 namespace Yaoi;
 
 use Yaoi\Log\Driver;
-use Yaoi\Client;
+use Yaoi\Service;
 
 /**
  * Class Log
  * @method Driver getDriver()
  * @method static Log getInstance($id = 'default', $reuse = true)
  */
-class Log extends Client
+class Log extends Service
 {
     protected static $dsnClass = '\Yaoi\Log\Dsn';
     public static $conf = array();

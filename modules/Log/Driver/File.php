@@ -3,7 +3,7 @@
 namespace Yaoi\Log\Driver;
 
 use Yaoi\App;
-use Yaoi\Client;
+use Yaoi\Service;
 use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Dsn;

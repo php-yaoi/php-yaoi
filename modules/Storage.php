@@ -5,13 +5,13 @@ use Closure;
 use Yaoi\Storage\Contract\ArrayKey;
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Contract\ExportImportArray;
-use Yaoi\Client;
+use Yaoi\Service;
 
 /**
  * Class Storage_Client
  * @method Driver|ExportImportArray|ArrayKey getDriver()
  */
-class Storage extends Client
+class Storage extends Service
 {
     protected static $dsnClass = '\Yaoi\Storage\Dsn';
     public static $conf = array();

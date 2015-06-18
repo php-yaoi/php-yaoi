@@ -7,7 +7,6 @@ use Yaoi\Http\Client\UploadFile;
 use Yaoi\Log;
 use Yaoi\Mock;
 use Yaoi\Mock\Able;
-use \String_Dsn;
 use \App;
 
 /**
@@ -15,7 +14,7 @@ use \App;
  * TODO detect response charset
  * @method Driver getDriver
  */
-class Client extends \Yaoi\Client implements Able
+class Client extends \Yaoi\Service implements Able
 {
     protected static $dsnClass = '\Yaoi\Http\Client\Dsn';
     public static $conf = array();
@@ -136,10 +135,10 @@ class Client extends \Yaoi\Client implements Able
 
     public function setProxy($dsn)
     {
-        if ($dsn instanceof String_Dsn) {
+        if ($dsn instanceof Dsn) {
             $this->proxy = $dsn;
         } else {
-            $this->proxy = new String_Dsn($dsn);
+            $this->proxy = new Dsn($dsn);
         }
     }
 

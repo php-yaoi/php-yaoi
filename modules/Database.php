@@ -15,7 +15,7 @@ use Yaoi\Sql\InsertInterface;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Statement;
 use Yaoi\Sql\UpdateInterface;
-use Yaoi\Client;
+use Yaoi\Service;
 
 /**
  * TODO catch and repair crashed table
@@ -24,7 +24,7 @@ use Yaoi\Client;
  * Class Database
  * @property Dsn $dsn
  */
-class Database extends Client implements DatabaseContract
+class Database extends Service implements DatabaseContract
 {
     protected static $dsnClass = '\Yaoi\Database\Dsn';
 

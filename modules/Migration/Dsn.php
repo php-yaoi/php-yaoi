@@ -4,7 +4,7 @@ namespace Yaoi\Migration;
 
 use Yaoi\Storage;
 
-class Dsn extends \Yaoi\Client\Dsn
+class Dsn extends \Yaoi\Service\Dsn
 {
     /**
      * @var \Yaoi\Storage|\Yaoi\Storage\Dsn|string

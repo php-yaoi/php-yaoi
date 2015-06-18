@@ -4,7 +4,7 @@ namespace Yaoi\Storage;
 /**
  * Class Storage_Dsn
  */
-class Dsn extends \Yaoi\Client\Dsn
+class Dsn extends \Yaoi\Service\Dsn
 {
     public $persistent = false;
     public $reconnect = false;

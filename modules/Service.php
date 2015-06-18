@@ -1,26 +1,24 @@
 <?php
 namespace Yaoi;
 
-use Yaoi\Client\Dsn;
-use Yaoi\Client\Exception;
+use Yaoi\Service\Exception;
 use Closure;
 use Yaoi\Database\Driver;
-use String_Dsn;
-use String_Utils;
+use Yaoi\String\Utils;
+use Yaoi\Service\Dsn;
 
 
 /**
- * Class Client
  * @property array $conf
  * @property array $instances
  */
-abstract class Client extends BaseClass
+abstract class Service extends BaseClass
 {
-    static protected $dsnClass = '\Yaoi\Client\Dsn';
+    static protected $dsnClass = '\Yaoi\Service\Dsn';
 
     /**
      * @param null $dsn
-     * @return null|Dsn
+     * @return null|Service\Dsn
      * @throws Exception
      */
     public static function dsn($dsn = null)
@@ -28,7 +26,7 @@ abstract class Client extends BaseClass
         if ($dsn instanceof Closure) {
             $dsn = $dsn();
             if (!$dsn instanceof Dsn) {
-                throw new Client\Exception('Closure should return dsn instance', Client\Exception::DSN_REQUIRED);
+                throw new Service\Exception('Closure should return dsn instance', Service\Exception::DSN_REQUIRED);
             }
         }
 
@@ -42,15 +40,15 @@ abstract class Client extends BaseClass
             } else {
                 $dsn = new $class($dsn);
             }
-        } elseif (!$dsn instanceof String_Dsn) {
-            throw new Client\Exception('Invalid argument', Client\Exception::INVALID_ARGUMENT);
+        } elseif (!$dsn instanceof Dsn) {
+            throw new Service\Exception('Invalid argument', Service\Exception::INVALID_ARGUMENT);
         }
         return $dsn;
     }
 
 
     /**
-     * @param String_Dsn|string|Closure|null $dsn
+     * @param Dsn|string|Closure|null $dsn
      * @throws Exception
      */
     public function __construct($dsn = null)
@@ -72,8 +70,8 @@ abstract class Client extends BaseClass
             $dsn->previousId = $previousId;
             $resource = new static($dsn);
         } elseif ('default' === $id) {
-            throw new Client\Exception('Default ' . get_called_class() . ' not configured',
-                Client\Exception::DEFAULT_NOT_SET);
+            throw new Service\Exception('Default ' . get_called_class() . ' not configured',
+                Service\Exception::DEFAULT_NOT_SET);
         } else {
             $resource = static::createByConfId('default', $id);
         }
@@ -85,7 +83,7 @@ abstract class Client extends BaseClass
      * Returns client instance
      *
      *
-     * @param string|Client|Dsn|Closure $id
+     * @param string|Service|Dsn|Closure $id
      * @param bool $reuse return previously created instance if true, create new if false
      * @return static
      * @throws Exception
@@ -108,12 +106,12 @@ abstract class Client extends BaseClass
             }
 
             return $resource;
-        } elseif ($id instanceof Client) {
+        } elseif ($id instanceof Service) {
             return $id;
-        } elseif ($id instanceof String_Dsn || $id instanceof Dsn || $id instanceof Closure) {
+        } elseif ($id instanceof Dsn || $id instanceof Dsn || $id instanceof Closure) {
             return new static($id);
         } else {
-            throw new Client\Exception('Invalid argument, Client/Closure/Client\Dsn/string required', Client\Exception::INVALID_ARGUMENT);
+            throw new Service\Exception('Invalid argument, Service/Closure/Service\Dsn/string required', Service\Exception::INVALID_ARGUMENT);
         }
     }
 
@@ -132,10 +130,10 @@ abstract class Client extends BaseClass
             if ($this->dsn && $this->dsn->driverClassName) {
                 $driverClass = $this->dsn->driverClassName;
             } else {
-                $driverClass = get_called_class() . '\Driver\\' . String_Utils::toCamelCase($this->dsn->scheme, '-');
+                $driverClass = get_called_class() . '\Driver\\' . Utils::toCamelCase($this->dsn->scheme, '-');
             }
             if (!class_exists($driverClass)) {
-                throw new Client\Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Client\Exception::NO_DRIVER);
+                throw new Service\Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Service\Exception::NO_DRIVER);
             }
             $this->driver = new $driverClass($this->dsn);
         }

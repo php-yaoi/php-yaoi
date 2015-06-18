@@ -1,8 +1,12 @@
 <?php
 
+namespace Yaoi\String;
+
+use Yaoi\String\Exception;
 use Yaoi\BaseClass;
 
-class String_Dsn extends BaseClass {
+class Dsn extends BaseClass
+{
     public $scheme;
     public $username;
     public $password;
@@ -10,7 +14,8 @@ class String_Dsn extends BaseClass {
     public $port;
     public $path;
 
-    public function __construct($dsnUrl = null) {
+    public function __construct($dsnUrl = null)
+    {
         if (null === $dsnUrl) {
             return;
         }
@@ -25,11 +30,11 @@ class String_Dsn extends BaseClass {
         }
 
         if (!$p = parse_url($dsnUrl)) {
-            throw new String_Exception('Malformed DSN URL', String_Exception::BAD_DSN);
+            throw new Exception('Malformed DSN URL', Exception::BAD_DSN);
         }
 
         if (isset($p['query'])) {
-            parse_str($p['query'],$p['query']);
+            parse_str($p['query'], $p['query']);
             foreach ($p['query'] as $key => $value) {
                 $this->$key = $value;
             }
@@ -61,7 +66,8 @@ class String_Dsn extends BaseClass {
     }
 
 
-    public function __toString() {
+    public function __toString()
+    {
         // http://user:password@host:port/path?query
         $result = $this->scheme;
 

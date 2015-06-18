@@ -1,7 +1,6 @@
 <?php
 
 namespace Yaoi\Http\Client;
-use String_Dsn;
 
 interface Driver
 {
@@ -9,7 +8,7 @@ interface Driver
 
     public function setUrl($url);
 
-    public function setProxy(String_Dsn $proxy);
+    public function setProxy(Dsn $proxy);
 
     public function setMethod($method);
 

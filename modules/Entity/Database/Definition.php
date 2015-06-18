@@ -25,7 +25,7 @@ class Definition extends BaseClass
 
     /**
      * @return Contract
-     * @throws \Yaoi\Client\Exception
+     * @throws \Yaoi\Service\Exception
      */
     public function database()
     {

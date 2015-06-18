@@ -2,7 +2,7 @@
 
 namespace Yaoi\Log;
 
-class Dsn extends \Yaoi\Client\Dsn
+class Dsn extends \Yaoi\Service\Dsn
 {
     public $storage;
     public $prefix = '';

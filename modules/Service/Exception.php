@@ -1,5 +1,5 @@
 <?php
-namespace Yaoi\Client;
+namespace Yaoi\Service;
 
 class Exception extends \Exception
 {

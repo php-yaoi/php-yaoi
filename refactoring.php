@@ -31,10 +31,10 @@ class Storage_Conf {}
 //*/
 
 
-// 2014.03.03 remove Client::createByDsn in favour of __construct or ::create()
-// remove Client::createByConfId in favour of ::getInstance()
+// 2014.03.03 remove Service::createByDsn in favour of __construct or ::create()
+// remove Service::createByConfId in favour of ::getInstance()
 /*
-class Client {
+class Service {
     public static function createByDsn(){}
     public static function createByConfId() {}
 }

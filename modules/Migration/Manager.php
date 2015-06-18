@@ -4,11 +4,11 @@ namespace Yaoi\Migration;
 
 use Closure;
 use Yaoi\Storage;
-use Yaoi\Client;
+use Yaoi\Service;
 use Yaoi\Migration;
 use Yaoi\Migration\Dsn;
 
-class Manager extends Client
+class Manager extends Service
 {
     public static $conf = array();
     protected static $instances = array();

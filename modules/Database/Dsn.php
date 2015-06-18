@@ -2,7 +2,7 @@
 
 namespace Yaoi\Database;
 
-class Dsn extends \Yaoi\Client\Dsn
+class Dsn extends \Yaoi\Service\Dsn
 {
     public $persistent = false;
     public $reconnect = false;

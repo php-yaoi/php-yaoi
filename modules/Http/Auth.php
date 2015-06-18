@@ -2,12 +2,12 @@
 namespace Yaoi\Http;
 
 use Yaoi\Http\Auth\Dsn;
-use Yaoi\Client;
+use Yaoi\Service;
 
 /**
  * Class Http_Auth
  */
-class Auth extends Client
+class Auth extends Service
 {
     protected static $dsnClass = 'Http_Auth_Dsn';
     public static $conf = array();
