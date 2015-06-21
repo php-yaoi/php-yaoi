@@ -1,12 +1,12 @@
 <?php
 
 namespace Yaoi\Database\Driver;
-use Yaoi\Database\Dsn;
+use Yaoi\Database\Settings;
 use Yaoi\Database\Quoter;
 
 interface Contract extends Quoter
 {
-    public function __construct(Dsn $dsn);
+    public function __construct(Settings $dsn);
 
     public function query($statement);
 

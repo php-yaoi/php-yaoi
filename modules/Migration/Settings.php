@@ -4,10 +4,10 @@ namespace Yaoi\Migration;
 
 use Yaoi\Storage;
 
-class Dsn extends \Yaoi\Service\Dsn
+class Settings extends \Yaoi\Service\Settings
 {
     /**
-     * @var \Yaoi\Storage|\Yaoi\Storage\Dsn|string
+     * @var \Yaoi\Storage|\Yaoi\Storage\Settings|string
      */
     public $storage;
 

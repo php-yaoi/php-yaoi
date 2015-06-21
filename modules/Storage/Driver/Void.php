@@ -4,14 +4,14 @@ namespace Yaoi\Storage\Driver;
 
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\BaseClass;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class Void extends BaseClass implements Driver
 {
     /**
-     * @var Dsn
+     * @var Settings
      */
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
     }
 

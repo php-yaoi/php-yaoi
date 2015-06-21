@@ -8,7 +8,7 @@ use MongoCollection;
 use MongoDB;
 use Yaoi\Storage\Contract\Driver;
 use App;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class Mongo implements Driver
 {
@@ -28,11 +28,11 @@ class Mongo implements Driver
     private $collection;
 
     /**
-     * @var Dsn
+     * @var Settings
      */
     private $dsn;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn;
 

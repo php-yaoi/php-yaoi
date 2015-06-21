@@ -6,16 +6,14 @@ use Closure;
 use Yaoi\Storage;
 use Yaoi\Service;
 use Yaoi\Migration;
-use Yaoi\Migration\Dsn;
+use Yaoi\Migration\Settings;
 
 class Manager extends Service
 {
-    public static $conf = array();
-    protected static $instances = array();
     /**
-     * @var Dsn
+     * @var Settings
      */
-    protected $dsn;
+    protected $settings;
 
 
     public function isApplied($migrationId)
@@ -31,7 +29,7 @@ class Manager extends Service
     protected function getStorage()
     {
         if (null === $this->storage) {
-            $this->storage = Storage::getInstance($this->dsn->storage);
+            $this->storage = Storage::getInstance($this->settings->storage);
         }
         return $this->storage;
     }
@@ -69,11 +67,16 @@ class Manager extends Service
 
     public function run()
     {
-        if ($this->dsn->run instanceof \Closure) {
-            $f = $this->dsn->run;
+        if ($this->settings->run instanceof \Closure) {
+            $f = $this->settings->run;
             $f($this);
         }
         return $this;
+    }
+
+    public static function getSettingsClassName()
+    {
+        return Settings::className();
     }
 
 }

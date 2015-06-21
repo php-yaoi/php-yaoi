@@ -4,11 +4,11 @@ namespace Yaoi\Log\Driver;
 
 use Yaoi\Log;
 use Yaoi\Log\Driver;
-use Yaoi\Log\Dsn;
+use Yaoi\Log\Settings;
 
 class Void implements Driver
 {
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
     }
 

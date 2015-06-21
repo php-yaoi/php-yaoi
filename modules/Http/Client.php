@@ -1,7 +1,7 @@
 <?php
 namespace Yaoi\Http;
 
-use Yaoi\Http\Client\Dsn;
+use Yaoi\Http\Client\Settings;
 use Yaoi\Http\Client\Driver;
 use Yaoi\Http\Client\UploadFile;
 use Yaoi\Log;
@@ -16,11 +16,6 @@ use \App;
  */
 class Client extends \Yaoi\Service implements Able
 {
-    protected static $dsnClass = '\Yaoi\Http\Client\Dsn';
-    public static $conf = array();
-    protected static $instances = array();
-    public static $globalSettings = array();
-
     const XML_HTTP_REQUEST = 'XMLHttpRequest';
 
     public $cookies = array();
@@ -44,29 +39,29 @@ class Client extends \Yaoi\Service implements Able
     );
 
     /**
-     * @var Dsn
+     * @var Settings
      */
-    protected $dsn;
+    protected $settings;
 
-    public function __construct($dsn = null)
+    public function __construct($settings = null)
     {
-        if ($dsn === null) {
-            $dsn = new Dsn();
+        if ($settings === null) {
+            $settings = new Settings();
         }
 
-        parent::__construct($dsn);
+        parent::__construct($settings);
         $this->reset();
-        if ($this->dsn) {
-            if ($this->dsn->proxy) {
-                $this->setProxy($this->dsn->proxy);
+        if ($this->settings) {
+            if ($this->settings->proxy) {
+                $this->setProxy($this->settings->proxy);
             }
 
-            if ($this->dsn->defaultHeaders) {
-                $this->defaultHeaders = array_merge($this->defaultHeaders, $this->dsn->defaultHeaders);
+            if ($this->settings->defaultHeaders) {
+                $this->defaultHeaders = array_merge($this->defaultHeaders, $this->settings->defaultHeaders);
             }
 
-            if ($this->dsn->log) {
-                $log = Log::getInstance($this->dsn->log);
+            if ($this->settings->log) {
+                $log = Log::getInstance($this->settings->log);
                 $this->logUrl($log);
                 $this->logContext($log);
                 $this->logResponseHeaders($log);
@@ -135,10 +130,10 @@ class Client extends \Yaoi\Service implements Able
 
     public function setProxy($dsn)
     {
-        if ($dsn instanceof Dsn) {
+        if ($dsn instanceof Settings) {
             $this->proxy = $dsn;
         } else {
-            $this->proxy = new Dsn($dsn);
+            $this->proxy = new Settings($dsn);
         }
     }
 
@@ -178,7 +173,7 @@ class Client extends \Yaoi\Service implements Able
         if ($uploadingFiles) {
             $driver->setMethod('POST');
 
-            $multipartBoundary = '--------------------------' . App::time()->microNow();
+            $multipartBoundary = '--------------------------' . \Yaoi\Date\Source::getInstance()->microNow();
             $content = '';
 
             foreach ($this->post as $name => $value) {
@@ -435,6 +430,11 @@ class Client extends \Yaoi\Service implements Able
     {
         $this->logResponseBody = $log;
         return $this;
+    }
+
+    public static function getSettingsClassName()
+    {
+        return Settings::className();
     }
 
 

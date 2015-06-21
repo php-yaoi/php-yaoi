@@ -6,6 +6,7 @@ use Yaoi\Storage\Contract\ArrayKey;
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Contract\ExportImportArray;
 use Yaoi\Service;
+use Yaoi\Storage\Settings;
 
 /**
  * Class Storage_Client
@@ -13,10 +14,6 @@ use Yaoi\Service;
  */
 class Storage extends Service
 {
-    protected static $dsnClass = '\Yaoi\Storage\Dsn';
-    public static $conf = array();
-    protected static $instances = array();
-
     public function get($key, Closure $setOnMiss = null, $ttl = null)
     {
         $this->prepareKey($key);
@@ -98,5 +95,11 @@ class Storage extends Service
         return $this->getDriver()->importArray($data);
 
     }
+
+    public static function getSettingsClassName()
+    {
+        return Settings::className();
+    }
+
 
 }

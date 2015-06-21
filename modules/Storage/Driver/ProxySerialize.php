@@ -2,15 +2,15 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 use Yaoi\Storage\Contract\Driver;
 
 class ProxySerialize implements Driver
 {
     /**
-     * @var Dsn
+     * @var Settings
      */
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         // TODO: Implement __construct() method.
     }

@@ -1,81 +1,83 @@
 <?php
 namespace Yaoi;
 
-use Yaoi\Service\Exception;
+use Yaoi\Service\Contract;
 use Closure;
 use Yaoi\Database\Driver;
+use Yaoi\Service\Exception;
 use Yaoi\String\Utils;
-use Yaoi\Service\Dsn;
-
+use Yaoi\Service\Settings;
 
 /**
- * @property array $conf
- * @property array $instances
+ * Class Service
+ * @package Yaoi
  */
-abstract class Service extends BaseClass
+
+abstract class Service extends BaseClass implements Contract
 {
-    static protected $dsnClass = '\Yaoi\Service\Dsn';
+    const PRIMARY = 'default';
+    const FALLBACK = 'fallback';
+
+    private static $registry = array();
+    public static function register($identifier, $settings) {
+        $class = get_called_class();
+        self::$registry[$class][$identifier] = $settings;
+    }
+
+    private static $instances = array();
+
+    public function getSettings() {
+        return $this->settings;
+    }
 
     /**
-     * @param null $dsn
-     * @return null|Service\Dsn
-     * @throws Exception
+     * @return Settings
      */
-    public static function dsn($dsn = null)
+    public static function createSettings() {
+        $className = static::getSettingsClassName();
+        return new $className;
+    }
+
+    /**
+     * @param null $settings
+     * @return null|Service\Settings
+     * @throws Service\Exception
+     */
+    public static function settings($settings = null)
     {
-        if ($dsn instanceof Closure) {
-            $dsn = $dsn();
-            if (!$dsn instanceof Dsn) {
-                throw new Service\Exception('Closure should return dsn instance', Service\Exception::DSN_REQUIRED);
-            }
+        $settingsClassName = static::getSettingsClassName();
+
+        if ($settings instanceof $settingsClassName) {
+            return $settings;
         }
 
-        if (null === $dsn || is_string($dsn)) {
-            /**
-             * @see Client_Dsn descendants
-             */
-            $class = static::$dsnClass;
-            if (null === $dsn) {
-                $dsn = null;
-            } else {
-                $dsn = new $class($dsn);
+        if ($settings instanceof Closure) {
+            $settings = $settings();
+            if (!$settings instanceof $settingsClassName) {
+                throw new Service\Exception('Closure should return ' . $settingsClassName . ' instance',
+                    Service\Exception::SETTINGS_REQUIRED);
             }
-        } elseif (!$dsn instanceof Dsn) {
-            throw new Service\Exception('Invalid argument', Service\Exception::INVALID_ARGUMENT);
+            return $settings;
         }
-        return $dsn;
+
+        if (is_string($settings)) {
+            $settings = new $settingsClassName($settings);
+            return $settings;
+        }
+
+        throw new Service\Exception('Invalid argument', Service\Exception::SETTINGS_REQUIRED);
     }
 
 
     /**
-     * @param Dsn|string|Closure|null $dsn
-     * @throws Exception
+     * @param Settings|string|Closure|null $settings
+     * @throws Service\Exception
      */
-    public function __construct($dsn = null)
+    public function __construct($settings = null)
     {
-        $this->dsn = static::dsn($dsn);
-    }
-
-
-    /**
-     * @param string $id
-     * @param Dsn $originalId
-     * @return static
-     * @throws Exception
-     */
-    private static function createByConfId($id = 'default', $previousId = null)
-    {
-        if (isset(static::$conf[$id])) {
-            $dsn = static::dsn(static::$conf[$id]);
-            $dsn->previousId = $previousId;
-            $resource = new static($dsn);
-        } elseif ('default' === $id) {
-            throw new Service\Exception('Default ' . get_called_class() . ' not configured',
-                Service\Exception::DEFAULT_NOT_SET);
-        } else {
-            $resource = static::createByConfId('default', $id);
+        if (null !== $settings) {
+            $this->settings = static::settings($settings);
         }
-        return $resource;
     }
 
 
@@ -83,59 +85,91 @@ abstract class Service extends BaseClass
      * Returns client instance
      *
      *
-     * @param string|Service|Dsn|Closure $id
-     * @param bool $reuse return previously created instance if true, create new if false
+     * @param string|Service|Settings|Closure $identifier
      * @return static
-     * @throws Exception
+     * @throws Service\Exception
      * fallback instead default
      */
-    public static function getInstance($id = 'default', $reuse = true)
+    public static function getInstance($identifier = self::PRIMARY)
     {
-        if (is_string($id)) {
-            if ($reuse) {
-                if (!isset(static::$conf[$id])) {
-                    $id = 'default';
-                }
+        $serviceClassName = get_called_class();
 
-                $resource = &static::$instances[$id];
-                if (!isset($resource)) {
-                    $resource = static::createByConfId($id);
-                }
-            } else {
-                $resource = static::createByConfId($id);
+        if (is_string($identifier)) {
+            $resource = &self::$instances[$serviceClassName][$identifier];
+
+            if (null !== $resource) {
+                return $resource;
             }
 
-            return $resource;
-        } elseif ($id instanceof Service) {
-            return $id;
-        } elseif ($id instanceof Dsn || $id instanceof Dsn || $id instanceof Closure) {
-            return new static($id);
-        } else {
-            throw new Service\Exception('Invalid argument, Service/Closure/Service\Dsn/string required', Service\Exception::INVALID_ARGUMENT);
+            if (!isset(self::$registry[$serviceClassName][$identifier])) {
+                if (self::FALLBACK === $identifier) {
+                    return new static();
+                    /*
+                    throw new Service\Exception('Service not configured, fallback missing',
+                        Service\Exception::NO_FALLBACK);
+                    */
+                }
+
+                $resource = static::getInstance(self::FALLBACK);
+                return $resource;
+            } else {
+                $settings = self::$registry[$serviceClassName][$identifier];
+
+                if (is_string($settings) && isset(self::$registry[$serviceClassName][$settings])) {
+                    $resource = static::getInstance($settings);
+                    return $resource;
+                }
+
+                $resource = new static($settings);
+                $resource->settings->identifier = $identifier;
+                return $resource;
+            }
         }
+
+        if ($identifier instanceof Service) {
+            return $identifier;
+        }
+
+        if ($identifier instanceof Settings) {
+            return new static($identifier);
+        }
+
+        throw new Exception('String identifier required', Exception::INVALID_ARGUMENT);
     }
 
 
-    protected $dsn;
+    /**
+     * @var null|Settings
+     */
+    protected $settings;
 
-    private $driver;
+    protected $driver;
 
     /**
      * @return Driver
-     * @throws Exception
+     * @throws Service\Exception
      */
     public function getDriver()
     {
         if (null === $this->driver) {
-            if ($this->dsn && $this->dsn->driverClassName) {
-                $driverClass = $this->dsn->driverClassName;
+            if ($this->settings && $this->settings->driverClassName) {
+                $driverClass = $this->settings->driverClassName;
             } else {
-                $driverClass = get_called_class() . '\Driver\\' . Utils::toCamelCase($this->dsn->scheme, '-');
+                $scheme = $this->settings->scheme;
+                $scheme = explode('.', $scheme, 2);
+                if (2 === count($scheme)) {
+                    $driverClass = '\\' . Utils::toCamelCase($scheme[0], '-') . '\\'
+                        . get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[1], '-');
+                }
+                else {
+                    $driverClass = get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[0], '-');
+                }
+
             }
             if (!class_exists($driverClass)) {
-                throw new Service\Exception($driverClass . ' (' . $this->dsn->scheme . ') not found', Service\Exception::NO_DRIVER);
+                throw new Service\Exception($driverClass . ' (' . $this->settings->scheme . ') not found', Service\Exception::NO_DRIVER);
             }
-            $this->driver = new $driverClass($this->dsn);
+            $this->driver = new $driverClass($this->settings);
         }
 
         /*
@@ -145,11 +179,6 @@ abstract class Service extends BaseClass
         */
 
         return $this->driver;
-    }
-
-    protected function forceDriver($driver)
-    {
-        $this->driver = $driver;
     }
 
 }

@@ -3,9 +3,18 @@
 namespace Yaoi\Date;
 use Yaoi\Mock;
 use Yaoi\Mock\Able;
+use Yaoi\Service;
 
-class Source implements Able
+class Source extends Service implements Able
 {
+    /**
+     * @return \Yaoi\Service\Settings
+     */
+    public static function getSettingsClassName()
+    {
+        return null;
+    }
+
     public function __construct()
     {
         $this->mock = Mock::getNull();

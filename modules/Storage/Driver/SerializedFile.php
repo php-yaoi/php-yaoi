@@ -3,17 +3,17 @@
 namespace Yaoi\Storage\Driver;
 
 use Yaoi\Storage\Exception;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class SerializedFile extends PhpVar
 {
 
     /**
-     * @var Dsn
+     * @var Settings
      */
     protected $dsn;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn;
     }

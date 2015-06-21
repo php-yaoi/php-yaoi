@@ -8,8 +8,9 @@
 namespace Yaoi\App;
 
 use Yaoi\App;
+use Yaoi\BaseClass;
 
-class Conf
+class Conf extends BaseClass
 {
     public static $dsn = array();
 

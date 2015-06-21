@@ -7,13 +7,13 @@ use Yaoi\Storage\Contract\ExportImportArray;
 use App;
 use Yaoi\BaseClass;
 use Yaoi\Storage\Contract\ArrayKey;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
 {
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
-        $this->dsn = $dsn ? $dsn : new Dsn();
+        $this->dsn = $dsn ? $dsn : new Settings();
         $this->time = \Yaoi\App::time($this->dsn->dateSource); // TODO use getInstance after Date_Source refactoring
     }
 

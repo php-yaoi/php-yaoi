@@ -4,12 +4,12 @@ namespace Yaoi\Storage\Driver;
 
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\Http\Client;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class Http implements Driver
 {
     /**
-     * @var Dsn
+     * @var Settings
      */
     private $dsn;
 
@@ -20,7 +20,7 @@ class Http implements Driver
      */
     private $http;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn;
         $this->dsnUrl = (string)$dsn;

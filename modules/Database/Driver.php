@@ -10,11 +10,11 @@ use Yaoi\Sql\Symbol;
 abstract class Driver implements \Yaoi\Database\Driver\Contract
 {
     /**
-     * @var Dsn
+     * @var Settings
      */
     public $dsn;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn;
     }

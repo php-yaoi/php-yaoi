@@ -8,7 +8,7 @@ interface Driver
 
     public function setUrl($url);
 
-    public function setProxy(Dsn $proxy);
+    public function setProxy(Settings $proxy);
 
     public function setMethod($method);
 

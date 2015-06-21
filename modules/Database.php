@@ -3,7 +3,7 @@ namespace Yaoi;
 
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Driver\MockProxy;
-use Yaoi\Database\Dsn;
+use Yaoi\Database\Settings;
 use Yaoi\Database\Contract as DatabaseContract;
 use Yaoi\Database\Query;
 use Yaoi\Log;
@@ -22,23 +22,18 @@ use Yaoi\Service;
  * TODO reconnect on gone away
  *
  * Class Database
- * @property Dsn $dsn
+ * @property Settings $settings
  */
 class Database extends Service implements DatabaseContract
 {
-    protected static $dsnClass = '\Yaoi\Database\Dsn';
-
-    public static $conf = array();
-    protected static $instances = array();
-
     /**
-     * @param string|Dsn $dsn
+     * @param string|Settings $settings
      */
-    public function __construct($dsn = null)
+    public function __construct($settings = null)
     {
-        parent::__construct($dsn);
-        if ($this->dsn->logQueries) {
-            $this->log(Log::getInstance($this->dsn->logQueries));
+        parent::__construct($settings);
+        if ($this->settings->logQueries) {
+            $this->log(Log::getInstance($this->settings->logQueries));
         }
     }
 
@@ -105,16 +100,16 @@ class Database extends Service implements DatabaseContract
 
         if (null === $dataSet) {
             if ($driver instanceof MockProxy) {
-                $this->forceDriver($driver->driver);
+                $this->driver = $driver->driver;
             }
         } else {
             if ($driver instanceof MockProxy) {
                 $driver->mock($dataSet);
             } else {
-                $mockDriver = new MockProxy($this->dsn);
+                $mockDriver = new MockProxy($this->settings);
                 $mockDriver->mock($dataSet);
                 $mockDriver->driver = $driver;
-                $this->forceDriver($mockDriver);
+                $this->driver = $mockDriver;
             }
         }
 
@@ -243,4 +238,10 @@ class Database extends Service implements DatabaseContract
         }
         return $this->utility;
     }
+
+    public static function getSettingsClassName()
+    {
+        return Settings::className();
+    }
+
 }

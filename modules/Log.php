@@ -2,19 +2,14 @@
 namespace Yaoi;
 
 use Yaoi\Log\Driver;
+use Yaoi\Log\Settings;
 use Yaoi\Service;
 
 /**
  * Class Log
- * @method Driver getDriver()
- * @method static Log getInstance($id = 'default', $reuse = true)
  */
 class Log extends Service
 {
-    protected static $dsnClass = '\Yaoi\Log\Dsn';
-    public static $conf = array();
-    protected static $instances = array();
-
     const TYPE_MESSAGE = 'm';
     const TYPE_ERROR = 'e';
     const TYPE_SUCCESS = 's';
@@ -29,4 +24,10 @@ class Log extends Service
         $this->getDriver()->push($message, $type);
         return $this;
     }
+
+    public static function getSettingsClassName()
+    {
+        return Settings::className();
+    }
+
 }

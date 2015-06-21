@@ -11,7 +11,7 @@ use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Date\Source;
 use Yaoi\Migration;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class DatabaseProxy extends BaseClass implements Driver, Expire,
     \Yaoi\Migration\Needed
@@ -44,9 +44,9 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
      */
     private $expireField;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
-        $this->dsn = $dsn ? $dsn : new Dsn();
+        $this->dsn = $dsn ? $dsn : new Settings();
         if (empty($dsn->proxyClient)) {
             throw new Exception('proxyClient required in dsn', Exception::PROXY_REQUIRED);
         }

@@ -5,12 +5,15 @@ namespace Yaoi;
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 
+use Yaoi\App\Conf;
 use Yaoi\Database;
 use Yaoi\Date\Source;
 use Yaoi\Log;
 use Yaoi\Storage;
 
 class App extends Service {
+
+
     const MODE_CLI = 'cli';
     const MODE_HTTP = 'http';
 
@@ -24,10 +27,10 @@ class App extends Service {
     /**
      * @var \Yaoi\App\Conf
      */
-    protected $conf;
+    protected $instanceConfig;
 
-    public function __construct($dsn = null) {
-        parent::__construct($dsn);
+    public function __construct($settings = null) {
+        parent::__construct($settings);
     }
 
     public static function init($conf = null) {
@@ -71,11 +74,11 @@ class App extends Service {
      * @param string $identifier
      * @return Database\Contract
      */
-    static function database($identifier = 'default') {
+    static function database($identifier = Service::PRIMARY) {
         return Database::getInstance($identifier);
     }
 
-    static function cache($identifier = 'default') {
+    static function cache($identifier = Service::PRIMARY) {
         return Storage::getInstance($identifier);
     }
 
@@ -83,7 +86,7 @@ class App extends Service {
      * @param string $identifier
      * @return Source
      */
-    static function time($identifier = 'default') {
+    static function time($identifier = Service::PRIMARY) {
         $resource = &self::$resources['time_' . $identifier];
         if (!isset($resource)) {
             $resource = new Source();
@@ -96,7 +99,7 @@ class App extends Service {
      * @param string $identifier
      * @return Log
      */
-    static function log($identifier = 'default') {
+    static function log($identifier = Service::PRIMARY) {
         return Log::getInstance($identifier);
     }
 
@@ -113,5 +116,12 @@ class App extends Service {
             App::instance()->stop();
         }
     }
+
+    public static function getSettingsClassName()
+    {
+        return Conf::className();
+    }
+
+
 }
 

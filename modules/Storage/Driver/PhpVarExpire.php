@@ -5,7 +5,7 @@ namespace Yaoi\Storage\Driver;
 use Yaoi\Storage\Contract\Expire;
 use App;
 use Yaoi\Date\Source;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class PhpVarExpire extends PhpVar implements Expire
 {
@@ -19,11 +19,13 @@ class PhpVarExpire extends PhpVar implements Expire
      */
     protected $expire;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
-        $this->dsn = $dsn ? $dsn : new Dsn();
+        $this->dsn = $dsn ? $dsn : new Settings();
         $this->expire = new PhpVar();
-        $this->time = App::time($this->dsn->dateSource); // TODO use getInstance after Date_Source refactoring
+        $this->time = $this->dsn->dateSource
+            ? Source::getInstance($this->dsn->dateSource)
+            : Source::getInstance();
     }
 
     public function set($key, $value, $ttl)

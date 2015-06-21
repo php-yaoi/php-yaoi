@@ -2,7 +2,7 @@
 
 namespace Yaoi\Http\Client;
 
-class Dsn extends \Yaoi\Service\Dsn
+class Settings extends \Yaoi\Service\Settings
 {
     public $proxy;
     public $defaultHeaders;

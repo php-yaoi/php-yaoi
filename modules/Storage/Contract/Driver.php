@@ -1,7 +1,7 @@
 <?php
 namespace Yaoi\Storage\Contract;
 
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 /**
  * Class Storage_Driver
@@ -10,7 +10,7 @@ use Yaoi\Storage\Dsn;
 interface Driver
 {
     /**
-     * @var Dsn
+     * @var Settings
      */
     /*
     protected $dsn;
@@ -26,7 +26,7 @@ interface Driver
     }
     */
 
-    public function __construct(Dsn $dsn = null);
+    public function __construct(Settings $dsn = null);
 
     public function get($key);
 

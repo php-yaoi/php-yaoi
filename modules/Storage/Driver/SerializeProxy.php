@@ -6,7 +6,7 @@ use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Exception;
 use Yaoi\BaseClass;
 use Yaoi\Storage;
-use Yaoi\Storage\Dsn;
+use Yaoi\Storage\Settings;
 
 class SerializeProxy extends BaseClass implements Driver
 {
@@ -46,9 +46,9 @@ class SerializeProxy extends BaseClass implements Driver
     protected $storage;
 
     /**
-     * @var Dsn
+     * @var Settings
      */
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn;
         if (empty($dsn->proxyClient)) {

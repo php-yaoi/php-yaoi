@@ -6,7 +6,7 @@ use Yaoi\App;
 use Yaoi\Service;
 use Yaoi\Log;
 use Yaoi\Log\Driver;
-use Yaoi\Log\Dsn;
+use Yaoi\Log\Settings;
 
 class File implements Driver
 {
@@ -14,7 +14,7 @@ class File implements Driver
     private $hits = 0;
     private $fileName;
 
-    public function __construct(Dsn $dsn = null)
+    public function __construct(Settings $dsn = null)
     {
         if (null === $dsn) {
             throw new Client\Exception('Log filename required in config dsn', Client\Exception::DSN_REQUIRED);

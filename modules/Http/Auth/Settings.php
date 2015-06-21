@@ -4,7 +4,7 @@ namespace Yaoi\Http\Auth;
 
 use Yaoi\Http\Auth;
 
-class Dsn extends \Yaoi\Service\Dsn
+class Settings extends \Yaoi\Service\Settings
 {
     public $salt;
     public $users;
