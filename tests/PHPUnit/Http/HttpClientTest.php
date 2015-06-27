@@ -71,31 +71,6 @@ class HttpClientTest extends TestCase {
         $this->assertSame("2", $httpClient->fetch());
     }
 
-    private function parseRequest($requestString) {
-        $lines = explode("\n",$requestString);
-
-        $result = array();
-        $result['Head'] = $lines[0];
-
-        unset($lines[0]);
-        $empty = false;
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (!$line) {
-                $empty = true;
-            }
-
-            if (!$empty) {
-                list($header, $value) = explode(':', $line, 2);
-                $result[$header] = trim($value);
-            } else {
-                $result [] = $line;
-            }
-
-        }
-        return $result;
-    }
-
 
     public function testMirror() {
         if (empty(TestCase::$settings['envHttpMirrorServer'])) {
@@ -116,8 +91,8 @@ class HttpClientTest extends TestCase {
             . 'Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3' . "\r\n"
             . 'Connection: close' . "\r\n\r\n";
 
-        $expectedParsed = $this->parseRequest($expected);
-        $responseParsed = $this->parseRequest($response);
+        $expectedParsed = \YaoiTests\Http\ClientHelper::parseRequest($expected);
+        $responseParsed = \YaoiTests\Http\ClientHelper::parseRequest($response);
 
         $this->assertArraySubset($expectedParsed, $responseParsed);
 
@@ -155,8 +130,8 @@ class HttpClientTest extends TestCase {
             . 'Content-Length: 50' . "\r\n"
             . 'Referer: http://' . TestCase::$settings['envHttpMirrorServer'] . '/test/ooo.html/?dasd=34' . "\r\n\r\n"
             . 'lang=Tcl&private=True&run=True&submit=Submit&code=';
-        $expectedParsed = $this->parseRequest($expected);
-        $responseParsed = $this->parseRequest($response);
+        $expectedParsed = \YaoiTests\Http\ClientHelper::parseRequest($expected);
+        $responseParsed = \YaoiTests\Http\ClientHelper::parseRequest($response);
 
         $this->assertArraySubset($expectedParsed, $responseParsed);
 

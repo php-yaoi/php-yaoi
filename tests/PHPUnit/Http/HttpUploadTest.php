@@ -2,8 +2,6 @@
 use Yaoi\Http\Client\UploadFile;
 use Yaoi\Http\Client;
 use Yaoi\Mock;
-use Yaoi\Mock\DataSetCapture;
-use Yaoi\Mock\DataSetPlay;
 use Yaoi\Storage;
 use Yaoi\Test\PHPUnit\TestCase;
 
@@ -47,6 +45,17 @@ class HttpUploadTest extends TestCase {
             );
         });
 
-        $this->assertSame(str_replace($request['mirror'], $mirror, $request['response']), $res);
+        $expected = str_replace($request['mirror'], $mirror, $request['response']);
+
+        $expectedParsed = \YaoiTests\Http\ClientHelper::parseRequest($expected);
+        $resParsed = \YaoiTests\Http\ClientHelper::parseRequest($res);
+
+
+        $this->assertArraySubset(
+            $expectedParsed,
+            $resParsed,
+            false,
+            print_r(array_diff($resParsed, $expectedParsed), 1)
+        );
     }
 } 
