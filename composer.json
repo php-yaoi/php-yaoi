@@ -3,7 +3,7 @@
   "type": "library",
   "description": "Yaoi is yet another object interoperator",
   "keywords": ["framework"],
-  "homepage": "http://php-yaoi.tk/",
+  "homepage": "https://github.com/php-yaoi/php-yaoi",
   "license": "MIT",
   "authors": [
     {
@@ -13,9 +13,7 @@
     }
   ],
   "require": {
-    "php": ">=5.3.0",
-    "monolog/monolog": "*",
-    "doctrine/annotations": "^1.2"
+    "php": ">=5.3.0"
   },
   "require-dev": {
     "codeclimate/php-test-reporter": "dev-master",
