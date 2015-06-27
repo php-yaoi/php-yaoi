@@ -11,8 +11,8 @@ use Yaoi\Storage\Settings;
 require_once __DIR__ . '/StorageMysqlTest.php';
 
 class StorageSqliteTest extends \StorageMysqlTest {
-    public function __construct() {
-        $db = Database::getInstance(Database::settings('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite'));
+    public function setUp() {
+        $db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
 
         //$db->log(new Log('stdout'));
 

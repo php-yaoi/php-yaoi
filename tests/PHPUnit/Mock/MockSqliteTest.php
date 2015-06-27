@@ -18,7 +18,7 @@ class MockSqliteTest extends Mock1VarTest {
 
     protected function resetStorage() {
         if (null === $this->storage) {
-            $db = Database::getInstance(Database::settings('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite'));
+            $db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
 
             //$db->log(new Log('stdout'));
 

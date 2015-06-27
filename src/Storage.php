@@ -96,7 +96,7 @@ class Storage extends Service
 
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Settings::className();
     }

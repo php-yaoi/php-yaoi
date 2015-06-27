@@ -73,7 +73,7 @@ class Manager extends Service
         return $this;
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Settings::className();
     }

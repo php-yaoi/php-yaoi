@@ -185,7 +185,7 @@ class DatabaseSqliteLegacyTest extends TestCase  {
 
     public function testTypes() {
         $q = "create table if not exists tes2  (a1 int, a2 bigint, a3 mediumint, a4 tinyint, a5 ololo);";
-        $db2 = Database::getInstance(Database::settings('sqlite:///' . sys_get_temp_dir() . '/test-sqlite4.sqlite'));
+        $db2 = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite4.sqlite');
 
         $db2->query($q);
         $db2->query("INSERT INTO tes2 VALUES (1,2,3,'4','hooy')");

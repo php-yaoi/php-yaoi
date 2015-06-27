@@ -2,7 +2,6 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Date\Source;
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Contract\ExportImportArray;
 use Yaoi\BaseClass;
@@ -14,7 +13,6 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function __construct(Settings $dsn = null)
     {
         $this->dsn = $dsn ? $dsn : new Settings();
-        $this->time = Source::getInstance($this->dsn->dateSource);
     }
 
     protected $data = array();

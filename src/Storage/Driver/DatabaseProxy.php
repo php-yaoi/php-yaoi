@@ -9,7 +9,7 @@ use Yaoi\Storage\Contract\Expire;
 use Yaoi\App;
 use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\Date\Source;
+use Yaoi\Date\TimeMachine;
 use Yaoi\Migration;
 use Yaoi\Storage\Settings;
 
@@ -23,7 +23,7 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
     private $db;
 
     /**
-     * @var Source
+     * @var TimeMachine
      */
     private $time;
 

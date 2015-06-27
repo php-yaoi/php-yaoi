@@ -5,18 +5,11 @@ use Yaoi\Mock;
 use Yaoi\Mock\Able;
 use Yaoi\Service;
 
-class Source extends Service implements Able
+class TimeMachine extends Service implements Able
 {
-    /**
-     * @return \Yaoi\Service\Settings
-     */
-    public static function getSettingsClassName()
+    public function __construct($settings = null)
     {
-        return null;
-    }
-
-    public function __construct()
-    {
+        parent::__construct($settings);
         $this->mock = Mock::getNull();
     }
 
@@ -131,4 +124,4 @@ class Source extends Service implements Able
         return $this;
     }
 }
-Source::register(Service::PRIMARY, new Service\Settings());
+TimeMachine::register(Service::PRIMARY, new Service\Settings());

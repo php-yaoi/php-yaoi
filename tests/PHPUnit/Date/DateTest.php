@@ -1,5 +1,5 @@
 <?php
-use Yaoi\Date\Source;
+use Yaoi\Date\TimeMachine;
 use Yaoi\Mock;
 use Yaoi\Storage;
 use Yaoi\Test\PHPUnit\TestCase;
@@ -16,7 +16,7 @@ class DateTest extends TestCase {
         //$mockSet->mode = Mock::MODE_CAPTURE;
         $mockSet->mode = Mock::MODE_PLAY;
 
-        $d = new Source();
+        $d = new TimeMachine();
         $d->mock($mockSet);
 
         $this->assertSame('2014-01-10', $d->date('Y-m-d'));

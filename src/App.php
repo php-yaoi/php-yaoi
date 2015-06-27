@@ -7,7 +7,7 @@ namespace Yaoi;
 
 use Yaoi\App\Conf;
 use Yaoi\Database;
-use Yaoi\Date\Source;
+use Yaoi\Date\TimeMachine;
 use Yaoi\Log;
 use Yaoi\Storage;
 
@@ -84,12 +84,12 @@ class App extends Service {
 
     /**
      * @param string $identifier
-     * @return Source
+     * @return TimeMachine
      */
     static function time($identifier = Service::PRIMARY) {
         $resource = &self::$resources['time_' . $identifier];
         if (!isset($resource)) {
-            $resource = new Source();
+            $resource = new TimeMachine();
         }
         return $resource;
     }
@@ -117,7 +117,7 @@ class App extends Service {
         }
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Conf::className();
     }

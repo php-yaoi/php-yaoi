@@ -122,7 +122,7 @@ class Auth extends Service
         die($message);
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Settings::className();
     }

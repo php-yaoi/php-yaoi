@@ -172,7 +172,7 @@ class Client extends \Yaoi\Service implements Able
         if ($uploadingFiles) {
             $driver->setMethod('POST');
 
-            $multipartBoundary = '--------------------------' . \Yaoi\Date\Source::getInstance()->microNow();
+            $multipartBoundary = '--------------------------' . \Yaoi\Date\TimeMachine::getInstance()->microNow();
             $content = '';
 
             foreach ($this->post as $name => $value) {
@@ -431,7 +431,7 @@ class Client extends \Yaoi\Service implements Able
         return $this;
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Settings::className();
     }

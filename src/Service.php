@@ -1,7 +1,6 @@
 <?php
 namespace Yaoi;
 
-use Yaoi\Service\Contract;
 use Closure;
 use Yaoi\Database\Driver;
 use Yaoi\Service\Exception;
@@ -13,9 +12,9 @@ use Yaoi\Service\Settings;
  * @package Yaoi
  */
 
-abstract class Service extends BaseClass implements Contract
+abstract class Service extends BaseClass
 {
-    const PRIMARY = 'default';
+    const PRIMARY = 'primary';
     const FALLBACK = 'fallback';
 
     private static $registry = array();
@@ -40,12 +39,20 @@ abstract class Service extends BaseClass implements Contract
 
     /**
      * @param null $settings
-     * @return null|Service\Settings
+     * @return Service\Settings
      * @throws Service\Exception
      */
-    public static function settings($settings = null)
+    protected static function settings($settings)
     {
         $settingsClassName = static::getSettingsClassName();
+
+        if (null === $settingsClassName) {
+            $settingsClassName = Settings::className();
+
+            if (null === $settings) {
+                return new Settings();
+            }
+        }
 
         if ($settings instanceof $settingsClassName) {
             return $settings;
@@ -78,6 +85,9 @@ abstract class Service extends BaseClass implements Contract
         if (null !== $settings) {
             $this->settings = static::settings($settings);
         }
+        else {
+            $this->settings = new Settings();
+        }
     }
 
 
@@ -101,9 +111,13 @@ abstract class Service extends BaseClass implements Contract
                 return $resource;
             }
 
-            if (!isset(self::$registry[$serviceClassName][$identifier])) {
-                if (self::FALLBACK === $identifier) {
-                    throw new Service\Exception('Service not configured, fallback missing',
+            $emptyRegistry = !isset(self::$registry[$serviceClassName]);
+            if ($emptyRegistry
+                || !array_key_exists($identifier, self::$registry[$serviceClassName])) {
+
+                if ($emptyRegistry
+                    || !array_key_exists(self::FALLBACK, self::$registry[$serviceClassName])) {
+                    throw new Service\Exception('Service ' . $serviceClassName . ' not configured for "' . $identifier . '", fallback missing',
                         Service\Exception::NO_FALLBACK);
                 }
 
@@ -112,15 +126,21 @@ abstract class Service extends BaseClass implements Contract
             } else {
                 $settings = self::$registry[$serviceClassName][$identifier];
 
+                /**
+                 * instance forwarding
+                 */
                 if (is_string($settings) && isset(self::$registry[$serviceClassName][$settings])) {
-                    $resource = static::getInstance($settings);
-                    return $resource;
+                    $newSettings = self::$registry[$serviceClassName][$settings];
+                    if ($settings !== $newSettings) {
+                        $resource = static::getInstance($settings);
+                        return $resource;
+                    }
                 }
 
                 $resource = new static($settings);
-                if (!$resource->settings) {
-                    var_dump($resource, $identifier);
-                    die('!!!');
+                if (!is_object($resource->settings)) {
+                    var_dump(self::$registry);
+                    throw new Exception('No settings "' . $identifier . '" ' . $serviceClassName);
                 }
                 $resource->settings->identifier = $identifier;
                 return $resource;
@@ -182,4 +202,11 @@ abstract class Service extends BaseClass implements Contract
         return $this->driver;
     }
 
+    /**
+     * @return \Yaoi\Service\Settings
+     */
+    protected static function getSettingsClassName()
+    {
+        return Settings::className();
+    }
 }

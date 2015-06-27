@@ -68,7 +68,7 @@ class TestServiceThree extends \Yaoi\Service {
     /**
      * @return \Yaoi\Service\Settings
      */
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return \Yaoi\Service\Settings::className();
     }

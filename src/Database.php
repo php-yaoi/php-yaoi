@@ -239,7 +239,7 @@ class Database extends Service implements DatabaseContract
         return $this->utility;
     }
 
-    public static function getSettingsClassName()
+    protected static function getSettingsClassName()
     {
         return Settings::className();
     }

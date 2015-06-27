@@ -11,7 +11,7 @@
 
     <testsuites>
         <testsuite name="AllTests">
-            <directory>./tests</directory>
+            <directory>./tests/PHPUnit</directory>
         </testsuite>
     </testsuites>
 

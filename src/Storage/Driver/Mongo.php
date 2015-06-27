@@ -6,7 +6,7 @@ use MongoBinData;
 use MongoClient;
 use MongoCollection;
 use MongoDB;
-use Yaoi\Date\Source;
+use Yaoi\Date\TimeMachine;
 use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Settings;
 
@@ -59,7 +59,7 @@ class Mongo implements Driver
     public function get($key)
     {
         if ($res = $this->collection->findOne(array('k' => $key))) {
-            if ($res['t'] && $res['t'] < Source::getInstance()->now()) {
+            if ($res['t'] && $res['t'] < TimeMachine::getInstance()->now()) {
                 $this->delete($key);
                 return null;
             }
@@ -93,7 +93,7 @@ class Mongo implements Driver
             $v = new MongoBinData($v);
         }
 
-        $this->collection->save(array('k' => $key, 'v' => $v, 't' => $ttl ? Source::getInstance()->now() + $ttl : null));
+        $this->collection->save(array('k' => $key, 'v' => $v, 't' => $ttl ? TimeMachine::getInstance()->now() + $ttl : null));
     }
 
     public function delete($key)

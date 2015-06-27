@@ -31,7 +31,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Yaoi\\Tests\\": "tests/"
+      "YaoiTests\\": "tests/src/"
     }
   },
   "extra": {

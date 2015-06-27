@@ -24,7 +24,7 @@ class HttpUploadTest extends TestCase {
         $mockSet = new Mock($storage);
         //$storage->deleteAll(); $mockSet = new Mock_DataSetCapture($storage);
 
-        \Yaoi\Date\Source::getInstance()->mock($mockSet);
+        \Yaoi\Date\TimeMachine::getInstance()->mock($mockSet);
 
         $client = Client::create();
         $mirror = TestCase::$settings['envHttpMirrorServer'];
