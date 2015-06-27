@@ -44,8 +44,8 @@ class HttpClientTest extends TestCase {
 
         $httpClient->url = 'http://' . TestCase::$settings['envHttpPHPServer'] . '/';
         $httpClient->followLocation = false;
-        //$httpClient->logError(new Log('stdout'));
-        //$httpClient->logRawResponseBody(new Log('stdout'));
+        $httpClient->logError(new Log('stdout'));
+        $httpClient->logRawResponseBody(new Log('stdout'));
 
         $this->assertSame("0", $httpClient->fetch());
         $this->assertSame("1", $httpClient->fetch());
