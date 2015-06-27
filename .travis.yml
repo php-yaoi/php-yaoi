@@ -22,8 +22,8 @@ before_script:
   - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - cp -rf tests/conf.travis.php tests/conf.php
-  - nohup node travis/http-mirror.js &
-  - nohup ~/.phpenv/versions/5.4/bin/php -S localhost:8000 travis/http-server.php &
+  - nohup node tests/resources/http-mirror.js &
+  - nohup ~/.phpenv/versions/5.4/bin/php -S localhost:8000 tests/resources/http-server.php &
   - composer install --dev --no-interaction
 
 matrix:
@@ -38,4 +38,4 @@ script:
 
 after_script:
  - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then php vendor/bin/coveralls -v; fi
- - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then CODECLIMATE_REPO_TOKEN=425176528a80121a7dd88270369b383fc2b18b57561f112ed28e76abca784152 ./vendor/bin/test-reporter; fi
+ - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then CODECLIMATE_REPO_TOKEN=bef21a7b3d0a531fec57b713df1720bb0da7114f5ce33a3e492ce9599b8ac8df ./vendor/bin/test-reporter; fi
