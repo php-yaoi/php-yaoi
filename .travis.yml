@@ -1,0 +1,41 @@
+language: php
+php:
+  - nightly
+  - hhvm
+  - 5.6
+  - 5.5
+  - 5.4
+  - 5.3
+
+addons:
+  postgresql: "9.3"
+
+services:
+  - memcached # will start memcached
+  - mongodb
+
+
+# execute any number of scripts before the test run, custom env's are available as variables
+before_script:
+  - mysql -e "create database IF NOT EXISTS test1;" -uroot
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - cp -rf tests/conf.travis.php tests/conf.php
+  - nohup node travis/http-mirror.js &
+  - nohup ~/.phpenv/versions/5.4/bin/php -S localhost:8000 travis/http-server.php &
+  - composer install --dev --no-interaction
+
+matrix:
+  allow_failures:
+    - php: hhvm
+    - php: nightly
+  fast_finish: true
+
+script:
+  - mkdir -p build/logs
+  - ./vendor/bin/phpunit -v --configuration phpunit.xml --coverage-clover build/logs/clover.xml
+
+after_script:
+ - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then php vendor/bin/coveralls -v; fi
+ - if [[$(phpenv version-name) != "nightly" && $(phpenv version-name) != "hhvm"]]; then CODECLIMATE_REPO_TOKEN=425176528a80121a7dd88270369b383fc2b18b57561f112ed28e76abca784152 ./vendor/bin/test-reporter; fi
