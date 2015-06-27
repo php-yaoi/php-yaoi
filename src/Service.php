@@ -84,8 +84,7 @@ abstract class Service extends BaseClass
     {
         if (null !== $settings) {
             $this->settings = static::settings($settings);
-        }
-        else {
+        } else {
             $this->settings = new Settings();
         }
     }
@@ -181,8 +180,7 @@ abstract class Service extends BaseClass
                 if (2 === count($scheme)) {
                     $driverClass = '\\' . Utils::toCamelCase($scheme[0], '-') . '\\'
                         . get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[1], '-');
-                }
-                else {
+                } else {
                     $driverClass = get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[0], '-');
                 }
 
@@ -203,7 +201,7 @@ abstract class Service extends BaseClass
     }
 
     /**
-     * @return \Yaoi\Service\Settings
+     * @return string
      */
     protected static function getSettingsClassName()
     {

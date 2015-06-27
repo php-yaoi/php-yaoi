@@ -20,21 +20,21 @@ class TimeMachine extends Service implements Able
 
     public function now()
     {
-        return $this->mock->branch(static::MOCK_NOW)->get(null, function () {
+        return $this->mock->branch(static::MOCK_NOW)->get(null, function() {
             return time();
         });
     }
 
     public function microNow()
     {
-        return $this->mock->branch(static::MOCK_MICRO_NOW)->get(null, function () {
+        return $this->mock->branch(static::MOCK_MICRO_NOW)->get(null, function() {
             microtime(1);
         });
     }
 
     public function strToTime($string, $now = null)
     {
-        return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get(null, function () use ($string, $now) {
+        return $this->mock->branch(static::MOCK_STR_TO_TIME, $string)->get(null, function() use ($string, $now) {
             return strtotime($string, $now);
         });
     }

@@ -384,8 +384,7 @@ class HighCharts extends BaseClass implements Renderer
         ?>isReset = true;
     loadPoints();
     <?php
-        }
-        else {
+        } else {
             foreach ($this->series as $id => $series) {
                 if (isset($this->ranges[$id]) && HighCharts\Series::VALUE_HIGH == $this->ranges[$id]) {
                     continue;

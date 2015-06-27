@@ -34,6 +34,10 @@ class Processor extends IteratorIterator
 
     private $combineOffset = array();
 
+    /**
+     * @param integer $offsetKey
+     * @param integer $offsetValue
+     */
     public function combineOffset($offsetKey, $offsetValue)
     {
         $this->combineOffset [$offsetKey] = $offsetValue;

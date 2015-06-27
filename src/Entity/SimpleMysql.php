@@ -107,7 +107,7 @@ class SimpleMysql extends BaseClass
 
     /**
      * @param $columnValues
-     * @param callable $withSelectDo
+     * @param Closure $withSelectDo
      * @return static[]
      */
     public static function getBy($columnValues, Closure $withSelectDo = null)
@@ -209,8 +209,9 @@ class SimpleMysql extends BaseClass
         if ($skipUndefined) {
             $data = (array)$this;
             foreach ($columns as $column) {
-                if (array_key_exists($column, $data))
-                    $result[$column] = $this->$column;
+                if (array_key_exists($column, $data)) {
+                                    $result[$column] = $this->$column;
+                }
             }
         } else {
             foreach ($columns as $column) {

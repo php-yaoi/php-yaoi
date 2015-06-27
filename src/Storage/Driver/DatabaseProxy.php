@@ -51,8 +51,7 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
             throw new Exception('proxyClient required in dsn', Exception::PROXY_REQUIRED);
         }
         $this->table = new Symbol($dsn->path
-            ? $dsn->path :
-            'key_value_storage');
+            ? $dsn->path : 'key_value_storage');
         $this->keyField = new Symbol('k');
         $this->valueField = new Symbol('v');
         $this->expireField = new Symbol('e');
@@ -165,7 +164,7 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
         $valueField = $this->valueField;
         $expireField = $this->expireField;
         $db = $this->db;
-        return new Migration($migrationId, function () use ($table, $keyField, $valueField, $expireField, $db) {
+        return new Migration($migrationId, function() use ($table, $keyField, $valueField, $expireField, $db) {
             //if ($this->db->getDriver() instanceof Database_Server_Mysql) {
             $db->query("CREATE TABLE IF NOT EXISTS :table (
 :key VARCHAR(255) NOT NULL DEFAULT '',
@@ -181,7 +180,7 @@ PRIMARY KEY (:key)
                 ));
             //}
 
-        }, function () use ($table, $db) {
+        }, function() use ($table, $db) {
             $db->query("DROP TABLE ?", $table);
         });
     }

@@ -46,17 +46,27 @@ class Debug
 
         for ($i = $skip; $i < count($trace); $i++) {
             $t = $trace[$i];
-            if (isset($t['class'])) $t['function'] = $t['class'] . $t['type'] . $t['function'];
-            if (!isset($t['file'])) $t['file'] = '';
-            if (!isset($t['line'])) $t['line'] = '';
+            if (isset($t['class'])) {
+                $t['function'] = $t['class'] . $t['type'] . $t['function'];
+            }
+            if (!isset($t['file'])) {
+                $t['file'] = '';
+            }
+            if (!isset($t['line'])) {
+                $t['line'] = '';
+            }
             $ta = array();
             if (!isset($t['args'])) {
                 $t['args'] = array();
             }
             foreach ($t['args'] as $a) {
-                if (is_object($a)) $ta[] = substr(str_replace(array("\n", "\r"), array(''), print_r($a, 1)), 0, 250);
-                elseif (is_array($a)) $ta[] = substr(str_replace(array("\n", "\r"), array(''), print_r($a, 1)), 0, 250);
-                else $ta[] = $a;
+                if (is_object($a)) {
+                    $ta[] = substr(str_replace(array("\n", "\r"), array(''), print_r($a, 1)), 0, 250);
+                } elseif (is_array($a)) {
+                    $ta[] = substr(str_replace(array("\n", "\r"), array(''), print_r($a, 1)), 0, 250);
+                } else {
+                    $ta[] = $a;
+                }
             }
 
             $t['file'] = str_replace($_SERVER['DOCUMENT_ROOT'], '.', $t['file']);

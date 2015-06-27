@@ -42,7 +42,7 @@ class Conf extends BaseClass
         );
 
 
-        $errorHandler = function ($errno, $errstr, $errfile, $errline, $errcontext) use ($app, $errorLevels) {
+        $errorHandler = function($errno, $errstr, $errfile, $errline, $errcontext) use ($app, $errorLevels) {
 
             file_put_contents($this->errorLogPath . 'php-errors-' . $errorLevels[$errno] . '.log',
                 date('r') . "\t" . App::instance()->path
@@ -58,7 +58,7 @@ class Conf extends BaseClass
 
         };
 
-        register_shutdown_function(function () use ($errorHandler) {
+        register_shutdown_function(function() use ($errorHandler) {
             $error = error_get_last();
             if (null !== $error) {
                 $errorHandler($error['type'], $error['message'], $error['file'], $error['line'], null);

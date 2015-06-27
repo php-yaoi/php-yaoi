@@ -39,8 +39,7 @@ class App extends Service {
             self::$instance->path = $_SERVER['REQUEST_URI'];
             self::$instance->host = $_SERVER['HTTP_HOST'];
             self::$instance->mode = self::MODE_HTTP;
-        }
-        elseif (isset($_SERVER['argv'][1])) {
+        } elseif (isset($_SERVER['argv'][1])) {
             self::$instance->path = $_SERVER['argv'][1];
             if (isset($_SERVER['argv'][2])) {
                 self::$instance->host = $_SERVER['argv'][2];

@@ -236,7 +236,7 @@ class Client extends \Yaoi\Service implements Able
         $self = $this;
         try {
             list($response, $this->responseHeaders) = $mock->branch('responseData')
-                ->get(null, function () use ($driver, $self, $mock) {
+                ->get(null, function() use ($driver, $self, $mock) {
                     $driver->fetch();
                     $response = $driver->getResponseContent();
                     $responseHeaders = $driver->getResponseHeaders();

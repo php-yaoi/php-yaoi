@@ -115,6 +115,9 @@ class Auth extends Service
         return md5($login . $salt . $password);
     }
 
+    /**
+     * @param string $message
+     */
     private function fatal($message)
     {
         header('WWW-Authenticate: Basic realm="' . $this->settings->title . '"');
