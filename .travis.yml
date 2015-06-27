@@ -24,7 +24,7 @@ before_script:
   - if [[ $(phpenv version-name) =~ 5.[3456] ]] ; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - cp -rf tests/conf.travis.php tests/conf.php
   - nohup node tests/resources/http-mirror.js &
-  - nohup ~/.phpenv/versions/5.4/bin/php -S localhost:8000 tests/resources/http-server.php &
+  - nohup ~/.phpenv/versions/5.4/bin/php -S 127.0.0.1:8000 tests/resources/http-server.php &
   - ls -l ~/.phpenv/versions
   - ls -l ~/.phpenv/versions/5.4
   - ls -l ~/.phpenv/versions/5.4/bin

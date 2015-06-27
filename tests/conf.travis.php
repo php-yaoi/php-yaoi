@@ -14,8 +14,8 @@ Log::register(Yaoi\Service::PRIMARY, 'stdout');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-TestCase::$settings['envHttpPHPServer'] = 'localhost:8000';
-TestCase::$settings['envHttpMirrorServer'] = defined('HHVM_VERSION') ? null : '127.0.0.1:1337';
+TestCase::$settings['envHttpPHPServer'] = '127.0.0.1:8000';
+TestCase::$settings['envHttpMirrorServer'] = '127.0.0.1:1337';
 TestCase::$settings['envMemcache'] = extension_loaded('memcache');
 TestCase::$settings['envMongo'] = extension_loaded('mongo');
 
