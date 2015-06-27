@@ -173,7 +173,6 @@ class Client extends \Yaoi\Service implements Able
             $driver->setMethod('POST');
 
             $multipartBoundary = '--------------------------' . \Yaoi\Date\TimeMachine::getInstance()->microNow();
-            var_dump('BOUND: ', $multipartBoundary, \Yaoi\Date\TimeMachine::getInstance()->microNow());
             $content = '';
 
             foreach ($this->post as $name => $value) {
