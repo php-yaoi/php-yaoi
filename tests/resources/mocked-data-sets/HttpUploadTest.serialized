@@ -1,0 +1,30 @@
+a:3:{s:9:"micro_now";a:2:{i:0;d:1435428875.149919;i:1;d:1435428875.149987;}s:7:"request";a:2:{s:6:"mirror";s:14:"localhost:1337";s:8:"response";s:1043:"POST /test/ooo.html/?dasd=34 HTTP/1.0
+Host: localhost:1337
+Content-Length: 608
+User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip, deflate
+Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3
+Connection: close
+Content-Type: multipart/form-data; boundary=--------------------------1435428875.1499
+
+----------------------------1435428875.1499
+Content-Disposition: form-data; name="first"
+
+simple post
+----------------------------1435428875.1499
+Content-Disposition: form-data; name="uploaded_file"; filename="attachment"
+Content-Type: application/octet-stream
+
+test file contents
+----------------------------1435428875.1499
+Content-Disposition: form-data; name="upload2"; filename="dummy"
+Content-Type: application/octet-stream
+
+this is a dummy file
+----------------------------1435428875.1499
+Content-Disposition: form-data; name="foo"
+
+bar
+----------------------------1435428875.1499--
+";}s:3:"now";a:8:{i:0;i:1435428875;i:1;i:1435428875;i:2;i:1435428875;i:3;i:1435428875;i:4;i:1435428875;i:5;i:1435428875;i:6;i:1435428875;i:7;i:1435428875;}}

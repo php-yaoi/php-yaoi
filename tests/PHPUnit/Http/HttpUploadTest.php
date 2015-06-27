@@ -19,7 +19,7 @@ class HttpUploadTest extends TestCase {
 
 
     public function testClientUpload() {
-        $storage = new Storage('serialized-file://localhost/tests/resources/mocked-data-sets/HttpUploadTest.dat?compression=1');
+        $storage = new Storage('serialized-file://localhost/tests/resources/mocked-data-sets/HttpUploadTest.serialized');
 
         $mockSet = new Mock($storage);
         //$storage->deleteAll(); $mockSet = new Mock_DataSetCapture($storage);
@@ -33,20 +33,20 @@ class HttpUploadTest extends TestCase {
         $client->post = array(
             'first' => 'simple post',
             'uploaded_file' => UploadFile::createByContent('test file contents'),
-            'upload2' => UploadFile::createByPath('mocked-data-sets/dummy'),
+            'upload2' => UploadFile::createByPath('tests/resources/mocked-data-sets/dummy'),
             'foo' => 'bar',
         );
 
 
         $res = $client->fetch();
-        if ($mockSet instanceof DataSetPlay) {
-            $this->assertSame(str_replace($mockSet->get('mirror'), $mirror, $mockSet->get('result')), $res);
-        }
-        elseif ($mockSet instanceof DataSetCapture) {
-            $mockSet->add($mirror, 'mirror');
-            $mockSet->add($res, 'result');
-        }
 
-        //echo $res;
+        $request = $mockSet->get('request', function() use ($res, $mirror) {
+            return array(
+                'mirror' => $mirror,
+                'response' => $res,
+            );
+        });
+
+        $this->assertSame(str_replace($request['mirror'], $mirror, $request['response']), $res);
     }
 } 

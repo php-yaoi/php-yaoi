@@ -5,6 +5,12 @@ use Yaoi\Mock;
 use Yaoi\Mock\Able;
 use Yaoi\Service;
 
+/**
+ * Class TimeMachine
+ *
+ * @summary TimeMachine grants mockable and shiftable access to timestamp and date data
+ * @package Yaoi\Date
+ */
 class TimeMachine extends Service implements Able
 {
     public function __construct($settings = null)
@@ -28,7 +34,7 @@ class TimeMachine extends Service implements Able
     public function microNow()
     {
         return $this->mock->branch(static::MOCK_MICRO_NOW)->get(null, function() {
-            microtime(1);
+            return microtime(1);
         });
     }
 
