@@ -21,9 +21,9 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function set($key, $value, $ttl)
     {
         if (is_array($key)) {
-            $kk =& $this->data;
+            $kk = & $this->data;
             foreach ($key as $k) {
-                $kk =& $kk[$k];
+                $kk = & $kk[$k];
             }
             $kk = $value;
         } else {
@@ -40,10 +40,10 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function get($key)
     {
         if (is_array($key)) {
-            $kk =& $this->data;
+            $kk = & $this->data;
             foreach ($key as $k) {
                 if (array_key_exists($k, $kk)) {
-                    $kk =& $kk[$k];
+                    $kk = & $kk[$k];
                 } else {
                     return null;
                 }
@@ -61,10 +61,10 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function keyExists($key)
     {
         if (is_array($key)) {
-            $kk =& $this->data;
+            $kk = & $this->data;
             foreach ($key as $k) {
                 if (array_key_exists($k, $kk)) {
-                    $kk =& $kk[$k];
+                    $kk = & $kk[$k];
                 } else {
                     return false;
                 }
@@ -82,14 +82,14 @@ class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray
     public function delete($key)
     {
         if (is_array($key)) {
-            $kk =& $this->data;
+            $kk = & $this->data;
             $lastKey = null;
             $parent = null;
             foreach ($key as $k) {
-                $parent =& $kk;
+                $parent = & $kk;
                 $lastKey = $k;
                 if (array_key_exists($k, $kk)) {
-                    $kk =& $kk[$k];
+                    $kk = & $kk[$k];
                 } else {
                     return;
                 }

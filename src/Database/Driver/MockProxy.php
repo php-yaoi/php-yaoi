@@ -50,7 +50,7 @@ class MockProxy extends Driver
     {
         $queryMock = $this->lastQuery;
         $driver = $this->driver;
-        return $queryMock->get(MockProxy::LAST_INSERT_ID, function () use ($queryMock, $driver) {
+        return $queryMock->get(MockProxy::LAST_INSERT_ID, function() use ($queryMock, $driver) {
             $res = $driver->lastInsertId($queryMock->temp(MockProxy::RESULT));
             return $res;
         });
@@ -64,7 +64,7 @@ class MockProxy extends Driver
     public function rowsAffected($queryMock)
     {
         $driver = $this->driver;
-        return $queryMock->get(MockProxy::ROWS_AFFECTED, function () use ($queryMock, $driver) {
+        return $queryMock->get(MockProxy::ROWS_AFFECTED, function() use ($queryMock, $driver) {
             return $driver->rowsAffected($queryMock->temp(MockProxy::RESULT));
         });
     }
@@ -73,7 +73,7 @@ class MockProxy extends Driver
     public function escape($value)
     {
         $driver = $this->driver;
-        return $this->mock->branch(MockProxy::ESCAPE)->get($value, function () use ($value, $driver) {
+        return $this->mock->branch(MockProxy::ESCAPE)->get($value, function() use ($value, $driver) {
             return $driver->escape($value);
         });
     }
@@ -85,7 +85,7 @@ class MockProxy extends Driver
     public function rewind($queryMock)
     {
         $driver = $this->driver;
-        return $queryMock->branch(MockProxy::REWIND)->get(null, function () use ($queryMock, $driver) {
+        return $queryMock->branch(MockProxy::REWIND)->get(null, function() use ($queryMock, $driver) {
             return $driver->rewind($queryMock->temp(MockProxy::RESULT));
         });
     }
@@ -97,7 +97,7 @@ class MockProxy extends Driver
     public function fetchAssoc($queryMock)
     {
         $driver = $this->driver;
-        return $queryMock->branch(MockProxy::ASSOC_ROWS)->get(null, function () use ($queryMock, $driver) {
+        return $queryMock->branch(MockProxy::ASSOC_ROWS)->get(null, function() use ($queryMock, $driver) {
             return $driver->fetchAssoc($queryMock->temp(MockProxy::RESULT));
         });
     }
@@ -124,7 +124,7 @@ class MockProxy extends Driver
     public function queryErrorMessage($queryMock)
     {
         $driver = $this->driver;
-        return $queryMock->get(MockProxy::ERROR_MESSAGE, function () use ($queryMock, $driver) {
+        return $queryMock->get(MockProxy::ERROR_MESSAGE, function() use ($queryMock, $driver) {
             return $driver->queryErrorMessage($queryMock->temp(MockProxy::RESULT));
         });
     }
@@ -136,7 +136,7 @@ class MockProxy extends Driver
     public function getDialect()
     {
         $driver = $this->driver;
-        return $this->mock->get('language', function () use ($driver) {
+        return $this->mock->get('language', function() use ($driver) {
             return $driver->getDialect();
         });
     }
@@ -147,7 +147,7 @@ class MockProxy extends Driver
     public function getUtility()
     {
         $driver = $this->driver;
-        return $this->mock->get('utility', function () use ($driver) {
+        return $this->mock->get('utility', function() use ($driver) {
             return $driver->getUtility();
         });
     }
