@@ -2,7 +2,6 @@
 namespace Yaoi;
 
 use Closure;
-use Yaoi\Database\Driver;
 use Yaoi\Service\Exception;
 use Yaoi\String\Utils;
 use Yaoi\Service\Settings;
@@ -166,7 +165,7 @@ abstract class Service extends BaseClass
     protected $driver;
 
     /**
-     * @return Driver
+     * @return object
      * @throws Service\Exception
      */
     public function getDriver()
