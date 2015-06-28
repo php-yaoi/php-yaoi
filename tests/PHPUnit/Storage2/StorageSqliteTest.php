@@ -12,12 +12,16 @@ require_once __DIR__ . '/StorageMysqlTest.php';
 
 class StorageSqliteTest extends \StorageMysqlTest {
     public function setUp() {
-        $db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
+        if (!extension_loaded('sqlite')) {
+            $this->markTestSkipped('SQLite extension not available');
+        }
+
+        $this->db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
 
         //$db->log(new Log('stdout'));
 
         $dsn = new Settings();
-        $dsn->proxyClient = $db;
+        $dsn->proxyClient = $this->db;
         //$dsn->path = 'storage';
         $dsn->driverClassName = DatabaseProxy::className();
 

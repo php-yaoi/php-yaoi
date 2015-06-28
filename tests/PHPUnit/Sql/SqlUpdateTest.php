@@ -1,10 +1,7 @@
 <?php
 use Yaoi\Sql\DefaultValue;
-use Yaoi\Test\PHPUnit\TestCase;
 
-
-
-class SqlUpdateTest extends TestCase {
+class SqlUpdateTest extends \YaoiTests\Sql\TestCase {
     public function testUpdate() {
         $u = Yaoi\Database::getInstance('test_mysqli')->statement();
 

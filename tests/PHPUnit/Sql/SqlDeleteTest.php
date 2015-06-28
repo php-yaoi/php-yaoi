@@ -1,9 +1,18 @@
 <?php
-use Yaoi\Test\PHPUnit\TestCase;
 
 
+class SqlDeleteTest extends \YaoiTests\Sql\TestCase {
+    public function setUp() {
+        try {
+            \Yaoi\Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
 
-class SqlDeleteTest extends TestCase {
+    }
+
+
     public function testDelete() {
         $this->assertSame(
             'DELETE FROM table WHERE one = 1',

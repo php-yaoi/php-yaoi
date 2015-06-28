@@ -1,11 +1,10 @@
 <?php
 use Yaoi\Database;
 use Yaoi\Sql\Statement;
-use Yaoi\Test\PHPUnit\TestCase;
 
 
 
-class SqlStatementTest extends TestCase {
+class SqlStatementTest extends \YaoiTests\Sql\TestCase {
     public function testQueryClient() {
         $s = new Statement();
         $s->select()->from('table');

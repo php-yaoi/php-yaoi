@@ -9,6 +9,17 @@ use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\App;
 
 class DatabaseMockTest extends TestCase  {
+    public function setUp() {
+        try {
+            Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
+
+    }
+
+
     /**
      * @var PhpVar
      */

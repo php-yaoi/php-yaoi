@@ -4,6 +4,17 @@ use Yaoi\Entity\SimpleMysql;
 use Yaoi\Test\PHPUnit\TestCase;
 
 class Entity_SimpleMysqlTest extends TestCase {
+
+    public function setUp() {
+        try {
+            Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
+
+    }
+
     public function testMain() {
         $createTable = <<<SQL
 CREATE TABLE IF NOT EXISTS `AutoTabled` (

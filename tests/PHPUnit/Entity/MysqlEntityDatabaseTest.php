@@ -7,7 +7,12 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 class MysqlEntityDatabaseTest extends TestEntityDatabaseUnified {
 
     public function setUp() {
-        $db = Database::getInstance('test_mysqli');
+        try {
+            $db = Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
 
         $createSQL = <<<SQL
 CREATE TABLE test_entity (

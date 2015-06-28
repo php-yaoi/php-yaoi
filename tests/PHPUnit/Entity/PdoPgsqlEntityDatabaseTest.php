@@ -19,7 +19,13 @@ class PdoPgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
             return;
         }
 
-        $db = Database::getInstance('test_pdo_pgsql');
+        try {
+            $db = Database::getInstance('test_pdo_pgsql');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+            return;
+        }
 
         $createSQL = <<<SQL
 CREATE TABLE test_entity (

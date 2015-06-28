@@ -1,10 +1,7 @@
 <?php
 use Yaoi\Sql\Symbol;
-use Yaoi\Test\PHPUnit\TestCase;
 
-
-
-class SqlUnionTest extends TestCase {
+class SqlUnionTest extends \YaoiTests\Sql\TestCase {
     public function testUnion() {
         $result = (string)Yaoi\Database::getInstance('test_mysqli')->select('table1')->where('one = ?' ,1)->groupBy('field')
             ->union("SELECT * FROM ?", new Symbol('table2'))

@@ -14,15 +14,21 @@ class StorageMysqlTest extends TestStorageBasic
 {
     protected $storage;
     protected $complexStorage;
+    protected $db;
 
     public function setUp()
     {
-        $db = Database::getInstance('test_mysqli');
+        try {
+            $this->db = Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
 
         //$db->log(new Log('stdout'));
 
         $dsn = new Settings();
-        $dsn->proxyClient = $db;
+        $dsn->proxyClient = $this->db;
         //$dsn->path = 'storage_table';
         $dsn->driverClassName = DatabaseProxy::className();
 
@@ -47,12 +53,10 @@ class StorageMysqlTest extends TestStorageBasic
 
     public function testConstructor()
     {
-        $db = Database::getInstance('test_mysqli');
-
         //$db->log(new Log('stdout'));
 
         $dsn = new Settings();
-        $dsn->proxyClient = $db;
+        $dsn->proxyClient = $this->db;
         $dsn->path = 'storage_table';
         $dsn->driverClassName = DatabaseProxy::className();
 

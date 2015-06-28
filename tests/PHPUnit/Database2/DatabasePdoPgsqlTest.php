@@ -28,10 +28,14 @@ SQL;
         else {
             $this->markTestSkipped('PDO extension is not available.');
         }
-    }
 
-    public function __construct() {
-        $this->db = Database::getInstance('test_pdo_pgsql');
+        try {
+            $this->db = Database::getInstance('test_pdo_pgsql');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
+
     }
 
 
