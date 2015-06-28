@@ -12,7 +12,7 @@ require_once __DIR__ . '/StorageMysqlTest.php';
 
 class StorageSqliteTest extends \StorageMysqlTest {
     public function setUp() {
-        if (!extension_loaded('sqlite')) {
+        if (!class_exists('SQLite3')) {
             $this->markTestSkipped('SQLite extension not available');
         }
 
