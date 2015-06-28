@@ -1,9 +1,6 @@
 <?php
-use Yaoi\Test\PHPUnit\TestCase;
 
-
-
-class SqlInsertTest extends TestCase {
+class SqlInsertTest extends \YaoiTests\Sql\TestCase {
     public function testSingleRow()
     {
         $statement = Yaoi\Database::getInstance('test_mysqli')->statement();

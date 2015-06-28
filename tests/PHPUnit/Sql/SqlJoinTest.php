@@ -1,9 +1,6 @@
 <?php
-use Yaoi\Test\PHPUnit\TestCase;
 
-
-
-class SqlJoinTest extends TestCase {
+class SqlJoinTest extends \YaoiTests\Sql\TestCase {
     public function testInnerJoin() {
         $s = Yaoi\Database::getInstance('test_mysqli')->statement();
         $s->select('*');

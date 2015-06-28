@@ -4,6 +4,15 @@ use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\App;
 
 class DatabaseBindsTest extends TestCase  {
+    public function setUp() {
+        try {
+            Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
+
+    }
 
     public function testUnnamedBinds() {
         $db = App::database('test_mysqli')->mock();

@@ -4,7 +4,22 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\App;
 
+/**
+ * Class DatabaseBasicTest
+ * @deprecated
+ */
 class DatabaseBasicTest extends TestCase  {
+
+    public function setUp() {
+        try {
+            Database::getInstance('test_mysqli');
+        }
+        catch (\Yaoi\Service\Exception $exception) {
+            $this->markTestSkipped($exception->getMessage());
+        }
+
+    }
+
 
     public function initTest1() {
         /*

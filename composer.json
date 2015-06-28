@@ -1,7 +1,7 @@
 {
   "name": "php-yaoi/php-yaoi",
   "type": "library",
-  "description": "Yaoi is yet another object interoperator",
+  "description": "Yaoi is yet another object interleaver",
   "keywords": ["framework"],
   "homepage": "https://github.com/php-yaoi/php-yaoi",
   "license": "MIT",

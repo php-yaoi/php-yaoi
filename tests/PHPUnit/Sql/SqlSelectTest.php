@@ -2,11 +2,8 @@
 use Yaoi\Database;
 use Yaoi\Sql\Expression;
 use Yaoi\Sql\Statement;
-use Yaoi\Test\PHPUnit\TestCase;
 
-
-
-class SqlSelectTest extends TestCase {
+class SqlSelectTest extends \YaoiTests\Sql\TestCase {
 
     public function testOmg() {
         $db = Yaoi\Database::getInstance('test_mysqli');

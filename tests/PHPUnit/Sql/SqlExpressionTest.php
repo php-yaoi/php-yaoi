@@ -1,11 +1,10 @@
 <?php
 use Yaoi\Database;
 use Yaoi\Sql\Expression;
-use Yaoi\Test\PHPUnit\TestCase;
 
 
 
-class SqlExpressionTest extends TestCase {
+class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
     public function testExpression() {
         $s = new Expression('test ? ? ?', 1, 2, 3);
         $driver = Database::getInstance('test_mysqli')->getDriver();
