@@ -34,36 +34,23 @@ class Dsn extends BaseClass
 
         if (isset($p['query'])) {
             parse_str($p['query'], $parsed);
-            foreach ($parsed as $key => $value) {
-                $this->$key = $value;
+            if (null !== $parsed) {
+                foreach ($parsed as $key => $value) {
+                    $this->$key = $value;
+                }
             }
         }
 
-        if (isset($p['scheme'])) {
-            $this->scheme = $p['scheme'];
+        foreach (array('scheme', 'user', 'pass', 'host', 'port') as $field) {
+            if (isset($p[$field])) {
+                $this->$field = $p[$field];
+            }
         }
 
         if (isset($p['path'])) {
             $this->path = substr($p['path'], 1);
         }
-
-        if (isset($p['user'])) {
-            $this->username = $p['user'];
-        }
-
-        if (isset($p['pass'])) {
-            $this->password = $p['pass'];
-        }
-
-        if (isset($p['host'])) {
-            $this->hostname = $p['host'];
-        }
-
-        if (isset($p['port'])) {
-            $this->port = $p['port'];
-        }
     }
-
 
     public function __toString()
     {
