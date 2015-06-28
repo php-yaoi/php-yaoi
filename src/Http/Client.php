@@ -10,8 +10,7 @@ use Yaoi\Mock\Able;
 
 /**
  * Class Http_Client
- * TODO detect response charset
- * @method Driver getDriver
+ * @method Driver getDriver()
  */
 class Client extends \Yaoi\Service implements Able
 {
@@ -20,6 +19,7 @@ class Client extends \Yaoi\Service implements Able
     public $cookies = array();
     public $requestCharset = 'UTF-8';
     public $charset = 'UTF-8';
+    /** @var  null|array */
     public $post;
     public $url;
     public $referrer;
@@ -153,7 +153,7 @@ class Client extends \Yaoi\Service implements Able
         }
 
         $headers = $this->headers;
-        if ($this->cookies) {
+        if (!empty($this->cookies)) {
             $headers['Cookie'] = http_build_query($this->cookies, null, '; ');
         }
 
@@ -170,29 +170,7 @@ class Client extends \Yaoi\Service implements Able
 
 
         if ($uploadingFiles) {
-            $driver->setMethod('POST');
-
-            $multipartBoundary = '--------------------------' . \Yaoi\Date\TimeMachine::getInstance()->microNow();
-            $content = '';
-
-            foreach ($this->post as $name => $value) {
-                if ($value instanceof UploadFile) {
-                    $content .= "--" . $multipartBoundary . "\r\n"
-                        . "Content-Disposition: form-data; name=\"" . $name . "\"; filename=\"" . $value->getFileName() . "\"\r\n"
-                        . "Content-Type: " . $value->mimeType . "\r\n\r\n"
-                        . $value->getContents() . "\r\n";
-                } else {
-                    $content .= "--" . $multipartBoundary . "\r\n"
-                        . "Content-Disposition: form-data; name=\"$name\"\r\n\r\n"
-                        . "$value\r\n";
-                }
-            }
-            $content .= "--" . $multipartBoundary . "--\r\n";
-
-            $driver->setRequestContent($content);
-            $headers['Content-Type'] = 'multipart/form-data; boundary=' . $multipartBoundary;
-            //$headers['Content-Length'] = strlen($content);
-            unset($content);
+            $headers = $this->prepareUpload($driver, $headers);
         } elseif ($this->post) {
             $driver->setMethod('POST');
             $content = http_build_query($this->post);
@@ -234,31 +212,7 @@ class Client extends \Yaoi\Service implements Able
         }
 
         $self = $this;
-        try {
-            list($response, $this->responseHeaders) = $mock->branch('responseData')
-                ->get(null, function() use ($driver, $self, $mock) {
-                    $driver->fetch();
-                    $response = $driver->getResponseContent();
-                    $responseHeaders = $driver->getResponseHeaders();
-
-                    if (!$self->skipBadRequestException && false === $response) {
-                        $e = new Client\Exception('Bad request', Client\Exception::BAD_REQUEST);
-                        $e->request = $driver->getRequest();
-                        $e->responseHeaders = $self->responseHeaders;
-                        $e->url = $self->url;
-                        throw $e;
-                    }
-
-                    return array($response, $responseHeaders);
-                });
-        } catch (Client\Exception $e) {
-            if ($this->logError) {
-                $this->logError->push($e->getMessage()
-                    . ', request: ' . print_r($driver->getRequest(), 1)
-                    . ', serialize: ' . base64_encode(serialize($driver->getRequest())));
-            }
-            throw $e;
-        }
+        $response = $this->performFetch($mock, $driver, $self);
 
 
         if ($this->logResponseHeaders) {
@@ -285,18 +239,7 @@ class Client extends \Yaoi\Service implements Able
         }
 
 
-        if (!empty($this->parsedHeaders['content-encoding'])) {
-
-            if ($response && 'gzip' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
-                if (!function_exists('gzdecode')) {
-                    $response = gzinflate(substr($response, 10, -8));
-                } else {
-                    $response = gzdecode($response);
-                }
-            } elseif ('deflate' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
-                $response = gzinflate($response);
-            }
-        }
+        $response = $this->decodeContent($response);
 
         if ($this->logResponseBody) {
             $this->logResponseBody->push($response);
@@ -434,6 +377,102 @@ class Client extends \Yaoi\Service implements Able
     protected static function getSettingsClassName()
     {
         return Settings::className();
+    }
+
+    /**
+     * @param $driver
+     * @param $headers
+     * @return mixed
+     * @throws \Yaoi\Service\Exception
+     */
+    private function prepareUpload($driver, $headers)
+    {
+        $driver->setMethod('POST');
+
+        $multipartBoundary = '--------------------------' . \Yaoi\Date\TimeMachine::getInstance()->microNow();
+        $content = '';
+
+        foreach ($this->post as $name => $value) {
+            if ($value instanceof UploadFile) {
+                $content .= "--" . $multipartBoundary . "\r\n"
+                    . "Content-Disposition: form-data; name=\"" . $name . "\"; filename=\"" . $value->getFileName() . "\"\r\n"
+                    . "Content-Type: " . $value->mimeType . "\r\n\r\n"
+                    . $value->getContents() . "\r\n";
+            } else {
+                $content .= "--" . $multipartBoundary . "\r\n"
+                    . "Content-Disposition: form-data; name=\"$name\"\r\n\r\n"
+                    . "$value\r\n";
+            }
+        }
+        $content .= "--" . $multipartBoundary . "--\r\n";
+
+        $driver->setRequestContent($content);
+        $headers['Content-Type'] = 'multipart/form-data; boundary=' . $multipartBoundary;
+        unset($content);
+        return $headers;
+    }
+
+    /**
+     * @param $response
+     * @return string
+     */
+    private function decodeContent($response)
+    {
+        if (!empty($this->parsedHeaders['content-encoding'])) {
+            if ($response && 'gzip' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
+                if (!function_exists('gzdecode')) {
+                    $response = gzinflate(substr($response, 10, -8));
+                    return $response;
+                } else {
+                    $response = gzdecode($response);
+                    return $response;
+                }
+            } elseif ('deflate' == strtolower($this->parsedHeaders['content-encoding']['value'])) {
+                $response = gzinflate($response);
+                return $response;
+            }
+            return $response;
+        }
+        return $response;
+    }
+
+    /**
+     * @param $mock
+     * @param $driver
+     * @param $self
+     * @return mixed
+     * @throws Client\Exception
+     * @throws \Exception
+     */
+    private function performFetch($mock, $driver, $self)
+    {
+        try {
+            list($response, $this->responseHeaders) = $mock->branch('responseData')
+                ->get(null, function () use ($driver, $self, $mock) {
+                    $driver->fetch();
+                    $response = $driver->getResponseContent();
+                    $responseHeaders = $driver->getResponseHeaders();
+
+                    if (!$self->skipBadRequestException && false === $response) {
+                        $e = new Client\Exception('Bad request', Client\Exception::BAD_REQUEST);
+                        $e->request = $driver->getRequest();
+                        $e->responseHeaders = $self->responseHeaders;
+                        $e->url = $self->url;
+                        throw $e;
+                    }
+
+                    return array($response, $responseHeaders);
+                });
+            return $response;
+        } catch (Client\Exception $e) {
+            if ($this->logError) {
+                $this->logError->push($e->getMessage()
+                    . ', request: ' . print_r($driver->getRequest(), 1)
+                    . ', serialize: ' . base64_encode(serialize($driver->getRequest())));
+            }
+            throw $e;
+        }
+        return $response;
     }
 
 
