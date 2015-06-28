@@ -2,9 +2,6 @@
 namespace Yaoi\Storage;
 use Yaoi\Service;
 
-/**
- * Class Storage_Dsn
- */
 class Settings extends \Yaoi\Service\Settings
 {
     public $persistent = false;

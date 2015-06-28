@@ -11,6 +11,7 @@ use Yaoi\Storage\Settings;
 /**
  * Class Storage_Client
  * @method Driver|ExportImportArray|ArrayKey getDriver()
+ * @method static \Yaoi\Storage\Settings createSettings()
  */
 class Storage extends Service
 {
