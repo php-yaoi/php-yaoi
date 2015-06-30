@@ -15,6 +15,18 @@ use YaoiTests\Service\BasicExposed;
 class RegisterTest extends TestCase
 {
     /**
+     * By default settings identifier is `Service::PRIMARY`
+     *
+     * @see Service::PRIMARY
+     * @throws \Yaoi\Service\Exception
+     * @see \Yaoi\Service::register
+     */
+    public function testRegisterPrimary() {
+        BasicExposed::register('test');
+        $this->assertSame('test', BasicExposed::getInstance()->getSettings()->scheme);
+    }
+
+    /**
      * To register a service instance you can use DSN url
      * @throws \Yaoi\Service\Exception
      * @see \Yaoi\Service::register
