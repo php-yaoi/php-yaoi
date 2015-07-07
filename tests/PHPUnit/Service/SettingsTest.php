@@ -10,10 +10,13 @@ use YaoiTests\Service\NoSettings;
 class SettingsTest extends TestCase
 {
 
+    /**
+     *
+     */
     public function testNullSettings() {
         $settings = new Settings();
-        $this->assertSame($settings, NoSettings::settings($settings));
-        $this->assertTrue(NoSettings::settings(null) instanceof $settings);
+        $this->assertSame($settings, NoSettings::create($settings)->getSettings());
+        $this->assertTrue(NoSettings::create(null)->getSettings() instanceof $settings);
     }
 
 
@@ -24,8 +27,6 @@ class SettingsTest extends TestCase
      */
     public function testDsnSettings() {
         $dsn = 'scheme://user:password@host:1234/path?flag1=one&flag2=two';
-        $settings = \YaoiTests\Service\BasicExposed::settings($dsn);
-        $this->assertTrue(BasicExposed::createSettings() instanceof $settings);
         $expected = array (
             'driverClassName' => NULL,
             'identifier' => NULL,
@@ -38,15 +39,10 @@ class SettingsTest extends TestCase
             'flag1' => 'one',
             'flag2' => 'two',
         );
-        $this->assertArraySubset($expected, (array)$settings);
+        $this->assertArraySubset($expected, (array)BasicExposed::create($dsn)->getSettings());
 
-        $expected = new \Yaoi\Service\Settings();
-
-        $settings = BasicExposed::settings(function()use($expected){
-            return $expected;
-        });
-
-        $this->assertSame($expected, $settings);
+        $expected = new Settings();
+        $this->assertSame($expected, BasicExposed::create($expected)->getSettings());
     }
 
 }

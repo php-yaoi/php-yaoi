@@ -8,7 +8,7 @@ use Yaoi\Storage;
 use Yaoi\Storage\PhpVar;
 use Yaoi\Storage\Void;
 
-class Mock
+class Mock extends Service
 {
     const MODE_COMBINED = 0;
     const MODE_PLAY = 1;

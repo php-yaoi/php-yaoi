@@ -3,11 +3,12 @@
 namespace Yaoi\Database;
 
 use Iterator;
+use Yaoi\BaseClass;
 use Yaoi\Sql\DefaultValue;
 use Yaoi\Sql\Expression;
 use Yaoi\Sql\Symbol;
 
-abstract class Driver implements \Yaoi\Database\Driver\Contract
+abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contract
 {
     /**
      * @var Settings

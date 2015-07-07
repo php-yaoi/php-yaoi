@@ -58,4 +58,21 @@ class HttpUploadTest extends TestCase {
             print_r(array_diff($resParsed, $expectedParsed), 1)
         );
     }
+
+    public function testPostDataToString() {
+        $httpClient = new Client();
+
+        $httpClient->post = array(
+            'simple' => 'string',
+            'object' => new \Yaoi\String\Parser('test-object')
+        );
+
+        $response = $httpClient->fetch('http://' . TestCase::$settings['envHttpMirrorServer']);
+        echo $response;
+        if (false === strpos($response, 'simple=string&object=test-object')) {
+            $this->assertTrue(false, 'Response is missing a substring');
+        }
+
+    }
+
 } 
