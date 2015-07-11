@@ -4,10 +4,36 @@ namespace Yaoi\Sql;
 
 use Closure;
 use Yaoi\BaseClass;
+use Yaoi\Database;
 use Yaoi\Database\Quoter;
+use Yaoi\Debug;
 
 class Expression extends BaseClass implements \Yaoi\IsEmpty
 {
+    /**
+     * @var Database
+     */
+    protected $database;
+
+    public function bindDatabase(Database\Contract $client = null)
+    {
+        $this->database = $client;
+        return $this;
+    }
+
+    public function __toString()
+    {
+        if (!$this->database) {
+            return '/* ERROR: Unknown database */';
+        }
+
+        try {
+            $res = $this->build($this->database->getDriver());
+            return $res;
+        } catch (\Exception $e) {
+            return '/* ERROR: ' . $e->getMessage() . ' */';
+        }
+    }
 
 
     /**
@@ -49,7 +75,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
         if ($count > 2) {
             array_shift($arguments);
             $this->binds = $arguments;
-        } elseif (isset($arguments[1])) {
+        } elseif (array_key_exists(1, $arguments)) {
             if (is_array($arguments[1])) {
                 $this->binds = $arguments[1];
             } else {
@@ -180,7 +206,8 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
                         $statement = substr_replace($statement, $value, $pos, 1);
                         $pos += strlen($value);
                     } else {
-                        throw new \Yaoi\Database\Exception('Placeholder \'?\' not found', \Yaoi\Database\Exception::PLACEHOLDER_NOT_FOUND);
+                        throw new \Yaoi\Database\Exception('Placeholder \'?\' not found ("' . $statement . '"), '
+                            . Debug::varBrief($this->binds), \Yaoi\Database\Exception::PLACEHOLDER_NOT_FOUND);
                     }
                 }
 

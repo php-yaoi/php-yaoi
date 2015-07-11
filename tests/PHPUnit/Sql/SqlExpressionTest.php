@@ -5,6 +5,11 @@ use Yaoi\Sql\Expression;
 
 
 class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
+
+    public function testNullBind() {
+        $this->assertSame('NULL', (string)Database::getInstance('test_mysqli')->expr('?', null));
+    }
+
     public function testExpression() {
         $s = new Expression('test ? ? ?', 1, 2, 3);
         $driver = Database::getInstance('test_mysqli')->getDriver();

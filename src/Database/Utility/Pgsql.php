@@ -72,4 +72,17 @@ where c.table_name = '$tableName';
         return $def;
     }
 
+    public function generateCreateTableOnDefinition(Table $table)
+    {
+        throw new \Exception('Not implemented');
+        // TODO: Implement generateCreateTableOnDefinition() method.
+    }
+
+    public function getColumnTypeString(Column $column)
+    {
+        throw new \Exception('Not implemented');
+        // TODO: Implement getColumnTypeString() method.
+    }
+
+
 }
