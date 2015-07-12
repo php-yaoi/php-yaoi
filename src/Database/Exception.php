@@ -13,6 +13,8 @@ class Exception extends \Exception
     const PLACEHOLDER_REDUNDANT = 7;
     const DISCONNECT_ERROR = 8;
     const REWIND_NOT_SUPPORTED = 9;
+    const INVALID_ARGUMENT = 10;
+    const INVALID_SCHEMA = 11;
 
     public $query;
 }

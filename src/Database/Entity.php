@@ -1,18 +1,18 @@
 <?php
 
-namespace Yaoi\Entity;
+namespace Yaoi\Database;
 
-use Yaoi\Entity;
-use Yaoi\Entity\Database\Definition;
-use Yaoi\Mappable\Contract;
+use Yaoi\Database\Entity\Definition;
+use Yaoi\Entity\Exception;
+use Yaoi\Mappable;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
 
-abstract class Database extends BaseClass implements Contract
+abstract class Entity extends BaseClass implements Mappable\Contract
 {
-    static public $tableName;
+    static protected $tableName;
 
 
     private static $definitions;
@@ -58,7 +58,7 @@ abstract class Database extends BaseClass implements Contract
             $i = 0;
             foreach ($tableDefinition->primaryKey as $keyField) {
                 if (!isset($args[$i])) {
-                    throw new Entity\Exception('Full primary key required', Entity\Exception::KEY_MISSING);
+                    throw new Exception('Full primary key required', Exception::KEY_MISSING);
                 }
                 $keyValue = $args[$i++];
                 $statement->where('? = ?', new Symbol($tableName, $keyField), $keyValue);
@@ -155,7 +155,7 @@ abstract class Database extends BaseClass implements Contract
         }
         foreach ($tableDefinition->primaryKey as $keyField) {
             if (!isset($data[$keyField])) {
-                throw new Entity\Exception('Primary key required for update', Entity\Exception::KEY_MISSING);
+                throw new Exception('Primary key required for update', Exception::KEY_MISSING);
             }
             $update->where("? = ?", new Symbol($keyField), $this->$keyField);
             unset($data[$keyField]);

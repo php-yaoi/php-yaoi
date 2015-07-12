@@ -1,7 +1,7 @@
 <?php
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Entity\Database;
+use Yaoi\Database\Entity;
 use Yaoi\Test\PHPUnit\TestCase;
 
 class TestEntityDatabaseUnified extends TestCase  {
@@ -51,7 +51,7 @@ class TestEntityDatabaseUnified extends TestCase  {
 /**
  * Class TestEntityDB
  */
-class TestEntityDB extends Database
+class TestEntityDB extends Entity
 {
     public $id;
     public $name;

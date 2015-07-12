@@ -81,4 +81,27 @@ class Debug
         return $return ? $result[$return] : $result;
     }
 
+
+    public static function varBrief($var) {
+        if (is_object($var)) {
+            return get_class($var) . ' #'. spl_object_hash($var);
+        }
+        if (is_array($var)) {
+            return 'Array(' . substr(implode(',', array_keys($var)), 0, 100) . ')';
+        }
+        if (is_bool($var)) {
+            return $var ? 'bool(true)' : 'bool(false)';
+        }
+        if (null === $var) {
+            return 'NULL';
+        }
+        if (is_string($var)) {
+            return '"' . $var . '"';
+        }
+        if (is_resource($var)) {
+            return 'Resource #' . (int)$var;
+        }
+        return $var;
+    }
+
 }

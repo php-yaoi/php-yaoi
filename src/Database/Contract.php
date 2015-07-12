@@ -84,4 +84,9 @@ interface Contract extends Able, Quoter
      * @return Table
      */
     public function getTableDefinition($tableName);
+
+    /**
+     * @return Utility
+     */
+    public function getUtility();
 }

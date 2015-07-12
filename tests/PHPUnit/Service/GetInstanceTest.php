@@ -9,7 +9,6 @@ use YaoiTests\Service\NoSettings;
 
 class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
 {
-
     /**
      * If you specify $identifier of wrong type you will get `Service\Exception`
      * @see Service::getInstance
@@ -23,14 +22,16 @@ class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
 
 
     /**
-     * Primary instance is returned by default
+     * Primary instance is returned by default, null $identifier is also a default
      *
      * @throws \Yaoi\Service\Exception
      * @see \Yaoi\Service::getInstance
      */
     public function testPrimary() {
-        BasicExposed::register('test');
+        BasicExposed::register('test://');
         $this->assertSame(BasicExposed::getInstance(), BasicExposed::getInstance(Service::PRIMARY));
+        $this->assertSame(BasicExposed::getInstance(null), BasicExposed::getInstance(Service::PRIMARY));
+
     }
 
     /**
@@ -40,8 +41,8 @@ class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
      * @see \Yaoi\Service::getInstance
      */
     public function testFallback() {
-        Another::register('test', Service::FALLBACK);
-        Another::register('test2', 'known');
+        Another::register('test://', Service::FALLBACK);
+        Another::register('test2://', 'known');
 
         $this->assertSame(Another::getInstance(), Another::getInstance('unknown'));
         $this->assertNotSame(Another::getInstance('unknown'), Another::getInstance('known'));
@@ -74,6 +75,12 @@ class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
     }
 
 
+    /**
+     * You can pass Settings object to create Service instance
+     *
+     * @throws Service\Exception
+     * @see \Yaoi\Service::getInstance
+     */
     public function testSettingsGetInstance() {
         $settings = BasicExposed::createSettings();
 
@@ -81,15 +88,70 @@ class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
     }
 
 
-    public function testNullSettings() {
-        NoSettings::register(null, 'test1');
-        NoSettings::getInstance('test1');
+    /**
+     * Primary config can be set up in class definition
+     *
+     * @throws Service\Exception
+     * @see \Yaoi\Service::getInstance
+     */
+    public function testDefaultPrimary() {
+        $this->assertInstanceOf(DefaultPrimary::className(), DefaultPrimary::getInstance());
     }
 
 
-    public function testDefaultFallback() {
-        DefaultPrimary::getInstance();
+    /**
+     * If Closure is passed, its result is being processed
+     *
+     * @throws Service\Exception
+     * @see \Yaoi\Service::getInstance as $example
+     */
+    public function testClosureInstance() {
+        $instance = new BasicExposed();
+        $settings = BasicExposed::createSettings();
+
+        $this->assertSame(
+            $instance,
+            BasicExposed::getInstance(
+                function () use ($instance) {
+                    return $instance;
+                }
+            )
+        );
+
+
+        $this->assertSame(
+            $settings,
+            BasicExposed::getInstance(
+                function () use ($settings) {
+                    return $settings;
+                }
+            )->getSettings()
+        );
     }
+
+
+    /**
+     * You can not use string settings in getInstance because it is ambiguous with identifiers
+     * @expectedExceptionCode \Yaoi\Service\Exception::NO_FALLBACK
+     * @expectedException \Yaoi\Service\Exception
+     * @see \Yaoi\Service::getInstance
+     */
+    public function testByStringDsn() {
+        BasicExposed::getInstance('test://test/?');
+    }
+
+
+    /**
+     * You can not use string settings in getInstance because it is ambiguous with identifiers
+     * @expectedExceptionCode \Yaoi\Service\Exception::NO_FALLBACK
+     * @expectedException \Yaoi\Service\Exception
+     * @see \Yaoi\Service::getInstance
+     */
+    public function testByStringDsnInClosure() {
+        BasicExposed::getInstance(function(){return 'test://test/?';});
+    }
+
+
 
 
 }

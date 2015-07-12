@@ -29,4 +29,19 @@ class Sqlite extends Utility
         return $definition;
     }
 
+
+    public function generateCreateTableOnDefinition(Table $table)
+    {
+        throw new \Exception('Not implemented');
+        // TODO: Implement generateCreateTableOnDefinition() method.
+    }
+
+    public function getColumnTypeString(Column $column)
+    {
+        throw new \Exception('Not implemented');
+        // TODO: Implement getColumnTypeString() method.
+    }
+
+
+
 }

@@ -8,9 +8,10 @@
 
 namespace PHPUnit\Service;
 
-use Yaoi\Service\Settings;
+use Yaoi\Service;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Service\BasicExposed;
+use YaoiTests\Service\NoSettings;
 
 class RegisterTest extends TestCase
 {
@@ -22,12 +23,12 @@ class RegisterTest extends TestCase
      * @see \Yaoi\Service::register
      */
     public function testRegisterPrimary() {
-        BasicExposed::register('test');
+        BasicExposed::register('test://test.test/');
         $this->assertSame('test', BasicExposed::getInstance()->getSettings()->scheme);
     }
 
     /**
-     * To register a service instance you can use DSN url
+     * To register a service instance you can use `\Yaoi\String\Dsn` compatible url
      * @throws \Yaoi\Service\Exception
      * @see \Yaoi\Service::register
      */
@@ -53,7 +54,7 @@ class RegisterTest extends TestCase
     }
 
     /**
-     * @expectedExceptionCode \Yaoi\Service\Exception::SETTINGS_REQUIRED
+     * @expectedExceptionCode \Yaoi\Service\Exception::INVALID_ARGUMENT
      * @expectedException \Yaoi\Service\Exception
      * @throws \Yaoi\Service\Exception
      */
@@ -78,7 +79,7 @@ class RegisterTest extends TestCase
         BasicExposed::register('test://test', 'test-id3');
         BasicExposed::register('test-id3', 'test-id4');
 
-        $this->assertSame(BasicExposed::getInstance('test-id3'), BasicExposed::getInstance('test-id4'));
+        $this->assertSame(BasicExposed::getInstance('test-id4'), BasicExposed::getInstance('test-id3'));
     }
 
     /**
@@ -87,7 +88,7 @@ class RegisterTest extends TestCase
      * @see \Yaoi\Service::register
      */
     public function testRegisterSettings() {
-        $settings = new Settings();
+        $settings = new Service\Settings();
         $settings->hostname = 'host-id6';
 
         BasicExposed::register($settings, 'test-id6');
@@ -95,7 +96,7 @@ class RegisterTest extends TestCase
     }
 
     /**
-     * @expectedExceptionCode \Yaoi\Service\Exception::SETTINGS_REQUIRED
+     * @expectedExceptionCode \Yaoi\Service\Exception::INVALID_ARGUMENT
      * @expectedException \Yaoi\Service\Exception
      * @throws \Yaoi\Service\Exception
      */
@@ -104,4 +105,17 @@ class RegisterTest extends TestCase
         $test2 = BasicExposed::getInstance('test-id7-bad');
         $this->assertSame('host-id7-bad', $test2->getSettings()->hostname);
     }
+
+    /**
+     * If null is being used as $settings, Service\Settings will be created instead
+     *
+     * @throws Service\Exception
+     * @see \Yaoi\Service::register
+     */
+    public function testNullSettings() {
+        NoSettings::register(null, 'test1');
+        $this->assertInstanceOf(Service\Settings::className(), NoSettings::getInstance('test1')->getSettings());
+    }
+
+
 }

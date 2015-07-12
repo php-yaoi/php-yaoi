@@ -2,6 +2,8 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Definition\Index;
+use Yaoi\Database\Exception;
 use Yaoi\Sql\Symbol;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
@@ -64,5 +66,143 @@ class Mysql extends Utility
             $definition->columns[$field] = $phpType;
         }
         return $definition;
+    }
+
+    public function generateCreateTableOnDefinition(Table $table) {
+        $statement = 'CREATE TABLE `' . $table->_tableName . '` (' . PHP_EOL;
+
+        foreach ($table->columns as $name => $column) {
+            $statement .= ' `' . $name . '` ' . $this->getColumnTypeString($column);
+
+            if ($column->flags & Column::AUTO_ID) {
+                $statement .= ' AUTO_INCREMENT';
+            }
+
+            $statement .= ',' . PHP_EOL;
+        }
+
+        foreach ($table->indexes as $index) {
+            $indexString = '';
+            foreach ($index->columns as $column) {
+                $indexString .= '`' . $column->name . '`, ';
+            }
+            $indexString = substr($indexString, 0, -2);
+
+            if ($index->type === Index::TYPE_KEY) {
+                $statement .= 'KEY (' . $indexString . '),' . PHP_EOL;
+            }
+            elseif ($index->type === Index::TYPE_UNIQUE) {
+                $statement .= ' UNIQUE KEY (' . $indexString . '),' . PHP_EOL;
+            }
+        }
+
+        foreach ($table->constraints as $constraint) {
+            /** @var Column $fk */
+            $fk = $constraint[0];
+            /** @var Column $ref */
+            $ref = $constraint[1];
+            $constraintName = $table->_tableName . '_' . $fk->name;
+
+            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->name . '`) REFERENCES `'
+                . $ref->table->_tableName . '` (`' . $ref->name . '`),' . PHP_EOL;
+        }
+
+        $statement .= ' PRIMARY KEY (';
+        foreach ($table->primaryKey as $column) {
+            $statement .= '`' . $column->name . '`,';
+        }
+        $statement = substr($statement, 0, -1);
+        $statement .= ')' . PHP_EOL;
+
+        $statement .= ')' . PHP_EOL;
+
+        return $statement;
+    }
+
+    private function getIntTypeString(Column $column) {
+        $intType = 'int';
+
+        // TODO implement SIZE_ definitions
+        /*
+        switch (true) {
+            case $flags & Column::SIZE_1B:
+                $intType = 'tinyint';
+                break;
+
+            case $flags & Column::SIZE_2B:
+                $intType = 'mediumint';
+                break;
+
+            case $flags & Column::SIZE_3B:
+                $intType = 'mediumint';
+                break;
+
+
+        }
+        */
+        return $intType;
+    }
+
+    private function getFloatTypeString(Column $column) {
+        // TODO implement double
+        return 'float';
+    }
+
+    private function getStringTypeString(Column $column) {
+        // TODO implement long strings
+
+        $length = $column->stringLength ? $column->stringLength : 255;
+        if ($column->stringFixed) {
+            return 'char(' . $length . ')';
+        }
+        else {
+            return 'varchar(' . $length . ')';
+        }
+    }
+
+    private function getTimestampTypeString(Column $column) {
+        if (false === $column->default) {
+            $column->default = '0';
+        }
+        return 'timestamp';
+    }
+
+    public function getColumnTypeString(Column $column) {
+        $flags = $column->flags;
+        switch (true) {
+            case ($flags & Column::INTEGER):
+                $typeString = $this->getIntTypeString($column);
+                break;
+
+            case $flags & Column::FLOAT:
+                $typeString = $this->getFloatTypeString($column);
+                break;
+
+            case $flags & Column::STRING:
+                $typeString = $this->getStringTypeString($column);
+                break;
+
+            case $flags & Column::TIMESTAMP:
+                $typeString = $this->getTimestampTypeString($column);
+                break;
+
+            default:
+                throw new Exception('Undefined column type for column ' . $column->name, Exception::INVALID_SCHEMA);
+
+        }
+
+        if ($flags & Column::UNSIGNED) {
+            $typeString .= ' unsigned';
+        }
+
+        if ($flags & Column::NOT_NULL) {
+            $typeString .= ' NOT NULL';
+        }
+
+        if (false !== $column->default) {
+            $typeString .= $this->database->expr(" DEFAULT ?", $column->default);
+        }
+
+        return $typeString;
     }
 }

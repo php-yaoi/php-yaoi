@@ -9,17 +9,6 @@ use Yaoi\Database\Quoter;
 class Statement extends ComplexStatement
 {
 
-    /**
-     * @var Database
-     */
-    protected $database;
-
-    public function bindDatabase(Contract $client = null)
-    {
-        $this->database = $client;
-        return $this;
-    }
-
     public function query(Contract $client = null)
     {
         if (null === $client) {
@@ -31,16 +20,6 @@ class Statement extends ComplexStatement
             $query->bindResultClass($this->resultClass);
         }
         return $query;
-    }
-
-    public function __toString()
-    {
-        try {
-            $res = $this->build($this->database->getDriver());
-            return $res;
-        } catch (\Exception $e) {
-            return '/* ERROR: ' . $e->getMessage() . ' */';
-        }
     }
 
 

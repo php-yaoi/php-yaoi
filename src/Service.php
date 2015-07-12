@@ -29,51 +29,24 @@ abstract class Service extends BaseClass
     }
 
     /**
+     * @param null $dsnString
      * @return Settings
      */
-    public static function createSettings() {
+    public static function createSettings($dsnString = null) {
         $className = static::getSettingsClassName();
-        return new $className;
+        return new $className($dsnString);
     }
 
-    /**
-     * @param null $settings
-     * @return Service\Settings
-     * @throws Service\Exception
-     */
-    protected static function settings($settings)
-    {
-        $settingsClassName = static::getSettingsClassName();
 
-        if (null === $settingsClassName) {
-            $settingsClassName = Settings::className();
-
-            if (null === $settings) {
-                return new Settings();
-            }
+    private static function resolveClosure(Closure $closure) {
+        $result = $closure();
+        if ($result instanceof Closure) {
+            return self::resolveClosure($result);
         }
-
-        if ($settings instanceof $settingsClassName) {
-            return $settings;
+        else {
+            return $result;
         }
-
-        if ($settings instanceof Closure) {
-            $settings = $settings();
-            if (!$settings instanceof $settingsClassName) {
-                throw new Service\Exception('Closure should return ' . $settingsClassName . ' instance',
-                    Service\Exception::SETTINGS_REQUIRED);
-            }
-            return $settings;
-        }
-
-        if (is_string($settings)) {
-            $settings = new $settingsClassName($settings);
-            return $settings;
-        }
-
-        throw new Service\Exception('Invalid argument', Service\Exception::SETTINGS_REQUIRED);
     }
-
 
     /**
      * @param Settings|string|Closure|null $settings
@@ -81,13 +54,104 @@ abstract class Service extends BaseClass
      */
     public function __construct($settings = null)
     {
+        $settingsClass = static::getSettingsClassName();
+        if (null === $settingsClass) {
+            $settingsClass = Settings::className();
+        }
+
         if (null !== $settings) {
-            $this->settings = static::settings($settings);
+            if ($settings instanceof Closure) {
+                $settings = self::resolveClosure($settings);
+            }
+
+            if (is_string($settings)) {
+                $this->settings = new $settingsClass($settings);
+            }
+            elseif ($settings instanceof $settingsClass) {
+                $this->settings = $settings;
+            }
+            else {
+                throw new Service\Exception('Invalid argument. ' . Debug::varBrief($settings), Service\Exception::SETTINGS_REQUIRED);
+            }
         } else {
-            $this->settings = new Settings();
+            $this->settings = new $settingsClass();
         }
     }
 
+
+
+    private static function findOrCreateInstance($serviceClassName, $identifier, $idIsSettings = false) {
+        //var_dump('=-=-=-=-=-=-=-=-=-=-=-=-=-=',$serviceClassName, $identifier, $idIsSettings);
+
+        if ($identifier instanceof Closure) {
+            $identifier = self::resolveClosure($identifier);
+        }
+
+        if (null === $identifier) {
+            if ($idIsSettings) {
+                return new $serviceClassName();
+            }
+            else {
+                $identifier = self::PRIMARY;
+            }
+        }
+
+        if (is_string($identifier)) {
+            $registry = isset(self::$registry[$serviceClassName]) ? self::$registry[$serviceClassName] : array();
+
+            if ($idIsSettings) {
+
+                if ($registry && array_key_exists($identifier, $registry)) {
+                    //var_dump('goin under -=-=-=-=-=-=-=-', $identifier);
+                    return self::findOrCreateInstance($serviceClassName, $identifier);
+                }
+
+                return new $serviceClassName($identifier);
+            }
+
+
+            $resource = &self::$instances[$serviceClassName][$identifier];
+
+            if (null !== $resource) {
+                return $resource;
+            }
+
+            if ($registry) {
+                if (array_key_exists($identifier, self::$registry[$serviceClassName])) {
+                    $settings = self::$registry[$serviceClassName][$identifier];
+                    //var_dump('goin under zero -=-=-=-=-=-=-=-', $settings);
+
+                    $resource = self::findOrCreateInstance($serviceClassName, $settings, true);
+                    return $resource;
+                }
+                else {
+                    if (array_key_exists(self::FALLBACK, $registry)) {
+                        $resource = self::findOrCreateInstance($serviceClassName, self::FALLBACK);
+                    }
+                }
+            }
+
+            if (null === $resource) {
+                throw new Service\Exception('Service ' . $serviceClassName . ' not configured for "' . $identifier . '", fallback missing',
+                    Service\Exception::NO_FALLBACK);
+            }
+            else {
+                return $resource;
+            }
+        }
+
+        if ($identifier instanceof Service) {
+            return $identifier;
+        }
+
+        if ($identifier instanceof Settings) {
+            return new $serviceClassName($identifier);
+        }
+
+
+
+        throw new Exception('Invalid argument', Exception::INVALID_ARGUMENT);
+    }
 
     /**
      * Returns client instance
@@ -102,54 +166,8 @@ abstract class Service extends BaseClass
     {
         $serviceClassName = get_called_class();
 
-        if (is_string($identifier)) {
-            $resource = &self::$instances[$serviceClassName][$identifier];
 
-            if (null !== $resource) {
-                return $resource;
-            }
-
-            $emptyRegistry = !isset(self::$registry[$serviceClassName]);
-            if ($emptyRegistry
-                || !array_key_exists($identifier, self::$registry[$serviceClassName])) {
-
-                if ($emptyRegistry
-                    || !array_key_exists(self::FALLBACK, self::$registry[$serviceClassName])) {
-                    throw new Service\Exception('Service ' . $serviceClassName . ' not configured for "' . $identifier . '", fallback missing',
-                        Service\Exception::NO_FALLBACK);
-                }
-
-                $resource = static::getInstance(self::FALLBACK);
-                return $resource;
-            } else {
-                $settings = self::$registry[$serviceClassName][$identifier];
-
-                /**
-                 * instance forwarding
-                 */
-                if (is_string($settings) && isset(self::$registry[$serviceClassName][$settings])) {
-                    $newSettings = self::$registry[$serviceClassName][$settings];
-                    if ($settings !== $newSettings) {
-                        $resource = static::getInstance($settings);
-                        return $resource;
-                    }
-                }
-
-                $resource = new static($settings);
-                $resource->settings->identifier = $identifier;
-                return $resource;
-            }
-        }
-
-        if ($identifier instanceof Service) {
-            return $identifier;
-        }
-
-        if ($identifier instanceof Settings) {
-            return new static($identifier);
-        }
-
-        throw new Exception('String identifier required', Exception::INVALID_ARGUMENT); // TODO change message here
+        return self::findOrCreateInstance($serviceClassName, $identifier);
     }
 
 

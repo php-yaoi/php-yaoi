@@ -136,7 +136,7 @@ class Database extends Service implements DatabaseContract
      */
     public function expr($expression, $binds = null)
     {
-        return Expression::createFromFuncArguments(func_get_args());
+        return Expression::createFromFuncArguments(func_get_args())->bindDatabase($this);
     }
 
 

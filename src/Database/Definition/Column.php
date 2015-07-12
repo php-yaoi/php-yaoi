@@ -24,6 +24,39 @@ class Column extends BaseClass
 
     const AUTO_TYPE = 4096;
 
+
+    public $flags;
+    public function __construct($flags = null)
+    {
+        $this->flags = $flags;
+    }
+
+    public $default = false;
+    public function setDefault($value) {
+        $this->default = $value;
+        return $this;
+    }
+
+    public $stringLength;
+    public $stringFixed;
+    public function setStringLength($length, $fixed = false) {
+        $this->stringLength = $length;
+        $this->stringFixed = $fixed;
+        return $this;
+    }
+
+
+    public $constraint;
+    public function setConstraint(Column $column = null) {
+        $this->constraint = $column;
+        return $this;
+    }
+
+
+    public $name;
+    /** @var  Table */
+    public $table;
+
     public static function castField($value, $columnType)
     {
         if (is_object($value)) {

@@ -44,10 +44,6 @@ class Client extends \Yaoi\Service implements Able
 
     public function __construct($settings = null)
     {
-        if ($settings === null) {
-            $settings = new Settings();
-        }
-
         parent::__construct($settings);
         $this->reset();
         if ($this->settings) {
@@ -145,6 +141,10 @@ class Client extends \Yaoi\Service implements Able
             $this->url = $url;
         }
 
+        if (strpos($this->url, '://') === false) {
+            $this->url = $this->getAbsoluteUrl($this->url);
+        }
+
         $driver = $this->getDriver();
         $driver->reset();
 
@@ -173,6 +173,11 @@ class Client extends \Yaoi\Service implements Able
             $headers = $this->prepareUpload($driver, $headers);
         } elseif ($this->post) {
             $driver->setMethod('POST');
+            foreach ($this->post as $key => $data) {
+                if (!is_string($data)) {
+                    $this->post[$key] = (string)$data;
+                }
+            }
             $content = http_build_query($this->post);
             $driver->setRequestContent($content);
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';

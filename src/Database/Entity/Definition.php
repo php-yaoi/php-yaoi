@@ -1,10 +1,9 @@
 <?php
 
-namespace Yaoi\Entity\Database;
+namespace Yaoi\Database\Entity;
 
 use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Table;
 
 class Definition extends BaseClass
@@ -24,7 +23,7 @@ class Definition extends BaseClass
     }
 
     /**
-     * @return Contract
+     * @return \Yaoi\Database\Contract;
      * @throws \Yaoi\Service\Exception
      */
     public function database()

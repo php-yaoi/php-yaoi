@@ -25,9 +25,6 @@ before_script:
   - cp -rf tests/conf.travis.php tests/conf.php
   - nohup node tests/resources/http-mirror.js &
   - nohup ~/.phpenv/versions/5.4/bin/php -S 127.0.0.1:8000 tests/resources/http-server.php &
-  - ls -l ~/.phpenv/versions
-  - ls -l ~/.phpenv/versions/5.4
-  - ls -l ~/.phpenv/versions/5.4/bin
   - composer install --dev --no-interaction
 
 matrix:
@@ -43,3 +40,11 @@ script:
 after_script:
  - if [[ $(phpenv version-name) =~ 5.[3456] ]] ; then php vendor/bin/coveralls -v; fi
  - if [[ $(phpenv version-name) =~ 5.[3456] ]] ; then CODECLIMATE_REPO_TOKEN=bef21a7b3d0a531fec57b713df1720bb0da7114f5ce33a3e492ce9599b8ac8df ./vendor/bin/test-reporter; fi
+
+notifications:
+ webhooks:
+   urls:
+     - https://webhooks.gitter.im/e/60df144804d6cd10e812
+   on_success: change  # options: [always|never|change] default: always
+   on_failure: always  # options: [always|never|change] default: always
+   on_start: false     # default: false
