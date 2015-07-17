@@ -11,21 +11,22 @@ class Table extends BaseClass
     public $primaryKey = array();
     /** @var Index[]  */
     public $indexes = array();
-    /** @var Column[]  */
-    public $columns = array();
+    /** @var \stdClass  */
+    public $columns;
     public $defaults = array();
     public $notNull = array();
 
-    public $_tableName;
+    public $name;
 
-    public function setTableName($name) {
-        $this->_tableName = $name;
+    public function setName($name) {
+        $this->name = $name;
         return $this;
     }
 
 
     public function __construct($columns = null) {
         if (!$columns) {
+            $this->columns = new \stdClass();
             return;
         }
         else {
@@ -36,19 +37,28 @@ class Table extends BaseClass
 
     public function setColumns($columns) {
         if (is_object($columns)) {
-            $this->columns = (array)$columns;
-        }
-        elseif (is_array($columns)) {
             $this->columns = $columns;
         }
         else {
-            throw new Exception('Object of stdClass or Column[] required as argument', Exception::INVALID_ARGUMENT);
+            throw new Exception('Object of stdClass required as argument', Exception::INVALID_ARGUMENT);
         }
 
-        foreach ($this->columns as $name => $column) {
+        /**
+         * @var string $name
+         * @var Column $column
+         */
+        foreach ((array)$this->columns as $name => $column) {
+            if (is_int($column)) {
+                $column = new Column($column);
+            }
+
+            if ($column->flags & Column::AUTO_ID) {
+                if (!$this->primaryKey) {
+                    $this->primaryKey = array($column);
+                }
+            }
             $column->name = $name;
             $column->table = $this;
-            $this->$name = $column;
             if ($column->constraint) {
                 $this->addConstraint($column, $column->constraint);
             }

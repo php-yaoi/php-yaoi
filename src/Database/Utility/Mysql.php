@@ -69,7 +69,7 @@ class Mysql extends Utility
     }
 
     public function generateCreateTableOnDefinition(Table $table) {
-        $statement = 'CREATE TABLE `' . $table->_tableName . '` (' . PHP_EOL;
+        $statement = 'CREATE TABLE `' . $table->name . '` (' . PHP_EOL;
 
         foreach ($table->columns as $name => $column) {
             $statement .= ' `' . $name . '` ' . $this->getColumnTypeString($column);
@@ -101,10 +101,10 @@ class Mysql extends Utility
             $fk = $constraint[0];
             /** @var Column $ref */
             $ref = $constraint[1];
-            $constraintName = $table->_tableName . '_' . $fk->name;
+            $constraintName = $table->name . '_' . $fk->name;
 
             $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->name . '`) REFERENCES `'
-                . $ref->table->_tableName . '` (`' . $ref->name . '`),' . PHP_EOL;
+                . $ref->table->name . '` (`' . $ref->name . '`),' . PHP_EOL;
         }
 
         $statement .= ' PRIMARY KEY (';

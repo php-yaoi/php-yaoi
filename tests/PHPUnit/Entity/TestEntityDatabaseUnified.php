@@ -60,13 +60,17 @@ class TestEntityDB extends Entity
     public $url;
     public $birthDate;
 
-    public static $tableName = 'test_entity';
-
-    public static function getTableSchema() {
-        $d = new Table();
-        $d->columns = array(
-            'id' => Column::INTEGER
-                & Column::AUTO_ID
-        );
+    /**
+     * Setup column types in provided columns object
+     * @param $columns static|\stdClass
+     */
+    static function setUpColumns($columns)
+    {
+        $columns->id = Column::AUTO_ID;
+        $columns->age = Column::INTEGER;
+        $columns->birthDate = Column::TIMESTAMP;
+        $columns->name = Column::create()->setStringLength(15, true);
+        $columns->url = Column::STRING;
+        $columns->weight = Column::INTEGER + Column::UNSIGNED;
     }
 }

@@ -75,7 +75,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns2 = new \stdClass();
         $columns2->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns2->meta = Column::create(Column::STRING);
-        $table2 = Table::create($columns2)->setTableName('test2');
+        $table2 = Table::create($columns2)->setName('test2');
 
 
         $columns = new \stdClass();
@@ -90,7 +90,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->type = Column::create(Column::STRING)->setStringLength(10, true);
 
         $table = Table::create($columns)
-            ->setTableName('test_entity')
+            ->setName('test_entity')
             ->setPrimaryKey($columns->id)
             ->addIndex(Index::TYPE_UNIQUE, $columns->dateUt, $columns->name, $columns->type);
 
@@ -125,7 +125,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->time = Column::create(Column::INTEGER);
         $columns->type = Column::create(Column::STRING);
 
-        $table = Table::create($columns)->setTableName('test_name')->setPrimaryKey($columns->id);
+        $table = Table::create($columns)->setName('test_name')->setPrimaryKey($columns->id);
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 

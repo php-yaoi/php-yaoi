@@ -26,8 +26,11 @@ class Column extends BaseClass
 
 
     public $flags;
-    public function __construct($flags = null)
+    public function __construct($flags = self::STRING)
     {
+        if ($flags === self::AUTO_ID) {
+            $flags += self::INTEGER;
+        }
         $this->flags = $flags;
     }
 
@@ -49,6 +52,12 @@ class Column extends BaseClass
     public $constraint;
     public function setConstraint(Column $column = null) {
         $this->constraint = $column;
+        return $this;
+    }
+
+    public $isUnique;
+    public function unique($yes = true) {
+        $this->isUnique = $yes;
         return $this;
     }
 

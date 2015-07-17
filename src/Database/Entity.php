@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database;
 
+use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity\Definition;
 use Yaoi\Entity\Exception;
 use Yaoi\Mappable;
@@ -9,12 +10,10 @@ use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
+use Yaoi\String\Utils;
 
-abstract class Entity extends BaseClass implements Mappable\Contract
+abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Contract
 {
-    static protected $tableName;
-
-
     private static $definitions;
 
     public static function definition()
@@ -29,9 +28,38 @@ abstract class Entity extends BaseClass implements Mappable\Contract
         return $definition;
     }
 
+    public static $tableName;
+
+    private static $tables = array();
+
+    /**
+     * Method should return table definition of entity
+     * @return Table
+     */
+    public static function table()
+    {
+        $className = get_called_class();
+        $table = &self::$tables[$className];
+        if (null !== $table) {
+            return $table;
+        }
+        $table = new Table();
+        static::setUpColumns($table->columns);
+        $table->setName(self::getTableName($className));
+        return $table;
+    }
+
+    /**
+     * @return \stdClass|static
+     */
+    public static function columns() {
+        return static::table()->columns;
+    }
+
+
     protected static function getTableName($className)
     {
-        return $tableName = null === static::$tableName ? $className : static::$tableName;
+        return $tableName = null === static::$tableName ? Utils::fromCamelCase($className) : static::$tableName;
     }
 
     protected $persistent;
