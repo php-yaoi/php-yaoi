@@ -28,43 +28,31 @@ class Mysql extends Utility
     public function getTableDefinition($tableName)
     {
         $res = $this->database->query("DESC ?", new Symbol($tableName));
-        $definition = new Table();
+        $columns = new \stdClass();
+        $primaryKey = array();
         while ($row = $res->fetchRow()) {
             $type = $row['Type'];
-            $phpType = Column::STRING;
             $field = $row['Field'];
-            if ('PRI' === $row['Key']) {
-                $definition->primaryKey [$field] = $field;
-            }
+
+            $phpType = $this->getTypeByString($type);
+
             if ('auto_increment' === $row['Extra']) {
-                $definition->autoIncrement = $field;
-            }
-            $definition->defaults[$field] = $row['Default'];
-            $definition->notNull[$field] = $row['Null'] === 'NO';
-            switch (true) {
-                case 'bigint' === substr($type, 0, 6):
-                case 'int' === substr($type, 0, 3):
-                case 'mediumint' === substr($type, 0, 9):
-                case 'smallint' === substr($type, 0, 8):
-                case 'tinyint' === substr($type, 0, 7):
-                    $phpType = Column::INTEGER;
-                    break;
-
-                case 'decimal' === substr($type, 0, 7):
-                case 'double' === $type:
-                case 'float' === $type:
-                    $phpType = Column::FLOAT;
-                    break;
-
-                case 'date' === $type:
-                case 'datetime' === $type:
-                case 'timestamp' === $type:
-                    $phpType = Column::TIMESTAMP;
-                    break;
+                $phpType += Column::AUTO_ID;
             }
 
-            $definition->columns[$field] = $phpType;
+
+            $column = new Column($phpType);
+            $columns->$field = $column;
+            $column->default = $row['Default'];
+            $column->notNull = $row['Null'] === 'NO';
+
+            if ('PRI' === $row['Key']) {
+                $primaryKey []= $columns->$field;
+            }
         }
+        $definition = new Table($columns);
+        $definition->setPrimaryKey($primaryKey);
+
         return $definition;
     }
 
@@ -117,6 +105,34 @@ class Mysql extends Utility
         $statement .= ')' . PHP_EOL;
 
         return $statement;
+    }
+
+
+    private function getTypeByString($type) {
+        $phpType = Column::STRING;
+        switch (true) {
+            case 'bigint' === substr($type, 0, 6):
+            case 'int' === substr($type, 0, 3):
+            case 'mediumint' === substr($type, 0, 9):
+            case 'smallint' === substr($type, 0, 8):
+            case 'tinyint' === substr($type, 0, 7):
+                $phpType = Column::INTEGER;
+                break;
+
+            case 'decimal' === substr($type, 0, 7):
+            case 'double' === $type:
+            case 'float' === $type:
+                $phpType = Column::FLOAT;
+                break;
+
+            case 'date' === $type:
+            case 'datetime' === $type:
+            case 'timestamp' === $type:
+                $phpType = Column::TIMESTAMP;
+                break;
+
+        }
+        return $phpType;
     }
 
     private function getIntTypeString(Column $column) {

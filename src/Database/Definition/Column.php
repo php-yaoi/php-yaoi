@@ -40,6 +40,12 @@ class Column extends BaseClass
         return $this;
     }
 
+    public $notNull = false;
+    public  function setNotNull($yes = true) {
+        $this->notNull = $yes;
+        return $this;
+    }
+
     public $stringLength;
     public $stringFixed;
     public function setStringLength($length, $fixed = false) {
