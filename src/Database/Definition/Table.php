@@ -34,6 +34,13 @@ class Table extends BaseClass
         }
     }
 
+    /**
+     * @return \stdClass
+     */
+    public function getColumns() {
+        return $this->columns;
+    }
+
 
     public function setColumns($columns) {
         if (is_object($columns)) {

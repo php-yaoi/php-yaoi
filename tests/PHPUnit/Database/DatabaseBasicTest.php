@@ -217,6 +217,7 @@ a15 date,
 a16 datetime,
 a17 time
 )");
+
         $this->assertArrayBitwiseAnd(array(
             'a1' => Column::INTEGER,
             'a2' => Column::INTEGER,
@@ -235,7 +236,7 @@ a17 time
             'a15' => Column::TIMESTAMP,
             'a16' => Column::TIMESTAMP,
             'a17' => Column::STRING
-        ), $db->getTableDefinition('test_columns')->columns);
+        ), (array)$db->getTableDefinition('test_columns')->columns);
     }
 
 

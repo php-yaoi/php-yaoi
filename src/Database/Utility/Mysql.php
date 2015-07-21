@@ -43,8 +43,8 @@ class Mysql extends Utility
 
             $column = new Column($phpType);
             $columns->$field = $column;
-            $column->default = $row['Default'];
-            $column->notNull = $row['Null'] === 'NO';
+            $column->setDefault($row['Default']);
+            $column->setFlag(Column::NOT_NULL, $row['Null'] === 'NO');
 
             if ('PRI' === $row['Key']) {
                 $primaryKey []= $columns->$field;

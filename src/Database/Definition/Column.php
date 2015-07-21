@@ -34,15 +34,21 @@ class Column extends BaseClass
         $this->flags = $flags;
     }
 
-    public $default = false;
-    public function setDefault($value) {
-        $this->default = $value;
+    public function setFlag($flag, $add = true) {
+        $flagSet = $this->flags & $flag;
+        if ($add && !$flagSet) {
+            $this->flags += $flag;
+        }
+        elseif (!$add && $flagSet) {
+            $this->flags -= $flag;
+        }
         return $this;
     }
 
-    public $notNull = false;
-    public  function setNotNull($yes = true) {
-        $this->notNull = $yes;
+
+    public $default = false;
+    public function setDefault($value) {
+        $this->default = $value;
         return $this;
     }
 
