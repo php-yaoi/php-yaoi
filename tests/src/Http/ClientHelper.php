@@ -12,11 +12,12 @@ class ClientHelper
         $result['Head'] = trim($lines[0]);
 
         $result['Head'] = str_replace('HTTP/1.1', 'HTTP/1.0', $result['Head']); // HHVM uses 1.1, PHP 5 uses 1.0
+        $result['Body'] = null;
 
         unset($lines[0]);
         $empty = false;
-        foreach ($lines as $line) {
-            $line = trim($line);
+        foreach ($lines as $rline) {
+            $line = trim($rline);
             if (!$line) {
                 $empty = true;
             }
@@ -30,7 +31,12 @@ class ClientHelper
                     $result []= $line;
                 }
             } else {
-                $result [] = $line;
+                if ((null === $result['Body']) && !$line) {
+                    $result['Body'] = '';
+                }
+                else {
+                    $result ['Body'] .= $rline;
+                }
             }
 
         }

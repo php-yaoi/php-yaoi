@@ -21,7 +21,7 @@ class Client extends \Yaoi\Service implements Able
     public $charset = 'UTF-8';
     /** @var  null|array */
     public $post;
-    public $url;
+    public $url; // TODO no direct access to url
     public $referrer;
     public $xRequestedWith;
     public $followLocation = true;
@@ -138,11 +138,10 @@ class Client extends \Yaoi\Service implements Able
     public function fetch($url = null)
     {
         if (null !== $url) {
+            if (strpos($url, '://') === false) {
+                $url = $this->getAbsoluteUrl($url);
+            }
             $this->url = $url;
-        }
-
-        if (strpos($this->url, '://') === false) {
-            $this->url = $this->getAbsoluteUrl($this->url);
         }
 
         $driver = $this->getDriver();
@@ -173,11 +172,12 @@ class Client extends \Yaoi\Service implements Able
             $headers = $this->prepareUpload($driver, $headers);
         } elseif ($this->post) {
             $driver->setMethod('POST');
-            foreach ($this->post as $key => $data) {
-                if (!is_string($data)) {
-                    $this->post[$key] = (string)$data;
+            array_walk_recursive($this->post, function (&$item){
+                if (is_object($item)) {
+                    $item = (string)$item;
                 }
-            }
+            });
+
             $content = http_build_query($this->post);
             $driver->setRequestContent($content);
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
