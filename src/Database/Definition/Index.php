@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vpoturaev
- * Date: 7/10/15
- * Time: 13:28
- */
 
 namespace Yaoi\Database\Definition;
 

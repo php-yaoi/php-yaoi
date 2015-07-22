@@ -6,9 +6,13 @@ use Yaoi\Test\PHPUnit\TestCase;
 
 class TestEntityDatabaseUnified extends TestCase  {
 
+    public function setUp() {
+        $this->markTestSkipped('Test is deprecated');
+    }
+
+
     public function testDefinition() {
-        $def = TestEntityDB::definition();
-        $table = $def->getTableDefinition();
+        $table = TestEntityDb::table();
 
         $this->assertSame(array(
             0 => 'id',
@@ -17,16 +21,16 @@ class TestEntityDatabaseUnified extends TestCase  {
             3 => 'weight',
             4 => 'url',
             5 => 'birthDate',
-        ), array_keys($table->columns));
+        ), array_keys($table->getColumns(true)));
 
 
-        $this->assertSame('id', $table->autoIncrement);
+        $this->assertSame('id', $table->autoIdColumn->schemaName);
 
-        $this->assertSame('test_entity', $def->getTableName());
+        $this->assertSame('test_entity_db', $table->schemaName);
     }
 
     public function testSave() {
-        $item = new TestEntityDB();
+        $item = new TestEntityDb();
         $item->name = 'Dick Cocker';
         $item->age = 32;
         $item->weight = 78;
@@ -37,12 +41,12 @@ class TestEntityDatabaseUnified extends TestCase  {
         $item->save();
         $this->assertEquals(1, $item->id);
 
-        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
 
         $item->name = 'John Doe';
 
         $item->save();
-        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
 
     }
 
@@ -51,7 +55,7 @@ class TestEntityDatabaseUnified extends TestCase  {
 /**
  * Class TestEntityDB
  */
-class TestEntityDB extends Entity
+class TestEntityDb extends Entity
 {
     public $id;
     public $name;
@@ -60,13 +64,17 @@ class TestEntityDB extends Entity
     public $url;
     public $birthDate;
 
-    public static $tableName = 'test_entity';
-
-    public static function getTableSchema() {
-        $d = new Table();
-        $d->columns = array(
-            'id' => Column::INTEGER
-                & Column::AUTO_ID
-        );
+    /**
+     * Setup column types in provided columns object
+     * @param $columns static|\stdClass
+     */
+    static function setUpColumns($columns)
+    {
+        $columns->id = Column::AUTO_ID;
+        $columns->name = Column::create()->setStringLength(15, true);
+        $columns->age = Column::INTEGER;
+        $columns->weight = Column::INTEGER + Column::UNSIGNED;
+        $columns->url = Column::STRING;
+        $columns->birthDate = Column::TIMESTAMP;
     }
 }

@@ -68,7 +68,6 @@ class HttpUploadTest extends TestCase {
         );
 
         $response = $httpClient->fetch('http://' . TestCase::$settings['envHttpMirrorServer']);
-        echo $response;
         if (false === strpos($response, 'simple=string&object=test-object')) {
             $this->assertTrue(false, 'Response is missing a substring');
         }

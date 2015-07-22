@@ -7,6 +7,8 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 class PdoPgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
 
     public function setUp() {
+        //$this->markTestSkipped('Test is deprecated');
+
         if (extension_loaded('PDO')) {
             $drivers = pdo_drivers();
             if (!in_array('pgsql', $drivers)) {
@@ -28,20 +30,20 @@ class PdoPgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
         }
 
         $createSQL = <<<SQL
-CREATE TABLE test_entity (
+CREATE TABLE test_entity_db (
 "id" SERIAL,
 "name" varchar(255),
 "age" int,
 "weight" int,
 "url" varchar(255),
-"birthDate" timestamp,
+"birth_date" timestamp,
 PRIMARY KEY("id")
 );
 SQL;
 
-        $db->query("DROP TABLE IF EXISTS test_entity");
+        $db->query("DROP TABLE IF EXISTS test_entity_db");
         $db->query($createSQL);
 
-        TestEntityDB::definition()->bindDatabase($db);
+        TestEntityDb::table()->bindDatabase($db);
     }
 }

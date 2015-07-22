@@ -28,51 +28,39 @@ class Mysql extends Utility
     public function getTableDefinition($tableName)
     {
         $res = $this->database->query("DESC ?", new Symbol($tableName));
-        $definition = new Table();
+        $columns = new \stdClass();
+        $primaryKey = array();
         while ($row = $res->fetchRow()) {
             $type = $row['Type'];
-            $phpType = Column::STRING;
             $field = $row['Field'];
-            if ('PRI' === $row['Key']) {
-                $definition->primaryKey [$field] = $field;
-            }
+
+            $phpType = $this->getTypeByString($type);
+
             if ('auto_increment' === $row['Extra']) {
-                $definition->autoIncrement = $field;
-            }
-            $definition->defaults[$field] = $row['Default'];
-            $definition->notNull[$field] = $row['Null'] === 'NO';
-            switch (true) {
-                case 'bigint' === substr($type, 0, 6):
-                case 'int' === substr($type, 0, 3):
-                case 'mediumint' === substr($type, 0, 9):
-                case 'smallint' === substr($type, 0, 8):
-                case 'tinyint' === substr($type, 0, 7):
-                    $phpType = Column::INTEGER;
-                    break;
-
-                case 'decimal' === substr($type, 0, 7):
-                case 'double' === $type:
-                case 'float' === $type:
-                    $phpType = Column::FLOAT;
-                    break;
-
-                case 'date' === $type:
-                case 'datetime' === $type:
-                case 'timestamp' === $type:
-                    $phpType = Column::TIMESTAMP;
-                    break;
+                $phpType += Column::AUTO_ID;
             }
 
-            $definition->columns[$field] = $phpType;
+
+            $column = new Column($phpType);
+            $columns->$field = $column;
+            $column->setDefault($row['Default']);
+            $column->setFlag(Column::NOT_NULL, $row['Null'] === 'NO');
+
+            if ('PRI' === $row['Key']) {
+                $primaryKey []= $columns->$field;
+            }
         }
+        $definition = new Table($columns);
+        $definition->setPrimaryKey($primaryKey);
+
         return $definition;
     }
 
     public function generateCreateTableOnDefinition(Table $table) {
-        $statement = 'CREATE TABLE `' . $table->_tableName . '` (' . PHP_EOL;
+        $statement = 'CREATE TABLE `' . $table->schemaName . '` (' . PHP_EOL;
 
-        foreach ($table->columns as $name => $column) {
-            $statement .= ' `' . $name . '` ' . $this->getColumnTypeString($column);
+        foreach ($table->getColumns(true) as $column) {
+            $statement .= ' `' . $column->schemaName . '` ' . $this->getColumnTypeString($column);
 
             if ($column->flags & Column::AUTO_ID) {
                 $statement .= ' AUTO_INCREMENT';
@@ -84,12 +72,12 @@ class Mysql extends Utility
         foreach ($table->indexes as $index) {
             $indexString = '';
             foreach ($index->columns as $column) {
-                $indexString .= '`' . $column->name . '`, ';
+                $indexString .= '`' . $column->schemaName . '`, ';
             }
             $indexString = substr($indexString, 0, -2);
 
             if ($index->type === Index::TYPE_KEY) {
-                $statement .= 'KEY (' . $indexString . '),' . PHP_EOL;
+                $statement .= ' KEY (' . $indexString . '),' . PHP_EOL;
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
                 $statement .= ' UNIQUE KEY (' . $indexString . '),' . PHP_EOL;
@@ -101,15 +89,15 @@ class Mysql extends Utility
             $fk = $constraint[0];
             /** @var Column $ref */
             $ref = $constraint[1];
-            $constraintName = $table->_tableName . '_' . $fk->name;
+            $constraintName = $table->schemaName . '_' . $fk->schemaName;
 
-            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->name . '`) REFERENCES `'
-                . $ref->table->_tableName . '` (`' . $ref->name . '`),' . PHP_EOL;
+            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->schemaName . '`) REFERENCES `'
+                . $ref->table->schemaName . '` (`' . $ref->schemaName . '`),' . PHP_EOL;
         }
 
         $statement .= ' PRIMARY KEY (';
         foreach ($table->primaryKey as $column) {
-            $statement .= '`' . $column->name . '`,';
+            $statement .= '`' . $column->schemaName . '`,';
         }
         $statement = substr($statement, 0, -1);
         $statement .= ')' . PHP_EOL;
@@ -117,6 +105,34 @@ class Mysql extends Utility
         $statement .= ')' . PHP_EOL;
 
         return $statement;
+    }
+
+
+    private function getTypeByString($type) {
+        $phpType = Column::STRING;
+        switch (true) {
+            case 'bigint' === substr($type, 0, 6):
+            case 'int' === substr($type, 0, 3):
+            case 'mediumint' === substr($type, 0, 9):
+            case 'smallint' === substr($type, 0, 8):
+            case 'tinyint' === substr($type, 0, 7):
+                $phpType = Column::INTEGER;
+                break;
+
+            case 'decimal' === substr($type, 0, 7):
+            case 'double' === $type:
+            case 'float' === $type:
+                $phpType = Column::FLOAT;
+                break;
+
+            case 'date' === $type:
+            case 'datetime' === $type:
+            case 'timestamp' === $type:
+                $phpType = Column::TIMESTAMP;
+                break;
+
+        }
+        return $phpType;
     }
 
     private function getIntTypeString(Column $column) {
@@ -187,7 +203,7 @@ class Mysql extends Utility
                 break;
 
             default:
-                throw new Exception('Undefined column type for column ' . $column->name, Exception::INVALID_SCHEMA);
+                throw new Exception('Undefined column type for column ' . $column->propertyName, Exception::INVALID_SCHEMA);
 
         }
 

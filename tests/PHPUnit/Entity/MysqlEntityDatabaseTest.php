@@ -7,6 +7,8 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 class MysqlEntityDatabaseTest extends TestEntityDatabaseUnified {
 
     public function setUp() {
+        //$this->markTestSkipped('Test is deprecated');
+
         try {
             $db = Database::getInstance('test_mysqli');
         }
@@ -15,19 +17,19 @@ class MysqlEntityDatabaseTest extends TestEntityDatabaseUnified {
         }
 
         $createSQL = <<<SQL
-CREATE TABLE test_entity (
+CREATE TABLE test_entity_db (
 `id` integer unsigned auto_increment,
 `name` varchar(255),
 `age` tinyint,
 `weight` tinyint,
 `url` varchar(255),
-`birthDate` timestamp,
+`birth_date` timestamp,
 PRIMARY KEY(`id`))
 SQL;
 
-        $db->query("DROP TABLE IF EXISTS `test_entity`");
+        $db->query("DROP TABLE IF EXISTS `test_entity_db`");
         $db->query($createSQL);
 
-        TestEntityDB::definition()->bindDatabase($db);
+        TestEntityDb::table()->bindDatabase($db);
     }
 }

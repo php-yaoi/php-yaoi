@@ -10,21 +10,31 @@ class Sqlite extends Utility
 {
     public function getTableDefinition($tableName)
     {
-        $definition = new Table();
         $res = $this->database->query("PRAGMA table_info($tableName)");
 
+        /** @var Column[] $primaryKey */
+        $primaryKey = array();
+        $columns = new \stdClass();
         while ($r = $res->fetchRow()) {
             $field = $r['name'];
+
+            $column = new Column(Column::AUTO_TYPE);
+            $column->setFlag(Column::NOT_NULL, (bool)$r['notnull']);
+            $column->setDefault($r['dflt_value']);
+
             if ($r['pk']) {
-                $definition->primaryKey [$field] = $field;
+                $primaryKey []= $column;
             }
-            $definition->defaults[$field] = $r['dflt_value'];
-            $definition->notNull[$field] = (bool)$r['notnull'];
-            $definition->columns[$field] = Column::AUTO_TYPE;
+
+            $columns->$field = $column;
         }
-        if (count($definition->primaryKey) === 1) {
-            $definition->autoIncrement = reset($definition->primaryKey);
+        if (count($primaryKey) === 1) {
+            $primaryKey[0]->setFlag(Column::AUTO_ID);
         }
+
+        $definition = new Table($columns);
+        $definition->setPrimaryKey($primaryKey);
+
 
         return $definition;
     }

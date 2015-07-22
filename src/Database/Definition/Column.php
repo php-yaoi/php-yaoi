@@ -26,10 +26,25 @@ class Column extends BaseClass
 
 
     public $flags;
-    public function __construct($flags = null)
+    public function __construct($flags = self::STRING)
     {
+        if ($flags === self::AUTO_ID) {
+            $flags += self::INTEGER;
+        }
         $this->flags = $flags;
     }
+
+    public function setFlag($flag, $add = true) {
+        $flagSet = $this->flags & $flag;
+        if ($add && !$flagSet) {
+            $this->flags += $flag;
+        }
+        elseif (!$add && $flagSet) {
+            $this->flags -= $flag;
+        }
+        return $this;
+    }
+
 
     public $default = false;
     public function setDefault($value) {
@@ -52,8 +67,33 @@ class Column extends BaseClass
         return $this;
     }
 
+    public $isUnique;
+    public function setUnique($yes = true) {
+        $this->isUnique = $yes;
+        return $this;
+    }
 
-    public $name;
+    public $isIndexed;
+    public function setIndexed($yes = true) {
+        $this->isIndexed = $yes;
+        return $this;
+    }
+
+
+    /**
+     * Name of mapped class property, usually in camelCase
+     * @var string
+     */
+    public $propertyName;
+
+    /**
+     * Name of database table column, in underscore_lowercase
+     * @var
+     */
+    public $schemaName;
+
+
+
     /** @var  Table */
     public $table;
 
@@ -64,14 +104,14 @@ class Column extends BaseClass
         }
 
         if ($columnType !== self::AUTO_TYPE) {
-            switch ($columnType) {
-                case self::FLOAT:
+            switch (true) {
+                case self::FLOAT & $columnType:
                     $value = (float)$value;
                     break;
-                case self::INTEGER:
+                case self::INTEGER & $columnType:
                     $value = (int)$value;
                     break;
-                case self::STRING:
+                case self::STRING & $columnType:
                     $value = (string)$value;
             }
         }

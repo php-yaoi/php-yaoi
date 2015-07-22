@@ -90,7 +90,7 @@ class Query implements \Iterator
         $result = array();
 
         if ($this->resultClass) {
-            /** @var Contract $class */
+            /** @var \Yaoi\Mappable\Contract $class */
             $class = $this->resultClass;
 
             if ($keyField !== null) {

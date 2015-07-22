@@ -6,6 +6,8 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 
 class SqliteEntityDatabaseTest extends TestEntityDatabaseUnified {
     public function setUp() {
+        //$this->markTestSkipped('Test is deprecated');
+
         $dbPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-sqlite5.db';
 
         /*
@@ -16,19 +18,19 @@ class SqliteEntityDatabaseTest extends TestEntityDatabaseUnified {
         $db = new Database('sqlite:///' . $dbPath);
 
         $createSQL = <<<SQL
-CREATE TABLE "test_entity" (
+CREATE TABLE "test_entity_db" (
 "id" INTEGER PRIMARY KEY,
 "name",
 "age",
 "weight",
 "url",
-"birthDate")
+"birth_date")
 SQL;
-        $db->query('DROP TABLE IF EXISTS "test_entity"');
+        $db->query('DROP TABLE IF EXISTS "test_entity_db"');
         $db->query($createSQL);
 
 
-        TestEntityDB::definition()->bindDatabase($db);
+        TestEntityDb::table()->bindDatabase($db);
     }
 
 }

@@ -2,36 +2,63 @@
 
 namespace Yaoi\Database;
 
-use Yaoi\Database\Entity\Definition;
+use Yaoi\Database\Definition\Table;
 use Yaoi\Entity\Exception;
 use Yaoi\Mappable;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
+use Yaoi\String\Utils;
 
-abstract class Entity extends BaseClass implements Mappable\Contract
+abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Contract
 {
-    static protected $tableName;
+    protected static $tableName;
 
+    /**
+     * @var Table[]
+     */
+    private static $tables = array();
 
-    private static $definitions;
-
-    public static function definition()
+    /**
+     * Method should return table definition of entity
+     * @return Table
+     */
+    public static function table()
     {
         $className = get_called_class();
-        $definition = &self::$definitions[$className];
-        if (null === $definition) {
-            $definition = new Definition();
-            $definition->className = $className;
-            $definition->tableName = static::$tableName;
+        $table = &self::$tables[$className];
+        if (null !== $table) {
+            return $table;
         }
-        return $definition;
+        $columns = new \stdClass();
+        static::setUpColumns($columns);
+        $table = new Table($columns);
+
+        $table->schemaName = null === static::$tableName
+            ? Utils::fromCamelCase(str_replace('\\', '', $className))
+            : static::$tableName;
+
+        $table->className = $className;
+        return $table;
     }
 
-    protected static function getTableName($className)
+    /**
+     * @return \stdClass|static
+     */
+    public static function columns() {
+        return static::table()->columns;
+    }
+
+
+    /**
+     * @return string
+     * @deprecated use ::table()->schemaName
+     * @todo remove method
+     */
+    protected static function getTableName()
     {
-        return $tableName = null === static::$tableName ? $className : static::$tableName;
+        return static::table()->schemaName;
     }
 
     protected $persistent;
@@ -40,28 +67,28 @@ abstract class Entity extends BaseClass implements Mappable\Contract
      * @param null $id
      * @return null|SelectInterface|static
      * @throws Exception
+     * @todo testdoc
      */
     public static function find($id = null)
     {
-        $definition = static::definition();
-        $tableDefinition = $definition->getTableDefinition();
-        $tableName = $definition->getTableName();
-        $statement = $definition->database()->select($tableName);
-        $statement->bindResultClass($definition->className);
+        $className = get_called_class();
+        $table = static::table();
+        $statement = $table->database()->select($table->schemaName);
+        $statement->bindResultClass($className);
 
         if ($id instanceof static) {
             foreach ($id->toArray(true) as $name => $value) {
-                $statement->where("? = ?", new Symbol($tableName, $name), $value);
+                $statement->where("? = ?", new Symbol($table->schemaName, $name), $value);
             }
         } elseif ($id) {
             $args = func_get_args();
             $i = 0;
-            foreach ($tableDefinition->primaryKey as $keyField) {
+            foreach ($table->primaryKey as $keyField) {
                 if (!isset($args[$i])) {
                     throw new Exception('Full primary key required', Exception::KEY_MISSING);
                 }
                 $keyValue = $args[$i++];
-                $statement->where('? = ?', new Symbol($tableName, $keyField), $keyValue);
+                $statement->where('? = ?', new Symbol($table->schemaName, $keyField->schemaName), $keyValue);
             }
             return $statement->query()->fetchRow();
         }
@@ -69,24 +96,15 @@ abstract class Entity extends BaseClass implements Mappable\Contract
     }
 
 
-    public function pivot()
-    {
-
-    }
-
-
     static function fromArray(array $row, $object = null, $source = null)
     {
-        $definition = static::definition();
-        $tableDefinition = $definition->getTableDefinition();
-
         if (is_null($object)) {
             $object = new static;
         }
 
-        foreach ($tableDefinition->columns as $column => $columnType) {
-            if (array_key_exists($column, $row)) {
-                $object->$column = Column::castField($row[$column], $columnType);
+        foreach (static::table()->getColumns(true) as $column) {
+            if (array_key_exists($column->schemaName, $row)) {
+                $object->{$column->propertyName} = Column::castField($row[$column->schemaName], $column->flags);
             }
         }
 
@@ -101,33 +119,17 @@ abstract class Entity extends BaseClass implements Mappable\Contract
     public function toArray($skipNotSetProperties = false)
     {
         $result = array();
-        foreach (static::definition()->getColumns() as $name => $type) {
-            $value = $this->$name;
+        foreach (static::table()->getColumns(true) as $column) {
+            $value = $this->{$column->propertyName};
             if (null === $value) {
                 if ($skipNotSetProperties) {
                     continue;
                 }
             } else {
-                switch ($type) {
-                    case Column::STRING:
-                        $value = (string)$value;
-                        break;
-                    case Column::INTEGER:
-                        $value = (int)$value;
-                        break;
-                    case Column::FLOAT:
-                        $value = (float)$value;
-                        break;
-
-                    /* TODO something about timestamps
-                    case Database::COLUMN_TYPE_TIMESTAMP:
-                        $value = ?
-                        break;
-                    */
-                }
+                $value = Column::castField($value, $column->flags);
             }
 
-            $result[$name] = $value;
+            $result[$column->schemaName] = $value;
         }
         return $result;
     }
@@ -144,21 +146,16 @@ abstract class Entity extends BaseClass implements Mappable\Contract
 
     public function update()
     {
-        $def = static::definition();
-        $tableDefinition = $def->getTableDefinition();
-        $update = $def->database()->update($def->getTableName());
-        $data = array();
-        foreach ($tableDefinition->columns as $column => $columnType) {
-            if (property_exists($this, $column)) {
-                $data[$column] = Column::castField($this->$column, $columnType);
-            }
-        }
-        foreach ($tableDefinition->primaryKey as $keyField) {
-            if (!isset($data[$keyField])) {
+        $table = static::table();
+        $update = $table->database()->update($table->schemaName);
+        $data = $this->toArray();
+
+        foreach ($table->primaryKey as $keyField) {
+            if (!isset($data[$keyField->schemaName])) {
                 throw new Exception('Primary key required for update', Exception::KEY_MISSING);
             }
-            $update->where("? = ?", new Symbol($keyField), $this->$keyField);
-            unset($data[$keyField]);
+            $update->where("? = ?", new Symbol($keyField->schemaName), $data[$keyField->schemaName]);
+            unset($data[$keyField->schemaName]);
         }
         $update->set($data);
         $update->query();
@@ -168,19 +165,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract
 
     public function insert()
     {
-        $definition = static::definition();
-        $tableDefinition = $definition->getTableDefinition();
-        $insert = $definition->database()->insert($definition->getTableName());
-        $data = array();
-        foreach ($tableDefinition->columns as $column => $columnType) {
-            if (property_exists($this, $column)) {
-                $data[$column] = Column::castField($this->$column, $columnType);
-            }
-        }
+        $table = static::table();
+        $insert = $table->database()->insert($table->schemaName);
+        $data = $this->toArray();
 
-        if ($autoId = $tableDefinition->autoIncrement) {
-            if (empty($this->$autoId)) {
-                unset($data[$autoId]);
+        if ($autoId = $table->autoIdColumn) {
+            if (empty($data[$autoId->schemaName])) {
+                unset($data[$autoId->schemaName]);
             }
         }
 
@@ -188,9 +179,9 @@ abstract class Entity extends BaseClass implements Mappable\Contract
 
         $query = $insert->query();
 
-        if ($autoId = $tableDefinition->autoIncrement) {
-            if (empty($this->$autoId)) {
-                $this->$autoId = $query->lastInsertId();
+        if ($autoId) {
+            if (empty($this->{$autoId->propertyName})) {
+                $this->{$autoId->propertyName} = $query->lastInsertId();
             }
         }
 

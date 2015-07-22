@@ -7,6 +7,9 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 class PgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
 
     public function setUp() {
+        //$this->markTestSkipped('Test is deprecated');
+
+
         if (!function_exists('pg_connect')) {
             $this->markTestSkipped('pg_connect is not available.');
             return;
@@ -15,20 +18,20 @@ class PgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
         $db = Database::getInstance('test_pgsql');
 
         $createSQL = <<<SQL
-CREATE TABLE test_entity (
+CREATE TABLE test_entity_db (
 "id" SERIAL,
 "name" varchar(255),
 "age" int,
 "weight" int,
 "url" varchar(255),
-"birthDate" timestamp,
+"birth_date" timestamp,
 PRIMARY KEY("id")
 );
 SQL;
 
-        $db->query("DROP TABLE IF EXISTS test_entity");
+        $db->query("DROP TABLE IF EXISTS test_entity_db");
         $db->query($createSQL);
 
-        TestEntityDB::definition()->bindDatabase($db);
+        TestEntityDb::table()->bindDatabase($db);
     }
 }

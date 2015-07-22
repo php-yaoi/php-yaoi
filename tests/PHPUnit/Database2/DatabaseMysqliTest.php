@@ -75,13 +75,14 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns2 = new \stdClass();
         $columns2->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns2->meta = Column::create(Column::STRING);
-        $table2 = Table::create($columns2)->setTableName('test2');
+        $table2 = Table::create($columns2);
+        $table2->schemaName = 'test2';
 
 
         $columns = new \stdClass();
         $columns->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns->fk_id = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED)
-            ->setConstraint($table2->id);
+            ->setConstraint($table2->getColumns()->id);
 
         $columns->fk_id2 = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED);
         $columns->dateUt = Column::create(Column::TIMESTAMP)->setDefault(null);
@@ -90,7 +91,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->type = Column::create(Column::STRING)->setStringLength(10, true);
 
         $table = Table::create($columns)
-            ->setTableName('test_entity')
+            ->setSchemaName('test_entity')
             ->setPrimaryKey($columns->id)
             ->addIndex(Index::TYPE_UNIQUE, $columns->dateUt, $columns->name, $columns->type);
 
@@ -100,11 +101,11 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
  `id` int unsigned NOT NULL AUTO_INCREMENT,
  `fk_id` int unsigned NOT NULL,
  `fk_id2` int unsigned NOT NULL,
- `dateUt` timestamp DEFAULT NULL,
+ `date_ut` timestamp DEFAULT NULL,
  `name` varchar(255) NOT NULL DEFAULT \'\',
  `seconds` float NOT NULL DEFAULT 0,
  `type` char(10),
- UNIQUE KEY (`dateUt`, `name`, `type`),
+ UNIQUE KEY (`date_ut`, `name`, `type`),
  CONSTRAINT `test_entity_fk_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
  PRIMARY KEY (`id`)
 )
@@ -125,7 +126,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->time = Column::create(Column::INTEGER);
         $columns->type = Column::create(Column::STRING);
 
-        $table = Table::create($columns)->setTableName('test_name')->setPrimaryKey($columns->id);
+        $table = Table::create($columns)->setSchemaName('test_name')->setPrimaryKey($columns->id);
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
