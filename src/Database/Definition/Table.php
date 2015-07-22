@@ -3,6 +3,7 @@
 namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
+use Yaoi\Database;
 use Yaoi\Database\Exception;
 use Yaoi\String\Utils;
 
@@ -142,6 +143,25 @@ class Table extends BaseClass
     public function addConstraint(Column $foreignKeyColumn, Column $referenceColumn) {
         $this->constraints []= array($foreignKeyColumn, $referenceColumn);
         return $this;
+    }
+
+
+    private $database;
+    public function bindDatabase(Database\Contract $database) {
+        $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @return \Yaoi\Database\Contract;
+     * @throws \Yaoi\Service\Exception
+     */
+    public function database()
+    {
+        if (null === $this->database) {
+            $this->database = Database::getInstance();
+        }
+        return $this->database;
     }
 
 }

@@ -104,14 +104,14 @@ class Column extends BaseClass
         }
 
         if ($columnType !== self::AUTO_TYPE) {
-            switch ($columnType) {
-                case self::FLOAT:
+            switch (true) {
+                case self::FLOAT & $columnType:
                     $value = (float)$value;
                     break;
-                case self::INTEGER:
+                case self::INTEGER & $columnType:
                     $value = (int)$value;
                     break;
-                case self::STRING:
+                case self::STRING & $columnType:
                     $value = (string)$value;
             }
         }

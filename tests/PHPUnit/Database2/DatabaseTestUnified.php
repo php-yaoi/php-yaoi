@@ -48,7 +48,6 @@ SQL;
     }
 
     protected function primaryTest(Table $def) {
-        var_dump($def->primaryKey);
         $this->assertSame(array('id1', 'id2'), array_keys($def->primaryKey));
     }
 

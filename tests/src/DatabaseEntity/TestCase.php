@@ -1,7 +1,6 @@
 <?php
 namespace YaoiTests\DatabaseEntity;
 
-
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use YaoiTests\EntityOneABBR;

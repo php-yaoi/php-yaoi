@@ -12,8 +12,7 @@ class TestEntityDatabaseUnified extends TestCase  {
 
 
     public function testDefinition() {
-        $def = TestEntityDb::definition();
-        $table = $def->getTableDefinition();
+        $table = TestEntityDb::table();
 
         $this->assertSame(array(
             0 => 'id',
@@ -21,13 +20,13 @@ class TestEntityDatabaseUnified extends TestCase  {
             2 => 'age',
             3 => 'weight',
             4 => 'url',
-            5 => 'birth_date',
+            5 => 'birthDate',
         ), array_keys($table->getColumns(true)));
 
 
         $this->assertSame('id', $table->autoIdColumn->schemaName);
 
-        $this->assertSame('test_entity_db', $def->getTableName());
+        $this->assertSame('test_entity_db', $table->schemaName);
     }
 
     public function testSave() {
@@ -72,10 +71,10 @@ class TestEntityDb extends Entity
     static function setUpColumns($columns)
     {
         $columns->id = Column::AUTO_ID;
-        $columns->age = Column::INTEGER;
-        $columns->birthDate = Column::TIMESTAMP;
         $columns->name = Column::create()->setStringLength(15, true);
-        $columns->url = Column::STRING;
+        $columns->age = Column::INTEGER;
         $columns->weight = Column::INTEGER + Column::UNSIGNED;
+        $columns->url = Column::STRING;
+        $columns->birthDate = Column::TIMESTAMP;
     }
 }
