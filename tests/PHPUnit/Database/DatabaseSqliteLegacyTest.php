@@ -196,13 +196,19 @@ class DatabaseSqliteLegacyTest extends TestCase  {
             'a4' => 4,
             'a5' => 'hooy',
         ), $db2->query("SELECT * FROM tes2")->fetchRow());
+
+        $columnFlags = array();
+        foreach ($db2->getTableDefinition('tes2')->getColumns(true) as $column) {
+            $columnFlags[$column->propertyName] = $column->flags;
+        }
+
         $this->assertArrayBitwiseAnd(array(
             'a1' => Column::AUTO_TYPE,
             'a2' => Column::AUTO_TYPE,
             'a3' => Column::AUTO_TYPE,
             'a4' => Column::AUTO_TYPE,
             'a5' => Column::AUTO_TYPE,
-        ), $db2->getTableDefinition('tes2')->columns);
+        ), $columnFlags);
 
         $db2->query("DROP table tes2");
 

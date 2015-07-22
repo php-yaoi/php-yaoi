@@ -32,25 +32,24 @@ SQL;
 
 
     protected function columnsTest(Table $def) {
-        $this->assertSame(array('id1', 'id2', 'name', 'address'), array_keys($def->columns));
+        $this->assertSame(array('id1', 'id2', 'name', 'address'), array_keys($def->getColumns(true)));
     }
 
     protected function autoIncrementTest(Table $def) {
-        $this->assertSame('id1', $def->autoIncrement);
+        $this->assertSame('id1', $def->autoIdColumn->propertyName);
     }
 
     protected function notNullTest(Table $def)
     {
-        $this->assertSame(array(
-            'id1' => true,
-            'id2' => true,
-            'name' => true,
-            'address' => false,
-        ), $def->notNull);
+        $this->assertNotEmpty($def->getColumn('id1')->flags & Column::NOT_NULL);
+        $this->assertNotEmpty($def->getColumn('id2')->flags & Column::NOT_NULL);
+        $this->assertNotEmpty($def->getColumn('name')->flags & Column::NOT_NULL);
+        $this->assertEmpty($def->getColumn('address')->flags & Column::NOT_NULL);
     }
 
     protected function primaryTest(Table $def) {
-        $this->assertSame(array('id1' => 'id1', 'id2' => 'id2'), $def->primaryKey);
+        var_dump($def->primaryKey);
+        $this->assertSame(array('id1', 'id2'), array_keys($def->primaryKey));
     }
 
     public function testDescribe() {
@@ -60,7 +59,7 @@ SQL;
 
         $this->initDef();
 
-        $def = $this->db->getTableDefinition('test_def');
+        $def = $this->db->getUtility()->getTableDefinition('test_def');
         $this->columnsTest($def);
         $this->autoIncrementTest($def);
         $this->notNullTest($def);
@@ -94,6 +93,11 @@ a17 time
 SQL;
 
     protected function columnsTest2(Table $def) {
+        $columnFlags = array();
+        foreach ($def->getColumns(true) as $column) {
+            $columnFlags[$column->propertyName] = $column->flags;
+        }
+
         $this->assertArrayBitwiseAnd(array(
             'a1' => Column::INTEGER,
             'a2' => Column::INTEGER,
@@ -112,7 +116,7 @@ SQL;
             'a15' => Column::TIMESTAMP,
             'a16' => Column::TIMESTAMP,
             'a17' => Column::STRING
-        ), $def->columns);
+        ), $columnFlags);
     }
 
     protected function initDef2() {

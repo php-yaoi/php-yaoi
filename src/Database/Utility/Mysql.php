@@ -57,10 +57,10 @@ class Mysql extends Utility
     }
 
     public function generateCreateTableOnDefinition(Table $table) {
-        $statement = 'CREATE TABLE `' . $table->name . '` (' . PHP_EOL;
+        $statement = 'CREATE TABLE `' . $table->schemaName . '` (' . PHP_EOL;
 
-        foreach ($table->columns as $name => $column) {
-            $statement .= ' `' . $name . '` ' . $this->getColumnTypeString($column);
+        foreach ($table->getColumns(true) as $column) {
+            $statement .= ' `' . $column->schemaName . '` ' . $this->getColumnTypeString($column);
 
             if ($column->flags & Column::AUTO_ID) {
                 $statement .= ' AUTO_INCREMENT';
@@ -72,12 +72,12 @@ class Mysql extends Utility
         foreach ($table->indexes as $index) {
             $indexString = '';
             foreach ($index->columns as $column) {
-                $indexString .= '`' . $column->name . '`, ';
+                $indexString .= '`' . $column->schemaName . '`, ';
             }
             $indexString = substr($indexString, 0, -2);
 
             if ($index->type === Index::TYPE_KEY) {
-                $statement .= 'KEY (' . $indexString . '),' . PHP_EOL;
+                $statement .= ' KEY (' . $indexString . '),' . PHP_EOL;
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
                 $statement .= ' UNIQUE KEY (' . $indexString . '),' . PHP_EOL;
@@ -89,15 +89,15 @@ class Mysql extends Utility
             $fk = $constraint[0];
             /** @var Column $ref */
             $ref = $constraint[1];
-            $constraintName = $table->name . '_' . $fk->name;
+            $constraintName = $table->schemaName . '_' . $fk->schemaName;
 
-            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->name . '`) REFERENCES `'
-                . $ref->table->name . '` (`' . $ref->name . '`),' . PHP_EOL;
+            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->schemaName . '`) REFERENCES `'
+                . $ref->table->schemaName . '` (`' . $ref->schemaName . '`),' . PHP_EOL;
         }
 
         $statement .= ' PRIMARY KEY (';
         foreach ($table->primaryKey as $column) {
-            $statement .= '`' . $column->name . '`,';
+            $statement .= '`' . $column->schemaName . '`,';
         }
         $statement = substr($statement, 0, -1);
         $statement .= ')' . PHP_EOL;
@@ -203,7 +203,7 @@ class Mysql extends Utility
                 break;
 
             default:
-                throw new Exception('Undefined column type for column ' . $column->name, Exception::INVALID_SCHEMA);
+                throw new Exception('Undefined column type for column ' . $column->propertyName, Exception::INVALID_SCHEMA);
 
         }
 

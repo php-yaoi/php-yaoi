@@ -4,6 +4,8 @@ namespace YaoiTests\DatabaseEntity;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use YaoiTests\EntityOneABBR;
+use YaoiTests\EntityTwo;
 
 abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
 {
@@ -39,8 +41,60 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
         $columns->id = new Column(Column::AUTO_ID);
 
         $table = new Table($columns);
-        $this->assertSame(array($columns->id), $table->primaryKey);
+        $this->assertSame(array('id' => $columns->id), $table->primaryKey);
     }
+
+
+    public function testColumns() {
+        $table = EntityOneABBR::table();
+        $columnsFlags = array();
+        foreach ($table->getColumns(true) as $column) {
+            $columnsFlags[$column->propertyName] = $column->flags;
+        }
+
+        $this->assertArrayBitwiseAnd(array(
+            'id' => Column::AUTO_ID + Column::INTEGER,
+            'name' => Column::STRING + Column::NOT_NULL,
+            'address' => Column::STRING,
+            'createdAt' => Column::TIMESTAMP,
+        ), $columnsFlags);
+    }
+
+
+    /**
+     * @see Yaoi\Database\Definition\Table::schemaName
+     */
+    public function testSchemaName() {
+        $this->assertSame('yaoi_tests_entity_one_abbr', EntityOneABBR::table()->schemaName);
+        $this->assertSame('custom_name', EntityTwo::table()->schemaName);
+    }
+
+    /**
+     * @see Yaoi\Database\Definition\Table::schemaName
+     */
+    public function testClassName() {
+        $this->assertSame('YaoiTests\EntityOneABBR', EntityOneABBR::table()->className);
+        $this->assertSame('YaoiTests\EntityTwo', EntityTwo::table()->className);
+    }
+
+
+    protected $entityOneCreateTableExpected;
+    protected $entityTwoCreateTableExpected;
+
+
+    public function testCreateTable() {
+        $this->assertSame(
+            $this->entityOneCreateTableExpected,
+            $this->database->getUtility()
+                ->generateCreateTableOnDefinition(EntityOneABBR::table()));
+
+        $this->assertSame(
+            $this->entityTwoCreateTableExpected,
+            $this->database->getUtility()
+                ->generateCreateTableOnDefinition(EntityTwo::table()));
+
+    }
+
 
 
 

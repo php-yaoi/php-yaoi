@@ -6,6 +6,11 @@ use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
 
+/**
+ * Class Definition
+ * @package Yaoi\Database\Entity
+ * @deprecated
+ */
 class Definition extends BaseClass
 {
     public $className;
@@ -48,7 +53,7 @@ class Definition extends BaseClass
     public function getTableDefinition()
     {
         if (null === $this->tableDefinition) {
-            $this->tableDefinition = $this->database()->getTableDefinition($this->getTableName());
+            $this->tableDefinition = $this->database()->getUtility()->getTableDefinition($this->getTableName());
         }
         return $this->tableDefinition;
     }

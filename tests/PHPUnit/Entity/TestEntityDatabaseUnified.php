@@ -6,8 +6,13 @@ use Yaoi\Test\PHPUnit\TestCase;
 
 class TestEntityDatabaseUnified extends TestCase  {
 
+    public function setUp() {
+        $this->markTestSkipped('Test is deprecated');
+    }
+
+
     public function testDefinition() {
-        $def = TestEntityDB::definition();
+        $def = TestEntityDb::definition();
         $table = $def->getTableDefinition();
 
         $this->assertSame(array(
@@ -16,17 +21,17 @@ class TestEntityDatabaseUnified extends TestCase  {
             2 => 'age',
             3 => 'weight',
             4 => 'url',
-            5 => 'birthDate',
-        ), array_keys($table->columns));
+            5 => 'birth_date',
+        ), array_keys($table->getColumns(true)));
 
 
-        $this->assertSame('id', $table->autoIncrement);
+        $this->assertSame('id', $table->autoIdColumn->schemaName);
 
-        $this->assertSame('test_entity', $def->getTableName());
+        $this->assertSame('test_entity_db', $def->getTableName());
     }
 
     public function testSave() {
-        $item = new TestEntityDB();
+        $item = new TestEntityDb();
         $item->name = 'Dick Cocker';
         $item->age = 32;
         $item->weight = 78;
@@ -37,12 +42,12 @@ class TestEntityDatabaseUnified extends TestCase  {
         $item->save();
         $this->assertEquals(1, $item->id);
 
-        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
 
         $item->name = 'John Doe';
 
         $item->save();
-        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
 
     }
 
@@ -51,7 +56,7 @@ class TestEntityDatabaseUnified extends TestCase  {
 /**
  * Class TestEntityDB
  */
-class TestEntityDB extends Entity
+class TestEntityDb extends Entity
 {
     public $id;
     public $name;

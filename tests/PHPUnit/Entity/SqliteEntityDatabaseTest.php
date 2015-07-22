@@ -6,6 +6,8 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 
 class SqliteEntityDatabaseTest extends TestEntityDatabaseUnified {
     public function setUp() {
+        $this->markTestSkipped('Test is deprecated');
+
         $dbPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-sqlite5.db';
 
         /*
@@ -28,7 +30,7 @@ SQL;
         $db->query($createSQL);
 
 
-        TestEntityDB::definition()->bindDatabase($db);
+        TestEntityDb::definition()->bindDatabase($db);
     }
 
 }

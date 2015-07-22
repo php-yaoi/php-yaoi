@@ -10,7 +10,7 @@ class Utils
 
     static function fromCamelCase($string, $delimiter = '_')
     {
-        return strtolower(ltrim(preg_replace('/([A-Z])/', $delimiter . '$1', $string), $delimiter));
+        return strtolower(ltrim(preg_replace('/([A-Z]+)/', $delimiter . '$1', $string), $delimiter));
     }
 
     static function starts($haystack, $needle)

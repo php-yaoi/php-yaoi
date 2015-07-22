@@ -68,13 +68,32 @@ class Column extends BaseClass
     }
 
     public $isUnique;
-    public function unique($yes = true) {
+    public function setUnique($yes = true) {
         $this->isUnique = $yes;
         return $this;
     }
 
+    public $isIndexed;
+    public function setIndexed($yes = true) {
+        $this->isIndexed = $yes;
+        return $this;
+    }
 
-    public $name;
+
+    /**
+     * Name of mapped class property, usually in camelCase
+     * @var string
+     */
+    public $propertyName;
+
+    /**
+     * Name of database table column, in underscore_lowercase
+     * @var
+     */
+    public $schemaName;
+
+
+
     /** @var  Table */
     public $table;
 

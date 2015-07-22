@@ -8,6 +8,8 @@ use Yaoi\Test\PHPUnit\TestCase;
 class UtilsTest extends TestCase  {
     public function testCamelCase() {
         $this->assertSame('lala-lala', Utils::fromCamelCase('LalaLala', '-'));
+        $this->assertSame('data_abbr', Utils::fromCamelCase('DataABBR'));
+        $this->assertSame('eshop', Utils::fromCamelCase('EShop'));
         $this->assertSame('LalaLala', Utils::toCamelCase('lala-lala', '-'));
     }
 

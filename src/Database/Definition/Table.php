@@ -4,30 +4,34 @@ namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
 use Yaoi\Database\Exception;
+use Yaoi\String\Utils;
 
 class Table extends BaseClass
 {
-    public $autoIncrement;
+    /** @var Column */
+    public $autoIdColumn;
+
+    /** @var Column[] */
     public $primaryKey = array();
+
     /** @var Index[]  */
     public $indexes = array();
+
     /** @var \stdClass  */
     public $columns;
-    public $defaults = array();
-    public $notNull = array();
 
-    public $name;
+    public $schemaName;
 
-    public function setName($name) {
-        $this->name = $name;
+    public function setSchemaName($schemaName) {
+        $this->schemaName = $schemaName;
         return $this;
     }
 
+    public $className;
 
     public function __construct($columns = null) {
         if (!$columns) {
             $this->columns = new \stdClass();
-            return;
         }
         else {
             $this->setColumns($columns);
@@ -35,10 +39,19 @@ class Table extends BaseClass
     }
 
     /**
-     * @return \stdClass
+     * @param bool|true $asArray
+     * @return Column[]|\stdClass
      */
-    public function getColumns() {
-        return $this->columns;
+    public function getColumns($asArray = false) {
+        return $asArray ? (array)$this->columns : $this->columns;
+    }
+
+    /**
+     * @param $name
+     * @return null|Column
+     */
+    public function getColumn($name) {
+        return isset($this->columns->$name) ? $this->columns->$name : null;
     }
 
 
@@ -57,29 +70,55 @@ class Table extends BaseClass
         foreach ((array)$this->columns as $name => $column) {
             if (is_int($column)) {
                 $column = new Column($column);
+                $this->columns->$name = $column;
             }
 
+            // another column reference
+            if (!empty($column->table)) {
+                $refColumn = $column;
+                $column = clone $column;
+                $this->columns->$name = $column;
+                $column->constraint = $refColumn;
+                $column->setFlag(Column::AUTO_ID, false);
+            }
+
+            $column->propertyName = $name;
+            $column->schemaName = Utils::fromCamelCase($name);
+            $column->table = $this;
+
             if ($column->flags & Column::AUTO_ID) {
+                $this->autoIdColumn = $column;
                 if (!$this->primaryKey) {
-                    $this->primaryKey = array($column);
+                    $this->primaryKey = array($column->schemaName => $column);
                 }
             }
-            $column->name = $name;
-            $column->table = $this;
+
             if ($column->constraint) {
                 $this->addConstraint($column, $column->constraint);
+            }
+            if ($column->isUnique) {
+                $this->addIndex(Index::TYPE_UNIQUE, $column);
+            }
+            elseif ($column->isIndexed) {
+                $this->addIndex(Index::TYPE_KEY, $column);
             }
         }
 
         return $this;
     }
 
+    /**
+     * @param Column[] $columns
+     * @return $this
+     */
     public function setPrimaryKey($columns) {
-        if (is_array($columns)) {
-            $this->primaryKey = $columns;
+        if (!is_array($columns)) {
+            $columns = func_get_args();
         }
-        else {
-            $this->primaryKey = func_get_args();
+        $this->primaryKey = array();
+        /** @var Column $column */
+        foreach ($columns as $column) {
+            $this->primaryKey [$column->schemaName]= $column;
         }
         return $this;
     }

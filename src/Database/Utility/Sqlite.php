@@ -33,6 +33,7 @@ class Sqlite extends Utility
         }
 
         $definition = new Table($columns);
+        $definition->setPrimaryKey($primaryKey);
 
 
         return $definition;
