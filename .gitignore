@@ -1,3 +1,4 @@
 tests/conf.php
 vendor
 build
+.idea
