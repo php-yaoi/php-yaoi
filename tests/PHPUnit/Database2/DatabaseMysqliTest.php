@@ -82,7 +82,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns = new \stdClass();
         $columns->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns->fk_id = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED)
-            ->setConstraint($table2->getColumns()->id);
+            ->setForeignKey($table2->getColumns()->id);
 
         $columns->fk_id2 = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED);
         $columns->dateUt = Column::create(Column::TIMESTAMP)->setDefault(null);

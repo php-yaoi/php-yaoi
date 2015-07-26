@@ -61,9 +61,9 @@ class Column extends BaseClass
     }
 
 
-    public $constraint;
-    public function setConstraint(Column $column = null) {
-        $this->constraint = $column;
+    public $foreignKey;
+    public function setForeignKey(Column $column = null) {
+        $this->foreignKey = $column;
         return $this;
     }
 

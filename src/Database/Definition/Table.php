@@ -79,7 +79,7 @@ class Table extends BaseClass
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
-                $column->constraint = $refColumn;
+                $column->foreignKey = $refColumn;
                 $column->setFlag(Column::AUTO_ID, false);
             }
 
@@ -94,8 +94,8 @@ class Table extends BaseClass
                 }
             }
 
-            if ($column->constraint) {
-                $this->addConstraint($column, $column->constraint);
+            if ($column->foreignKey) {
+                $this->addConstraint($column, $column->foreignKey);
             }
             if ($column->isUnique) {
                 $this->addIndex(Index::TYPE_UNIQUE, $column);
