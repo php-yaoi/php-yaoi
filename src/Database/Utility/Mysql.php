@@ -34,6 +34,7 @@ class Mysql extends Utility
         $res = $this->database->query("DESC ?", $tableSymbol);
         $columns = new \stdClass();
         while ($row = $res->fetchRow()) {
+            var_dump($row);
             $type = $row['Type'];
             $field = $row['Field'];
 
@@ -46,11 +47,15 @@ class Mysql extends Utility
             $column = new Column($phpType);
             $columns->$field = $column;
             $column->schemaName = $field;
-            $column->setDefault($row['Default']);
-            $column->setFlag(Column::NOT_NULL, $row['Null'] === 'NO');
+            $notNull = $row['Null'] === 'NO';
+            if ($row['Default'] !== null || !$notNull) {
+                $column->setDefault($row['Default']);
+            }
+            $column->setFlag(Column::NOT_NULL, $notNull);
         }
 
         $definition = new Table($columns);
+        $definition->setSchemaName($tableName);
 
         $res = $this->database->query("SHOW INDEX FROM ?", $tableSymbol);
         $indexes = array();
@@ -197,9 +202,6 @@ class Mysql extends Utility
     }
 
     private function getTimestampTypeString(Column $column) {
-        if (false === $column->default) {
-            $column->default = '0';
-        }
         return 'timestamp';
     }
 
@@ -235,8 +237,8 @@ class Mysql extends Utility
             $typeString .= ' NOT NULL';
         }
 
-        if (false !== $column->default) {
-            $typeString .= $this->database->expr(" DEFAULT ?", $column->default);
+        if (false !== ($default = $column->getDefault())) {
+            $typeString .= $this->database->expr(" DEFAULT ?", $default);
         }
 
         return $typeString;
@@ -256,8 +258,8 @@ class Mysql extends Utility
     {
         $alter = array();
 
-        $beforeColumns = $before->getColumns(true);
-        foreach ($after->getColumns(true) as $columnName => $afterColumn) {
+        $beforeColumns = $before->getColumns(true, true);
+        foreach ($after->getColumns(true, true) as $columnName => $afterColumn) {
             $afterTypeString = $this->getColumnTypeString($afterColumn);
 
             if (!isset($beforeColumns[$columnName])) {
@@ -291,6 +293,22 @@ class Mysql extends Utility
         }
 
         return $alter;
+    }
+
+    /**
+     * @param Column[] $columns
+     * @return mixed
+     */
+    public function checkColumns(array $columns)
+    {
+        foreach ($columns as $column) {
+            if ($column->flags & Column::TIMESTAMP) {
+                if (!$column->getDefault()) {
+                    $column->setDefault('0000-00-00 00:00:00');
+                    $column->setFlag(Column::NOT_NULL);
+                }
+            }
+        }
     }
 
 

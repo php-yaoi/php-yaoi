@@ -5,7 +5,7 @@ namespace Yaoi\Database\Definition;
 use Yaoi\BaseClass;
 use Yaoi\Sql\Symbol;
 
-class Column extends Symbol
+class Column extends BaseClass
 {
 
     const AUTO_ID = 1;
@@ -31,7 +31,9 @@ class Column extends Symbol
     {
         if ($flags === self::AUTO_ID) {
             $flags += self::INTEGER;
+            $flags += self::NOT_NULL;
         }
+
         $this->flags = $flags;
     }
 
@@ -47,10 +49,19 @@ class Column extends Symbol
     }
 
 
-    public $default = false;
+    private $default = false;
     public function setDefault($value) {
         $this->default = $value;
         return $this;
+    }
+
+    public function getDefault() {
+        if (false === $this->default && !($this->flags & self::NOT_NULL) && !($this->flags & self::TIMESTAMP)) {
+            return null;
+        }
+        else {
+            return $this->default;
+        }
     }
 
     public $stringLength;

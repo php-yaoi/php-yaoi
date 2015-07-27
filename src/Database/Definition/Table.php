@@ -45,8 +45,14 @@ class Table extends BaseClass
      */
     public function getColumns($asArray = false, $bySchemaName = false) {
         if ($bySchemaName) {
-
+            $columns = array();
+            /** @var Column $column */
+            foreach ((array)$this->columns as $column) {
+                $columns [$column->schemaName]= $column;
+            }
+            return $asArray ? $columns : (object)$columns;
         }
+
         return $asArray ? (array)$this->columns : $this->columns;
     }
 
@@ -107,6 +113,8 @@ class Table extends BaseClass
                 $this->addIndex(Index::TYPE_KEY, $column);
             }
         }
+
+        $this->database()->getUtility()->checkColumns((array)$this->columns);
 
         return $this;
     }

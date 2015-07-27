@@ -145,6 +145,8 @@ SQL;
         $columns->name = Column::STRING + Column::NOT_NULL;
         $columns->uniOne = Column::INTEGER;
         $columns->uniTwo = Column::INTEGER;
+        $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
+        $columns->updated = Column::TIMESTAMP;
 
         $table = new Table($columns);
         $table->setSchemaName('test_indexes');
@@ -157,6 +159,7 @@ SQL;
 
         $utility->dropTableIfExists('test_indexes');
         $createSQL = $utility->generateCreateTableOnDefinition($table);
+        echo $createSQL;
         $this->db->query($createSQL);
 
         $actualTable = $utility->getTableDefinition('test_indexes');
