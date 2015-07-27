@@ -130,8 +130,41 @@ SQL;
         }
 
         $this->initDef2();
-        $def = $this->db->getTableDefinition('test_columns');
+        $def = $this->db->getUtility()->getTableDefinition('test_columns');
         $this->columnsTest2($def);
+    }
+
+
+    public function testCreateIndexes() {
+        if ($this->skip) {
+            return;
+        }
+
+        $columns = new stdClass();
+        $columns->id = Column::AUTO_ID;
+        $columns->name = Column::STRING + Column::NOT_NULL;
+        $columns->uniOne = Column::INTEGER;
+        $columns->uniTwo = Column::INTEGER;
+
+        $table = new Table($columns);
+        $table->setSchemaName('test_indexes');
+        $table->addIndex(\Yaoi\Database\Definition\Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
+
+        $table->addIndex(\Yaoi\Database\Definition\Index::TYPE_KEY, $columns->name);
+
+        $utility = $this->db->getUtility();
+
+
+        $utility->dropTableIfExists('test_indexes');
+        $createSQL = $utility->generateCreateTableOnDefinition($table);
+        $this->db->query($createSQL);
+
+        $actualTable = $utility->getTableDefinition('test_indexes');
+
+        var_dump($utility->generateAlterTable($actualTable, $table));
+
+        $this->assertSame($createSQL, $utility->generateCreateTableOnDefinition($actualTable));
+
     }
 
 }

@@ -3,8 +3,9 @@
 namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
+use Yaoi\Sql\Symbol;
 
-class Column extends BaseClass
+class Column extends Symbol
 {
 
     const AUTO_ID = 1;

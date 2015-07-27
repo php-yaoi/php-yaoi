@@ -17,6 +17,11 @@ interface Contract
     public function getTableDefinition($tableName);
 
     public function generateCreateTableOnDefinition(Table $table);
+    public function generateAlterTable(Table $before, Table $after);
 
     public function getColumnTypeString(Column $column);
+
+    public function dropTableIfExists($tableName);
+    public function dropTable($tableName);
+
 }

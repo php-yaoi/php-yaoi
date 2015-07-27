@@ -21,15 +21,18 @@ class Mysql extends Utility
         return $this;
     }
 
+
+    const _PRIMARY = 'PRIMARY';
+
     /**
      * @param $tableName
      * @return Table
      */
     public function getTableDefinition($tableName)
     {
-        $res = $this->database->query("DESC ?", new Symbol($tableName));
+        $tableSymbol = new Symbol($tableName);
+        $res = $this->database->query("DESC ?", $tableSymbol);
         $columns = new \stdClass();
-        $primaryKey = array();
         while ($row = $res->fetchRow()) {
             $type = $row['Type'];
             $field = $row['Field'];
@@ -40,18 +43,35 @@ class Mysql extends Utility
                 $phpType += Column::AUTO_ID;
             }
 
-
             $column = new Column($phpType);
             $columns->$field = $column;
+            $column->schemaName = $field;
             $column->setDefault($row['Default']);
             $column->setFlag(Column::NOT_NULL, $row['Null'] === 'NO');
+        }
 
-            if ('PRI' === $row['Key']) {
-                $primaryKey []= $columns->$field;
+        $definition = new Table($columns);
+
+        $res = $this->database->query("SHOW INDEX FROM ?", $tableSymbol);
+        $indexes = array();
+        $uniqueIndex = array();
+        foreach ($res as $row) {
+            $indexes [$row['Key_name']][$row['Seq_in_index']] = $columns->{$row['Column_name']};
+            $uniqueIndex [$row['Key_name']] = !$row['Non_unique'];
+        }
+
+        foreach ($indexes as $indexName => $indexData) {
+            ksort($indexData);
+            $index = new Index(array_values($indexData));
+            $index->setName($indexName);
+            $index->setType($uniqueIndex[$indexName] ? Index::TYPE_UNIQUE : Index::TYPE_KEY);
+            if ($indexName === self::_PRIMARY) {
+                $definition->setPrimaryKey($index->columns);
+            }
+            else {
+                $definition->addIndex($index);
             }
         }
-        $definition = new Table($columns);
-        $definition->setPrimaryKey($primaryKey);
 
         return $definition;
     }
@@ -221,4 +241,57 @@ class Mysql extends Utility
 
         return $typeString;
     }
+
+    public function dropTableIfExists($tableName)
+    {
+        $this->database->query("DROP TABLE IF EXISTS ?", new Symbol($tableName));
+    }
+
+    public function dropTable($tableName)
+    {
+        $this->database->query("DROP TABLE ?", new Symbol($tableName));
+    }
+
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        $alter = array();
+
+        $beforeColumns = $before->getColumns(true);
+        foreach ($after->getColumns(true) as $columnName => $afterColumn) {
+            $afterTypeString = $this->getColumnTypeString($afterColumn);
+
+            if (!isset($beforeColumns[$columnName])) {
+                $alter []= 'ADD COLUMN `' . $afterColumn->schemaName . '` ' . $afterTypeString;
+            }
+            else {
+                $beforeColumn = $beforeColumns[$columnName];
+                if ($this->getColumnTypeString($beforeColumn) !== $afterTypeString) {
+                    $alter []= 'MODIFY COLUMN `' . $afterColumn->schemaName . '` ' . $afterTypeString;
+                }
+                unset($beforeColumns[$columnName]);
+            }
+        }
+        foreach ($beforeColumns as $columnName => $beforeColumn) {
+            $alter []= 'DROP COLUMN `' . $beforeColumn->schemaName . '`';
+        }
+
+        $beforeIndexes = $before->indexes;
+        foreach ($after->indexes as $indexId => $index) {
+            if (!isset($beforeIndexes[$indexId])) {
+                $alter []= 'ADD '
+                    . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
+                    . 'INDEX `' . $index->getName() . '` ()';
+            }
+            else {
+                unset($beforeIndexes[$indexId]);
+            }
+        }
+        foreach ($beforeIndexes as $indexId => $index) {
+            $alter []= 'DROP INDEX `' . $index->getName() . '`';
+        }
+
+        return $alter;
+    }
+
+
 }

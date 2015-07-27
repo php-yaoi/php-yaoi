@@ -43,7 +43,10 @@ class Table extends BaseClass
      * @param bool|true $asArray
      * @return Column[]|\stdClass
      */
-    public function getColumns($asArray = false) {
+    public function getColumns($asArray = false, $bySchemaName = false) {
+        if ($bySchemaName) {
+
+        }
         return $asArray ? (array)$this->columns : $this->columns;
     }
 
@@ -126,16 +129,16 @@ class Table extends BaseClass
 
 
     public function addIndex($index) {
-        if ($index instanceof Index) {
-            $this->indexes []= $index;
-        }
-        else {
+        if (!$index instanceof Index) {
             $args = func_get_args();
             $type = array_shift($args);
             $columns = $args;
 
-            $this->indexes []= Index::create($columns)->setType($type);
+            $index = Index::create($columns)->setType($type);
         }
+
+        $this->indexes [$index->getId()]= $index;
+
         return $this;
     }
 
