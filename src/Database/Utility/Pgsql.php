@@ -89,5 +89,25 @@ where c.table_name = '$tableName';
         // TODO: Implement getColumnTypeString() method.
     }
 
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        throw new \Exception('Not implemented');
+
+        // TODO: Implement generateAlterTable() method.
+    }
+
+    /**
+     * Check/fix database related type misconceptions
+     *
+     * @param Column[] $columns
+     * @return mixed
+     */
+    public function checkColumns(array $columns)
+    {
+        throw new \Exception('Not implemented');
+
+        // TODO: Implement checkColumns() method.
+    }
+
 
 }

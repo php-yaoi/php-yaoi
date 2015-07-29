@@ -52,6 +52,21 @@ class Sqlite extends Utility
         // TODO: Implement getColumnTypeString() method.
     }
 
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        // TODO: Implement generateAlterTable() method.
+    }
+
+    /**
+     * Check/fix database related type misconceptions
+     *
+     * @param Column[] $columns
+     * @return mixed
+     */
+    public function checkColumns(array $columns)
+    {
+        // TODO: Implement checkColumns() method.
+    }
 
 
 }

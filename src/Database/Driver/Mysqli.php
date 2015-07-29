@@ -117,7 +117,7 @@ class Mysqli extends Driver implements Driver\Contract
         if (null === $this->mysqli) {
             $this->connect();
         }
-        return $this->mysqli->real_escape_string($string);
+        return $this->mysqli->real_escape_string((string)$string);
     }
 
 

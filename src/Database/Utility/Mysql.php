@@ -34,7 +34,6 @@ class Mysql extends Utility
         $res = $this->database->query("DESC ?", $tableSymbol);
         $columns = new \stdClass();
         while ($row = $res->fetchRow()) {
-            var_dump($row);
             $type = $row['Type'];
             $field = $row['Field'];
 
@@ -81,11 +80,17 @@ class Mysql extends Utility
         return $definition;
     }
 
-    public function generateCreateTableOnDefinition(Table $table) {
-        $statement = 'CREATE TABLE `' . $table->schemaName . '` (' . PHP_EOL;
+
+    protected static function quoteSymbol($symbol) {
+        return "`$symbol`";
+    }
+
+
+    protected function generateCreateTableColumns(Table $table) {
+        $statement = '';
 
         foreach ($table->getColumns(true) as $column) {
-            $statement .= ' `' . $column->schemaName . '` ' . $this->getColumnTypeString($column);
+            $statement .= ' ' . self::quoteSymbol($column->schemaName) . ' ' . $this->getColumnTypeString($column);
 
             if ($column->flags & Column::AUTO_ID) {
                 $statement .= ' AUTO_INCREMENT';
@@ -93,36 +98,39 @@ class Mysql extends Utility
 
             $statement .= ',' . PHP_EOL;
         }
+        return $statement;
+    }
+
+
+    public function generateCreateTableOnDefinition(Table $table) {
+        $statement = 'CREATE TABLE ' . self::quoteSymbol($table->schemaName) . ' (' . PHP_EOL;
+        $statement .= $this->generateCreateTableColumns($table);
 
         foreach ($table->indexes as $index) {
             $indexString = '';
             foreach ($index->columns as $column) {
-                $indexString .= '`' . $column->schemaName . '`, ';
+                $indexString .=  self::quoteSymbol($column->schemaName) . ', ';
             }
             $indexString = substr($indexString, 0, -2);
 
             if ($index->type === Index::TYPE_KEY) {
-                $statement .= ' KEY (' . $indexString . '),' . PHP_EOL;
+                $statement .= ' KEY ' . self::quoteSymbol($index->getName()) . ' (' . $indexString . '),' . PHP_EOL;
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
-                $statement .= ' UNIQUE KEY (' . $indexString . '),' . PHP_EOL;
+                $statement .= ' UNIQUE KEY ' . self::quoteSymbol($index->getName()) . ' (' . $indexString . '),' . PHP_EOL;
             }
         }
 
-        foreach ($table->constraints as $constraint) {
-            /** @var Column $fk */
-            $fk = $constraint[0];
-            /** @var Column $ref */
-            $ref = $constraint[1];
-            $constraintName = $table->schemaName . '_' . $fk->schemaName;
-
-            $statement .= ' CONSTRAINT `' . $constraintName . '` FOREIGN KEY (`' . $fk->schemaName . '`) REFERENCES `'
-                . $ref->table->schemaName . '` (`' . $ref->schemaName . '`),' . PHP_EOL;
+        foreach ($table->foreignKeys as $foreignKey) {
+            $statement .= ' CONSTRAINT ' . self::quoteSymbol($foreignKey->getName())
+                . ' FOREIGN KEY (' . $this->quoteColumns($foreignKey->getChildColumns()) . ') REFERENCES '
+                . self::quoteSymbol($foreignKey->getReferencedTable()->schemaName)
+                . ' (' . $this->quoteColumns($foreignKey->getParentColumns()) . '),' . PHP_EOL;
         }
 
         $statement .= ' PRIMARY KEY (';
         foreach ($table->primaryKey as $column) {
-            $statement .= '`' . $column->schemaName . '`,';
+            $statement .= self::quoteSymbol($column->schemaName) . ',';
         }
         $statement = substr($statement, 0, -1);
         $statement .= ')' . PHP_EOL;
@@ -244,16 +252,6 @@ class Mysql extends Utility
         return $typeString;
     }
 
-    public function dropTableIfExists($tableName)
-    {
-        $this->database->query("DROP TABLE IF EXISTS ?", new Symbol($tableName));
-    }
-
-    public function dropTable($tableName)
-    {
-        $this->database->query("DROP TABLE ?", new Symbol($tableName));
-    }
-
     public function generateAlterTable(Table $before, Table $after)
     {
         $alter = array();
@@ -292,7 +290,13 @@ class Mysql extends Utility
             $alter []= 'DROP INDEX `' . $index->getName() . '`';
         }
 
-        return $alter;
+        if ($alter) {
+            $alterSql = 'ALTER TABLE `' . $after->schemaName . '`' . PHP_EOL . implode(',' . PHP_EOL, $alter);
+            return $alterSql;
+        }
+        else {
+            return '';
+        }
     }
 
     /**
@@ -308,6 +312,19 @@ class Mysql extends Utility
                     $column->setFlag(Column::NOT_NULL);
                 }
             }
+        }
+    }
+
+    /**
+     * @param Column[] $columns
+     */
+    private function quoteColumns(array $columns) {
+        $result = '';
+        foreach ($columns as $column) {
+            $result .= '`' . $column->schemaName . '`,';
+        }
+        if ($result) {
+            return substr($result, 0, -1);
         }
     }
 

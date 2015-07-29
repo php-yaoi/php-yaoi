@@ -21,7 +21,8 @@ class Table extends BaseClass
     /** @var \stdClass  */
     public $columns;
 
-    public $schemaName;
+
+    public $schemaName; // tODO exception on empty schemaName
 
     public function setSchemaName($schemaName) {
         $this->schemaName = $schemaName;
@@ -65,7 +66,7 @@ class Table extends BaseClass
     }
 
 
-    public function setColumns($columns) {
+    private function setColumns($columns) {
         if (is_object($columns)) {
             $this->columns = $columns;
         }
@@ -88,8 +89,12 @@ class Table extends BaseClass
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
-                $column->foreignKey = $refColumn;
+                $this->addForeignKey(new ForeignKey(array($column), array($refColumn)));
                 $column->setFlag(Column::AUTO_ID, false);
+            }
+
+            if ($foreignKey = $column->getForeignKey()) {
+                $this->addForeignKey($foreignKey);
             }
 
             $column->propertyName = $name;
@@ -103,9 +108,6 @@ class Table extends BaseClass
                 }
             }
 
-            if ($column->foreignKey) {
-                $this->addConstraint($column, $column->foreignKey);
-            }
             if ($column->isUnique) {
                 $this->addIndex(Index::TYPE_UNIQUE, $column);
             }
@@ -120,7 +122,7 @@ class Table extends BaseClass
     }
 
     /**
-     * @param Column[] $columns
+     * @param Column[]|Column $columns
      * @return $this
      */
     public function setPrimaryKey($columns) {
@@ -150,9 +152,13 @@ class Table extends BaseClass
         return $this;
     }
 
-    public $constraints = array();
-    public function addConstraint(Column $foreignKeyColumn, Column $referenceColumn) {
-        $this->constraints []= array($foreignKeyColumn, $referenceColumn);
+    /**
+     * @var ForeignKey[]
+     */
+    public $foreignKeys = array();
+    public function addForeignKey(ForeignKey $foreignKey) {
+        // todo sync child and parent column types
+        $this->foreignKeys []= $foreignKey;
         return $this;
     }
 

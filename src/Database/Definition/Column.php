@@ -72,13 +72,6 @@ class Column extends BaseClass
         return $this;
     }
 
-
-    public $foreignKey;
-    public function setForeignKey(Column $column = null) {
-        $this->foreignKey = $column;
-        return $this;
-    }
-
     public $isUnique;
     public function setUnique($yes = true) {
         $this->isUnique = $yes;
@@ -129,5 +122,16 @@ class Column extends BaseClass
         }
 
         return $value;
+    }
+
+
+    private $foreignKey;
+    public function setForeignKey(Column $column, $onUpdate = ForeignKey::NO_ACTION, $onDelete = ForeignKey::NO_ACTION) {
+        $this->foreignKey = new ForeignKey(array($this), array($column), $onUpdate, $onDelete);
+        return $this;
+    }
+
+    public function getForeignKey() {
+        return $this->foreignKey;
     }
 }

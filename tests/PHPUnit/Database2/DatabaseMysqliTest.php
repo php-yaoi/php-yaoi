@@ -34,7 +34,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         );
 
         $this->assertSame(
-            'float',
+            'float DEFAULT NULL',
             $utility->getColumnTypeString(
                 Column::create(Column::FLOAT)
             )
@@ -49,7 +49,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         );
 
         $this->assertSame(
-            'timestamp DEFAULT \'0\'',
+            'timestamp',
             $utility->getColumnTypeString(
                 Column::create(Column::TIMESTAMP)
             )
@@ -97,19 +97,19 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
-        $this->assertSame('CREATE TABLE `test_entity` (
+        $this->assertSame("CREATE TABLE `test_entity` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
  `fk_id` int unsigned NOT NULL,
  `fk_id2` int unsigned NOT NULL,
- `date_ut` timestamp DEFAULT NULL,
- `name` varchar(255) NOT NULL DEFAULT \'\',
+ `date_ut` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `name` varchar(255) NOT NULL DEFAULT '',
  `seconds` float NOT NULL DEFAULT 0,
- `type` char(10),
- UNIQUE KEY (`date_ut`, `name`, `type`),
- CONSTRAINT `test_entity_fk_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
+ `type` char(10) DEFAULT NULL,
+ UNIQUE KEY `unique_date_ut_name_type` (`date_ut`, `name`, `type`),
+ CONSTRAINT `fk_test_entity_fk_id_test2_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
  PRIMARY KEY (`id`)
 )
-', $sql);
+", $sql);
     }
 
     public function testUtilityCreateTable2() {
@@ -134,11 +134,11 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
  `id` int unsigned NOT NULL AUTO_INCREMENT,
  `branch` varchar(255) NOT NULL,
  `duration` float NOT NULL,
- `entity` varchar(255),
- `language` varchar(255),
- `project` varchar(255),
- `time` int,
- `type` varchar(255),
+ `entity` varchar(255) DEFAULT NULL,
+ `language` varchar(255) DEFAULT NULL,
+ `project` varchar(255) DEFAULT NULL,
+ `time` int DEFAULT NULL,
+ `type` varchar(255) DEFAULT NULL,
  PRIMARY KEY (`id`)
 )
 ', $sql);

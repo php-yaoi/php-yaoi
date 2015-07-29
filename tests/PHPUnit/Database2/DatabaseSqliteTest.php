@@ -20,7 +20,7 @@ SQL;
     }
 
 
-    public function __construct() {
+    public function setUp() {
         $fileName = sys_get_temp_dir() . '/test-sqlite.sqlite';
         if (file_exists($fileName)) {
             unlink($fileName);
