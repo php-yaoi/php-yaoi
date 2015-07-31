@@ -216,7 +216,7 @@ DROP INDEX `key_name`", $utility->generateAlterTable($table, $updatedTable));
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
 
         $createSql = CreateTable::create()->bindDatabase($this->db)->setTable($table);
-        $this->assertSame(" CREATE TABLE `test_indexes` (
+        $this->assertSame("CREATE TABLE `test_indexes` (
   `id` int NOT NULL  AUTO_INCREMENT ,
   `name` varchar(255) NOT NULL ,
   `uni_one` int DEFAULT NULL ,

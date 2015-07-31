@@ -4,6 +4,7 @@ namespace Yaoi\Database\Utility;
 
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Exception;
+use Yaoi\Sql\Mysql\CreateTable;
 use Yaoi\Sql\Symbol;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
@@ -86,58 +87,10 @@ class Mysql extends Utility
     }
 
 
-    protected function generateCreateTableColumns(Table $table) {
-        $statement = '';
-
-        foreach ($table->getColumns(true) as $column) {
-            $statement .= ' ' . self::quoteSymbol($column->schemaName) . ' ' . $this->getColumnTypeString($column);
-
-            if ($column->flags & Column::AUTO_ID) {
-                $statement .= ' AUTO_INCREMENT';
-            }
-
-            $statement .= ',' . PHP_EOL;
-        }
-        return $statement;
-    }
-
-
     public function generateCreateTableOnDefinition(Table $table) {
-        $statement = 'CREATE TABLE ' . self::quoteSymbol($table->schemaName) . ' (' . PHP_EOL;
-        $statement .= $this->generateCreateTableColumns($table);
-
-        foreach ($table->indexes as $index) {
-            $indexString = '';
-            foreach ($index->columns as $column) {
-                $indexString .=  self::quoteSymbol($column->schemaName) . ', ';
-            }
-            $indexString = substr($indexString, 0, -2);
-
-            if ($index->type === Index::TYPE_KEY) {
-                $statement .= ' KEY ' . self::quoteSymbol($index->getName()) . ' (' . $indexString . '),' . PHP_EOL;
-            }
-            elseif ($index->type === Index::TYPE_UNIQUE) {
-                $statement .= ' UNIQUE KEY ' . self::quoteSymbol($index->getName()) . ' (' . $indexString . '),' . PHP_EOL;
-            }
-        }
-
-        foreach ($table->foreignKeys as $foreignKey) {
-            $statement .= ' CONSTRAINT ' . self::quoteSymbol($foreignKey->getName())
-                . ' FOREIGN KEY (' . $this->quoteColumns($foreignKey->getChildColumns()) . ') REFERENCES '
-                . self::quoteSymbol($foreignKey->getReferencedTable()->schemaName)
-                . ' (' . $this->quoteColumns($foreignKey->getParentColumns()) . '),' . PHP_EOL;
-        }
-
-        $statement .= ' PRIMARY KEY (';
-        foreach ($table->primaryKey as $column) {
-            $statement .= self::quoteSymbol($column->schemaName) . ',';
-        }
-        $statement = substr($statement, 0, -1);
-        $statement .= ')' . PHP_EOL;
-
-        $statement .= ')' . PHP_EOL;
-
-        return $statement;
+        $expression = new CreateTable();
+        $expression->bindDatabase($this->database)->setTable($table);
+        return $expression->build();
     }
 
 

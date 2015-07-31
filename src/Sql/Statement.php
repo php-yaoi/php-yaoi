@@ -4,7 +4,7 @@ namespace Yaoi\Sql;
 
 use Yaoi\Database;
 use Yaoi\Database\Contract;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 
 class Statement extends ComplexStatement
 {

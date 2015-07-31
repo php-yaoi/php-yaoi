@@ -11,6 +11,7 @@ use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Statement;
 use Yaoi\Sql\UpdateInterface;
 use Yaoi\Database\Definition\Table;
+use Yaoi\String\Quoter;
 
 interface Contract extends Able, Quoter
 {

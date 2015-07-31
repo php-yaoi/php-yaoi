@@ -21,7 +21,7 @@ drop table test2
  */
 
 namespace Yaoi\Sql;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 
 abstract class ComplexStatement extends Expression implements
     SelectInterface,

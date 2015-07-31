@@ -5,7 +5,7 @@ namespace Yaoi\Sql;
 use Closure;
 use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 use Yaoi\Debug;
 
 class Expression extends BaseClass implements \Yaoi\IsEmpty
@@ -138,7 +138,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
         return $this;
     }
 
-    const OP_APPEND = ' ';
+    const OP_APPEND = '';
 
     public function appendExpr($expression)
     {
@@ -182,7 +182,18 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
             return '';
         }
 
-        if ($this->binds && $quoter !== null) {
+        if (null === $quoter) {
+            if ($this->database) {
+                $quoter = $this->database->getDriver();
+            }
+        }
+
+
+        if ($this->binds) {
+            if ($quoter === null) {
+                throw new Exception('Missing quoter', Exception::MISSING_QUOTER);
+            }
+
             $statement = $this->statement;
 
             $replace = array();
