@@ -1,7 +1,9 @@
 <?php
 
 namespace PHPUnit\Service;
+use CustomVendor\TestServiceThree;
 use Yaoi\Date\TimeMachine;
+use Yaoi\Service\Exception;
 use Yaoi\Service\Settings;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Service\BasicExposed;
@@ -17,6 +19,22 @@ class SettingsTest extends TestCase
         $settings = new Settings();
         $this->assertSame($settings, NoSettings::create($settings)->getSettings());
         $this->assertTrue(NoSettings::create(null)->getSettings() instanceof $settings);
+    }
+
+    /**
+     * If closure is used as settings container, it should return not null value
+     *
+     * @expectedException \Yaoi\Service\Exception
+     * @expectedExceptionCode \Yaoi\Service\Exception::INVALID_ARGUMENT
+     */
+    public function testNullClosure() {
+        BasicExposed::register(function(){
+            $settings = new Settings();
+            $settings->username = 'johndoe';
+            // forget to return result
+        }, 'test-null-closure');
+
+        BasicExposed::getInstance('test-null-closure');
     }
 
 

@@ -85,6 +85,10 @@ abstract class Service extends BaseClass
 
         if ($identifier instanceof Closure) {
             $identifier = self::resolveClosure($identifier);
+            if (null === $identifier) {
+                throw new Exception('Null closure result. Did you forget to return value at settings closure?',
+                    Exception::INVALID_ARGUMENT);
+            }
         }
 
         if (null === $identifier) {
