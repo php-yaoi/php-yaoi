@@ -37,6 +37,11 @@ class Formatter extends BaseClass
         return $this;
     }
 
+    public function setPlaceholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
     public function build(Quoter $quoter = null) {
         if ($this->binds) {
             if ($quoter === null && $this->quoter !== null) {
@@ -63,11 +68,12 @@ class Formatter extends BaseClass
 
             if ($unnamed) {
                 $pos = 0;
+                $placeholderLength = strlen($this->placeholder);
                 foreach ($this->binds as $value) {
                     $pos = strpos($statement, $this->placeholder, $pos);
                     if ($pos !== false) {
                         $value = $quoter->quote($value);
-                        $statement = substr_replace($statement, $value, $pos, 1);
+                        $statement = substr_replace($statement, $value, $pos, $placeholderLength);
                         $pos += strlen($value);
                     } else {
                         throw new Exception('Placeholder \'' . $this->placeholder . '\' not found ("' . $statement . '"), '

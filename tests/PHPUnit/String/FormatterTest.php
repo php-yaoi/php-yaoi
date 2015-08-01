@@ -54,6 +54,23 @@ class FormatterTest extends TestCase
 
 
     /**
+     * If you can not use '?' as placeholder, you can use any other string.
+     *
+     * @throws Exception
+     * @see Formatter::setPlaceholder
+     * @see Formatter::__construct
+     */
+    public function testCustomPlaceholder() {
+        $this->assertSame(
+            'Would you prefer cake or ice-cream?',
+            Formatter::create('Would you prefer @@ or @@?', 'cake', 'ice-cream')
+                ->setPlaceholder('@@')
+                ->build(new Raw())
+        );
+    }
+
+
+    /**
      * You can use named placeholders with ':' prepended to key,
      * only array of binds is allowed for named placeholders
      *
