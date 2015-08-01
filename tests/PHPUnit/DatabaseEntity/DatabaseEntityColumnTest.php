@@ -70,7 +70,7 @@ class DatabaseEntityColumnTest extends TestCase
 
         $column1->setForeignKey($column2);
 
-        $this->assertSame($column2, $column1->foreignKey);
+        $this->assertSame(array($column2), $column1->getForeignKey()->getParentColumns());
     }
 
 

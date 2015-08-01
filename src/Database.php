@@ -56,6 +56,11 @@ class Database extends Service implements DatabaseContract
     }
 
 
+    /**
+     * @param Contract $item
+     * @return string
+     * @deprecated
+     */
     public function mappableInsertString(Contract $item)
     {
         $l = array_map(array($this, 'quote'), $item->toArray());
