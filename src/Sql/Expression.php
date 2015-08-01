@@ -8,6 +8,11 @@ use Yaoi\Database;
 use Yaoi\String\Quoter;
 use Yaoi\Debug;
 
+/**
+ * Class Expression
+ * @package Yaoi\Sql
+ * @todo Utilize String\Formatter
+ */
 class Expression extends BaseClass implements \Yaoi\IsEmpty
 {
     /**
