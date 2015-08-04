@@ -31,13 +31,10 @@ class Table extends BaseClass
 
     public $className;
 
-    public function __construct($columns = null) {
-        if (!$columns) {
-            $this->columns = new \stdClass();
-        }
-        else {
-            $this->setColumns($columns);
-        }
+    public function __construct($columns, Database\Contract $database, $schemaName) {
+        $this->schemaName = $schemaName;
+        $this->database = $database;
+        $this->setColumns($columns);
     }
 
     /**
@@ -116,7 +113,7 @@ class Table extends BaseClass
             }
         }
 
-        $this->database()->getUtility()->checkColumns((array)$this->columns);
+        $this->database->getUtility()->checkColumns((array)$this->columns);
 
         return $this;
     }
@@ -164,10 +161,6 @@ class Table extends BaseClass
 
 
     private $database;
-    public function bindDatabase(Database\Contract $database) {
-        $this->database = $database;
-        return $this;
-    }
 
     /**
      * @return \Yaoi\Database\Contract;
@@ -176,7 +169,8 @@ class Table extends BaseClass
     public function database()
     {
         if (null === $this->database) {
-            $this->database = Database::getInstance();
+            throw new Exception('Database not bound', Exception::DATABASE_REQUIRED);
+            //$this->database = Database::getInstance();
         }
         return $this->database;
     }

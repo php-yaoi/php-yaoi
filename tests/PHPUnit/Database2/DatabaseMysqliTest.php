@@ -18,6 +18,24 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
     }
 
 
+    protected $createTableStatement = "CREATE TABLE `test_indexes` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) NOT NULL,
+ `uni_one` int DEFAULT NULL,
+ `uni_two` int DEFAULT NULL,
+ `default_null` float DEFAULT NULL,
+ `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `ref_id` int NOT NULL,
+ `r_one` varchar(255) DEFAULT NULL,
+ `r_two` varchar(255) DEFAULT NULL,
+ UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
+ KEY `key_name` (`name`),
+ CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
+ CONSTRAINT `fk_test_indexes_r_one_r_two_table_a_m_one_m_two` FOREIGN KEY (`r_one`, `r_two`) REFERENCES `table_a` (`m_one`, `m_two`),
+ PRIMARY KEY (`id`)
+)";
+
+
     /**
      * @throws Database\Exception
      * @see \Yaoi\Database\Entity
@@ -75,8 +93,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns2 = new \stdClass();
         $columns2->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns2->meta = Column::create(Column::STRING);
-        $table2 = Table::create($columns2);
-        $table2->schemaName = 'test2';
+        $table2 = Table::create($columns2, $this->db, 'test2');
 
 
         $columns = new \stdClass();
@@ -90,8 +107,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->seconds = Column::create(Column::FLOAT + Column::NOT_NULL)->setDefault(0);
         $columns->type = Column::create(Column::STRING)->setStringLength(10, true);
 
-        $table = Table::create($columns)
-            ->setSchemaName('test_entity')
+        $table = Table::create($columns, $this->db, 'test_entity')
             ->setPrimaryKey($columns->id)
             ->addIndex(Index::TYPE_UNIQUE, $columns->dateUt, $columns->name, $columns->type);
 
@@ -108,8 +124,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
  UNIQUE KEY `unique_date_ut_name_type` (`date_ut`, `name`, `type`),
  CONSTRAINT `fk_test_entity_fk_id_test2_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
  PRIMARY KEY (`id`)
-)
-", $sql);
+)", (string)$sql);
     }
 
     public function testUtilityCreateTable2() {
@@ -126,7 +141,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         $columns->time = Column::create(Column::INTEGER);
         $columns->type = Column::create(Column::STRING);
 
-        $table = Table::create($columns)->setSchemaName('test_name')->setPrimaryKey($columns->id);
+        $table = Table::create($columns, $this->db, 'test_name')->setPrimaryKey($columns->id);
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
@@ -140,8 +155,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
  `time` int DEFAULT NULL,
  `type` varchar(255) DEFAULT NULL,
  PRIMARY KEY (`id`)
-)
-', $sql);
+)', (string)$sql);
 
     }
 

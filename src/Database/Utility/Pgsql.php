@@ -2,9 +2,11 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Pgsql\TypeString;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Pgsql\CreateTable;
 
 class Pgsql extends Utility
 {
@@ -71,30 +73,25 @@ where c.table_name = '$tableName';
             $columns->$field = $column;
         }
 
-        $def = new Table($columns);
+        $def = new Table($columns, $this->database, $tableName);
         $def->setPrimaryKey($primaryKey);
 
         return $def;
     }
 
-    public function generateCreateTableOnDefinition(Table $table)
-    {
-        throw new \Exception('Not implemented');
-        // TODO: Implement generateCreateTableOnDefinition() method.
+
+    public function generateCreateTableOnDefinition(Table $table) {
+        $expression = new CreateTable();
+        $expression->bindDatabase($this->database)->generate($table);
+        return $expression->batch;
     }
 
     public function getColumnTypeString(Column $column)
     {
-        throw new \Exception('Not implemented');
-        // TODO: Implement getColumnTypeString() method.
+        $typeString = new TypeString($this->database);
+        return $typeString->getByColumn($column);
     }
 
-    public function generateAlterTable(Table $before, Table $after)
-    {
-        throw new \Exception('Not implemented');
-
-        // TODO: Implement generateAlterTable() method.
-    }
 
     /**
      * Check/fix database related type misconceptions
@@ -104,9 +101,20 @@ where c.table_name = '$tableName';
      */
     public function checkColumns(array $columns)
     {
-        throw new \Exception('Not implemented');
+        foreach ($columns as $column) {
+            if ($column->flags & Column::AUTO_ID) {
+                $column->flags = Column::AUTO_ID;
+            }
 
-        // TODO: Implement checkColumns() method.
+            /*
+            if ($column->flags & Column::TIMESTAMP) {
+                if (!$column->getDefault()) {
+                    $column->setDefault(null);
+                    $column->setFlag(Column::NOT_NULL);
+                }
+            }
+            */
+        }
     }
 
 

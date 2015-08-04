@@ -3,9 +3,12 @@
 namespace Yaoi\Database;
 
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Utility\Contract as UtilityContract;
 use Yaoi\BaseClass;
 use Yaoi\Database\Contract as DatabaseContract;
+use Yaoi\Sql\AlterTable;
+use Yaoi\Sql\CreateTable;
 use Yaoi\Sql\Symbol;
 
 abstract class Utility extends BaseClass implements UtilityContract
@@ -44,5 +47,14 @@ abstract class Utility extends BaseClass implements UtilityContract
     {
         $this->database->query("DROP TABLE ?", new Symbol($tableName));
     }
+
+
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        $expression = new AlterTable();
+        $expression->bindDatabase($this->database)->generate($before, $after);
+        return $expression->build();
+    }
+
 
 }

@@ -5,25 +5,39 @@ namespace Yaoi\Sql;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Exception;
 
 class CreateTable extends Expression
 {
     /** @var  Table */
     protected $table;
 
+
+    private $first = true;
+    protected function appendComma() {
+        if ($this->first) {
+            $this->first = false;
+        }
+        else {
+            $this->appendExpr(',' . PHP_EOL);
+        }
+    }
+
+
     protected function appendColumns() {
         $utility = $this->database->getUtility();
 
         foreach ($this->table->getColumns(true) as $column) {
+            $this->appendComma();
             $this->appendExpr(' ? ' . $utility->getColumnTypeString($column), new Symbol($column->schemaName));
 
             if ($column->flags & Column::AUTO_ID) {
                 $this->appendExpr(' AUTO_INCREMENT');
             }
-
-            $this->appendExpr(',' . PHP_EOL);
         }
     }
+
+
 
     protected function appendIndexes() {
         foreach ($this->table->indexes as $index) {
@@ -33,17 +47,20 @@ class CreateTable extends Expression
             }
 
             if ($index->type === Index::TYPE_KEY) {
-                $this->appendExpr(' KEY ? (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
+                $this->appendComma();
+                $this->appendExpr(' KEY ? (?)', new Symbol($index->getName()), $columns);
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
-                $this->appendExpr(' UNIQUE KEY ? (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
+                $this->appendComma();
+                $this->appendExpr(' UNIQUE KEY ? (?)', new Symbol($index->getName()), $columns);
             }
         }
     }
 
     protected function appendForeignKeys() {
         foreach ($this->table->foreignKeys as $foreignKey) {
-            $this->appendExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?),' . PHP_EOL,
+            $this->appendComma();
+            $this->appendExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)',
                 new Symbol($foreignKey->getName()),
                 $foreignKey->getChildColumns(),
                 new Symbol($foreignKey->getReferencedTable()->schemaName),
@@ -53,11 +70,16 @@ class CreateTable extends Expression
     }
 
     public function appendPrimaryKey() {
-        $this->appendExpr(' PRIMARY KEY (?)' . PHP_EOL, array_values($this->table->primaryKey));
+        $this->appendComma();
+        $this->appendExpr(' PRIMARY KEY (?)', array_values($this->table->primaryKey));
     }
 
 
-    public function setTable(Table $table) {
+    public function generate(Table $table) {
+        if (!$this->database) {
+            throw new Exception('Database is not set, please use `bindDatabase`', Exception::DATABASE_REQUIRED);
+        }
+
         $this->table = $table;
 
         $this->appendExpr('CREATE TABLE ? (' . PHP_EOL, new Symbol($this->table->schemaName));
@@ -66,7 +88,7 @@ class CreateTable extends Expression
         $this->appendForeignKeys();
         $this->appendPrimaryKey();
 
-        $this->appendExpr(')' . PHP_EOL);
+        $this->appendExpr(PHP_EOL . ')');
         return $this;
     }
 

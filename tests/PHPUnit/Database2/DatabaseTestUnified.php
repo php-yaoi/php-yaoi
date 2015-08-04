@@ -44,6 +44,8 @@ SQL;
 
     protected function notNullTest(Table $def)
     {
+        var_dump($def->getColumn('id1'));
+
         $this->assertNotEmpty($def->getColumn('id1')->flags & Column::NOT_NULL);
         $this->assertNotEmpty($def->getColumn('id2')->flags & Column::NOT_NULL);
         $this->assertNotEmpty($def->getColumn('name')->flags & Column::NOT_NULL);
@@ -151,18 +153,17 @@ SQL;
         $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
         $columns->updated = Column::TIMESTAMP;
 
-        $table = new Table($columns);
-        $table->setSchemaName('test_indexes');
+        $table = new Table($columns, $this->db, 'test_indexes');
         $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
-
         $table->addIndex(Index::TYPE_KEY, $columns->name);
 
         $utility = $this->db->getUtility();
 
 
+        //print_r($columns->updated);
         $utility->dropTableIfExists('test_indexes');
         $createSQL = $utility->generateCreateTableOnDefinition($table);
-        //echo $createSQL;
+        echo $createSQL;
         $this->db->query($createSQL);
 
         $actualTable = $utility->getTableDefinition('test_indexes');
@@ -172,19 +173,21 @@ SQL;
             ->setDefault('normal')
             ->setStringLength(15, true);
 
-        $updatedTable = new Table($columns2);
-        $updatedTable->schemaName = 'test_indexes';
+        $updatedTable = new Table($columns2, $this->db, 'test_indexes');
 
         $this->assertSame('', $utility->generateAlterTable($actualTable, $table));
         $this->assertSame("ALTER TABLE `test_indexes`
 ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
 DROP INDEX `unique_uni_one_uni_two`,
-DROP INDEX `key_name`", $utility->generateAlterTable($table, $updatedTable));
+DROP INDEX `key_name`", (string)$utility->generateAlterTable($table, $updatedTable));
 
-        $this->assertSame($createSQL, $utility->generateCreateTableOnDefinition($actualTable));
+        $this->assertSame((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
 
     }
 
+
+
+    protected $createTableStatement;
 
     public function testCreateTable() {
         if ($this->skip) {
@@ -195,8 +198,7 @@ DROP INDEX `key_name`", $utility->generateAlterTable($table, $updatedTable));
         $columnsA->id = Column::AUTO_ID;
         $columnsA->mOne = Column::INTEGER;
         $columnsA->mTwo = Column::INTEGER;
-        $tableA = new Table($columnsA);
-        $tableA->schemaName = 'table_a';
+        $tableA = new Table($columnsA, $this->db, 'table_a');
 
         $columns = new stdClass();
         $columns->id = Column::AUTO_ID;
@@ -209,30 +211,13 @@ DROP INDEX `key_name`", $utility->generateAlterTable($table, $updatedTable));
         $columns->rOne = new Column();
         $columns->rTwo = new Column();
 
-        $table = new Table($columns);
-        $table->setSchemaName('test_indexes');
+        $table = new Table($columns, $this->db, 'test_indexes');
         $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
         $table->addIndex(Index::TYPE_KEY, $columns->name);
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
 
-        $createSql = CreateTable::create()->bindDatabase($this->db)->setTable($table);
-        $this->assertSame("CREATE TABLE `test_indexes` (
- `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) NOT NULL,
- `uni_one` int DEFAULT NULL,
- `uni_two` int DEFAULT NULL,
- `default_null` float DEFAULT NULL,
- `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- `ref_id` int NOT NULL,
- `r_one` varchar(255) DEFAULT NULL,
- `r_two` varchar(255) DEFAULT NULL,
- UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
- KEY `key_name` (`name`),
- CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
- CONSTRAINT `fk_test_indexes_r_one_r_two_table_a_m_one_m_two` FOREIGN KEY (`r_one`, `r_two`) REFERENCES `table_a` (`m_one`, `m_two`),
- PRIMARY KEY (`id`)
-)
-", (string)$createSql);
+        $createSql = CreateTable::create()->bindDatabase($this->db)->generate($table);
+        $this->assertSame($this->createTableStatement, (string)$createSql);
 
     }
 

@@ -2,9 +2,11 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Sqlite\TypeString;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Sqlite\CreateTable;
 
 class Sqlite extends Utility
 {
@@ -32,29 +34,17 @@ class Sqlite extends Utility
             $primaryKey[0]->setFlag(Column::AUTO_ID);
         }
 
-        $definition = new Table($columns);
+        $definition = new Table($columns, $this->database, $tableName);
         $definition->setPrimaryKey($primaryKey);
 
 
         return $definition;
     }
 
-
-    public function generateCreateTableOnDefinition(Table $table)
-    {
-        throw new \Exception('Not implemented');
-        // TODO: Implement generateCreateTableOnDefinition() method.
-    }
-
     public function getColumnTypeString(Column $column)
     {
-        throw new \Exception('Not implemented');
-        // TODO: Implement getColumnTypeString() method.
-    }
-
-    public function generateAlterTable(Table $before, Table $after)
-    {
-        // TODO: Implement generateAlterTable() method.
+        $typeString = new TypeString($this->database);
+        return $typeString->getByColumn($column);
     }
 
     /**
@@ -66,6 +56,13 @@ class Sqlite extends Utility
     public function checkColumns(array $columns)
     {
         // TODO: Implement checkColumns() method.
+    }
+
+
+    public function generateCreateTableOnDefinition(Table $table) {
+        $expression = new CreateTable();
+        $expression = $expression->bindDatabase($this->database)->generate($table);
+        return $expression->batch;
     }
 
 

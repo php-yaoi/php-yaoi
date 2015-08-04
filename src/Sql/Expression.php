@@ -180,7 +180,6 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
         return $this;
     }
 
-
     public function build(Quoter $quoter = null)
     {
         if ($this->isEmpty()) {

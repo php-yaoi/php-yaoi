@@ -55,6 +55,10 @@ class Column extends BaseClass
         return $this;
     }
 
+    /**
+     * @return bool|null
+     * @todo move custom logic to utility
+     */
     public function getDefault() {
         if (false === $this->default && !($this->flags & self::NOT_NULL) && !($this->flags & self::TIMESTAMP)) {
             return null;
@@ -136,5 +140,9 @@ class Column extends BaseClass
 
     public function getForeignKey() {
         return $this->foreignKey;
+    }
+
+    public function getTypeString() {
+        return $this->table->database()->getUtility()->getColumnTypeString($this);
     }
 }
