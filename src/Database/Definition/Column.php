@@ -60,7 +60,7 @@ class Column extends BaseClass
      * @todo move custom logic to utility
      */
     public function getDefault() {
-        if (false === $this->default && !($this->flags & self::NOT_NULL) && !($this->flags & self::TIMESTAMP)) {
+        if (false === $this->default && !($this->flags & self::NOT_NULL)) {
             return null;
         }
         else {

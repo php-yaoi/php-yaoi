@@ -53,4 +53,13 @@ SQL;
         return;
     }
 
+
+    protected $testCreateIndexesAlterExpected = <<<SQL
+ALTER TABLE `test_indexes`
+ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
+DROP INDEX `unique_uni_one_uni_two`,
+DROP INDEX `key_name`
+SQL;
+
+
 }

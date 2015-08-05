@@ -7,7 +7,7 @@ use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Exception;
 
-class CreateTable extends Expression
+abstract class CreateTable extends Expression
 {
     /** @var  Table */
     protected $table;

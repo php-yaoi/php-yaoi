@@ -44,11 +44,9 @@ SQL;
 
     protected function notNullTest(Table $def)
     {
-        var_dump($def->getColumn('id1'));
-
-        $this->assertNotEmpty($def->getColumn('id1')->flags & Column::NOT_NULL);
-        $this->assertNotEmpty($def->getColumn('id2')->flags & Column::NOT_NULL);
-        $this->assertNotEmpty($def->getColumn('name')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('id1')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('id2')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('name')->flags & Column::NOT_NULL);
         $this->assertEmpty($def->getColumn('address')->flags & Column::NOT_NULL);
     }
 
@@ -140,6 +138,8 @@ SQL;
     }
 
 
+    protected $testCreateIndexesAlterExpected;
+
     public function testCreateIndexes() {
         if ($this->skip) {
             return;
@@ -163,7 +163,7 @@ SQL;
         //print_r($columns->updated);
         $utility->dropTableIfExists('test_indexes');
         $createSQL = $utility->generateCreateTableOnDefinition($table);
-        echo $createSQL;
+        //echo $createSQL;
         $this->db->query($createSQL);
 
         $actualTable = $utility->getTableDefinition('test_indexes');
@@ -176,10 +176,11 @@ SQL;
         $updatedTable = new Table($columns2, $this->db, 'test_indexes');
 
         $this->assertSame('', $utility->generateAlterTable($actualTable, $table));
-        $this->assertSame("ALTER TABLE `test_indexes`
-ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
-DROP INDEX `unique_uni_one_uni_two`,
-DROP INDEX `key_name`", (string)$utility->generateAlterTable($table, $updatedTable));
+
+        $this->assertSame(
+            $this->testCreateIndexesAlterExpected,
+            (string)$utility->generateAlterTable($table, $updatedTable)
+        );
 
         $this->assertSame((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
 
@@ -216,7 +217,7 @@ DROP INDEX `key_name`", (string)$utility->generateAlterTable($table, $updatedTab
         $table->addIndex(Index::TYPE_KEY, $columns->name);
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
 
-        $createSql = CreateTable::create()->bindDatabase($this->db)->generate($table);
+        $createSql = $this->db->getUtility()->generateCreateTableOnDefinition($table);
         $this->assertSame($this->createTableStatement, (string)$createSql);
 
     }

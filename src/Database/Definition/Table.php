@@ -82,7 +82,7 @@ class Table extends BaseClass
             }
 
             // another column reference
-            if (!empty($column->table)) {
+            if (!empty($column->table) && $column->table->schemaName != $this->schemaName) {
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
@@ -113,7 +113,7 @@ class Table extends BaseClass
             }
         }
 
-        $this->database->getUtility()->checkColumns((array)$this->columns);
+        $this->database->getUtility()->checkTable($this);
 
         return $this;
     }

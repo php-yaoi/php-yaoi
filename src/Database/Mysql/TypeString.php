@@ -81,7 +81,7 @@ class TypeString
                 break;
 
             default:
-                throw new Exception('Undefined column type for column ' . $column->propertyName, Exception::INVALID_SCHEMA);
+                throw new Exception('Undefined column type (' . $flags . ') for column ' . $column->propertyName, Exception::INVALID_SCHEMA);
 
         }
 

@@ -67,7 +67,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
         );
 
         $this->assertSame(
-            'timestamp',
+            'timestamp DEFAULT NULL', // TODO utility check columns!
             $utility->getColumnTypeString(
                 Column::create(Column::TIMESTAMP)
             )
@@ -158,5 +158,14 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
 )', (string)$sql);
 
     }
+
+
+
+    protected $testCreateIndexesAlterExpected = <<<SQL
+ALTER TABLE `test_indexes`
+ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
+DROP INDEX `unique_uni_one_uni_two`,
+DROP INDEX `key_name`
+SQL;
 
 }

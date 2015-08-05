@@ -48,14 +48,10 @@ class Sqlite extends Utility
     }
 
     /**
-     * Check/fix database related type misconceptions
-     *
-     * @param Column[] $columns
-     * @return mixed
+     * @inheritdoc
      */
-    public function checkColumns(array $columns)
+    public function checkTable(Table $table)
     {
-        // TODO: Implement checkColumns() method.
     }
 
 

@@ -2,12 +2,12 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Mysql\CreateTable;
 use Yaoi\Database\Mysql\SchemaReader;
 use Yaoi\Database\Mysql\TypeString;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Sql\CreateTable;
 
 class Mysql extends Utility
 {
@@ -42,12 +42,11 @@ class Mysql extends Utility
     }
 
     /**
-     * @param Column[] $columns
-     * @return mixed
+     * @inheritdoc
      */
-    public function checkColumns(array $columns)
+    public function checkTable(Table $table)
     {
-        foreach ($columns as $column) {
+        foreach ($table->getColumns(true) as $column) {
             if ($column->flags & Column::TIMESTAMP) {
                 if (!$column->getDefault()) {
                     $column->setDefault('0000-00-00 00:00:00');

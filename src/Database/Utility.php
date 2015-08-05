@@ -32,10 +32,9 @@ abstract class Utility extends BaseClass implements UtilityContract
     /**
      * Check/fix database related type misconceptions
      *
-     * @param Column[] $columns
-     * @return mixed
+     * @param Table $table
      */
-    abstract public function checkColumns(array $columns);
+    abstract public function checkTable(Table $table);
 
 
     public function dropTableIfExists($tableName)
