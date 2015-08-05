@@ -18,21 +18,21 @@ SQL;
 
     protected $createTableStatement = <<<SQL
 CREATE TABLE test_indexes (
- id int NOT NULL AUTO_INCREMENT,
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
  name varchar(255) NOT NULL,
- uni_one int DEFAULT NULL,
- uni_two int DEFAULT NULL,
+ uni_one INTEGER DEFAULT NULL,
+ uni_two INTEGER DEFAULT NULL,
  default_null float DEFAULT NULL,
- updated timestamp,
- ref_id int NOT NULL,
+ updated timestamp DEFAULT NULL,
+ ref_id INTEGER NOT NULL,
  r_one varchar(255) DEFAULT NULL,
  r_two varchar(255) DEFAULT NULL,
- UNIQUE KEY unique_uni_one_uni_two (uni_one, uni_two),
- KEY key_name (name),
  CONSTRAINT fk_test_indexes_ref_id_table_a_id FOREIGN KEY (ref_id) REFERENCES table_a (id),
- CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two),
- PRIMARY KEY (id)
-)
+ CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two)
+);
+CREATE UNIQUE INDEX unique_uni_one_uni_two ON test_indexes (uni_one, uni_two);
+CREATE INDEX key_name ON test_indexes (name);
+
 SQL;
 
     protected function autoIncrementTest(Table $def) {
@@ -55,10 +55,10 @@ SQL;
 
 
     protected $testCreateIndexesAlterExpected = <<<SQL
-ALTER TABLE `test_indexes`
-ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
-DROP INDEX `unique_uni_one_uni_two`,
-DROP INDEX `key_name`
+ALTER TABLE test_indexes
+ADD COLUMN new_field char(15) NOT NULL DEFAULT 'normal',
+DROP INDEX unique_uni_one_uni_two,
+DROP INDEX key_name
 SQL;
 
 

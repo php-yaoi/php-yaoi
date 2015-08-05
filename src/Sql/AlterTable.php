@@ -29,6 +29,7 @@ class AlterTable extends Expression
             else {
                 $beforeColumn = $beforeColumns[$columnName];
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
+                    var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
                     $alter []= $database->expr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
                 }
                 unset($beforeColumns[$columnName]);

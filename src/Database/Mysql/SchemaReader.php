@@ -15,12 +15,12 @@ class SchemaReader
     /**
      * @var Database
      */
-    private $database;
+    protected $database;
 
     /**
      * @var Database\Utility
      */
-    private $utility;
+    protected $utility;
 
     public function __construct(Database\Contract $database) {
         $this->database = $database;

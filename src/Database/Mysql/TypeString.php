@@ -16,7 +16,7 @@ class TypeString
     }
 
 
-    private function getIntTypeString(Column $column) {
+    protected function getIntTypeString(Column $column) {
         $intType = 'int';
 
         // TODO implement SIZE_ definitions
@@ -61,8 +61,10 @@ class TypeString
         return 'timestamp';
     }
 
-    public function getByColumn(Column $column) {
+
+    protected function getBaseType(Column $column) {
         $flags = $column->flags;
+
         switch (true) {
             case ($flags & Column::INTEGER):
                 $typeString = $this->getIntTypeString($column);
@@ -84,6 +86,15 @@ class TypeString
                 throw new Exception('Undefined column type (' . $flags . ') for column ' . $column->propertyName, Exception::INVALID_SCHEMA);
 
         }
+
+        return $typeString;
+
+    }
+
+    public function getByColumn(Column $column) {
+        $flags = $column->flags;
+
+        $typeString = $this->getBaseType($column);
 
         if ($flags & Column::UNSIGNED) {
             $typeString .= ' unsigned';

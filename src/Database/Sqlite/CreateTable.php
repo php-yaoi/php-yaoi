@@ -19,7 +19,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
         foreach ($this->table->getColumns(true) as $column) {
             $this->appendComma();
             if ($column->flags & Column::AUTO_ID) {
-                $this->appendExpr(' ? INTEGER PRIMARY KEY AUTOINCREMENT', new Symbol($column->schemaName));
+                $this->appendExpr(' ? INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL', new Symbol($column->schemaName));
                 if (array_values($this->table->primaryKey) !== array($column)) {
                     throw new Exception("Auto ID conflicts PRIMARY KEY", Exception::INVALID_SCHEMA);
                 }
