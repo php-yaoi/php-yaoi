@@ -7,7 +7,7 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Exception;
 use Yaoi\Sql\Batch;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 
 class CreateTable extends \Yaoi\Sql\CreateTable
@@ -53,7 +53,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
             }
 
             if ($index->type === Index::TYPE_KEY) {
-                $createIndex = new Expression(
+                $createIndex = new SimpleExpression(
                     "CREATE INDEX ? ON ? (?)",
                     new Symbol($index->getName()),
                     new Symbol($this->table->schemaName),
@@ -64,7 +64,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
                 //$this->appendExpr(' KEY ? (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
-                $createIndex = new Expression(
+                $createIndex = new SimpleExpression(
                     "CREATE UNIQUE INDEX ? ON ? (?)",
                     new Symbol($index->getName()),
                     new Symbol($this->table->schemaName),

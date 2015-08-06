@@ -12,7 +12,7 @@ namespace Yaoi\Database\Pgsql;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Sql\Batch;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 
 class CreateTable extends \Yaoi\Sql\CreateTable
@@ -42,7 +42,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
             }
 
             if ($index->type === Index::TYPE_KEY) {
-                $createIndex = new Expression(
+                $createIndex = new SimpleExpression(
                     "CREATE INDEX ? ON ? (?)",
                     new Symbol($index->getName()),
                     new Symbol($this->table->schemaName),

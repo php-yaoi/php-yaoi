@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Sqlite\AlterTable;
 use Yaoi\Database\Sqlite\SchemaReader;
 use Yaoi\Database\Sqlite\TypeString;
 use Yaoi\Database\Utility;
@@ -41,6 +42,14 @@ class Sqlite extends Utility
         $schemaReader = new SchemaReader($this->database);
         $definition = $schemaReader->getTableDefinition($tableName);
         return $definition;
+    }
+
+
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        $expression = new AlterTable();
+        $expression->bindDatabase($this->database)->generate($before, $after);
+        return $expression->batch;
     }
 
 

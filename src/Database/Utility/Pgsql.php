@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database\Utility;
 
+use Yaoi\Database\Pgsql\AlterTable;
 use Yaoi\Database\Pgsql\SchemaReader;
 use Yaoi\Database\Pgsql\TypeString;
 use Yaoi\Database\Utility;
@@ -42,5 +43,11 @@ class Pgsql extends Utility
     {
     }
 
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        $expression = new AlterTable();
+        $expression->bindDatabase($this->database)->generate($before, $after);
+        return $expression->batch;
+    }
 
 }

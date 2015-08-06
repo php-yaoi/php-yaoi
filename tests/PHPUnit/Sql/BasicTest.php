@@ -9,7 +9,7 @@
 namespace PHPUnit\Sql;
 
 
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\String\Quoter\Raw;
 use Yaoi\Test\PHPUnit\TestCase;
 
@@ -25,13 +25,13 @@ class BasicTest extends TestCase
     public function testAppend() {
         $this->assertSame(
             'start-middle-end',
-            Expression::create('start')->appendExpr('-mid?l?', 'd', 'e')->appendExpr('-e?d', 'n')->build(new Raw())
+            SimpleExpression::create('start')->appendExpr('-mid?l?', 'd', 'e')->appendExpr('-e?d', 'n')->build(new Raw())
         );
     }
 
 
     public function testQuote() {
-        $this->assertSame('m1ddle', Expression::create('m?ddle', 1)->build(new Raw()));
+        $this->assertSame('m1ddle', SimpleExpression::create('m?ddle', 1)->build(new Raw()));
     }
 
 }

@@ -5,6 +5,7 @@ namespace Yaoi\Database\Definition;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Exception;
+use Yaoi\Sql\CreateTable;
 use Yaoi\String\Utils;
 
 class Table extends BaseClass
@@ -173,6 +174,15 @@ class Table extends BaseClass
             //$this->database = Database::getInstance();
         }
         return $this->database;
+    }
+
+
+    /**
+     * @return CreateTable
+     * @throws Exception
+     */
+    public function getCreateTable() {
+        return $this->database()->getUtility()->generateCreateTableOnDefinition($this);
     }
 
 }

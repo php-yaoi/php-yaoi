@@ -39,7 +39,7 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
         $columns = new \stdClass();
         $columns->id = new Column(Column::AUTO_ID);
 
-        $table = new Table($columns);
+        $table = new Table($columns, $this->database, 'some_table');
         $this->assertSame(array('id' => $columns->id), $table->primaryKey);
     }
 
@@ -84,12 +84,12 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
     public function testCreateTable() {
         $this->assertSame(
             $this->entityOneCreateTableExpected,
-            $this->database->getUtility()
+            (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityOneABBR::table()));
 
         $this->assertSame(
             $this->entityTwoCreateTableExpected,
-            $this->database->getUtility()
+            (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityTwo::table()));
 
     }

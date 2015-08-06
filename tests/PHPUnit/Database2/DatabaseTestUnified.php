@@ -139,6 +139,7 @@ SQL;
 
 
     protected $testCreateIndexesAlterExpected;
+    protected $testCreateTableAfterAlter;
 
     public function testCreateIndexes() {
         if ($this->skip) {
@@ -174,16 +175,29 @@ SQL;
             ->setStringLength(15, true);
 
         $updatedTable = new Table($columns2, $this->db, 'test_indexes');
+        $updatedTable->addIndex(Index::TYPE_UNIQUE, $columns2->updated);
 
-        $this->assertSame('', $utility->generateAlterTable($actualTable, $table));
+        $this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
 
+        $alterTable = $utility->generateAlterTable($table, $updatedTable);
         $this->assertSame(
             $this->testCreateIndexesAlterExpected,
-            (string)$utility->generateAlterTable($table, $updatedTable)
+            (string)$alterTable
         );
 
         $this->assertSame((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
 
+        try {
+            //echo $alterTable, PHP_EOL;
+            $this->db->query($alterTable)->execute();
+        }
+        catch (\Yaoi\Database\Exception $e) {
+            echo $e->query . PHP_EOL;
+            throw $e;
+        }
+
+        $actualTable = $utility->getTableDefinition('test_indexes');
+        $this->assertSame($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
     }
 
 

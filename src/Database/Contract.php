@@ -5,7 +5,7 @@ namespace Yaoi\Database;
 use Yaoi\Log;
 use Yaoi\Mock\Able;
 use Yaoi\Sql\DeleteInterface;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\InsertInterface;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Statement;
@@ -31,7 +31,7 @@ interface Contract extends Able, Quoter
     /**
      * @param $statement
      * @param null $binds
-     * @return Expression
+     * @return SimpleExpression
      */
     public function expr($statement, $binds = null);
 

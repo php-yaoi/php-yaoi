@@ -46,6 +46,8 @@ SQL;
             unlink($fileName);
         }
         $this->db = new Database('sqlite:///' . $fileName);
+
+        //$this->db->log(new \Yaoi\Log('stdout'));
     }
 
 
@@ -55,10 +57,34 @@ SQL;
 
 
     protected $testCreateIndexesAlterExpected = <<<SQL
-ALTER TABLE test_indexes
-ADD COLUMN new_field char(15) NOT NULL DEFAULT 'normal',
-DROP INDEX unique_uni_one_uni_two,
-DROP INDEX key_name
+ALTER TABLE test_indexes RENAME TO _temp_table;
+CREATE TABLE test_indexes (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ name varchar(255) NOT NULL,
+ uni_one INTEGER DEFAULT NULL,
+ uni_two INTEGER DEFAULT NULL,
+ default_null float DEFAULT NULL,
+ updated timestamp DEFAULT NULL,
+ new_field char(15) NOT NULL DEFAULT 'normal'
+);
+CREATE UNIQUE INDEX unique_updated ON test_indexes (updated);
+INSERT INTO test_indexes (id, name, uni_one, uni_two, default_null, updated) SELECT id, name, uni_one, uni_two, default_null, updated FROM _temp_table;
+DROP TABLE _temp_table;
+
+SQL;
+
+    protected $testCreateTableAfterAlter = <<<SQL
+CREATE TABLE test_indexes (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ name varchar(255) NOT NULL,
+ uni_one INTEGER DEFAULT NULL,
+ uni_two INTEGER DEFAULT NULL,
+ default_null float DEFAULT NULL,
+ updated timestamp DEFAULT NULL,
+ new_field varchar(255) NOT NULL DEFAULT 'normal'
+);
+CREATE UNIQUE INDEX unique_updated ON test_indexes (updated);
+
 SQL;
 
 

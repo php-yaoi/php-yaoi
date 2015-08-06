@@ -29,8 +29,7 @@ SQL;
         $db->query('DROP TABLE IF EXISTS "test_entity_db"');
         $db->query($createSQL);
 
-
-        TestEntityDb::table()->bindDatabase($db);
+        TestEntityDb::bindDatabase($db);
     }
 
 }

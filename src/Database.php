@@ -12,7 +12,7 @@ use Yaoi\Mappable\Contract;
 use Yaoi\Mock;
 use Yaoi\Sql\Batch;
 use Yaoi\Sql\DeleteInterface;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\InsertInterface;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Statement;
@@ -53,11 +53,11 @@ class Database extends Service implements DatabaseContract
         }
         else {
             $arguments = func_get_args();
-            $statements = array(Expression::createFromFuncArguments($arguments));
+            $statements = array(SimpleExpression::createFromFuncArguments($arguments));
         }
 
         if (empty($statements) || empty($statement)) {
-            throw new Exception('Empty statement or batch', Exception::EMPTY_STATEMENT);
+            throw new Exception('Empty statement', Exception::EMPTY_STATEMENT);
         }
         $query = null;
         foreach ($statements as $expression) {
@@ -151,12 +151,12 @@ class Database extends Service implements DatabaseContract
     /**
      * @param $expression
      * @param null $binds
-     * @return Expression
+     * @return SimpleExpression
      * @throws Sql\Exception
      */
     public function expr($expression, $binds = null)
     {
-        return Expression::createFromFuncArguments(func_get_args())->bindDatabase($this);
+        return SimpleExpression::createFromFuncArguments(func_get_args())->bindDatabase($this);
     }
 
 

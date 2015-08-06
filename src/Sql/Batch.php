@@ -3,25 +3,59 @@
 namespace Yaoi\Sql;
 
 use Yaoi\BaseClass;
+use Yaoi\String\Quoter;
 
-class Batch extends BaseClass
+class Batch extends Expression
 {
     /** @var Expression[] */
-    private $expressions = array();
+    private $statements = array();
     public function add(Expression $expression) {
-        $this->expressions []= $expression;
+        $this->statements []= $expression;
         return $this;
     }
 
     public function get() {
-        return $this->expressions;
+        $result = array();
+        foreach ($this->statements as $statement) {
+            if ($statement instanceof Batch) {
+                $statement->appendResult($result);
+            }
+            else {
+                $result []= $statement;
+            }
+        }
+        return $result;
+    }
+
+    private function appendResult(&$result) {
+        foreach ($this->statements as $statement) {
+            if ($statement instanceof Batch) {
+                $statement->appendResult($result);
+            }
+            else {
+                $result []= $statement;
+            }
+        }
+    }
+
+
+    public function build(Quoter $quoter = null) {
+        $result = '';
+        foreach ($this->statements as $expression) {
+            $build = $expression->build($quoter);
+            if ($build) {
+                if ($expression instanceof Batch) {
+                    $result .= $build;
+                }
+                else {
+                    $result .= $build . ';' . PHP_EOL;
+                }
+            }
+        }
+        return $result;
     }
 
     public function __toString() {
-        $result = '';
-        foreach ($this->expressions as $expression) {
-            $result .= $expression->build() . ';' . PHP_EOL;
-        }
-        return $result;
+        return $this->build();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 use Yaoi\Database;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Statement;
 
 class SqlSelectTest extends \YaoiTests\Sql\TestCase {
@@ -23,13 +23,13 @@ class SqlSelectTest extends \YaoiTests\Sql\TestCase {
     public function testEx() {
         $quoter = Database::getInstance()->getDriver();
 
-        $ex = new Expression('ololo = ? AND bbb = ?', 12, 13);
+        $ex = new SimpleExpression('ololo = ? AND bbb = ?', 12, 13);
         $ex->andExpr('lala = :ow', array('ow' => 'OWWW'));
         $this->assertSame("ololo = 12 AND bbb = 13 AND lala = 'OWWW'", $ex->build($quoter));
 
-        $ex = new Expression('ololo = ? AND bbb = ?', 12, 13);
+        $ex = new SimpleExpression('ololo = ? AND bbb = ?', 12, 13);
         $ex->andExpr('lala = :ow', array('ow' => 'OWWW'))->andExpr('omnom');
-        $e2 = new Expression('hidden');
+        $e2 = new SimpleExpression('hidden');
         $ex->orExpr($e2);
 
         $this->assertSame("ololo = 12 AND bbb = 13 AND lala = 'OWWW' AND omnom OR hidden", $ex->build($quoter));
@@ -42,7 +42,7 @@ class SqlSelectTest extends \YaoiTests\Sql\TestCase {
     public function testAs() {
         $quoter = Database::getInstance()->getDriver();
 
-        $ex = new Expression('ololo = ? AND bbb = ?', 12, 13);
+        $ex = new SimpleExpression('ololo = ? AND bbb = ?', 12, 13);
         $ex->andExpr('lala = :ow', array('ow' => 'OWWW'));
         $ex->asExpr('alias');
         $this->assertSame("(ololo = 12 AND bbb = 13 AND lala = 'OWWW') AS alias", $ex->build($quoter));
@@ -74,7 +74,7 @@ class SqlSelectTest extends \YaoiTests\Sql\TestCase {
         $se = new Statement();
         $se->select('VERSION(), FROM_UNIXTIME(?)', 12321);
         $se->select('now()');
-        $se->select(function(){$e = new Expression('a-b');$e->asExpr('wkhoooy');return $e;});
+        $se->select(function(){$e = new SimpleExpression('a-b');$e->asExpr('wkhoooy');return $e;});
 
         $this->assertSame("SELECT VERSION(), FROM_UNIXTIME(12321), now(), (a-b) AS wkhoooy", $se->build(Database::getInstance()->getDriver()));
 

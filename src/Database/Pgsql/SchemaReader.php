@@ -129,14 +129,32 @@ where c.table_name = ? ORDER BY c.ordinal_position ASC;
 
             $notNull = $r['is_nullable'] === 'NO';
             $column = new Column($phpType);
+            $skipDefault = false;
             if ('nextval' === substr($r['column_default'], 0, 7)) {
                 $column->setFlag(Column::AUTO_ID);
                 $column->setFlag(Column::INTEGER);
+                $skipDefault = true;
             }
             $column->setFlag(Column::NOT_NULL, $notNull);
-            if ($r['column_default'] !== null || !$notNull) {
-                $column->setDefault($r['column_default']);
+
+            if (!$skipDefault) {
+                $default = $r['column_default'];
+                if ($default !== null || !$notNull) {
+                    if (is_string($default)) {
+                        if ("'" === $default[0]) {
+                            $pos = strrpos($default, "'::");
+                            if ($pos !== false) {
+                                $default = substr($default, 1, $pos - 1);
+                            }
+                        }
+                        elseif ('NULL::' === substr($default, 0, 6)) {
+                            $default = null;
+                        }
+                    }
+                    $column->setDefault($default);
+                }
             }
+
 
             $columns->$field = $column;
         }

@@ -1,19 +1,20 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: vpoturaev
+ * Date: 8/6/15
+ * Time: 12:50
+ */
 
 namespace Yaoi\Sql;
 
-use Closure;
+
 use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\String\Quoter;
 use Yaoi\Debug;
+use Yaoi\String\Quoter;
 
-/**
- * Class Expression
- * @package Yaoi\Sql
- * @todo Utilize String\Formatter
- */
-class Expression extends BaseClass implements \Yaoi\IsEmpty
+abstract class Expression extends BaseClass
 {
     /**
      * @var Database
@@ -40,65 +41,9 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
         }
     }
 
-
-    /**
-     * @param $arguments
-     * @return Expression
-     * @throws \Yaoi\Sql\Exception
-     */
-    public static function createFromFuncArguments($arguments)
-    {
-        if (empty($arguments[0])) {
-            throw new \Yaoi\Sql\Exception('Literal statement or Sql_Expression required as first argument',
-                \Yaoi\Sql\Exception::STATEMENT_REQUIRED);
-        }
-        if ($arguments[0] instanceof Expression) {
-            return $arguments[0];
-        }
-        if ($arguments[0] instanceof Symbol) {
-            return new self('?', $arguments[0]);
-        }
-        if ($arguments[0] instanceof Closure) {
-            $expression = $arguments[0]();
-            if (!$expression instanceof Expression) {
-                throw new \Yaoi\Sql\Exception('Closure should return ' . get_called_class(),
-                    \Yaoi\Sql\Exception::CLOSURE_MISTYPE);
-            }
-            return $expression;
-        }
-
-        $expression = new self;
-        $expression->setFromFuncArguments($arguments);
-        return $expression;
-    }
-
-    private function setFromFuncArguments($arguments)
-    {
-        $this->statement = $arguments[0];
-
-        $count = count($arguments);
-        if ($count > 2) {
-            array_shift($arguments);
-            $this->binds = $arguments;
-        } elseif (array_key_exists(1, $arguments)) {
-            if (is_array($arguments[1])) {
-                $this->binds = $arguments[1];
-            } else {
-                $this->binds = array($arguments[1]);
-            }
-        }
-    }
-
-    public function __construct($statement = null, $binds = null)
-    {
-        if (null !== $statement) {
-            $this->setFromFuncArguments(func_get_args());
-        }
-    }
-
     private $as;
-    private $statement;
-    private $binds;
+    protected $statement;
+    protected $binds;
     private $queue = array();
 
 
@@ -113,7 +58,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function andExpr($expression)
     {
-        $this->queue [] = array(self::OP_AND, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_AND, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -122,7 +67,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function orExpr($expression)
     {
-        $this->queue [] = array(self::OP_OR, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_OR, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -131,7 +76,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function xorExpr($expression)
     {
-        $this->queue [] = array(self::OP_XOR, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_XOR, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -139,7 +84,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function commaExpr($expression)
     {
-        $this->queue [] = array(self::OP_COMMA, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_COMMA, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -147,7 +92,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function appendExpr($expression)
     {
-        $this->queue [] = array(self::OP_APPEND, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_APPEND, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -155,7 +100,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function unionExpr($expression)
     {
-        $this->queue [] = array(self::OP_UNION, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_UNION, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -163,7 +108,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
     public function unionAllExpr($expression)
     {
-        $this->queue [] = array(self::OP_UNION_ALL, Expression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array(self::OP_UNION_ALL, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -174,7 +119,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
             $this->queue,
             array(
                 self::OP_APPEND,
-                Expression::createFromFuncArguments(func_get_args())
+                SimpleExpression::createFromFuncArguments(func_get_args())
             )
         );
         return $this;
@@ -244,7 +189,7 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
 
         foreach ($this->queue as $item) {
             /**
-             * @var Expression $expression
+             * @var SimpleExpression $expression
              */
             $expression = $item[1];
 
@@ -282,4 +227,8 @@ class Expression extends BaseClass implements \Yaoi\IsEmpty
         }
         return true;
     }
+
+
+
+
 }

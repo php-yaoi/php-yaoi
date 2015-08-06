@@ -164,8 +164,25 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
     protected $testCreateIndexesAlterExpected = <<<SQL
 ALTER TABLE `test_indexes`
 ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
+ADD UNIQUE INDEX `unique_updated` (`updated`),
 DROP INDEX `unique_uni_one_uni_two`,
 DROP INDEX `key_name`
 SQL;
+
+    protected $testCreateTableAfterAlter = <<<SQL
+CREATE TABLE `test_indexes` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) NOT NULL,
+ `uni_one` int DEFAULT NULL,
+ `uni_two` int DEFAULT NULL,
+ `default_null` float DEFAULT NULL,
+ `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `new_field` varchar(255) NOT NULL DEFAULT 'normal',
+ UNIQUE KEY `unique_updated` (`updated`),
+ PRIMARY KEY (`id`)
+)
+SQL;
+
+
 
 }

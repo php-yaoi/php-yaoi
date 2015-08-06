@@ -1,4 +1,6 @@
 <?php
+namespace Yaoi;
+
 class DependencyRepository {
     public static $items = array();
     private static $sequenceId = 0;

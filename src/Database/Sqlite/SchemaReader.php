@@ -78,7 +78,8 @@ class SchemaReader extends Database\Mysql\SchemaReader
 
     private function readIndexes(Table $table) {
 
-        $res = $this->database->query("PRAGMA INDEX_LIST (?)", $table->schemaName);
+        $res = $this->database->query("PRAGMA INDEX_LIST (?)", $table->schemaName)->fetchAll();
+        $res = array_reverse($res);
         foreach ($res as $indexRow) {
             $cols = $this->database->query("PRAGMA INDEX_INFO (?)", $indexRow['name']);
             $columns = array();
@@ -89,7 +90,6 @@ class SchemaReader extends Database\Mysql\SchemaReader
             $index->setType($indexRow['unique'] ? Index::TYPE_UNIQUE : Index::TYPE_KEY);
             $table->addIndex($index);
         }
-
     }
 
 

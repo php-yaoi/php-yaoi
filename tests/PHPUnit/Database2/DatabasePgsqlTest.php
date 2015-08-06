@@ -78,9 +78,28 @@ SQL;
     protected $testCreateIndexesAlterExpected = <<<SQL
 ALTER TABLE "test_indexes"
 ADD COLUMN "new_field" char(15) NOT NULL DEFAULT 'normal',
-DROP INDEX "unique_uni_one_uni_two",
-DROP INDEX "key_name"
+DROP CONSTRAINT "unique_uni_one_uni_two";
+CREATE UNIQUE INDEX "unique_updated" ON "test_indexes" ("updated");
+DROP INDEX "key_name";
+
 SQL;
+
+
+    protected $testCreateTableAfterAlter = <<<SQL
+CREATE TABLE "test_indexes" (
+ "id" SERIAL,
+ "name" varchar(255) NOT NULL,
+ "uni_one" int DEFAULT NULL,
+ "uni_two" int DEFAULT NULL,
+ "default_null" float DEFAULT NULL,
+ "updated" timestamp DEFAULT NULL,
+ "new_field" varchar(255) NOT NULL DEFAULT 'normal',
+ CONSTRAINT "unique_updated" UNIQUE ("updated"),
+ PRIMARY KEY ("id")
+);
+
+SQL;
+
 
 
 }
