@@ -3,6 +3,7 @@
 namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
+use Yaoi\Sql\Symbol;
 
 class Column extends BaseClass
 {
@@ -30,7 +31,9 @@ class Column extends BaseClass
     {
         if ($flags === self::AUTO_ID) {
             $flags += self::INTEGER;
+            $flags += self::NOT_NULL;
         }
+
         $this->flags = $flags;
     }
 
@@ -46,10 +49,23 @@ class Column extends BaseClass
     }
 
 
-    public $default = false;
+    private $default = false;
     public function setDefault($value) {
         $this->default = $value;
         return $this;
+    }
+
+    /**
+     * @return bool|null
+     * @todo move custom logic to utility
+     */
+    public function getDefault() {
+        if (false === $this->default && !($this->flags & self::NOT_NULL)) {
+            return null;
+        }
+        else {
+            return $this->default;
+        }
     }
 
     public $stringLength;
@@ -57,13 +73,6 @@ class Column extends BaseClass
     public function setStringLength($length, $fixed = false) {
         $this->stringLength = $length;
         $this->stringFixed = $fixed;
-        return $this;
-    }
-
-
-    public $constraint;
-    public function setConstraint(Column $column = null) {
-        $this->constraint = $column;
         return $this;
     }
 
@@ -117,5 +126,23 @@ class Column extends BaseClass
         }
 
         return $value;
+    }
+
+
+    /**
+     * @var ForeignKey
+     */
+    private $foreignKey;
+    public function setForeignKey(Column $column, $onUpdate = ForeignKey::NO_ACTION, $onDelete = ForeignKey::NO_ACTION) {
+        $this->foreignKey = new ForeignKey(array($this), array($column), $onUpdate, $onDelete);
+        return $this;
+    }
+
+    public function getForeignKey() {
+        return $this->foreignKey;
+    }
+
+    public function getTypeString() {
+        return $this->table->database()->getUtility()->getColumnTypeString($this);
     }
 }

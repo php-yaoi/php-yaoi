@@ -4,6 +4,7 @@ namespace Yaoi\Database;
 
 use Iterator;
 use Yaoi\BaseClass;
+use Yaoi\Database\Definition\Column;
 use Yaoi\Sql\DefaultValue;
 use Yaoi\Sql\Expression;
 use Yaoi\Sql\Symbol;
@@ -39,6 +40,8 @@ abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contrac
             return '(' . $value->build($this) . ')';
         } elseif ($value instanceof Symbol) {
             return $this->quoteSymbol($value);
+        } elseif ($value instanceof Column) {
+            return $this->quoteSymbol(new Symbol($value->schemaName));
         } elseif ($value instanceof DefaultValue) {
             return 'DEFAULT';
         } else {

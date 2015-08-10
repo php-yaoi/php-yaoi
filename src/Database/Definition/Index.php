@@ -26,4 +26,31 @@ class Index extends BaseClass
         $this->type = $type;
         return $this;
     }
+
+
+    private $name;
+    public function setName($name) {
+        $this->name = $name;
+        return $this;
+    }
+    public function getName() {
+        if (!$this->name) {
+            $this->name = $this->getId();
+        }
+
+        return $this->name;
+    }
+
+
+    private $id;
+    public function getId() {
+        if (!$this->id) {
+            $this->id = $this->type;
+            foreach ($this->columns as $column) {
+                $this->id .= '_' . $column->schemaName;
+            }
+        }
+        return $this->id;
+    }
+
 }

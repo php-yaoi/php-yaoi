@@ -15,6 +15,8 @@ class Exception extends \Exception
     const REWIND_NOT_SUPPORTED = 9;
     const INVALID_ARGUMENT = 10;
     const INVALID_SCHEMA = 11;
+    const DATABASE_REQUIRED = 12;
+    const EMPTY_STATEMENT = 13;
 
     public $query;
 }

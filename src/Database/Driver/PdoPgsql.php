@@ -89,11 +89,13 @@ class PdoPgsql extends Driver
     }
 
     /**
-     * @param PDOStatement $result
+     * @param $result
+     * @throws Database\Exception
      */
     public function rewind($result)
     {
-        if (!empty($result->rewinded)) {
+        if (empty($result->rewinded)) {
+            /** @noinspection PhpUndefinedFieldInspection */
             $result->rewinded = true;
         } else {
             throw new Database\Exception('Can not rewind query result', Database\Exception::REWIND_NOT_SUPPORTED);

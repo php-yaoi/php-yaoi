@@ -3,7 +3,7 @@
 namespace Yaoi\Sql;
 
 use Yaoi\Database\Contract;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 use Yaoi\Database\Query;
 
 interface StatementInterface

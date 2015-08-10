@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database;
 
+use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Entity\Exception;
 use Yaoi\Mappable;
@@ -33,11 +34,11 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
         $columns = new \stdClass();
         static::setUpColumns($columns);
-        $table = new Table($columns);
-
-        $table->schemaName = null === static::$tableName
+        $schemaName = null === static::$tableName
             ? Utils::fromCamelCase(str_replace('\\', '', $className))
             : static::$tableName;
+        $table = new Table($columns, self::getDatabase($className), $schemaName);
+
 
         $table->className = $className;
         return $table;
@@ -189,5 +190,27 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $this;
     }
 
+    /**
+     * @var Contract[]
+     */
+    private static $databases = array();
+    public static function bindDatabase(Contract $database) {
+        $class = get_called_class();
+        if (!isset(self::$databases[$class]) || self::$databases[$class] !== $database) {
+            self::$databases[$class] = $database;
+            if (isset(self::$tables[$class])) {
+                unset(self::$tables[$class]);
+            }
+        }
+    }
+
+    private static function getDatabase($class) {
+        if (isset(self::$databases[$class])) {
+            return self::$databases[$class];
+        }
+        else {
+            return Database::getInstance();
+        }
+    }
 
 }

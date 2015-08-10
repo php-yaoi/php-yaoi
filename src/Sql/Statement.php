@@ -4,7 +4,7 @@ namespace Yaoi\Sql;
 
 use Yaoi\Database;
 use Yaoi\Database\Contract;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 
 class Statement extends ComplexStatement
 {
@@ -63,7 +63,7 @@ class Statement extends ComplexStatement
 
 
     /**
-     * @var Expression[]
+     * @var SimpleExpression[]
      */
     protected $select = array();
 
@@ -71,7 +71,7 @@ class Statement extends ComplexStatement
     {
         $this->command = self::CMD_SELECT;
         if (null !== $expression) {
-            $this->select [] = Expression::createFromFuncArguments(func_get_args());
+            $this->select [] = SimpleExpression::createFromFuncArguments(func_get_args());
         }
         return $this;
     }
@@ -165,7 +165,7 @@ class Statement extends ComplexStatement
 
     public function expr($expression, $binds = null)
     {
-        $e = Expression::createFromFuncArguments(func_get_args());
+        $e = SimpleExpression::createFromFuncArguments(func_get_args());
         return $e;
     }
 

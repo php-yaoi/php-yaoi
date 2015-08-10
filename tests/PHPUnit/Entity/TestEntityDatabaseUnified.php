@@ -1,8 +1,8 @@
 <?php
 use Yaoi\Database\Definition\Column;
-use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
 use Yaoi\Test\PHPUnit\TestCase;
+use Yaoi\Database;
 
 class TestEntityDatabaseUnified extends TestCase  {
 

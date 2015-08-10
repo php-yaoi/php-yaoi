@@ -5,6 +5,7 @@ namespace Yaoi\Database\Definition;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Exception;
+use Yaoi\Sql\CreateTable;
 use Yaoi\String\Utils;
 
 class Table extends BaseClass
@@ -21,7 +22,8 @@ class Table extends BaseClass
     /** @var \stdClass  */
     public $columns;
 
-    public $schemaName;
+
+    public $schemaName; // tODO exception on empty schemaName
 
     public function setSchemaName($schemaName) {
         $this->schemaName = $schemaName;
@@ -30,20 +32,26 @@ class Table extends BaseClass
 
     public $className;
 
-    public function __construct($columns = null) {
-        if (!$columns) {
-            $this->columns = new \stdClass();
-        }
-        else {
-            $this->setColumns($columns);
-        }
+    public function __construct($columns, Database\Contract $database, $schemaName) {
+        $this->schemaName = $schemaName;
+        $this->database = $database;
+        $this->setColumns($columns);
     }
 
     /**
      * @param bool|true $asArray
      * @return Column[]|\stdClass
      */
-    public function getColumns($asArray = false) {
+    public function getColumns($asArray = false, $bySchemaName = false) {
+        if ($bySchemaName) {
+            $columns = array();
+            /** @var Column $column */
+            foreach ((array)$this->columns as $column) {
+                $columns [$column->schemaName]= $column;
+            }
+            return $asArray ? $columns : (object)$columns;
+        }
+
         return $asArray ? (array)$this->columns : $this->columns;
     }
 
@@ -56,7 +64,7 @@ class Table extends BaseClass
     }
 
 
-    public function setColumns($columns) {
+    private function setColumns($columns) {
         if (is_object($columns)) {
             $this->columns = $columns;
         }
@@ -75,12 +83,16 @@ class Table extends BaseClass
             }
 
             // another column reference
-            if (!empty($column->table)) {
+            if (!empty($column->table) && $column->table->schemaName != $this->schemaName) {
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
-                $column->constraint = $refColumn;
+                $this->addForeignKey(new ForeignKey(array($column), array($refColumn)));
                 $column->setFlag(Column::AUTO_ID, false);
+            }
+
+            if ($foreignKey = $column->getForeignKey()) {
+                $this->addForeignKey($foreignKey);
             }
 
             $column->propertyName = $name;
@@ -94,9 +106,6 @@ class Table extends BaseClass
                 }
             }
 
-            if ($column->constraint) {
-                $this->addConstraint($column, $column->constraint);
-            }
             if ($column->isUnique) {
                 $this->addIndex(Index::TYPE_UNIQUE, $column);
             }
@@ -105,11 +114,13 @@ class Table extends BaseClass
             }
         }
 
+        $this->database->getUtility()->checkTable($this);
+
         return $this;
     }
 
     /**
-     * @param Column[] $columns
+     * @param Column[]|Column $columns
      * @return $this
      */
     public function setPrimaryKey($columns) {
@@ -126,31 +137,31 @@ class Table extends BaseClass
 
 
     public function addIndex($index) {
-        if ($index instanceof Index) {
-            $this->indexes []= $index;
-        }
-        else {
+        if (!$index instanceof Index) {
             $args = func_get_args();
             $type = array_shift($args);
             $columns = $args;
 
-            $this->indexes []= Index::create($columns)->setType($type);
+            $index = Index::create($columns)->setType($type);
         }
+
+        $this->indexes [$index->getId()]= $index;
+
         return $this;
     }
 
-    public $constraints = array();
-    public function addConstraint(Column $foreignKeyColumn, Column $referenceColumn) {
-        $this->constraints []= array($foreignKeyColumn, $referenceColumn);
+    /**
+     * @var ForeignKey[]
+     */
+    public $foreignKeys = array();
+    public function addForeignKey(ForeignKey $foreignKey) {
+        // todo sync child and parent column types
+        $this->foreignKeys []= $foreignKey;
         return $this;
     }
 
 
     private $database;
-    public function bindDatabase(Database\Contract $database) {
-        $this->database = $database;
-        return $this;
-    }
 
     /**
      * @return \Yaoi\Database\Contract;
@@ -159,9 +170,19 @@ class Table extends BaseClass
     public function database()
     {
         if (null === $this->database) {
-            $this->database = Database::getInstance();
+            throw new Exception('Database not bound', Exception::DATABASE_REQUIRED);
+            //$this->database = Database::getInstance();
         }
         return $this->database;
+    }
+
+
+    /**
+     * @return CreateTable
+     * @throws Exception
+     */
+    public function getCreateTable() {
+        return $this->database()->getUtility()->generateCreateTableOnDefinition($this);
     }
 
 }

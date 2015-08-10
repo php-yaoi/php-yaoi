@@ -2,7 +2,7 @@
 
 namespace Yaoi\Database\Driver;
 use Yaoi\Database\Settings;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 
 interface Contract extends Quoter
 {

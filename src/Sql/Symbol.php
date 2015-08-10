@@ -2,7 +2,9 @@
 
 
 namespace Yaoi\Sql;
-class Symbol
+use Yaoi\BaseClass;
+
+class Symbol extends BaseClass
 {
     public $names = array();
     public $name;

@@ -1,6 +1,6 @@
 <?php
 use Yaoi\Database;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 
 
 
@@ -11,7 +11,7 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
     }
 
     public function testExpression() {
-        $s = new Expression('test ? ? ?', 1, 2, 3);
+        $s = new SimpleExpression('test ? ? ?', 1, 2, 3);
         $driver = Database::getInstance('test_mysqli')->getDriver();
 
         $this->assertSame('test 1 2 3', $s->build($driver));
@@ -19,7 +19,7 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
 
 
     public function testEmpty() {
-        $s = new Expression();
+        $s = new SimpleExpression();
         $this->assertSame(true, $s->isEmpty());
         $this->assertSame('', $s->build());
     }
@@ -29,18 +29,18 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
      * @expectedExceptionCode \Yaoi\Sql\Exception::STATEMENT_REQUIRED
      */
     public function testCreateFromArgumentsStatementRequired() {
-        Expression::createFromFuncArguments(array());
+        SimpleExpression::createFromFuncArguments(array());
     }
 
 
     public function testCreateFromArgumentsProxy() {
-        $ex = new Expression('test');
-        $this->assertSame($ex, Expression::createFromFuncArguments(array($ex)));
+        $ex = new SimpleExpression('test');
+        $this->assertSame($ex, SimpleExpression::createFromFuncArguments(array($ex)));
     }
 
     public function testCreateFromArgumentsClosure() {
-        $ex = new Expression('test');
-        $this->assertSame($ex, Expression::createFromFuncArguments(array(
+        $ex = new SimpleExpression('test');
+        $this->assertSame($ex, SimpleExpression::createFromFuncArguments(array(
             function() use ($ex) {
                 return $ex;
             }
@@ -53,7 +53,7 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
      * @expectedExceptionCode \Yaoi\Sql\Exception::CLOSURE_MISTYPE
      */
     public function testCreateFromArgumentsBadClosure() {
-        Expression::createFromFuncArguments(array(
+        SimpleExpression::createFromFuncArguments(array(
             function() {
                 return 'not a Sql_Expression instance';
             }
@@ -62,7 +62,7 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
 
 
     public function testXor() {
-        $ex = new Expression('1');
+        $ex = new SimpleExpression('1');
         $ex->xorExpr('2');
         $this->assertSame('1 XOR 2', $ex->build());
     }
@@ -73,7 +73,7 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
      * @expectedExceptionCode \Yaoi\Database\Exception::PLACEHOLDER_NOT_FOUND
      */
     public function testPlaceholderNotFound() {
-        $ex = new Expression('1 = 1', 1);
+        $ex = new SimpleExpression('1 = 1', 1);
         $ex->build(Database::getInstance()->getDriver());
     }
 
@@ -82,14 +82,14 @@ class SqlExpressionTest extends  \YaoiTests\Sql\TestCase {
      * @expectedExceptionCode \Yaoi\Database\Exception::PLACEHOLDER_REDUNDANT
      */
     public function testPlaceholderRedundant() {
-        $ex = new Expression('1 = ? AND 2 = ?', 1);
+        $ex = new SimpleExpression('1 = ? AND 2 = ?', 1);
         $ex->build(Database::getInstance()->getDriver());
     }
 
 
     public function testEnable() {
-        $ex = new Expression('1');
-        $or = new Expression('2');
+        $ex = new SimpleExpression('1');
+        $or = new SimpleExpression('2');
 
         $ex->orExpr($or);
         $this->assertSame('1 OR 2', $ex->build());

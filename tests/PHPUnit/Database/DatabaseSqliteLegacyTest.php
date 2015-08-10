@@ -203,11 +203,11 @@ class DatabaseSqliteLegacyTest extends TestCase  {
         }
 
         $this->assertArrayBitwiseAnd(array(
-            'a1' => Column::AUTO_TYPE,
-            'a2' => Column::AUTO_TYPE,
-            'a3' => Column::AUTO_TYPE,
-            'a4' => Column::AUTO_TYPE,
-            'a5' => Column::AUTO_TYPE,
+            'a1' => Column::INTEGER,
+            'a2' => Column::INTEGER,
+            'a3' => Column::INTEGER,
+            'a4' => Column::INTEGER,
+            'a5' => Column::STRING,
         ), $columnFlags);
 
         $db2->query("DROP table tes2");

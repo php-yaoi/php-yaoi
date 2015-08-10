@@ -1,10 +1,11 @@
 <?php
 namespace Yaoi\Database;
 
-use DependencyRepository;
+use Yaoi\DependencyRepository;
 use Yaoi\Database;
 use Yaoi\Log;
 use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Database\Driver;
 
 /**
@@ -19,7 +20,7 @@ use Yaoi\Database\Driver;
 class Query implements \Iterator
 {
     /**
-     * @var Expression
+     * @var SimpleExpression
      */
     private $expression;
 
@@ -282,7 +283,7 @@ class Query implements \Iterator
 
     public function log(Log $log = null)
     {
-        $this->logResourceId = DependencyRepository::add($log);
+        $this->logResourceId = \Yaoi\DependencyRepository::add($log);
         return $this;
     }
 

@@ -3,14 +3,16 @@ namespace Yaoi;
 
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Driver\MockProxy;
+use Yaoi\Database\Exception;
 use Yaoi\Database\Settings;
 use Yaoi\Database\Contract as DatabaseContract;
 use Yaoi\Database\Query;
 use Yaoi\Log;
 use Yaoi\Mappable\Contract;
 use Yaoi\Mock;
+use Yaoi\Sql\Batch;
 use Yaoi\Sql\DeleteInterface;
-use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\InsertInterface;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Statement;
@@ -23,6 +25,7 @@ use Yaoi\Service;
  *
  * Class Database
  * @property Settings $settings
+ * @method Database\Driver getDriver
  */
 class Database extends Service implements DatabaseContract
 {
@@ -45,17 +48,34 @@ class Database extends Service implements DatabaseContract
      */
     public function query($statement = null, $binds = null)
     {
-        $arguments = func_get_args();
+        if ($statement instanceof Batch) {
+            $statements = $statement->get();
+        }
+        else {
+            $arguments = func_get_args();
+            $statements = array(SimpleExpression::createFromFuncArguments($arguments));
+        }
 
-        $query = new Query(Expression::createFromFuncArguments($arguments), $this->getDriver());
-        if (null !== $this->log) {
-            $query->log($this->log);
+        if (empty($statements) || empty($statement)) {
+            throw new Exception('Empty statement', Exception::EMPTY_STATEMENT);
+        }
+        $query = null;
+        foreach ($statements as $expression) {
+            $query = new Query($expression, $this->getDriver());
+            if (null !== $this->log) {
+                $query->log($this->log);
+            }
         }
 
         return $query;
     }
 
 
+    /**
+     * @param Contract $item
+     * @return string
+     * @deprecated
+     */
     public function mappableInsertString(Contract $item)
     {
         $l = array_map(array($this, 'quote'), $item->toArray());
@@ -131,12 +151,12 @@ class Database extends Service implements DatabaseContract
     /**
      * @param $expression
      * @param null $binds
-     * @return Expression
+     * @return SimpleExpression
      * @throws Sql\Exception
      */
     public function expr($expression, $binds = null)
     {
-        return Expression::createFromFuncArguments(func_get_args())->bindDatabase($this);
+        return SimpleExpression::createFromFuncArguments(func_get_args())->bindDatabase($this);
     }
 
 

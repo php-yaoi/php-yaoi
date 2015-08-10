@@ -21,7 +21,7 @@ drop table test2
  */
 
 namespace Yaoi\Sql;
-use Yaoi\Database\Quoter;
+use Yaoi\String\Quoter;
 
 abstract class ComplexStatement extends Expression implements
     SelectInterface,
@@ -37,7 +37,7 @@ abstract class ComplexStatement extends Expression implements
 
     public function from($expression, $binds = null)
     {
-        $this->from [] = Expression::createFromFuncArguments(func_get_args());
+        $this->from [] = SimpleExpression::createFromFuncArguments(func_get_args());
         return $this;
     }
 
@@ -69,19 +69,19 @@ abstract class ComplexStatement extends Expression implements
 
     public function leftJoin($expression, $binds = null)
     {
-        $this->join [] = array(self::JOIN_LEFT, Expression::createFromFuncArguments(func_get_args()));
+        $this->join [] = array(self::JOIN_LEFT, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
     public function rightJoin($expression, $binds = null)
     {
-        $this->join [] = array(self::JOIN_RIGHT, Expression::createFromFuncArguments(func_get_args()));
+        $this->join [] = array(self::JOIN_RIGHT, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
     public function innerJoin($expression, $binds = null)
     {
-        $this->join [] = array(self::JOIN_INNER, Expression::createFromFuncArguments(func_get_args()));
+        $this->join [] = array(self::JOIN_INNER, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -91,7 +91,7 @@ abstract class ComplexStatement extends Expression implements
         foreach ($this->join as $item) {
             $direction = $item[0];
             /**
-             * @var Expression $expression
+             * @var SimpleExpression $expression
              */
             $expression = $item[1];
             if ($expression && !$expression->isEmpty()) {
@@ -104,7 +104,7 @@ abstract class ComplexStatement extends Expression implements
 
 
     /**
-     * @var Expression
+     * @var SimpleExpression
      */
     protected $where;
 
@@ -115,9 +115,9 @@ abstract class ComplexStatement extends Expression implements
         }
 
         if (null === $this->where) {
-            $this->where = Expression::createFromFuncArguments(func_get_args());
+            $this->where = SimpleExpression::createFromFuncArguments(func_get_args());
         } else {
-            $this->where->andExpr(Expression::createFromFuncArguments(func_get_args()));
+            $this->where->andExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
         }
         return $this;
     }
@@ -135,7 +135,7 @@ abstract class ComplexStatement extends Expression implements
 
 
     /**
-     * @var Expression
+     * @var SimpleExpression
      */
     protected $order;
 
@@ -146,9 +146,9 @@ abstract class ComplexStatement extends Expression implements
         }
 
         if (null === $this->order) {
-            $this->order = Expression::createFromFuncArguments(func_get_args());
+            $this->order = SimpleExpression::createFromFuncArguments(func_get_args());
         } else {
-            $this->order->commaExpr(Expression::createFromFuncArguments(func_get_args()));
+            $this->order->commaExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
         }
         return $this;
     }
@@ -204,9 +204,9 @@ abstract class ComplexStatement extends Expression implements
         }
 
         if (null === $this->groupBy) {
-            $this->groupBy = Expression::createFromFuncArguments(func_get_args());
+            $this->groupBy = SimpleExpression::createFromFuncArguments(func_get_args());
         } else {
-            $this->groupBy->commaExpr(Expression::createFromFuncArguments(func_get_args()));
+            $this->groupBy->commaExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
         }
 
         return $this;
@@ -234,9 +234,9 @@ abstract class ComplexStatement extends Expression implements
         }
 
         if (null === $this->having) {
-            $this->having = Expression::createFromFuncArguments(func_get_args());
+            $this->having = SimpleExpression::createFromFuncArguments(func_get_args());
         } else {
-            $this->having->andExpr(Expression::createFromFuncArguments(func_get_args()));
+            $this->having->andExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
         }
 
         return $this;
@@ -268,9 +268,9 @@ abstract class ComplexStatement extends Expression implements
             return $this;
         }
         if (null === $this->union) {
-            $this->union = new Expression();
+            $this->union = new SimpleExpression();
         }
-        $this->union->unionExpr(Expression::createFromFuncArguments(func_get_args()));
+        $this->union->unionExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
 
         return $this;
     }
@@ -288,9 +288,9 @@ abstract class ComplexStatement extends Expression implements
         }
 
         if (null === $this->union) {
-            $this->union = new Expression();
+            $this->union = new SimpleExpression();
         }
-        $this->union->unionAllExpr(Expression::createFromFuncArguments(func_get_args()));
+        $this->union->unionAllExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
 
         return $this;
     }
@@ -313,8 +313,6 @@ abstract class ComplexStatement extends Expression implements
 
     public function set($expression, $binds = null)
     {
-
-        // TODO implement
         if (null === $expression) {
             return $this;
         }
@@ -335,9 +333,9 @@ abstract class ComplexStatement extends Expression implements
             }
 
             $expressionString = substr($expressionString, 0, -2);
-            $expression = new Expression($expressionString, $bindsArray);
+            $expression = new SimpleExpression($expressionString, $bindsArray);
         } else {
-            $expression = Expression::createFromFuncArguments(func_get_args());
+            $expression = SimpleExpression::createFromFuncArguments(func_get_args());
         }
 
         if (null === $this->set) {

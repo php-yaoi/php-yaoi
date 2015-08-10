@@ -4,6 +4,9 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\Symbol;
 use Yaoi\Test\PHPUnit\TestCase;
+use Yaoi\Database\Definition\Index;
+use Yaoi\Database\Definition\ForeignKey;
+use Yaoi\Sql\CreateTable;
 
 abstract class DatabaseTestUnified extends TestCase {
     /** @var  Contract */
@@ -41,9 +44,9 @@ SQL;
 
     protected function notNullTest(Table $def)
     {
-        $this->assertNotEmpty($def->getColumn('id1')->flags & Column::NOT_NULL);
-        $this->assertNotEmpty($def->getColumn('id2')->flags & Column::NOT_NULL);
-        $this->assertNotEmpty($def->getColumn('name')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('id1')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('id2')->flags & Column::NOT_NULL);
+        $this->assertNotFalse($def->getColumn('name')->flags & Column::NOT_NULL);
         $this->assertEmpty($def->getColumn('address')->flags & Column::NOT_NULL);
     }
 
@@ -130,8 +133,107 @@ SQL;
         }
 
         $this->initDef2();
-        $def = $this->db->getTableDefinition('test_columns');
+        $def = $this->db->getUtility()->getTableDefinition('test_columns');
         $this->columnsTest2($def);
+    }
+
+
+    protected $testCreateIndexesAlterExpected;
+    protected $testCreateTableAfterAlter;
+
+    public function testCreateIndexes() {
+        if ($this->skip) {
+            return;
+        }
+
+        $columns = new stdClass();
+        $columns->id = Column::AUTO_ID;
+        $columns->name = Column::STRING + Column::NOT_NULL;
+        $columns->uniOne = Column::INTEGER;
+        $columns->uniTwo = Column::INTEGER;
+        $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
+        $columns->updated = Column::TIMESTAMP;
+
+        $table = new Table($columns, $this->db, 'test_indexes');
+        $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
+        $table->addIndex(Index::TYPE_KEY, $columns->name);
+
+        $utility = $this->db->getUtility();
+
+
+        //print_r($columns->updated);
+        $utility->dropTableIfExists('test_indexes');
+        $createSQL = $utility->generateCreateTableOnDefinition($table);
+        //echo $createSQL;
+        $this->db->query($createSQL);
+
+        $actualTable = $utility->getTableDefinition('test_indexes');
+
+        $columns2 = clone $columns;
+        $columns2->newField = Column::create(Column::STRING + Column::NOT_NULL)
+            ->setDefault('normal')
+            ->setStringLength(15, true);
+
+        $updatedTable = new Table($columns2, $this->db, 'test_indexes');
+        $updatedTable->addIndex(Index::TYPE_UNIQUE, $columns2->updated);
+
+        $this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
+
+        $alterTable = $utility->generateAlterTable($table, $updatedTable);
+        $this->assertStringEqualsCRLF(
+            $this->testCreateIndexesAlterExpected,
+            (string)$alterTable
+        );
+
+        $this->assertStringEqualsCRLF((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
+
+        try {
+            //echo $alterTable, PHP_EOL;
+            $this->db->query($alterTable)->execute();
+        }
+        catch (\Yaoi\Database\Exception $e) {
+            echo $e->query . PHP_EOL;
+            throw $e;
+        }
+
+        $actualTable = $utility->getTableDefinition('test_indexes');
+        $this->assertStringEqualsCRLF($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
+    }
+
+
+
+    protected $createTableStatement;
+
+    public function testCreateTable() {
+        if ($this->skip) {
+            return;
+        }
+
+        $columnsA = new stdClass();
+        $columnsA->id = Column::AUTO_ID;
+        $columnsA->mOne = Column::INTEGER;
+        $columnsA->mTwo = Column::INTEGER;
+        $tableA = new Table($columnsA, $this->db, 'table_a');
+
+        $columns = new stdClass();
+        $columns->id = Column::AUTO_ID;
+        $columns->name = Column::STRING + Column::NOT_NULL;
+        $columns->uniOne = Column::INTEGER;
+        $columns->uniTwo = Column::INTEGER;
+        $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
+        $columns->updated = Column::TIMESTAMP;
+        $columns->refId = $columnsA->id;
+        $columns->rOne = new Column();
+        $columns->rTwo = new Column();
+
+        $table = new Table($columns, $this->db, 'test_indexes');
+        $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
+        $table->addIndex(Index::TYPE_KEY, $columns->name);
+        $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
+
+        $createSql = $this->db->getUtility()->generateCreateTableOnDefinition($table);
+        $this->assertStringEqualsCRLF($this->createTableStatement, (string)$createSql);
+
     }
 
 }

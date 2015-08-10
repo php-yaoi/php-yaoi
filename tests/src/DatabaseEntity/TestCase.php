@@ -25,7 +25,7 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
      * @see Column::__construct
      */
     public function testAutoIdColumn() {
-        $this->assertSame(Column::AUTO_ID + Column::INTEGER, Column::create(Column::AUTO_ID)->flags);
+        $this->assertSame(Column::AUTO_ID + Column::INTEGER + Column::NOT_NULL, Column::create(Column::AUTO_ID)->flags);
         $this->assertSame(Column::AUTO_ID + Column::INTEGER + Column::SIZE_4B,
             Column::create(Column::AUTO_ID + Column::INTEGER + Column::SIZE_4B)->flags);
     }
@@ -39,7 +39,7 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
         $columns = new \stdClass();
         $columns->id = new Column(Column::AUTO_ID);
 
-        $table = new Table($columns);
+        $table = new Table($columns, $this->database, 'some_table');
         $this->assertSame(array('id' => $columns->id), $table->primaryKey);
     }
 
@@ -82,14 +82,14 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
 
 
     public function testCreateTable() {
-        $this->assertSame(
+        $this->assertStringEqualsCRLF(
             $this->entityOneCreateTableExpected,
-            $this->database->getUtility()
+            (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityOneABBR::table()));
 
-        $this->assertSame(
+        $this->assertStringEqualsCRLF(
             $this->entityTwoCreateTableExpected,
-            $this->database->getUtility()
+            (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityTwo::table()));
 
     }
