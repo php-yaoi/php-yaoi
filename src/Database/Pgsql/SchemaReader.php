@@ -37,8 +37,8 @@ select
   t.relname as table_name,
   i.relname as index_name,
   a.attname as column_name,
-  ix.indisunique as is_unique,
-  ix.indisprimary as is_primary
+  ix.indisunique::int as is_unique,
+  ix.indisprimary::int as is_primary
 from
   pg_class t,
   pg_class i,

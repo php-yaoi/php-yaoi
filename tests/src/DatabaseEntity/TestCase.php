@@ -82,12 +82,12 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
 
 
     public function testCreateTable() {
-        $this->assertSame(
+        $this->assertStringEqualsCRLF(
             $this->entityOneCreateTableExpected,
             (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityOneABBR::table()));
 
-        $this->assertSame(
+        $this->assertStringEqualsCRLF(
             $this->entityTwoCreateTableExpected,
             (string)$this->database->getUtility()
                 ->generateCreateTableOnDefinition(EntityTwo::table()));

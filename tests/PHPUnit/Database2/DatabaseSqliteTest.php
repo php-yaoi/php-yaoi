@@ -40,16 +40,18 @@ SQL;
     }
 
 
+    private $dbFileName;
     public function setUp() {
-        $fileName = sys_get_temp_dir() . '/test-sqlite.sqlite';
-        if (file_exists($fileName)) {
-            unlink($fileName);
-        }
-        $this->db = new Database('sqlite:///' . $fileName);
-
-        //$this->db->log(new \Yaoi\Log('stdout'));
+        $this->dbFileName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testSqlite.sqlite';
+        $this->db = new Database('sqlite:///' . $this->dbFileName);
     }
 
+    public function tearDown() {
+        $this->db->disconnect();
+        if (file_exists($this->dbFileName)) {
+            unlink($this->dbFileName);
+        }
+    }
 
     protected function columnsTest2(Table $def) {
         return;

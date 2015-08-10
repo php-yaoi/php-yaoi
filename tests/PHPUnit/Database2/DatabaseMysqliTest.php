@@ -113,7 +113,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
-        $this->assertSame("CREATE TABLE `test_entity` (
+        $this->assertStringEqualsCRLF("CREATE TABLE `test_entity` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
  `fk_id` int unsigned NOT NULL,
  `fk_id2` int unsigned NOT NULL,
@@ -145,7 +145,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
-        $this->assertSame('CREATE TABLE `test_name` (
+        $this->assertStringEqualsCRLF('CREATE TABLE `test_name` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
  `branch` varchar(255) NOT NULL,
  `duration` float NOT NULL,

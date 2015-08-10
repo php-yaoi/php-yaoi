@@ -180,12 +180,12 @@ SQL;
         $this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
 
         $alterTable = $utility->generateAlterTable($table, $updatedTable);
-        $this->assertSame(
+        $this->assertStringEqualsCRLF(
             $this->testCreateIndexesAlterExpected,
             (string)$alterTable
         );
 
-        $this->assertSame((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        $this->assertStringEqualsCRLF((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
 
         try {
             //echo $alterTable, PHP_EOL;
@@ -197,7 +197,7 @@ SQL;
         }
 
         $actualTable = $utility->getTableDefinition('test_indexes');
-        $this->assertSame($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        $this->assertStringEqualsCRLF($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
     }
 
 
@@ -232,7 +232,7 @@ SQL;
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
 
         $createSql = $this->db->getUtility()->generateCreateTableOnDefinition($table);
-        $this->assertSame($this->createTableStatement, (string)$createSql);
+        $this->assertStringEqualsCRLF($this->createTableStatement, (string)$createSql);
 
     }
 
