@@ -7,34 +7,35 @@ use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Exception;
 
-class AlterTable extends Expression
+class AlterTable extends Batch
 {
     /** @var  Table */
     protected $before;
     /** @var  Table */
     protected $after;
 
-    protected $lines = array();
+    /** @var  Expression */
+    protected $alterLines;
 
-    public function generate(Table $before, Table $after)
-    {
-        if (!$this->database) {
-            throw new Exception('Database is not set, please use `bindDatabase`', Exception::DATABASE_REQUIRED);
-        }
-
+    public function __construct(Table $before, Table $after) {
         $this->before = $before;
         $this->after = $after;
-        $this->lines = array();
+
+        $this->database = $before->database();
+        $alterExpression = new SimpleExpression('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
+        $this->alterLines = new SimpleExpression();
+        $this->alterLines->setOpComma(',' . PHP_EOL);
+        $this->add($alterExpression);
 
         $this->processColumns();
         $this->processIndexes();
 
-        if ($this->lines) {
-            $this->appendExpr('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
-            $this->appendExpr(implode(',' . PHP_EOL, $this->lines));
+        if ($this->alterLines->isEmpty()) {
+            $alterExpression->disable();
         }
-
-        return $this;
+        else {
+            $alterExpression->appendExpr($this->alterLines);
+        }
     }
 
     protected function processColumns() {
@@ -43,19 +44,19 @@ class AlterTable extends Expression
             $afterTypeString = $afterColumn->getTypeString();
 
             if (!isset($beforeColumns[$columnName])) {
-                $this->lines []= $this->database->expr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
+                $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
             }
             else {
                 $beforeColumn = $beforeColumns[$columnName];
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
                     //var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
-                    $this->lines []= $this->database->expr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
+                    $this->alterLines->commaExpr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
                 }
                 unset($beforeColumns[$columnName]);
             }
         }
         foreach ($beforeColumns as $columnName => $beforeColumn) {
-            $this->lines []= $this->database->expr('DROP COLUMN ?', new Symbol($beforeColumn->schemaName));
+            $this->alterLines->commaExpr('DROP COLUMN ?', new Symbol($beforeColumn->schemaName));
         }
     }
 
@@ -63,7 +64,7 @@ class AlterTable extends Expression
         $beforeIndexes = $this->before->indexes;
         foreach ($this->after->indexes as $indexId => $index) {
             if (!isset($beforeIndexes[$indexId])) {
-                $this->lines []= $this->database->expr('ADD '
+                $this->alterLines->commaExpr('ADD '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? (?)', new Symbol($index->getName()), $index->columns);
             }
@@ -72,7 +73,7 @@ class AlterTable extends Expression
             }
         }
         foreach ($beforeIndexes as $indexId => $index) {
-            $this->lines []= $this->database->expr('DROP INDEX ?', new Symbol($index->getName()));
+            $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
         }
     }
 

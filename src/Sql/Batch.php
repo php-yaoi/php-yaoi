@@ -14,16 +14,12 @@ class Batch extends Expression
         return $this;
     }
 
+    /**
+     * @return Expression[]
+     */
     public function get() {
         $result = array();
-        foreach ($this->statements as $statement) {
-            if ($statement instanceof Batch) {
-                $statement->appendResult($result);
-            }
-            else {
-                $result []= $statement;
-            }
-        }
+        $this->appendResult($result);
         return $result;
     }
 
@@ -40,19 +36,33 @@ class Batch extends Expression
 
 
     public function build(Quoter $quoter = null) {
-        $result = '';
-        foreach ($this->statements as $expression) {
-            $build = $expression->build($quoter);
-            if ($build) {
-                if ($expression instanceof Batch) {
-                    $result .= $build;
-                }
-                else {
-                    $result .= $build . ';' . PHP_EOL;
+        try {
+            $result = '';
+            if (null === $quoter) {
+                $quoter = $this->database->getDriver();
+            }
+            $flatStatements = $this->get();
+            $builds = array();
+            foreach ($flatStatements as $expression) {
+                $build = $expression->build($quoter);
+                if ($build) {
+                    $builds []= $build;
                 }
             }
+
+            if (!$builds) {
+                return '';
+            }
+            if (count($builds) > 1) {
+                return implode(';' . PHP_EOL, $builds) . ';' . PHP_EOL;
+            }
+            else {
+                return $builds[0];
+            }
         }
-        return $result;
+        catch (\Exception $e) {
+            return '/* ERROR: ' . $e->getMessage() . ' */';
+        }
     }
 
     public function __toString() {

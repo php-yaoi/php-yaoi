@@ -163,7 +163,8 @@ SQL;
 
         //print_r($columns->updated);
         $utility->dropTableIfExists('test_indexes');
-        $createSQL = $utility->generateCreateTableOnDefinition($table);
+        //$createSQL = $utility->generateCreateTableOnDefinition($table);
+        $createSQL = $table->getCreateTable();
         //echo $createSQL;
         $this->db->query($createSQL);
 
@@ -177,27 +178,31 @@ SQL;
         $updatedTable = new Table($columns2, $this->db, 'test_indexes');
         $updatedTable->addIndex(Index::TYPE_UNIQUE, $columns2->updated);
 
-        $this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
+        //$this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
+        $this->assertSame('', (string)$table->getAlterTableFrom($actualTable));
 
-        $alterTable = $utility->generateAlterTable($table, $updatedTable);
+        //$alterTable = $utility->generateAlterTable($table, $updatedTable);
+        $alterTable = $updatedTable->getAlterTableFrom($table);
         $this->assertStringEqualsCRLF(
             $this->testCreateIndexesAlterExpected,
             (string)$alterTable
         );
 
-        $this->assertStringEqualsCRLF((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        //$this->assertStringEqualsCRLF((string)$createSQL, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        $this->assertStringEqualsCRLF((string)$createSQL, (string)$actualTable->getCreateTable());
 
         try {
             //echo $alterTable, PHP_EOL;
             $this->db->query($alterTable)->execute();
         }
         catch (\Yaoi\Database\Exception $e) {
-            echo $e->query . PHP_EOL;
+            var_dump($e->query);
             throw $e;
         }
 
         $actualTable = $utility->getTableDefinition('test_indexes');
-        $this->assertStringEqualsCRLF($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        //$this->assertStringEqualsCRLF($this->testCreateTableAfterAlter, (string)$utility->generateCreateTableOnDefinition($actualTable));
+        $this->assertStringEqualsCRLF($this->testCreateTableAfterAlter, (string)$actualTable->getCreateTable());
     }
 
 

@@ -9,13 +9,9 @@ use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
 {
-    public $batch;
-
-    public function __construct() {
-        $this->batch = new Batch();
-    }
-
     protected function processColumns() {
+        $this->alterLines->disable();
+
         $intersect = array();
         $changed = false;
 
@@ -25,7 +21,7 @@ class AlterTable extends \Yaoi\Sql\AlterTable
 
             if (!isset($beforeColumns[$columnName])) {
                 $changed = true;
-                $this->lines []= $this->database->expr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
+                $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
             }
             else {
                 $beforeColumn = $beforeColumns[$columnName];
@@ -54,17 +50,17 @@ class AlterTable extends \Yaoi\Sql\AlterTable
 
              */
 
-            $this->batch->add($this->database->expr(
+            $this->add($this->database->expr(
                 "ALTER TABLE ? RENAME TO _temp_table",
                 new Symbol($this->before->schemaName)
             ));
 
-            $this->batch->add($this->after->getCreateTable());
-            $this->batch->add($this->database->expr(
+            $this->add($this->after->getCreateTable());
+            $this->add($this->database->expr(
                 "INSERT INTO ? (?) SELECT ? FROM _temp_table",
                 new Symbol($this->after->schemaName), $intersect, $intersect)
             );
-            $this->batch->add($this->database->expr("DROP TABLE _temp_table"));
+            $this->add($this->database->expr("DROP TABLE _temp_table"));
         }
 
     }

@@ -61,9 +61,11 @@ class Database extends Service implements DatabaseContract
         }
         $query = null;
         foreach ($statements as $expression) {
-            $query = new Query($expression, $this->getDriver());
-            if (null !== $this->log) {
-                $query->log($this->log);
+            if (!$expression->isEmpty()) {
+                $query = new Query($expression, $this->getDriver());
+                if (null !== $this->log) {
+                    $query->log($this->log);
+                }
             }
         }
 

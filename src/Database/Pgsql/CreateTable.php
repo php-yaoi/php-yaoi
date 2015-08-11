@@ -21,20 +21,11 @@ class CreateTable extends \Yaoi\Sql\CreateTable
         $utility = $this->database->getUtility();
 
         foreach ($this->table->getColumns(true) as $column) {
-            $this->appendComma();
-            if ($column->flags & Column::AUTO_ID) {
-                $this->appendExpr(' ? SERIAL', new Symbol($column->schemaName));
-            }
-            else {
-                $this->appendExpr(' ? ' . $utility->getColumnTypeString($column), new Symbol($column->schemaName));
-            }
+            $this->createLines->commaExpr(' ? ' . $utility->getColumnTypeString($column), new Symbol($column->schemaName));
         }
     }
 
     protected function appendIndexes() {
-        $this->batch = new Batch();
-        $this->batch->add($this);
-
         foreach ($this->table->indexes as $index) {
             $columns = array();
             foreach ($index->columns as $column) {
@@ -49,18 +40,12 @@ class CreateTable extends \Yaoi\Sql\CreateTable
                     $columns
                     );
                 $createIndex->bindDatabase($this->database);
-                $this->batch->add($createIndex);
+                $this->add($createIndex);
                 //$this->appendExpr(' KEY ? (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
             }
             elseif ($index->type === Index::TYPE_UNIQUE) {
-                $this->appendComma();
-                $this->appendExpr(' CONSTRAINT ? UNIQUE (?)', new Symbol($index->getName()), $columns);
+                $this->createLines->commaExpr(' CONSTRAINT ? UNIQUE (?)', new Symbol($index->getName()), $columns);
             }
         }
     }
-
-    /** @var  Batch */
-    public $batch;
-
-
 }

@@ -268,7 +268,7 @@ abstract class ComplexStatement extends Expression implements
             return $this;
         }
         if (null === $this->union) {
-            $this->union = new SimpleExpression();
+            $this->union = new SimpleExpression(' ');
         }
         $this->union->unionExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
 
@@ -298,7 +298,7 @@ abstract class ComplexStatement extends Expression implements
     protected function buildUnion(Quoter $quoter)
     {
         if ($this->union && !$this->union->isEmpty()) {
-            return $this->union->build($quoter);
+            return substr($this->union->build($quoter), 1);
         } else {
             return '';
         }

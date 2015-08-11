@@ -108,6 +108,10 @@ class TypeString
             $typeString .= $this->database->expr(" DEFAULT ?", $default);
         }
 
+        if ($column->flags & Column::AUTO_ID) {
+            $typeString .= ' AUTO_INCREMENT';
+        }
+
         return $typeString;
     }
 

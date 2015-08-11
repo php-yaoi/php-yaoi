@@ -111,7 +111,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
             ->setPrimaryKey($columns->id)
             ->addIndex(Index::TYPE_UNIQUE, $columns->dateUt, $columns->name, $columns->type);
 
-        $sql = $utility->generateCreateTableOnDefinition($table);
+        $sql = $table->getCreateTable();
 
         $this->assertStringEqualsCRLF("CREATE TABLE `test_entity` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,

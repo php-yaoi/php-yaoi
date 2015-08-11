@@ -96,8 +96,7 @@ CREATE TABLE "test_indexes" (
  "new_field" varchar(255) NOT NULL DEFAULT 'normal',
  CONSTRAINT "unique_updated" UNIQUE ("updated"),
  PRIMARY KEY ("id")
-);
-
+)
 SQL;
 
 

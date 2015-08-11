@@ -8,6 +8,7 @@ use Yaoi\Database\Mysql\TypeString;
 use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\AlterTable;
 
 class Mysql extends Utility
 {
@@ -58,9 +59,14 @@ class Mysql extends Utility
 
 
     public function generateCreateTableOnDefinition(Table $table) {
-        $expression = new CreateTable();
-        $expression = $expression->bindDatabase($this->database)->generate($table);
+        $expression = new CreateTable($table);
         return $expression;
     }
+
+    public function generateAlterTable(Table $before, Table $after)
+    {
+        return new AlterTable($before, $after);
+    }
+
 
 }

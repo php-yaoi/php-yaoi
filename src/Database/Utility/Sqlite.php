@@ -28,9 +28,7 @@ class Sqlite extends Utility
 
 
     public function generateCreateTableOnDefinition(Table $table) {
-        $expression = new CreateTable();
-        $expression = $expression->bindDatabase($this->database)->generate($table);
-        return $expression->batch;
+        return new CreateTable($table);
     }
 
     /**
@@ -47,9 +45,7 @@ class Sqlite extends Utility
 
     public function generateAlterTable(Table $before, Table $after)
     {
-        $expression = new AlterTable();
-        $expression->bindDatabase($this->database)->generate($before, $after);
-        return $expression->batch;
+        return new AlterTable($before, $after);
     }
 
 

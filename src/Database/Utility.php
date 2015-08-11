@@ -29,14 +29,6 @@ abstract class Utility extends BaseClass implements UtilityContract
     }
 
 
-    /**
-     * Check/fix database related type misconceptions
-     *
-     * @param Table $table
-     */
-    abstract public function checkTable(Table $table);
-
-
     public function dropTableIfExists($tableName)
     {
         $this->database->query("DROP TABLE IF EXISTS ?", new Symbol($tableName));
@@ -46,14 +38,4 @@ abstract class Utility extends BaseClass implements UtilityContract
     {
         $this->database->query("DROP TABLE ?", new Symbol($tableName));
     }
-
-
-    public function generateAlterTable(Table $before, Table $after)
-    {
-        $expression = new AlterTable();
-        $expression->bindDatabase($this->database)->generate($before, $after);
-        return $expression->build();
-    }
-
-
 }

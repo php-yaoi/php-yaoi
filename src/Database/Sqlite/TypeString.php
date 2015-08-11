@@ -29,6 +29,9 @@ class TypeString extends \Yaoi\Database\Mysql\TypeString
 
     public function getByColumn(Column $column)
     {
+        if ($column->flags & Column::AUTO_ID) {
+            return 'INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL';
+        }
 
         return parent::getByColumn($column);
     }

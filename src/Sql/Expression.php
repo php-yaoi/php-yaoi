@@ -80,11 +80,15 @@ abstract class Expression extends BaseClass
         return $this;
     }
 
-    const OP_COMMA = ', ';
+    private $opComma = ', ';
+    public function setOpComma($separator) {
+        $this->opComma = $separator;
+        return $this;
+    }
 
     public function commaExpr($expression)
     {
-        $this->queue [] = array(self::OP_COMMA, SimpleExpression::createFromFuncArguments(func_get_args()));
+        $this->queue [] = array($this->opComma, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
 
@@ -194,7 +198,7 @@ abstract class Expression extends BaseClass
             $expression = $item[1];
 
             if (!$expression->isEmpty()) {
-                $result .= $item[0] . $expression->build($quoter);
+                $result .= ($result ? $item[0] : '') . $expression->build($quoter);
             }
         }
 

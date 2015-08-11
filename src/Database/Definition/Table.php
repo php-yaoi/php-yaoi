@@ -171,7 +171,6 @@ class Table extends BaseClass
     {
         if (null === $this->database) {
             throw new Exception('Database not bound', Exception::DATABASE_REQUIRED);
-            //$this->database = Database::getInstance();
         }
         return $this->database;
     }
@@ -183,6 +182,11 @@ class Table extends BaseClass
      */
     public function getCreateTable() {
         return $this->database()->getUtility()->generateCreateTableOnDefinition($this);
+    }
+
+
+    public function getAlterTableFrom(Table $before) {
+        return $this->database()->getUtility()->generateAlterTable($before, $this);
     }
 
 }

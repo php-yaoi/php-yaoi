@@ -6,9 +6,18 @@ use Yaoi\Test\PHPUnit\TestCase;
 class DatabaseSqliteLegacyTest extends TestCase  {
 
     private $db;
-    public function setUp() {
-        $this->db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
 
+    private $sqliteFileName;
+    public function setUp() {
+        $this->sqliteFileName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-sqlite-5.sqlite';
+        $this->db = new Database('sqlite:///' . $this->sqliteFileName);
+    }
+
+    public function tearDown() {
+        if (file_exists($this->sqliteFileName)) {
+            unset($this->db);
+            unlink($this->sqliteFileName);
+        }
     }
 
 
