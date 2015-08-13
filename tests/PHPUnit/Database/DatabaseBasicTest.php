@@ -12,6 +12,9 @@ class DatabaseBasicTest extends TestCase  {
 
     public function setUp() {
         try {
+            if (!class_exists('mysqli', false)) {
+                throw new \Exception('Mysqli extension is not available');
+            }
             Database::getInstance('test_mysqli');
         }
         catch (\Yaoi\Service\Exception $exception) {

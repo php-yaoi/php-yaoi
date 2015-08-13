@@ -7,14 +7,7 @@ require_once __DIR__ . '/TestEntityDatabaseUnified.php';
 class PgsqlEntityDatabaseTest extends TestEntityDatabaseUnified {
 
     public function setUp() {
-        //$this->markTestSkipped('Test is deprecated');
-
-
-        if (!function_exists('pg_connect')) {
-            $this->markTestSkipped('pg_connect is not available.');
-            return;
-        }
-
+        \YaoiTests\Database\CheckAvailable::checkPgsql();
         $db = Database::getInstance('test_pgsql');
 
         $createSQL = <<<SQL

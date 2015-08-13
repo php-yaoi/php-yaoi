@@ -5,23 +5,14 @@ use Yaoi\Test\PHPUnit\TestCase;
 
 class DatabaseSqliteLegacyTest extends TestCase  {
 
+    /** @var  Database */
     private $db;
 
     private $sqliteFileName;
     public function setUp() {
         $this->sqliteFileName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-sqlite-5.sqlite';
         $this->db = new Database('sqlite:///' . $this->sqliteFileName);
-    }
 
-    public function tearDown() {
-        if (file_exists($this->sqliteFileName)) {
-            unset($this->db);
-            unlink($this->sqliteFileName);
-        }
-    }
-
-
-    public function initTest1() {
         //var_dump($this->db->getDriver());
         $this->db->query("DROP TABLE IF EXISTS test1");
         $this->db->query("CREATE TABLE test1 (id integer unsigned auto_increment, PRIMARY KEY(id))");
@@ -29,6 +20,13 @@ class DatabaseSqliteLegacyTest extends TestCase  {
         $this->db->query("INSERT INTO test1 (id) VALUES (2)");
         $this->db->query("INSERT INTO test1 (id) VALUES (3)");
         //http://stackoverflow.com/questions/1609637/is-it-possible-to-insert-multiple-rows-at-a-time-in-an-sqlite-database
+    }
+
+    public function tearDown() {
+        if (file_exists($this->sqliteFileName)) {
+            unset($this->db);
+            unlink($this->sqliteFileName);
+        }
     }
 
     public function testConnection() {
@@ -39,8 +37,6 @@ class DatabaseSqliteLegacyTest extends TestCase  {
 
 
     public function testFetch() {
-        $this->initTest1();
-
         $db = $this->db;
         $row = $db->query("SELECT * FROM test1 ORDER BY id ASC")->fetchRow();
         $this->assertSame(array('id' => 1), $row);
@@ -54,7 +50,6 @@ class DatabaseSqliteLegacyTest extends TestCase  {
     }
 
     public function testFetchIterator() {
-        $this->initTest1();
         $db = $this->db;
 
         $query = $db->query("SELECT * FROM test1 ORDER BY id ASC");
@@ -86,7 +81,6 @@ class DatabaseSqliteLegacyTest extends TestCase  {
 
     public function testBinds() {
         $db = $this->db;
-        $this->initTest1();
 
         $query = $db->query("SELECT id, :id, :st, :nu FROM test1 WHERE id = :id",
             array('id' => 2, 'st' => 'ss', 'nu' => null))->skipAutoExecute();
@@ -137,14 +131,12 @@ class DatabaseSqliteLegacyTest extends TestCase  {
 
     public function testLastInsertId() {
         $db = $this->db;
-        $this->initTest1();
         $query = $db->query("INSERT INTO test1 (id) VALUES (23)");
         $this->assertSame(4, $query->lastInsertId());
     }
 
     public function testRowsAffected() {
         $db = $this->db;
-        $this->initTest1();
         $db->query("UPDATE test1 SET id=id+10 WHERE id >= 2")->rowsAffectedIn($var);
 
         $this->assertSame(2, $var);
