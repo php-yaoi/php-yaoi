@@ -26,13 +26,8 @@ SQL;
 )";
 
     public function setUp() {
-        try {
-            $this->database = \Yaoi\Database::getInstance('test_mysqli');
-        }
-        catch (\Yaoi\Service\Exception $exception) {
-            $this->markTestSkipped($exception->getMessage());
-        }
-
+        \YaoiTests\Database\CheckAvailable::checkMysqli();
+        $this->database = \Yaoi\Database::getInstance('test_mysqli');
     }
 
 }

@@ -19,16 +19,8 @@ SQL;
 
     protected function setUp()
     {
-        if (!function_exists('pg_connect')) {
-            $this->markTestSkipped('pg_connect is not available.');
-        }
-        try {
-            $this->db = Database::getInstance('test_pgsql');
-        }
-        catch (\Yaoi\Service\Exception $exception) {
-            $this->markTestSkipped($exception->getMessage());
-        }
-
+        \YaoiTests\Database\CheckAvailable::checkPgsql();
+        $this->db = Database::getInstance('test_pgsql');
     }
 
     protected $createTable2 = <<<SQL

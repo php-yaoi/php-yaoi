@@ -8,13 +8,8 @@ use Yaoi\Database\Definition\Index;
 require_once __DIR__ . '/DatabaseTestUnified.php';
 class DatabaseMysqliTest extends DatabaseTestUnified {
     public function setUp() {
-        try {
-            $this->db = Database::getInstance('test_mysqli');
-        }
-        catch (\Yaoi\Service\Exception $exception) {
-            $this->markTestSkipped($exception->getMessage());
-        }
-
+        \YaoiTests\Database\CheckAvailable::checkMysqli();
+        $this->db = Database::getInstance('test_mysqli');
     }
 
 

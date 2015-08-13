@@ -10,13 +10,7 @@ use Yaoi\App;
 
 class DatabaseMockTest extends TestCase  {
     public function setUp() {
-        try {
-            Database::getInstance('test_mysqli');
-        }
-        catch (\Yaoi\Service\Exception $exception) {
-            $this->markTestSkipped($exception->getMessage());
-        }
-
+        \YaoiTests\Database\CheckAvailable::checkMysqli();
     }
 
 
