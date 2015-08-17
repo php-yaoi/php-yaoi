@@ -6,7 +6,7 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Utility\Contract as UtilityContract;
 use Yaoi\BaseClass;
-use Yaoi\Database\Contract as DatabaseContract;
+use Yaoi\Database;
 use Yaoi\Sql\AlterTable;
 use Yaoi\Sql\CreateTable;
 use Yaoi\Sql\Symbol;
@@ -14,15 +14,15 @@ use Yaoi\Sql\Symbol;
 abstract class Utility extends BaseClass implements UtilityContract
 {
     /**
-     * @var DatabaseContract
+     * @var Database
      */
     protected $database;
 
     /**
-     * @param Contract $database
+     * @param Database $database
      * @return $this
      */
-    public function setDatabase(DatabaseContract $database)
+    public function setDatabase(Database $database)
     {
         $this->database = $database;
         return $this;

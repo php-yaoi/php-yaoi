@@ -9,6 +9,10 @@ class Migration
     const ROLLBACK = 'rollback';
     const SKIP = 'skip';
 
+    public $dryRun = true;
+    /** @var  Log */
+    public $log;
+
     public $id;
     /**
      * @var Closure
@@ -30,6 +34,7 @@ class Migration
         $this->applyCallable = $apply;
         $this->rollbackCallable = $rollback;
         $this->isAppliedCallable = $isApplied;
+        $this->log = Log::void();
     }
 
 }

@@ -30,4 +30,13 @@ class Log extends Service
         return Settings::className();
     }
 
+
+    private static $void;
+    public static function void() {
+        if (null === self::$void) {
+            self::$void = new Log('void');
+        }
+        return self::$void;
+    }
+
 }

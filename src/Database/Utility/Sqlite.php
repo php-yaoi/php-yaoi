@@ -48,6 +48,10 @@ class Sqlite extends Utility
         return new AlterTable($before, $after);
     }
 
-
-
+    public function tableExists($tableName)
+    {
+        $rows = $this->database
+            ->query("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", $tableName)->fetchAll();
+        return (bool)$rows;
+    }
 }

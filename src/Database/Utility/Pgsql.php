@@ -46,4 +46,14 @@ class Pgsql extends Utility
         return new AlterTable($before, $after);
     }
 
+    public function tableExists($tableName)
+    {
+        $rows = $this->database->query("SELECT 1
+   FROM   information_schema.tables
+   WHERE  table_schema = ?
+   AND    table_name = ?", $this->database->settings->path, $tableName)->fetchAll();
+        return (bool)$rows;
+    }
+
+
 }

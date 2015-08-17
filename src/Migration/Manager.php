@@ -3,6 +3,7 @@
 namespace Yaoi\Migration;
 
 use Closure;
+use Yaoi\Log;
 use Yaoi\Storage;
 use Yaoi\Service;
 use Yaoi\Migration;
@@ -41,7 +42,7 @@ class Manager extends Service
 
         if ($migration->isAppliedCallable !== null) {
             $f = $migration->isAppliedCallable;
-            $isApplied = $f();
+            $isApplied = $f($migration);
         } else {
             $isApplied = $this->isApplied($migration->id);
         }
@@ -49,14 +50,18 @@ class Manager extends Service
         if (Migration::ROLLBACK === $action) {
             if ($isApplied && null !== $migration->rollbackCallable) {
                 $f = $migration->rollbackCallable;
-                $f();
-                $this->getStorage()->delete($migration->id);
+                $f($migration);
+                if (null !== $migration->id) {
+                    $this->getStorage()->delete($migration->id);
+                }
             }
         } elseif (Migration::APPLY === $action) {
             if (!$isApplied) {
                 $f = $migration->applyCallable;
-                $f();
-                $this->getStorage()->set($migration->id, 1);
+                $f($migration);
+                if (null !== $migration->id) {
+                    $this->getStorage()->set($migration->id, 1);
+                }
             }
         }
 
@@ -64,8 +69,30 @@ class Manager extends Service
     }
 
 
+    /** @var Migration[] */
+    private $migrations = array();
+    public function add($migrations) {
+        if ($migrations instanceof Migration) {
+            $migrations = array($migrations);
+        }
+
+        foreach ($migrations as $migration) {
+            $this->migrations []= $migration;
+        }
+        return $this;
+    }
+
+    /** @var  Log */
+    private $log;
+    public function setLog(Log $log = null) {
+        $this->log = $log;
+    }
+
     public function run()
     {
+        foreach ($this->migrations as $migration) {
+            $this->perform($migration);
+        }
         if ($this->settings->run instanceof \Closure) {
             $f = $this->settings->run;
             $f($this);

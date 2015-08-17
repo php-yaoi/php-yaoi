@@ -5,7 +5,10 @@ namespace Yaoi\Database\Definition;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Exception;
+use Yaoi\Log;
+use Yaoi\Migration;
 use Yaoi\Sql\CreateTable;
+use Yaoi\String\Formatter;
 use Yaoi\String\Utils;
 
 class Table extends BaseClass
@@ -187,6 +190,66 @@ class Table extends BaseClass
 
     public function getAlterTableFrom(Table $before) {
         return $this->database()->getUtility()->generateAlterTable($before, $this);
+    }
+
+
+    public function migration() {
+        $database = $this->database();
+        $table = $this;
+        $statement = null;
+
+        $checkRun = function () use ($statement, $database, $table) {
+            if (null !== $statement) {
+                return $statement;
+            }
+            $tableExists = $database->getUtility()->tableExists($table->schemaName);
+            if (!$tableExists) {
+                $statement = $this->getCreateTable();
+            }
+            else {
+                $statement = $this->getAlterTableFrom($database->getUtility()->getTableDefinition($table->schemaName));
+            }
+            return $statement;
+        };
+
+        $migration = new Migration(
+            null,
+            function(Migration $migration) use ($checkRun, $database){
+                $statement = $checkRun();
+                $migration->log->push((string)$statement);
+
+                if (!$migration->dryRun) {
+                    try {
+                        $database->query($statement);
+                        $migration->log->push('OK', Log::TYPE_SUCCESS);
+                    }
+                    catch (Exception $exception) {
+                        $migration->log->push($exception->getMessage(), Log::TYPE_ERROR);
+                    }
+                }
+            },
+            null,
+            function(Migration $migration) use ($checkRun, $table){
+                if ((string)$checkRun()) {
+                    $result = false;
+                }
+                else {
+                    $result = true;
+                }
+                if ($migration->log) {
+                    $migration->log->push(
+                        Formatter::create('Table ? (?) ?',
+                            $table->schemaName,
+                            $table->className,
+                            $result ? ' is up to date' : ' requires migration'
+                        ),
+                        $result ? Log::TYPE_MESSAGE : Log::TYPE_ERROR
+                    );
+                }
+                return $result;
+            }
+        );
+        return $migration;
     }
 
 }

@@ -2,7 +2,7 @@
 
 namespace Yaoi\Database\Utility;
 
-use Yaoi\Database\Contract as DatabaseContract;
+use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\AlterTable;
@@ -10,7 +10,7 @@ use Yaoi\Sql\CreateTable;
 
 interface Contract
 {
-    public function setDatabase(DatabaseContract $database);
+    public function setDatabase(Database $database);
 
     /**
      * @param $tableName
@@ -35,6 +35,7 @@ interface Contract
 
     public function dropTableIfExists($tableName);
     public function dropTable($tableName);
+    public function tableExists($tableName);
 
 
     /**

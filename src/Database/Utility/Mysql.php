@@ -68,5 +68,11 @@ class Mysql extends Utility
         return new AlterTable($before, $after);
     }
 
+    public function tableExists($tableName)
+    {
+        $rows = $this->database->query("SHOW TABLES LIKE ?", $tableName)->fetchAll();
+        return (bool)$rows;
+    }
+
 
 }
