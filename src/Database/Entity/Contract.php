@@ -7,9 +7,15 @@ use Yaoi\Database\Definition\Table;
 interface Contract
 {
     /**
-     * Setup column types in provided columns object
+     * Required setup column types in provided columns object
      * @param $columns static|\stdClass
      */
     static function setUpColumns($columns);
 
+    /**
+     * Optional setup table indexes and other properties, can be left empty
+     * @param Table $table
+     * @return void
+     */
+    static function setUpTable(\Yaoi\Database\Definition\Table $table);
 }

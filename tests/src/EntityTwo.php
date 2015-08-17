@@ -3,6 +3,7 @@
 namespace YaoiTests;
 
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
 
 class EntityTwo extends Entity
@@ -12,8 +13,6 @@ class EntityTwo extends Entity
     public $createdAt;
     public $updatedAt;
     public $info;
-
-    protected static $tableName = 'custom_name';
 
     /**
      * Setup column types in provided columns object
@@ -27,5 +26,16 @@ class EntityTwo extends Entity
         $columns->updatedAt = Column::TIMESTAMP;
         $columns->info = Column::create(Column::STRING)->setIndexed();
     }
+
+    /**
+     * Optional setup table indexes and other properties, can be left empty
+     * @param Table $table
+     * @return void
+     */
+    static function setUpTable(\Yaoi\Database\Definition\Table $table)
+    {
+        $table->setSchemaName('custom_name');
+    }
+
 
 }

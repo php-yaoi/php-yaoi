@@ -4,6 +4,7 @@ namespace YaoiTests;
 
 
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
 
 class EntityOneABBR extends Entity
@@ -25,4 +26,15 @@ class EntityOneABBR extends Entity
         $columns->address = Column::create(Column::STRING)->setDefault('');
         $columns->createdAt = Column::TIMESTAMP;
     }
+
+    /**
+     * Optional setup table indexes and other properties, can be left empty
+     * @param Table $table
+     * @return void
+     */
+    static function setUpTable(\Yaoi\Database\Definition\Table $table)
+    {
+    }
+
+
 }

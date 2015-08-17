@@ -14,8 +14,6 @@ use Yaoi\String\Utils;
 
 abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Contract
 {
-    protected static $tableName;
-
     /**
      * @var Table[]
      */
@@ -34,13 +32,11 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
         $columns = new \stdClass();
         static::setUpColumns($columns);
-        $schemaName = null === static::$tableName
-            ? Utils::fromCamelCase(str_replace('\\', '', $className))
-            : static::$tableName;
+        $schemaName = Utils::fromCamelCase(str_replace('\\', '', $className));
         $table = new Table($columns, self::getDatabase($className), $schemaName);
-
-
         $table->className = $className;
+        static::setUpTable($table);
+
         return $table;
     }
 

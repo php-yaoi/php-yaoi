@@ -77,4 +77,15 @@ class TestEntityDb extends Entity
         $columns->url = Column::STRING;
         $columns->birthDate = Column::TIMESTAMP;
     }
+
+    /**
+     * Optional setup table indexes and other properties, can be left empty
+     * @param \Yaoi\Database\Definition\Table $table
+     * @return void
+     */
+    static function setUpTable(Database\Definition\Table $table)
+    {
+    }
+
+
 }
