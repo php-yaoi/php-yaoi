@@ -30,12 +30,11 @@ class EntityTwo extends Entity
     /**
      * Optional setup table indexes and other properties, can be left empty
      * @param Table $table
+     * @param static|\stdClass $columns
      * @return void
      */
-    static function setUpTable(\Yaoi\Database\Definition\Table $table)
+    static function setUpTable(\Yaoi\Database\Definition\Table $table, $columns)
     {
         $table->setSchemaName('custom_name');
     }
-
-
 }
