@@ -4,6 +4,7 @@ namespace Yaoi\String;
 
 use Yaoi\BaseClass;
 use Yaoi\Debug;
+use Yaoi\String\Quoter\Raw;
 
 class Formatter extends BaseClass
 {
@@ -42,6 +43,7 @@ class Formatter extends BaseClass
         return $this;
     }
 
+    static private $rawQuoter;
     public function build(Quoter $quoter = null) {
         if ($this->binds) {
             if ($quoter === null && $this->quoter !== null) {
@@ -49,7 +51,10 @@ class Formatter extends BaseClass
             }
 
             if ($quoter === null) {
-                throw new Exception('Missing quoter', Exception::MISSING_QUOTER);
+                if (null === self::$rawQuoter) {
+                    self::$rawQuoter = new Raw();
+                }
+                $quoter = self::$rawQuoter;
             }
 
             $statement = $this->statement;

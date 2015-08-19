@@ -22,6 +22,9 @@ class Stdout implements Driver
      */
     public function push($message, $type = Log::TYPE_MESSAGE)
     {
+        if (is_object($message) && method_exists($message, '__toString')) {
+            $message = (string)$message;
+        }
         echo $this->dsn->prefix, print_r($message, 1), "\r\n";
         return $this;
     }

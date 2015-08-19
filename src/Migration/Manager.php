@@ -2,7 +2,6 @@
 
 namespace Yaoi\Migration;
 
-use Closure;
 use Yaoi\Log;
 use Yaoi\Storage;
 use Yaoi\Service;
@@ -93,7 +92,7 @@ class Manager extends Service
         $this->log = $log;
         return $this;
     }
-    
+
     public function run($dryRun = false)
     {
         foreach ($this->jobs as $job) {

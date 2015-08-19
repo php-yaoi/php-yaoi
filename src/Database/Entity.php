@@ -35,7 +35,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $schemaName = Utils::fromCamelCase(str_replace('\\', '', $className));
         $table = new Table($columns, self::getDatabase($className), $schemaName);
         $table->className = $className;
-        static::setUpTable($table);
+        static::setUpTable($table, $columns);
 
         return $table;
     }
@@ -208,5 +208,18 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             return Database::getInstance();
         }
     }
+
+
+    public function findOrSave() {
+        $item = self::find($this)->query()->fetchRow();
+        if (!$item) {
+            $this->save();
+        }
+        else {
+            self::fromArray($item->toArray(), $this);
+        }
+        return $this;
+    }
+
 
 }
