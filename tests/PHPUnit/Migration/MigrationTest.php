@@ -84,28 +84,25 @@ class MigrationTest extends TestCase  {
     }
 
     public function testRun() {
-        $d = new Settings();
-        $d->storage = new PhpVar();
+        $settings = new Settings();
+        $settings->storage = new PhpVar();
         $log = '';
-        $d->run = function (Manager $m) use (&$log) {
-            $log .= 'r';
+        $manager = new Manager($settings);
+        $manager->add(
+            array(
+                new Migration('t1', function () use (&$log) {
+                    $log .= 'at1';
+                }),
 
-            $m->perform(new Migration('t1', function () use (&$log) {
-                $log .= 'at1';
-            }));
+                new Migration('t2', function () use (&$log) {
+                    $log .= 'at2';
+                })
+                )
+        );
 
-            $m->perform(new Migration('t2', function () use (&$log) {
-                $log .= 'at2';
-            }));
+        $manager->run();
 
-        };
-        $m = new Manager($d);
-
-        $m->run();
-
-        $this->assertSame('rat1at2', $log);
-
-
+        $this->assertSame('at1at2', $log);
     }
 
     public function testGlobalMigrations() {

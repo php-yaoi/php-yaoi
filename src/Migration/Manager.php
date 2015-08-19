@@ -2,7 +2,6 @@
 
 namespace Yaoi\Migration;
 
-use Closure;
 use Yaoi\Log;
 use Yaoi\Storage;
 use Yaoi\Service;
@@ -69,15 +68,20 @@ class Manager extends Service
     }
 
 
-    /** @var Migration[] */
-    private $migrations = array();
-    public function add($migrations) {
+    private $jobs = array();
+
+    /**
+     * @param Migration[]|Migration $migrations
+     * @param string $action
+     * @return $this
+     */
+    public function add($migrations, $action = Migration::APPLY) {
         if ($migrations instanceof Migration) {
             $migrations = array($migrations);
         }
 
         foreach ($migrations as $migration) {
-            $this->migrations []= $migration;
+            $this->jobs []= array($migration, $action);
         }
         return $this;
     }
@@ -86,16 +90,20 @@ class Manager extends Service
     private $log;
     public function setLog(Log $log = null) {
         $this->log = $log;
+        return $this;
     }
 
-    public function run()
+    public function run($dryRun = false)
     {
-        foreach ($this->migrations as $migration) {
-            $this->perform($migration);
-        }
-        if ($this->settings->run instanceof \Closure) {
-            $f = $this->settings->run;
-            $f($this);
+        foreach ($this->jobs as $job) {
+            /** @var Migration $migration */
+            $migration = $job[0];
+            $action = $job[1];
+            if ($this->log) {
+                $migration->log = $this->log;
+            }
+            $migration->dryRun = $dryRun;
+            $this->perform($migration, $action);
         }
         return $this;
     }

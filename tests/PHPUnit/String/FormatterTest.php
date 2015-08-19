@@ -2,6 +2,8 @@
 
 namespace PHPUnit\String;
 
+use Yaoi\Database;
+use Yaoi\Sql\Symbol;
 use Yaoi\String\Exception;
 use Yaoi\String\Formatter;
 use Yaoi\String\Quoter\DoubleQuote;
@@ -125,27 +127,31 @@ class FormatterTest extends TestCase
     }
 
     /**
-     * Build with binds and no quoter will fail with exception
+     * Build with binds and no quoter will use Raw quoter
      *
-     * @expectedException \Yaoi\String\Exception
-     * @expectedExceptionCode \Yaoi\String\Exception::MISSING_QUOTER
      * @throws \Yaoi\String\Exception
      * @see Formatter::setQuoter
      * @see Formatter::build
+     * @see Raw
      */
     public function testMissingQuoter() {
-        Formatter::create('? AND ?', 1, 2)->build();
+        $this->assertSame(
+            Formatter::create('? AND ?', 1, 2)->setQuoter(new Raw())->build(),
+            Formatter::create('? AND ?', 1, 2)->build()
+        );
     }
 
     /**
-     * String cast with binds and no quoter will result string with error message.
      * Uncaught exception during build will be converted to error string result (with code and message).
      *
      * @see Formatter::setQuoter
      * @see Formatter::__toString
      */
     public function testMissingQuotesToString() {
-        $this->assertSame('#ERROR: (2) Missing quoter', (string)Formatter::create('? AND ?', 1, 2));
+        $this->assertSame(
+            '#ERROR: (2) Yaoi\Database\Driver\ () not found',
+            (string)Formatter::create('? AND ?', 1, 2)
+                ->setQuoter(new Database()));
     }
 
     /**

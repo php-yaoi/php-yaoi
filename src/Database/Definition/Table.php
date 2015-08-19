@@ -241,7 +241,7 @@ class Table extends BaseClass
                         Formatter::create('Table ? (?) ?',
                             $table->schemaName,
                             $table->className,
-                            $result ? ' is up to date' : ' requires migration'
+                            $result ? 'is up to date' : 'requires migration'
                         ),
                         $result ? Log::TYPE_MESSAGE : Log::TYPE_ERROR
                     );

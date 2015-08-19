@@ -7,6 +7,7 @@ use Yaoi\Service;
 
 /**
  * Class Log
+ * @method Log\Driver getDriver()
  */
 class Log extends Service
 {
