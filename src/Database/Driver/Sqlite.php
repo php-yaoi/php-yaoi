@@ -103,7 +103,7 @@ class Sqlite extends Driver
      */
     public function getUtility()
     {
-        return new Database\Utility\Sqlite();
+        return new Database\Sqlite\Utility();
     }
 
 

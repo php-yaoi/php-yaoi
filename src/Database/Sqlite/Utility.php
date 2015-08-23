@@ -1,16 +1,11 @@
 <?php
 
-namespace Yaoi\Database\Utility;
+namespace Yaoi\Database\Sqlite;
 
-use Yaoi\Database\Sqlite\AlterTable;
-use Yaoi\Database\Sqlite\SchemaReader;
-use Yaoi\Database\Sqlite\TypeString;
-use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Database\Sqlite\CreateTable;
 
-class Sqlite extends Utility
+class Utility extends \Yaoi\Database\Utility
 {
 
     public function getColumnTypeString(Column $column)

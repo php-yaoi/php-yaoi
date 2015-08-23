@@ -1,16 +1,11 @@
 <?php
 
-namespace Yaoi\Database\Utility;
+namespace Yaoi\Database\Pgsql;
 
-use Yaoi\Database\Pgsql\AlterTable;
-use Yaoi\Database\Pgsql\SchemaReader;
-use Yaoi\Database\Pgsql\TypeString;
-use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Database\Pgsql\CreateTable;
 
-class Pgsql extends Utility
+class Utility extends \Yaoi\Database\Utility
 {
     /**
      * @param $tableName

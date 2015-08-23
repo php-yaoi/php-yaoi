@@ -137,7 +137,7 @@ class PdoPgsql extends Driver
      */
     public function getUtility()
     {
-        return new Database\Utility\Pgsql();
+        return new Database\Pgsql\Utility();
     }
 
 

@@ -1,16 +1,12 @@
 <?php
 
-namespace Yaoi\Database\Utility;
+namespace Yaoi\Database\Mysql;
 
-use Yaoi\Database\Mysql\CreateTable;
-use Yaoi\Database\Mysql\SchemaReader;
-use Yaoi\Database\Mysql\TypeString;
-use Yaoi\Database\Utility;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Sql\AlterTable;
+use Yaoi\String\Tokenizer;
 
-class Mysql extends Utility
+class Utility extends \Yaoi\Database\Utility
 {
     public function killSleepers($timeout = 30)
     {
@@ -72,6 +68,38 @@ class Mysql extends Utility
     {
         $rows = $this->database->query("SHOW TABLES LIKE ?", $tableName)->fetchAll();
         return (bool)$rows;
+    }
+
+
+    /** @var  Tokenizer */
+    private $tokenizer;
+    public function getStatementTokenizer() {
+        if (null === $this->tokenizer) {
+            $this->tokenizer = $tokenizer = new Tokenizer();
+
+            $tokenizer
+                ->addQuote('`', '`', array('``' => '`'))
+                ->addQuote(
+                    "'", "'", array(
+                        '\\\'' => '\'',
+                        '\"' => '"',
+                        '\r' => "\r",
+                        '\n' => "\n",
+                    )
+                )
+                ->addQuote(
+                    '"', '"', array(
+                        '\\\'' => '\'',
+                        '\"' => '"',
+                        '\r' => "\r",
+                        '\n' => "\n",
+                    )
+                )
+                ->addLineStopper('#')
+                ->addLineStopper('-- ')
+                ;
+        }
+        return $this->tokenizer;
     }
 
 

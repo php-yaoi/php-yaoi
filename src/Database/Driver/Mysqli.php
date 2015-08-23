@@ -162,11 +162,11 @@ class Mysqli extends Driver implements Driver\Contract
     }
 
     /**
-     * @return Database\Utility\Mysql
+     * @return \Yaoi\Database\Mysql\Utility
      */
     public function getUtility()
     {
-        return new Database\Utility\Mysql();
+        return new Database\Mysql\Utility();
     }
 
 

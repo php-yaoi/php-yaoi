@@ -23,7 +23,7 @@ class Parser extends BaseClass implements IsEmpty
      * @param null $end
      * @return Parser
      */
-    public function inner($start = null, $end = null)
+    public function inner($start = null, $end = null, $reverse = false)
     {
         if (is_null($this->string)) {
             return $this;
@@ -42,7 +42,12 @@ class Parser extends BaseClass implements IsEmpty
         if (is_null($end)) {
             $endOffset = strlen($this->string);
         } else {
-            $endOffset = strpos($this->string, (string)$end, $startOffset);
+            if ($reverse) {
+                $endOffset = strrpos($this->string, (string)$end, $startOffset);
+            }
+            else {
+                $endOffset = strpos($this->string, (string)$end, $startOffset);
+            }
             if (false === $endOffset) {
                 return new static();
             }
