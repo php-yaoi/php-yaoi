@@ -36,7 +36,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
      * @see \Yaoi\Database\Entity
      */
     public function testUtilityTypeString() {
-        /** @var Database\Utility\Mysql $utility */
+        /** @var \Yaoi\Database\Mysql\Utility $utility */
         $utility = $this->db->getUtility();
 
         $this->assertSame(
@@ -81,7 +81,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
 
 
     public function testUtilityCreateTable() {
-        /** @var Database\Utility\Mysql $utility */
+        /** @var \Yaoi\Database\Mysql\Utility $utility */
         $utility = $this->db->getUtility();
 
 
@@ -123,7 +123,7 @@ class DatabaseMysqliTest extends DatabaseTestUnified {
     }
 
     public function testUtilityCreateTable2() {
-        /** @var Database\Utility\Mysql $utility */
+        /** @var \Yaoi\Database\Mysql\Utility $utility */
         $utility = $this->db->getUtility();
 
         $columns = new \stdClass();
@@ -177,6 +177,30 @@ CREATE TABLE `test_indexes` (
  PRIMARY KEY (`id`)
 )
 SQL;
+
+
+    public function testCreateTableReader() {
+        $sql = "CREATE TABLE `wtf_entity_waka_user_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT, #fff1
+  `use``r_id` int(11) NOT NULL,-- fff2
+  `item_id` int(11) NOT NULL,
+  `name` VARCHAR(255) NOT NULL DEFAULT 'default',
+  `created_at` int(11) DEFAULT NULL,
+  `modified_at` int(11) DEFAULT NULL,
+  `total_seconds` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_id_item_id` (`user_id`,`item_id`),
+  KEY `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` (`item_id`),
+  CONSTRAINT `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` FOREIGN KEY (`item_id`) REFERENCES `wtf_entity_waka_item` (`id`),
+  CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`user_id`) REFERENCES `wtf_entity_waka_user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8";
+
+        $createTableReader = new Database\Mysql\CreateTableReader($sql, $this->db);
+        $table = $createTableReader->getDefinition();
+
+        echo $table->getCreateTable();
+
+    }
 
 
 
