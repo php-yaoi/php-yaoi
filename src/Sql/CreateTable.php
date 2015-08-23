@@ -50,7 +50,7 @@ abstract class CreateTable extends Batch
     }
 
     public function appendPrimaryKey() {
-        $this->createLines->commaExpr(' PRIMARY KEY (?)', array_values($this->table->primaryKey));
+        $this->createLines->commaExpr(' PRIMARY KEY (:columns)', array('columns' => array_values($this->table->primaryKey)));
     }
 
 
