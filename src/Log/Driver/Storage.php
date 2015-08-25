@@ -2,11 +2,12 @@
 
 namespace Yaoi\Log\Driver;
 
+use Yaoi\BaseClass;
 use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Settings;
 
-class Storage implements Driver
+class Storage extends BaseClass implements Driver
 {
     public function __construct(Settings $dsn = null)
     {

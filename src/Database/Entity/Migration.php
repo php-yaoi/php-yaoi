@@ -14,10 +14,6 @@ class Migration extends AbstractMigration
     /** @var Table  */
     private $table;
 
-    private $database;
-
-    private $utility;
-
     public function __construct(Table $table) {
         $this->id = null;
         $this->table = $table;
@@ -25,24 +21,22 @@ class Migration extends AbstractMigration
     }
 
     private $statement;
-    private function checkRun() {
-        if (null === $this->statement) {
-            $database = $this->table->database();
-            $utility = $database->getUtility();
 
-            $tableExists = $utility->tableExists($this->table->schemaName);
-            if (!$tableExists) {
-                $this->statement = $this->table->getCreateTable();
-            }
-            else {
-                $this->statement = $this->table->getAlterTableFrom(
-                    $utility->getTableDefinition($this->table->schemaName)
-                );
-            }
+    private function checkRun()
+    {
+        $database = $this->table->database();
+        $utility = $database->getUtility();
+
+        $tableExists = $utility->tableExists($this->table->schemaName);
+        if (!$tableExists) {
+            $statement = $this->table->getCreateTable();
+        } else {
+            $statement = $this->table->getAlterTableFrom(
+                $utility->getTableDefinition($this->table->schemaName)
+            );
         }
 
-        return $this->statement;
-
+        return $statement;
     }
 
 

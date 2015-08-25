@@ -179,9 +179,11 @@ PRIMARY KEY (:key)
                     'expire' => $expireField,
                 ));
             //}
+            return true;
 
         }, function() use ($table, $db) {
             $db->query("DROP TABLE ?", $table);
+            return true;
         });
     }
 }
