@@ -27,10 +27,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
 
     protected function appendIndexes() {
         foreach ($this->table->indexes as $index) {
-            $columns = array();
-            foreach ($index->columns as $column) {
-                $columns []= new Symbol($column->schemaName);
-            }
+            $columns = Symbol::prepareColumns($index->columns);
 
             if ($index->type === Index::TYPE_KEY) {
                 $createIndex = new SimpleExpression(

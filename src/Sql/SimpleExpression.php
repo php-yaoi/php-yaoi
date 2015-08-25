@@ -33,6 +33,12 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
         if ($arguments[0] instanceof Symbol) {
             return new self('?', $arguments[0]);
         }
+        if ($arguments[0] instanceof Database\Definition\Column) {
+            return new self('?', $arguments[0]);
+        }
+        if ($arguments[0] instanceof Database\Definition\Table) {
+            return new self('?', $arguments[0]);
+        }
         if ($arguments[0] instanceof Closure) {
             $expression = $arguments[0]();
             if (!$expression instanceof Expression) {
@@ -40,6 +46,15 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
                     \Yaoi\Sql\Exception::CLOSURE_MISTYPE);
             }
             return $expression;
+        }
+        if ($arguments[0] instanceof \stdClass) {
+            $columns = $arguments[0];
+            $arguments = array(':columns', array('columns' => array()));
+            foreach ((array)$columns as $column) {
+                if ($column instanceof Database\Definition\Column) {
+                    $arguments[1]['columns'][] = $column;
+                }
+            }
         }
 
         $expression = new self;

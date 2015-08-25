@@ -16,7 +16,7 @@ class AlterTable extends \Yaoi\Sql\AlterTable
                 $this->add($this->database->expr('CREATE '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? ON ? (?)',
-                    new Symbol($index->getName()), new Symbol($this->before->schemaName), $index->columns)
+                    new Symbol($index->getName()), new Symbol($this->before->schemaName), Symbol::prepareColumns($index->columns))
                 );
             }
             else {

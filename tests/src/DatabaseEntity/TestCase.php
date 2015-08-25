@@ -213,6 +213,30 @@ EOD;
     }
 
 
+    protected $expectedBindsStatement = <<<SQL
+SELECT `yaoi_tests_entity_tag`.`id`, `yaoi_tests_entity_tag`.`name`
+FROM `yaoi_tests_entity_host`
+LEFT JOIN `yaoi_tests_entity_session` ON `yaoi_tests_entity_session`.`host_id` = `yaoi_tests_entity_host`.`id`
+LEFT JOIN `yaoi_tests_entity_session_tag` ON `yaoi_tests_entity_session`.`id` = `yaoi_tests_entity_session_tag`.`session_id`
+LEFT JOIN `yaoi_tests_entity_tag` ON `yaoi_tests_entity_tag`.`id` = `yaoi_tests_entity_session_tag`.`tag_id`
+WHERE `yaoi_tests_entity_host`.`id` = 12
+GROUP BY `yaoi_tests_entity_tag`.`id`
+SQL;
+
+    public function testBinds() {
+        $select = Host::find()
+            ->select(Tag::columns())
+            ->where('? = ?', Host::columns()->id, 12)
+            ->leftJoin('? ON ? = ?', Session::table(), Session::columns()->hostId, Host::columns()->id)
+            ->leftJoin('? ON ? = ?', SessionTag::table(), Session::columns()->id, SessionTag::columns()->sessionId)
+            ->leftJoin('? ON ? = ?', Tag::table(), Tag::columns()->id, SessionTag::columns()->tagId)
+            ->groupBy(Tag::columns()->id)
+            ->bindResultClass(Tag::className());
+
+        $this->assertStringEqualsSpaceless($this->expectedBindsStatement, $select->build());
+    }
+
+
     public function setUp() {
         Host::bindDatabase($this->database);
         Session::bindDatabase($this->database);

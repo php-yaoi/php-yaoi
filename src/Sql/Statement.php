@@ -182,6 +182,7 @@ class Statement extends ComplexStatement
     public function bindResultClass($resultClass = null)
     {
         $this->resultClass = $resultClass;
+        return $this;
     }
 
 

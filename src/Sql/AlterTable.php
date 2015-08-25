@@ -66,7 +66,7 @@ class AlterTable extends Batch
             if (!isset($beforeIndexes[$indexId])) {
                 $this->alterLines->commaExpr('ADD '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
-                    . 'INDEX ? (?)', new Symbol($index->getName()), $index->columns);
+                    . 'INDEX ? (?)', new Symbol($index->getName()), Symbol::prepareColumns($index->columns));
             }
             else {
                 unset($beforeIndexes[$indexId]);

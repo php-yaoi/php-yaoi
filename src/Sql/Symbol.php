@@ -3,6 +3,7 @@
 
 namespace Yaoi\Sql;
 use Yaoi\BaseClass;
+use Yaoi\Database\Definition\Column;
 
 class Symbol extends BaseClass
 {
@@ -17,5 +18,23 @@ class Symbol extends BaseClass
             }
         }
         $this->name = $this->names[0];
+    }
+
+
+    /**
+     * @param array|\stdClass $columns
+     * @return array|Symbol[]
+     */
+    public static function prepareColumns($columns) {
+        if ($columns instanceof \stdClass) {
+            $columns = (array)$columns;
+        }
+        $result = array();
+        foreach ($columns as $column) {
+            if ($column instanceof Column) {
+                $result []= new Symbol($column->schemaName);
+            }
+        }
+        return $result;
     }
 } 
