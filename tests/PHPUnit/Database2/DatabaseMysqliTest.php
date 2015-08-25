@@ -6,7 +6,7 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Definition\Index;
 
 require_once __DIR__ . '/DatabaseTestUnified.php';
-class DatabaseMysqliTest extends DatabaseTestUnified {
+class DatabaseMysqliTest extends \YaoiTests\DatabaseTestUnified {
     public function setUp() {
         \YaoiTests\Database\CheckAvailable::checkMysqli();
         $this->db = Database::getInstance('test_mysqli');

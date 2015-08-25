@@ -1,6 +1,7 @@
 <?php
 use Yaoi\Database;
-use Yaoi\Migration;
+use Yaoi\Migration\ClosureMigration;
+use Yaoi\Migration\Migration;
 use Yaoi\Migration\Settings;
 use Yaoi\Migration\Manager;
 use Yaoi\Storage\PhpVar;
@@ -17,7 +18,7 @@ class MigrationTest extends TestCase  {
             'm1' => 0
         );
 
-        $migration = new Migration('m1', function () use (&$applied) {
+        $migration = new ClosureMigration('m1', function () use (&$applied) {
             $applied['m1']++;
         }, function () use (&$applied) {
             $applied['m1']--;
@@ -47,21 +48,19 @@ class MigrationTest extends TestCase  {
 
         $log = '';
 
-        $migrationAlwaysApply = new Migration('m1', function () use (&$log) {
+        $migrationAlwaysApply = new ClosureMigration('m1', function () use (&$log) {
             $log .= 'a';
         }, function () use (&$log) {
-            $log .= 'r';
-        }, function () {
-            return false;
-        });
+            return;
+        },
+            true);
 
-        $migrationAlwaysRollback = new Migration('m1', function () use (&$log) {
-            $log .= 'a';
+        $migrationAlwaysRollback = new ClosureMigration('m1', function () use (&$log) {
+            return;
         }, function () use (&$log) {
             $log .= 'r';
-        }, function () {
-            return true;
-        });
+        },
+            true);
 
 
         $m->perform($migrationAlwaysApply)
@@ -90,11 +89,11 @@ class MigrationTest extends TestCase  {
         $manager = new Manager($settings);
         $manager->add(
             array(
-                new Migration('t1', function () use (&$log) {
+                new ClosureMigration('t1', function () use (&$log) {
                     $log .= 'at1';
                 }),
 
-                new Migration('t2', function () use (&$log) {
+                new ClosureMigration('t2', function () use (&$log) {
                     $log .= 'at2';
                 })
                 )
@@ -113,12 +112,12 @@ class MigrationTest extends TestCase  {
             $dsn->storage = 'serialized-file:///conf/migrations.lock';
             $dsn->run = function (Manager $m) {
                 // Add migration for TASK-1234
-                $m->perform(new Migration('TASK-1234', function () {
+                $m->perform(new ClosureMigration('TASK-1234', function () {
                     Database::getInstance()->query("ALTER TABLE `table1` ADD COLUMN `field` CHAR(1) DEFAULT NULL");
                 }));
 
                 // Rollback migrations for TASK-1123
-                $m->perform(new Migration('TASK-1123', function () {
+                $m->perform(new ClosureMigration('TASK-1123', function () {
                     Database::getInstance()->query("ALTER TABLE `table2` ADD COLUMN `field2` CHAR(1) DEFAULT NULL");
                 }, function () {
                     Database::getInstance()->query("ALTER TABLE `table2` DROP COLUMN `field2`");

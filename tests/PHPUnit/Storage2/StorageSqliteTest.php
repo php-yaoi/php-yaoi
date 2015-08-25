@@ -11,12 +11,16 @@ use Yaoi\Storage\Settings;
 require_once __DIR__ . '/StorageMysqlTest.php';
 
 class StorageSqliteTest extends \StorageMysqlTest {
+
+    private $sqliteFilename;
     public function setUp() {
         if (!class_exists('SQLite3')) {
             $this->markTestSkipped('SQLite extension not available');
         }
 
-        $this->db = new Database('sqlite:///' . sys_get_temp_dir() . '/test-sqlite.sqlite');
+        $this->sqliteFilename =  sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-sqlite.sqlite';
+        echo $this->sqliteFilename;
+        $this->db = new Database('sqlite:///' . $this->sqliteFilename);
 
         //$db->log(new Log('stdout'));
 
@@ -41,6 +45,13 @@ class StorageSqliteTest extends \StorageMysqlTest {
         });
 
 
+    }
+
+    public function tearDown() {
+        if (file_exists($this->sqliteFilename)) {
+            $this->db->getDriver()->disconnect();
+            unlink($this->sqliteFilename);
+        }
     }
 
 }

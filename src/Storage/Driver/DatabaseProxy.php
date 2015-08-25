@@ -10,7 +10,7 @@ use Yaoi\App;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Date\TimeMachine;
-use Yaoi\Migration;
+use Yaoi\Migration\ClosureMigration;
 use Yaoi\Storage\Settings;
 
 class DatabaseProxy extends BaseClass implements Driver, Expire,
@@ -154,7 +154,7 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
     }
 
     /**
-     * @return Migration
+     * @return ClosureMigration
      */
     public function getMigration()
     {
@@ -164,7 +164,7 @@ class DatabaseProxy extends BaseClass implements Driver, Expire,
         $valueField = $this->valueField;
         $expireField = $this->expireField;
         $db = $this->db;
-        return new Migration($migrationId, function() use ($table, $keyField, $valueField, $expireField, $db) {
+        return new ClosureMigration($migrationId, function() use ($table, $keyField, $valueField, $expireField, $db) {
             //if ($this->db->getDriver() instanceof Database_Server_Mysql) {
             $db->query("CREATE TABLE IF NOT EXISTS :table (
 :key VARCHAR(255) NOT NULL DEFAULT '',

@@ -72,8 +72,15 @@ class AlterTable extends Batch
                 unset($beforeIndexes[$indexId]);
             }
         }
-        foreach ($beforeIndexes as $indexId => $index) {
-            $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
+        if ($beforeIndexes) {
+            foreach ($this->after->foreignKeys as $foreignKey) {
+                if (isset($beforeIndexes[$foreignKey->getName()])) {
+                    unset($beforeIndexes[$foreignKey->getName()]);
+                }
+            }
+            foreach ($beforeIndexes as $indexId => $index) {
+                $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
+            }
         }
     }
 

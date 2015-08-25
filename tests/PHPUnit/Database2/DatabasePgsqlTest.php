@@ -4,7 +4,7 @@ use Yaoi\Database;
 
 require_once __DIR__ . '/DatabaseTestUnified.php';
 
-class DatabasePgsqlTest extends DatabaseTestUnified {
+class DatabasePgsqlTest extends \YaoiTests\DatabaseTestUnified {
 
     protected $createTable1 = <<<SQL
 CREATE TABLE IF NOT EXISTS test_def (

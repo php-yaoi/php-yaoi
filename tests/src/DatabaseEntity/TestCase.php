@@ -3,6 +3,14 @@ namespace YaoiTests\DatabaseEntity;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Log;
+use Yaoi\Migration\ClosureMigration;
+use Yaoi\Migration\Manager;
+use Yaoi\Migration\Migration;
+use YaoiTests\Entity\Host;
+use YaoiTests\Entity\Session;
+use YaoiTests\Entity\SessionTag;
+use YaoiTests\Entity\Tag;
 use YaoiTests\EntityOneABBR;
 use YaoiTests\EntityTwo;
 
@@ -95,6 +103,43 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
     }
 
 
+
+    public function testMigrate() {
+        /** @var Table[] $tables */
+        $tables = array(
+            Session::table(),
+            Host::table(),
+            Tag::table(),
+            SessionTag::table(),
+        );
+
+        $remover = new Manager();
+        $remover->setLog(new Log('colored-stdout'));
+        foreach ($tables as $table) {
+            $remover->add($table->migration(), Migration::ROLLBACK);
+        }
+
+
+        $adder = new Manager();
+        $adder->setLog(new Log('colored-stdout'));
+        foreach ($tables as $table) {
+            $adder->add($table->migration());
+        }
+
+        $remover->run();
+        $adder->run();
+        //$adder->run();
+        //$remover->run();
+        //$remover->run();
+    }
+
+
+    public function setUp() {
+        Host::bindDatabase($this->database);
+        Session::bindDatabase($this->database);
+        SessionTag::bindDatabase($this->database);
+        Tag::bindDatabase($this->database);
+    }
 
 
 }

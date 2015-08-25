@@ -1,5 +1,8 @@
 <?php
 
+namespace YaoiTests;
+
+
 class DatabaseEntityMysqliTest extends \YaoiTests\DatabaseEntity\TestCase
 {
 
@@ -28,6 +31,7 @@ SQL;
     public function setUp() {
         \YaoiTests\Database\CheckAvailable::checkMysqli();
         $this->database = \Yaoi\Database::getInstance('test_mysqli');
+        parent::setUp();
     }
 
 }
