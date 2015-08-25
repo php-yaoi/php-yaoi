@@ -36,8 +36,8 @@ class TestCase extends PHPUnit_Framework_TestCase
 
     public function assertStringEqualsSpaceless($expected, $actual, $message = '')
     {
-        $expected = preg_replace("/\s/", "", $expected);
-        $actual = preg_replace("/\s+/", "", $actual);
+        $expected = preg_replace("/\s+/", " ", $expected);
+        $actual = preg_replace("/\s+/", " ", $actual);
         $this->assertSame($expected, $actual, $message);
     }
 

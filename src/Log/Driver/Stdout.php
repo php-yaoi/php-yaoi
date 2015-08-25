@@ -8,7 +8,7 @@ use Yaoi\Log\Settings;
 
 class Stdout implements Driver
 {
-    private $dsn;
+    protected $dsn;
 
     public function __construct(Settings $dsn = null)
     {

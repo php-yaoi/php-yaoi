@@ -1,4 +1,6 @@
 <?php
+namespace YaoiTests;
+
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
@@ -146,7 +148,7 @@ SQL;
             return;
         }
 
-        $columns = new stdClass();
+        $columns = new \stdClass();
         $columns->id = Column::AUTO_ID;
         $columns->name = Column::STRING + Column::NOT_NULL;
         $columns->uniOne = Column::INTEGER;
@@ -214,13 +216,13 @@ SQL;
             return;
         }
 
-        $columnsA = new stdClass();
+        $columnsA = new \stdClass();
         $columnsA->id = Column::AUTO_ID;
         $columnsA->mOne = Column::INTEGER;
         $columnsA->mTwo = Column::INTEGER;
         $tableA = new Table($columnsA, $this->db, 'table_a');
 
-        $columns = new stdClass();
+        $columns = new \stdClass();
         $columns->id = Column::AUTO_ID;
         $columns->name = Column::STRING + Column::NOT_NULL;
         $columns->uniOne = Column::INTEGER;

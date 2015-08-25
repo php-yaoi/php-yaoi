@@ -4,7 +4,7 @@ use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
 
 require_once __DIR__ . '/DatabaseTestUnified.php';
-class DatabaseSqliteTest extends DatabaseTestUnified {
+class DatabaseSqliteTest extends \YaoiTests\DatabaseTestUnified {
     protected $createTable1 = <<<SQL
 CREATE TABLE IF NOT EXISTS test_def (
   id1 INTEGER NOT NULL,

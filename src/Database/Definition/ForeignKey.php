@@ -65,35 +65,29 @@ class ForeignKey extends BaseClass
         return $this->parentColumns;
     }
 
-    private $id;
-    public function getId() {
-        if (null === $this->id) {
-            $this->id = 'fk';
-            foreach ($this->childColumns as $column) {
-                $this->id .= '_' . $column->table->schemaName;
-                break;
-            }
-            foreach ($this->childColumns as $column) {
-                $this->id .= '_' . $column->schemaName;
-            }
-            foreach ($this->parentColumns as $column) {
-                $this->id .= '_' . $column->table->schemaName;
-                break;
-            }
-            foreach ($this->parentColumns as $column) {
-                $this->id .= '_' . $column->schemaName;
-            }
-        }
-        return $this->id;
-    }
-
-
     private $name;
     public function getName() {
         if (null === $this->name) {
-            $this->name = $this->getId();
-        }
+            $this->name = 'fk';
+            foreach ($this->childColumns as $column) {
+                $this->name .= '_' . $column->table->schemaName;
+                break;
+            }
+            foreach ($this->childColumns as $column) {
+                $this->name .= '_' . $column->schemaName;
+            }
+            foreach ($this->parentColumns as $column) {
+                $this->name .= '_' . $column->table->schemaName;
+                break;
+            }
+            foreach ($this->parentColumns as $column) {
+                $this->name .= '_' . $column->schemaName;
+            }
 
+            if (strlen($this->name) > 64) {
+                $this->name = md5($this->name);
+            }
+        }
         return $this->name;
     }
 }

@@ -24,10 +24,7 @@ abstract class CreateTable extends Batch
 
     protected function appendIndexes() {
         foreach ($this->table->indexes as $index) {
-            $columns = array();
-            foreach ($index->columns as $column) {
-                $columns []= new Symbol($column->schemaName);
-            }
+            $columns = Symbol::prepareColumns($index->columns);
 
             if ($index->type === Index::TYPE_KEY) {
                 $this->createLines->commaExpr(' KEY ? (?)', new Symbol($index->getName()), $columns);
@@ -42,15 +39,19 @@ abstract class CreateTable extends Batch
         foreach ($this->table->foreignKeys as $foreignKey) {
             $this->createLines->commaExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)',
                 new Symbol($foreignKey->getName()),
-                $foreignKey->getChildColumns(),
+                Symbol::prepareColumns($foreignKey->getChildColumns()),
                 new Symbol($foreignKey->getReferencedTable()->schemaName),
-                $foreignKey->getParentColumns()
+                Symbol::prepareColumns($foreignKey->getParentColumns())
             );
         }
     }
 
     public function appendPrimaryKey() {
-        $this->createLines->commaExpr(' PRIMARY KEY (:columns)', array('columns' => array_values($this->table->primaryKey)));
+        $columns = array();
+        foreach ($this->table->primaryKey as $column) {
+            $columns []= new Symbol($column->schemaName);
+        }
+        $this->createLines->commaExpr(' PRIMARY KEY (:columns)', array('columns' => $columns));
     }
 
 
@@ -63,7 +64,7 @@ abstract class CreateTable extends Batch
         $this->createLines = new SimpleExpression();
         $this->createLines->setOpComma(',' . PHP_EOL);
 
-        $createExpression = new SimpleExpression('CREATE TABLE ? (' . PHP_EOL, new Symbol($this->table->schemaName));
+        $createExpression = new SimpleExpression('CREATE TABLE ? (' . PHP_EOL, $this->table);
         $this->add($createExpression);
 
         $this->appendColumns();

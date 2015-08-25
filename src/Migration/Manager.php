@@ -5,7 +5,6 @@ namespace Yaoi\Migration;
 use Yaoi\Log;
 use Yaoi\Storage;
 use Yaoi\Service;
-use Yaoi\Migration;
 
 class Manager extends Service
 {
@@ -39,27 +38,26 @@ class Manager extends Service
             return $this;
         }
 
-        if ($migration->isAppliedCallable !== null) {
-            $f = $migration->isAppliedCallable;
-            $isApplied = $f($migration);
-        } else {
-            $isApplied = $this->isApplied($migration->id);
-        }
+        $id = $migration->getId();
 
         if (Migration::ROLLBACK === $action) {
-            if ($isApplied && null !== $migration->rollbackCallable) {
-                $f = $migration->rollbackCallable;
-                $f($migration);
-                if (null !== $migration->id) {
-                    $this->getStorage()->delete($migration->id);
+            if ($migration->hasInternalState()) {
+                $migration->rollback();
+            }
+            elseif ($this->isApplied($id)) {
+                if ($migration->rollback()) {
+                    $this->getStorage()->delete($id);
                 }
             }
+
+
         } elseif (Migration::APPLY === $action) {
-            if (!$isApplied) {
-                $f = $migration->applyCallable;
-                $f($migration);
-                if (null !== $migration->id) {
-                    $this->getStorage()->set($migration->id, 1);
+            if ($migration->hasInternalState()) {
+                $migration->apply();
+            }
+            elseif (!$this->isApplied($id)) {
+                if ($migration->apply()) {
+                    $this->getStorage()->set($id, 1);
                 }
             }
         }
@@ -100,9 +98,9 @@ class Manager extends Service
             $migration = $job[0];
             $action = $job[1];
             if ($this->log) {
-                $migration->log = $this->log;
+                $migration->setLog($this->log);
             }
-            $migration->dryRun = $dryRun;
+            $migration->setDryRun($dryRun);
             $this->perform($migration, $action);
         }
         return $this;

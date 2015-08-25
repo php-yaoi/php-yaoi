@@ -70,7 +70,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     {
         $className = get_called_class();
         $table = static::table();
-        $statement = $table->database()->select($table->schemaName);
+        $statement = $table->database()->select($table);
         $statement->bindResultClass($className);
 
         if ($id instanceof static) {
