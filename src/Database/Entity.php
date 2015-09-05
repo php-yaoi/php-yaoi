@@ -6,6 +6,7 @@ use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Mappable;
 use Yaoi\Sql\SelectInterface;
+use Yaoi\Sql\Statement;
 use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
@@ -47,50 +48,51 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
 
-    /**
-     * @return string
-     * @deprecated use ::table()->schemaName
-     * @todo remove method
-     */
-    protected static function getTableName()
-    {
-        return static::table()->schemaName;
-    }
-
     protected $persistent;
 
+
     /**
-     * @param null $id
-     * @return null|SelectInterface|static
+     * @param null|static $filter
+     * @return SelectInterface
+     */
+    public static function statement($filter = null) {
+        $className = get_called_class();
+        $table = static::table();
+        $statement = $table->database()->select($table);
+        $statement->bindResultClass($className);
+
+        if ($filter instanceof static) {
+            foreach ($filter->toArray(true) as $name => $value) {
+                $statement->where("? = ?", new Symbol($table->schemaName, $name), $value);
+            }
+        }
+        return $statement;
+    }
+
+    /**
+     * @param ...$id
+     * @return static
      * @throws \Yaoi\Entity\Exception
      * @todo testdoc
      */
-    public static function find($id = null)
+    public static function find($id)
     {
         $className = get_called_class();
         $table = static::table();
         $statement = $table->database()->select($table);
         $statement->bindResultClass($className);
 
-        if ($id instanceof static) {
-            foreach ($id->toArray(true) as $name => $value) {
-                $statement->where("? = ?", new Symbol($table->schemaName, $name), $value);
+        $args = func_get_args();
+        $i = 0;
+        foreach ($table->primaryKey as $keyField) {
+            if (!isset($args[$i])) {
+                throw new \Yaoi\Entity\Exception('Full primary key required', \Yaoi\Entity\Exception::KEY_MISSING);
             }
-        } elseif ($id) {
-            $args = func_get_args();
-            $i = 0;
-            foreach ($table->primaryKey as $keyField) {
-                if (!isset($args[$i])) {
-                    throw new \Yaoi\Entity\Exception('Full primary key required', \Yaoi\Entity\Exception::KEY_MISSING);
-                }
-                $keyValue = $args[$i++];
-                $statement->where('? = ?', new Symbol($table->schemaName, $keyField->schemaName), $keyValue);
-            }
-            return $statement->query()->fetchRow();
+            $keyValue = $args[$i++];
+            $statement->where('? = ?', new Symbol($table->schemaName, $keyField->schemaName), $keyValue);
         }
-        return $statement;
+        return $statement->query()->fetchRow();
     }
-
 
     static function fromArray(array $row, $object = null, $source = null)
     {
@@ -137,6 +139,24 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         } else {
             $this->insert();
         }
+    }
+
+
+    public function delete() {
+        $table = static::table();
+        $delete = $table->database()->delete($table->schemaName);
+        $data = $this->toArray();
+
+        foreach ($table->primaryKey as $keyField) {
+            if (!isset($this->{$keyField->schemaName})) {
+                throw new \Yaoi\Entity\Exception('Primary key required for delete', \Yaoi\Entity\Exception::KEY_MISSING);
+            }
+            $delete->where("? = ?", new Symbol($keyField->schemaName), $data[$keyField->schemaName]);
+        }
+
+        $delete->query();
+        $this->persistent = false;
+        return $this;
     }
 
 
@@ -210,7 +230,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
 
     public function findOrSave() {
-        $item = self::find($this)->query()->fetchRow();
+        /** @var static $item */
+        $item = self::statement($this)->query()->fetchRow();
         if (!$item) {
             $this->save();
         }
