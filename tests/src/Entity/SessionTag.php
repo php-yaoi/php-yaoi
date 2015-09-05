@@ -31,7 +31,9 @@ class SessionTag extends Entity
      */
     static function setUpTable(\Yaoi\Database\Definition\Table $table, $columns)
     {
-        $table->setPrimaryKey($columns->sessionId, $columns->tagId);
+        $table
+            ->disableDatabaseForeignKeys()
+            ->setPrimaryKey($columns->sessionId, $columns->tagId);
     }
 
 

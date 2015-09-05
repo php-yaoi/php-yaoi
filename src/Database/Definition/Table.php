@@ -33,7 +33,7 @@ class Table extends BaseClass
 
     public $className;
 
-    public function __construct($columns, Database\Contract $database, $schemaName) {
+    public function __construct(\stdClass $columns, Database\Contract $database, $schemaName) {
         $this->schemaName = $schemaName;
         $this->database = $database;
         $this->setColumns($columns);
@@ -66,12 +66,25 @@ class Table extends BaseClass
     }
 
 
+    private $columnForeignKeys = array();
+
+    /**
+     * @param Column $column
+     * @return null|ForeignKey
+     */
+    public function getForeignKeyByColumn(Column $column) {
+        $name = $column->propertyName;
+        if (isset($this->columnForeignKeys[$name])) {
+            return $this->columnForeignKeys[$name];
+        }
+        else {
+            return null;
+        }
+    }
+
     private function setColumns($columns) {
         if (is_object($columns)) {
             $this->columns = $columns;
-        }
-        else {
-            throw new Exception('Object of stdClass required as argument', Exception::INVALID_ARGUMENT);
         }
 
         /**
@@ -89,7 +102,9 @@ class Table extends BaseClass
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
-                $this->addForeignKey(new ForeignKey(array($column), array($refColumn)));
+                $foreignKey = new ForeignKey(array($column), array($refColumn));
+                $this->columnForeignKeys [$name]= $foreignKey;
+                $this->addForeignKey($foreignKey);
                 $column->setFlag(Column::AUTO_ID, false);
             }
 
@@ -109,10 +124,14 @@ class Table extends BaseClass
             }
 
             if ($column->isUnique) {
-                $this->addIndex(Index::TYPE_UNIQUE, $column);
+                $index = new Index($column);
+                $index->setType(Index::TYPE_UNIQUE);
+                $this->addIndex($index);
             }
             elseif ($column->isIndexed) {
-                $this->addIndex(Index::TYPE_KEY, $column);
+                $index = new Index($column);
+                $index->setType(Index::TYPE_KEY);
+                $this->addIndex($index);
             }
         }
 
@@ -173,9 +192,6 @@ class Table extends BaseClass
      */
     public function database()
     {
-        if (null === $this->database) {
-            throw new Exception('Database not bound', Exception::DATABASE_REQUIRED);
-        }
         return $this->database;
     }
 
@@ -196,6 +212,13 @@ class Table extends BaseClass
 
     public function migration() {
         return new Database\Entity\Migration($this);
+    }
+
+
+    public $disableForeignKeys = false;
+    public function disableDatabaseForeignKeys($disable = true) {
+        $this->disableForeignKeys = $disable;
+        return $this;
     }
 
 }

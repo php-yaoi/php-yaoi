@@ -4,10 +4,8 @@ namespace YaoiTests\DatabaseEntity;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Log;
-use Yaoi\Migration\ClosureMigration;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
-use Yaoi\Storage\PhpVar;
 use YaoiTests\Entity\Host;
 use YaoiTests\Entity\Session;
 use YaoiTests\Entity\SessionTag;
@@ -125,7 +123,7 @@ CREATE TABLE `yaoi_tests_entity_session` (
  `host_id` int NOT NULL,
  `started_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `ended_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`),
+ CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
  PRIMARY KEY (`id`)
 )
 OK
@@ -147,8 +145,6 @@ CREATE TABLE `yaoi_tests_entity_session_tag` (
  `session_id` int NOT NULL,
  `tag_id` int NOT NULL,
  `added_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- CONSTRAINT `262487835611c7b057e16bd498a1117f` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`),
- CONSTRAINT `fk_yaoi_tests_entity_session_tag_tag_id_yaoi_tests_entity_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `yaoi_tests_entity_tag` (`id`),
  PRIMARY KEY (`session_id`, `tag_id`)
 )
 OK
@@ -189,10 +185,11 @@ EOD;
         $log = new Log('stdout');
 
         $remover = new Manager();
-        $remover->setLog($log);
         foreach ($tables as $table) {
             $remover->add($table->migration(), Migration::ROLLBACK);
         }
+        $remover->run();
+        $remover->setLog($log);
 
 
         $adder = new Manager();
@@ -201,6 +198,7 @@ EOD;
             $adder->add($table->migration());
         }
 
+
         ob_start();
         $remover->run();
         $adder->run();
@@ -208,6 +206,10 @@ EOD;
         $remover->run();
         $remover->run();
         $logData = ob_get_clean();
+
+        ob_start();
+        $adder->run();
+        ob_end_clean();
 
         $this->assertStringEqualsCRLF($this->expectedMigrateLog, $logData);
     }
@@ -224,7 +226,7 @@ GROUP BY `yaoi_tests_entity_tag`.`id`
 SQL;
 
     public function testBinds() {
-        $select = Host::find()
+        $select = Host::statement()
             ->select(Tag::columns())
             ->where('? = ?', Host::columns()->id, 12)
             ->leftJoin('? ON ? = ?', Session::table(), Session::columns()->hostId, Host::columns()->id)
@@ -235,6 +237,78 @@ SQL;
 
         $this->assertStringEqualsSpaceless($this->expectedBindsStatement, $select->build());
     }
+
+
+    /**
+     * @see Entity::save
+     * @see Entity::delete
+     * @see Entity::find
+     * @throws \Yaoi\Entity\Exception
+     */
+    public function testLifeCycle() {
+        $host = new Host();
+        $host->name = 'test';
+        $host->save();
+        $this->assertSame(1, $host->id);
+
+        $host->name = 'Test';
+        $host->save();
+
+        $host2 = new Host();
+        $host2->name = 'Test 2';
+        $host2->save();
+        $this->assertSame(2, $host2->id);
+
+        $this->assertSame('Test', Host::find($host->id)->name);
+        $host->delete();
+
+        $this->assertNull(Host::find($host->id));
+
+    }
+
+
+    public function testFindOrSave() {
+        $sessionTag = new SessionTag();
+        $sessionTag->sessionId = 123;
+        $sessionTag->tagId = 456;
+
+        $sessionTag->findOrSave();
+    }
+
+    /**
+     * @expectedException \Yaoi\Entity\Exception
+     * @expectedExceptionCode \Yaoi\Entity\Exception::KEY_MISSING
+     * @throws \Yaoi\Entity\Exception
+     */
+    public function testFindFullPrimaryRequired() {
+        SessionTag::find(123);
+    }
+    /**
+     * @expectedException \Yaoi\Entity\Exception
+     * @expectedExceptionCode \Yaoi\Entity\Exception::KEY_MISSING
+     * @throws \Yaoi\Entity\Exception
+     */
+    public function testUpdateFullPrimaryRequired() {
+        $sessionTag = new SessionTag();
+        $sessionTag->sessionId = 123;
+        $sessionTag->addedAt = time();
+        $sessionTag->update();
+    }
+
+    /**
+     * @expectedException \Yaoi\Entity\Exception
+     * @expectedExceptionCode \Yaoi\Entity\Exception::KEY_MISSING
+     * @throws \Yaoi\Entity\Exception
+     */
+    public function testDeleteFullPrimaryRequired() {
+        $sessionTag = new SessionTag();
+        $sessionTag->sessionId = 123;
+        $sessionTag->delete();
+    }
+
+
+
+
 
 
     public function setUp() {

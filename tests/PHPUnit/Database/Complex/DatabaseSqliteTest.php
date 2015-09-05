@@ -28,7 +28,7 @@ CREATE TABLE test_indexes (
  r_one varchar(255) DEFAULT NULL,
  r_two varchar(255) DEFAULT NULL,
  CONSTRAINT fk_test_indexes_ref_id_table_a_id FOREIGN KEY (ref_id) REFERENCES table_a (id),
- CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two)
+ CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two)
 );
 CREATE UNIQUE INDEX unique_uni_one_uni_two ON test_indexes (uni_one, uni_two);
 CREATE INDEX key_name ON test_indexes (name);

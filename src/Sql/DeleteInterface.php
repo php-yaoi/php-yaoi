@@ -2,61 +2,18 @@
 
 namespace Yaoi\Sql;
 
+/**
+ * Interface DeleteInterface
+ * @package Yaoi\Sql
+ * @method SelectInterface from($expression, ...$binds)
+ * @method SelectInterface innerJoin($expression, ...$binds)
+ * @method SelectInterface leftJoin($expression, ...$binds)
+ * @method SelectInterface rightJoin($expression, ...$binds)
+ * @method SelectInterface where($expression, ...$binds)
+ * @method SelectInterface order($expression, ...$binds)
+ * @method SelectInterface limit($limit, $offset)
+ * @method SelectInterface offset($offset)
+ */
 interface DeleteInterface extends StatementInterface
 {
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function from($expression, $binds = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function innerJoin($expression, $binds = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function leftJoin($expression, $binds = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function rightJoin($expression, $binds = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function where($expression, $binds = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @return $this
-     */
-    public function order($expression, $binds = null);
-
-    /**
-     * @param $limit
-     * @param null $offset
-     * @return $this
-     */
-    public function limit($limit, $offset = null);
-
-    /**
-     * @param $offset
-     * @return $this
-     */
-    public function offset($offset);
-
 }
