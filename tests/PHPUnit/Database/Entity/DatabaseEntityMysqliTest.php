@@ -1,6 +1,6 @@
 <?php
 
-namespace YaoiTests;
+namespace PHPUnit\Database\Entity;
 
 
 class DatabaseEntityMysqliTest extends \YaoiTests\DatabaseEntity\TestCase

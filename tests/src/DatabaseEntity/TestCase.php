@@ -4,10 +4,8 @@ namespace YaoiTests\DatabaseEntity;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Log;
-use Yaoi\Migration\ClosureMigration;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
-use Yaoi\Storage\PhpVar;
 use YaoiTests\Entity\Host;
 use YaoiTests\Entity\Session;
 use YaoiTests\Entity\SessionTag;
@@ -125,7 +123,7 @@ CREATE TABLE `yaoi_tests_entity_session` (
  `host_id` int NOT NULL,
  `started_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `ended_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`),
+ CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
  PRIMARY KEY (`id`)
 )
 OK
@@ -147,8 +145,6 @@ CREATE TABLE `yaoi_tests_entity_session_tag` (
  `session_id` int NOT NULL,
  `tag_id` int NOT NULL,
  `added_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- CONSTRAINT `262487835611c7b057e16bd498a1117f` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`),
- CONSTRAINT `fk_yaoi_tests_entity_session_tag_tag_id_yaoi_tests_entity_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `yaoi_tests_entity_tag` (`id`),
  PRIMARY KEY (`session_id`, `tag_id`)
 )
 OK

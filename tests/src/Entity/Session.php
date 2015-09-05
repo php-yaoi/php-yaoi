@@ -2,6 +2,7 @@
 namespace YaoiTests\Entity;
 
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
 
@@ -32,7 +33,9 @@ class Session extends Entity
      */
     static function setUpTable(\Yaoi\Database\Definition\Table $table, $columns)
     {
-        // no op
+        $table->getForeignKeyByColumn($columns->hostId)
+            ->setOnDelete(ForeignKey::CASCADE)
+            ->setOnUpdate(ForeignKey::CASCADE);
     }
 
 

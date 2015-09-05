@@ -4,7 +4,6 @@ namespace Yaoi\Database;
 
 use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Entity\Exception;
 use Yaoi\Mappable;
 use Yaoi\Sql\SelectInterface;
 use Yaoi\Sql\Symbol;
@@ -63,7 +62,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     /**
      * @param null $id
      * @return null|SelectInterface|static
-     * @throws Exception
+     * @throws \Yaoi\Entity\Exception
      * @todo testdoc
      */
     public static function find($id = null)
@@ -82,7 +81,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             $i = 0;
             foreach ($table->primaryKey as $keyField) {
                 if (!isset($args[$i])) {
-                    throw new Exception('Full primary key required', Exception::KEY_MISSING);
+                    throw new \Yaoi\Entity\Exception('Full primary key required', \Yaoi\Entity\Exception::KEY_MISSING);
                 }
                 $keyValue = $args[$i++];
                 $statement->where('? = ?', new Symbol($table->schemaName, $keyField->schemaName), $keyValue);
@@ -149,7 +148,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
         foreach ($table->primaryKey as $keyField) {
             if (!isset($data[$keyField->schemaName])) {
-                throw new Exception('Primary key required for update', Exception::KEY_MISSING);
+                throw new \Yaoi\Entity\Exception('Primary key required for update', \Yaoi\Entity\Exception::KEY_MISSING);
             }
             $update->where("? = ?", new Symbol($keyField->schemaName), $data[$keyField->schemaName]);
             unset($data[$keyField->schemaName]);

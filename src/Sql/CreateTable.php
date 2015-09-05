@@ -2,10 +2,9 @@
 
 namespace Yaoi\Sql;
 
-use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Database\Exception;
 
 abstract class CreateTable extends Batch
 {
@@ -36,12 +35,17 @@ abstract class CreateTable extends Batch
     }
 
     protected function appendForeignKeys() {
+        if ($this->table->disableForeignKeys) {
+            return;
+        }
         foreach ($this->table->foreignKeys as $foreignKey) {
-            $this->createLines->commaExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)',
+            $this->createLines->commaExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)??',
                 new Symbol($foreignKey->getName()),
-                Symbol::prepareColumns($foreignKey->getChildColumns()),
+                Symbol::prepareColumns($foreignKey->getLocalColumns()),
                 new Symbol($foreignKey->getReferencedTable()->schemaName),
-                Symbol::prepareColumns($foreignKey->getParentColumns())
+                Symbol::prepareColumns($foreignKey->getReferenceColumns()),
+                new Raw($foreignKey->onUpdate === ForeignKey::NO_ACTION ? '' : ' ON UPDATE ' . $foreignKey->onUpdate),
+                new Raw($foreignKey->onDelete === ForeignKey::NO_ACTION ? '' : ' ON DELETE ' . $foreignKey->onDelete)
             );
         }
     }
