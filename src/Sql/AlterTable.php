@@ -66,14 +66,21 @@ class AlterTable extends Batch
             if (!isset($beforeIndexes[$indexId])) {
                 $this->alterLines->commaExpr('ADD '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
-                    . 'INDEX ? (?)', new Symbol($index->getName()), $index->columns);
+                    . 'INDEX ? (?)', new Symbol($index->getName()), Symbol::prepareColumns($index->columns));
             }
             else {
                 unset($beforeIndexes[$indexId]);
             }
         }
-        foreach ($beforeIndexes as $indexId => $index) {
-            $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
+        if ($beforeIndexes) {
+            foreach ($this->after->foreignKeys as $foreignKey) {
+                if (isset($beforeIndexes[$foreignKey->getName()])) {
+                    unset($beforeIndexes[$foreignKey->getName()]);
+                }
+            }
+            foreach ($beforeIndexes as $indexId => $index) {
+                $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
+            }
         }
     }
 

@@ -5,7 +5,7 @@ namespace Yaoi\Migration;
 interface Needed
 {
     /**
-     * @return \Yaoi\Migration
+     * @return \Yaoi\Migration\Migration
      */
     public function getMigration();
 }

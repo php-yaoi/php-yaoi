@@ -6,94 +6,96 @@ use Yaoi\BaseClass;
 
 class ForeignKey extends BaseClass
 {
-    const CASCADE = 'cascade';
-    const SET_NULL = 'set_null';
-    const SET_DEFAULT = 'set_default';
-    const NO_ACTION = 'no_action';
-    const RESTRICT = 'restrict';
+    const CASCADE = 'CASCADE';
+    const SET_NULL = 'SET NULL';
+    const SET_DEFAULT = 'SET DEFAULT';
+    const NO_ACTION = 'NO ACTION';
+    const RESTRICT = 'RESTRICT';
 
     const PARENT = 'parent';
     const CHILD = 'child';
 
-    private $onUpdate;
-    private $onDelete;
+    public $onUpdate;
+    public $onDelete;
 
     /**
-     * @param Column[] $childColumns
-     * @param Column[] $parentColumns
+     * @param Column[] $localColumns
+     * @param Column[] $referenceColumns
      * @param string $onUpdate
      * @param string $onDelete
+     * @throws Exception
      */
-    public function __construct(array $childColumns,
-                                array $parentColumns,
+    public function __construct(array $localColumns,
+                                array $referenceColumns,
                                 $onUpdate = self::NO_ACTION,
                                 $onDelete = self::NO_ACTION) {
-        $childColumns = array_values($childColumns);
-        $parentColumns = array_values($parentColumns);
+        $localColumns = array_values($localColumns);
+        $referenceColumns = array_values($referenceColumns);
 
-        if (count($childColumns) !== count($parentColumns)) {
+        if (count($localColumns) !== count($referenceColumns)) {
             throw new Exception('Foreign key column count mismatch', Exception::FK_COUNT_MISMATCH);
         }
 
-        $this->childColumns = $childColumns;
-        $this->parentColumns = $parentColumns;
+        $this->localColumns = $localColumns;
+        $this->referenceColumns = $referenceColumns;
         $this->onUpdate = $onUpdate;
         $this->onDelete = $onDelete;
     }
 
 
+    public function setOnUpdate($onUpdate = self::NO_ACTION) {
+        $this->onUpdate = $onUpdate;
+        return $this;
+    }
+
+    public function setOnDelete($onDelete = self::NO_ACTION) {
+        $this->onDelete = $onDelete;
+        return $this;
+    }
+
     /**
      * @return Table
      */
     public function getReferencedTable() {
-        return $this->parentColumns[0]->table;
+        return $this->referenceColumns[0]->table;
     }
 
     /** @var Column[] */
-    private $parentColumns = array();
+    private $referenceColumns = array();
 
     /**
      * @var Column[]
      */
-    private $childColumns = array();
+    private $localColumns = array();
 
-    public function getChildColumns() {
-        return $this->childColumns;
+    public function getLocalColumns() {
+        return $this->localColumns;
     }
 
-    public function getParentColumns() {
-        return $this->parentColumns;
+    public function getReferenceColumns() {
+        return $this->referenceColumns;
     }
-
-    private $id;
-    public function getId() {
-        if (null === $this->id) {
-            $this->id = 'fk';
-            foreach ($this->childColumns as $column) {
-                $this->id .= '_' . $column->table->schemaName;
-                break;
-            }
-            foreach ($this->childColumns as $column) {
-                $this->id .= '_' . $column->schemaName;
-            }
-            foreach ($this->parentColumns as $column) {
-                $this->id .= '_' . $column->table->schemaName;
-                break;
-            }
-            foreach ($this->parentColumns as $column) {
-                $this->id .= '_' . $column->schemaName;
-            }
-        }
-        return $this->id;
-    }
-
 
     private $name;
     public function getName() {
         if (null === $this->name) {
-            $this->name = $this->getId();
-        }
+            $this->name = 'fk';
+            foreach ($this->localColumns as $column) {
+                $this->name .= '_' . $column->table->schemaName;
+                break;
+            }
+            foreach ($this->localColumns as $column) {
+                $this->name .= '_' . $column->schemaName;
+            }
+            foreach ($this->referenceColumns as $column) {
+                $this->name .= '_' . $column->table->schemaName;
+                $this->name .= '_' . $column->schemaName;
+            }
 
+            if (strlen($this->name) > 64) {
+                $this->name = md5($this->name);
+            }
+        }
         return $this->name;
     }
 }

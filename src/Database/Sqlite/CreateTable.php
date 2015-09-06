@@ -32,17 +32,14 @@ class CreateTable extends \Yaoi\Sql\CreateTable
     private $skipPrimary;
     public function appendPrimaryKey() {
         if (!$this->skipPrimary) {
-            $this->createLines->commaExpr(' PRIMARY KEY (?)' . PHP_EOL, array_values($this->table->primaryKey));
+            $this->createLines->commaExpr(' PRIMARY KEY (?)' . PHP_EOL, Symbol::prepareColumns($this->table->primaryKey));
         }
     }
 
 
     protected function appendIndexes() {
         foreach ($this->table->indexes as $index) {
-            $columns = array();
-            foreach ($index->columns as $column) {
-                $columns []= new Symbol($column->schemaName);
-            }
+            $columns = Symbol::prepareColumns($index->columns);
 
             if ($index->type === Index::TYPE_KEY) {
                 $createIndex = new SimpleExpression(

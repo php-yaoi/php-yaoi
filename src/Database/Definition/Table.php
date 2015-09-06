@@ -6,9 +6,7 @@ use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Exception;
 use Yaoi\Log;
-use Yaoi\Migration;
 use Yaoi\Sql\CreateTable;
-use Yaoi\String\Formatter;
 use Yaoi\String\Utils;
 
 class Table extends BaseClass
@@ -35,15 +33,16 @@ class Table extends BaseClass
 
     public $className;
 
-    public function __construct($columns, Database\Contract $database, $schemaName) {
+    public function __construct(\stdClass $columns, Database\Contract $database, $schemaName) {
         $this->schemaName = $schemaName;
         $this->database = $database;
         $this->setColumns($columns);
     }
 
     /**
-     * @param bool|true $asArray
-     * @return Column[]|\stdClass
+     * @param bool $asArray
+     * @param bool $bySchemaName
+     * @return array|Column[]|\stdClass
      */
     public function getColumns($asArray = false, $bySchemaName = false) {
         if ($bySchemaName) {
@@ -67,12 +66,25 @@ class Table extends BaseClass
     }
 
 
+    private $columnForeignKeys = array();
+
+    /**
+     * @param Column $column
+     * @return null|ForeignKey
+     */
+    public function getForeignKeyByColumn(Column $column) {
+        $name = $column->propertyName;
+        if (isset($this->columnForeignKeys[$name])) {
+            return $this->columnForeignKeys[$name];
+        }
+        else {
+            return null;
+        }
+    }
+
     private function setColumns($columns) {
         if (is_object($columns)) {
             $this->columns = $columns;
-        }
-        else {
-            throw new Exception('Object of stdClass required as argument', Exception::INVALID_ARGUMENT);
         }
 
         /**
@@ -90,7 +102,9 @@ class Table extends BaseClass
                 $refColumn = $column;
                 $column = clone $column;
                 $this->columns->$name = $column;
-                $this->addForeignKey(new ForeignKey(array($column), array($refColumn)));
+                $foreignKey = new ForeignKey(array($column), array($refColumn));
+                $this->columnForeignKeys [$name]= $foreignKey;
+                $this->addForeignKey($foreignKey);
                 $column->setFlag(Column::AUTO_ID, false);
             }
 
@@ -110,10 +124,14 @@ class Table extends BaseClass
             }
 
             if ($column->isUnique) {
-                $this->addIndex(Index::TYPE_UNIQUE, $column);
+                $index = new Index($column);
+                $index->setType(Index::TYPE_UNIQUE);
+                $this->addIndex($index);
             }
             elseif ($column->isIndexed) {
-                $this->addIndex(Index::TYPE_KEY, $column);
+                $index = new Index($column);
+                $index->setType(Index::TYPE_KEY);
+                $this->addIndex($index);
             }
         }
 
@@ -148,17 +166,19 @@ class Table extends BaseClass
             $index = Index::create($columns)->setType($type);
         }
 
-        $this->indexes [$index->getId()]= $index;
+        $this->indexes [$index->getName()]= $index;
 
         return $this;
     }
 
+    /** @var array|Table[]  */
+    public $dependentTables = array();
     /**
      * @var ForeignKey[]
      */
     public $foreignKeys = array();
     public function addForeignKey(ForeignKey $foreignKey) {
-        // todo sync child and parent column types
+        $foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
         $this->foreignKeys []= $foreignKey;
         return $this;
     }
@@ -167,14 +187,11 @@ class Table extends BaseClass
     private $database;
 
     /**
-     * @return \Yaoi\Database\Contract;
-     * @throws \Yaoi\Service\Exception
+     * @return Database\Contract
+     * @throws Exception
      */
     public function database()
     {
-        if (null === $this->database) {
-            throw new Exception('Database not bound', Exception::DATABASE_REQUIRED);
-        }
         return $this->database;
     }
 
@@ -194,62 +211,14 @@ class Table extends BaseClass
 
 
     public function migration() {
-        $database = $this->database();
-        $table = $this;
-        $statement = null;
+        return new Database\Entity\Migration($this);
+    }
 
-        $checkRun = function () use ($statement, $database, $table) {
-            if (null !== $statement) {
-                return $statement;
-            }
-            $tableExists = $database->getUtility()->tableExists($table->schemaName);
-            if (!$tableExists) {
-                $statement = $this->getCreateTable();
-            }
-            else {
-                $statement = $this->getAlterTableFrom($database->getUtility()->getTableDefinition($table->schemaName));
-            }
-            return $statement;
-        };
 
-        $migration = new Migration(
-            null,
-            function(Migration $migration) use ($checkRun, $database){
-                $statement = $checkRun();
-                $migration->log->push((string)$statement);
-
-                if (!$migration->dryRun) {
-                    try {
-                        $database->query($statement);
-                        $migration->log->push('OK', Log::TYPE_SUCCESS);
-                    }
-                    catch (Exception $exception) {
-                        $migration->log->push($exception->getMessage(), Log::TYPE_ERROR);
-                    }
-                }
-            },
-            null,
-            function(Migration $migration) use ($checkRun, $table){
-                if ((string)$checkRun()) {
-                    $result = false;
-                }
-                else {
-                    $result = true;
-                }
-                if ($migration->log) {
-                    $migration->log->push(
-                        Formatter::create('Table ? (?) ?',
-                            $table->schemaName,
-                            $table->className,
-                            $result ? 'is up to date' : 'requires migration'
-                        ),
-                        $result ? Log::TYPE_MESSAGE : Log::TYPE_ERROR
-                    );
-                }
-                return $result;
-            }
-        );
-        return $migration;
+    public $disableForeignKeys = false;
+    public function disableDatabaseForeignKeys($disable = true) {
+        $this->disableForeignKeys = $disable;
+        return $this;
     }
 
 }

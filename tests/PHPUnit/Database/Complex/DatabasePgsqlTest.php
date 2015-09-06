@@ -4,7 +4,7 @@ use Yaoi\Database;
 
 require_once __DIR__ . '/DatabaseTestUnified.php';
 
-class DatabasePgsqlTest extends DatabaseTestUnified {
+class DatabasePgsqlTest extends \YaoiTests\DatabaseTestUnified {
 
     protected $createTable1 = <<<SQL
 CREATE TABLE IF NOT EXISTS test_def (
@@ -59,7 +59,7 @@ CREATE TABLE "test_indexes" (
  "r_two" varchar(255) DEFAULT NULL,
  CONSTRAINT "unique_uni_one_uni_two" UNIQUE ("uni_one", "uni_two"),
  CONSTRAINT "fk_test_indexes_ref_id_table_a_id" FOREIGN KEY ("ref_id") REFERENCES "table_a" ("id"),
- CONSTRAINT "fk_test_indexes_r_one_r_two_table_a_m_one_m_two" FOREIGN KEY ("r_one", "r_two") REFERENCES "table_a" ("m_one", "m_two"),
+ CONSTRAINT "fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two" FOREIGN KEY ("r_one", "r_two") REFERENCES "table_a" ("m_one", "m_two"),
  PRIMARY KEY ("id")
 );
 CREATE INDEX "key_name" ON "test_indexes" ("name");

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPUnit\DatabaseEntity;
+namespace PHPUnit\Database\Entity;
 
 
 use Yaoi\Database\Definition\Column;
@@ -70,7 +70,7 @@ class DatabaseEntityColumnTest extends TestCase
 
         $column1->setForeignKey($column2);
 
-        $this->assertSame(array($column2), $column1->getForeignKey()->getParentColumns());
+        $this->assertSame(array($column2), $column1->getForeignKey()->getReferenceColumns());
     }
 
 

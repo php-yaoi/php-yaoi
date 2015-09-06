@@ -8,16 +8,16 @@ use Yaoi\Test\PHPUnit\TestCase;
 class SerializedFileTest extends TestCase {
     public function testStoring() {
         $tempDir = sys_get_temp_dir();
-        $filePath = $tempDir . '/temp1.dat';
+        $filePath = $tempDir . DIRECTORY_SEPARATOR . 'temp1.dat';
         //var_dump($filePath);
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-        $storage = Storage::create('serialized-file://localhost/' . $filePath);
+        $storage = Storage::create('serialized-file:///' . $filePath);
         $storage->set('test', 11);
         unset($storage);
         $this->assertSame('a:1:{s:4:"test";i:11;}', file_get_contents($filePath));
-        $storage = new Storage('serialized-file://localhost/' . $filePath);
+        $storage = new Storage('serialized-file:///' . $filePath);
         $this->assertSame(11, $storage->get('test'));
         unset($storage);
         $storage = new Storage('serialized-file://localhost/' . $filePath);

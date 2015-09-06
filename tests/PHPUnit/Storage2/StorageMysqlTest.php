@@ -1,7 +1,8 @@
 <?php
 use Yaoi\Database;
-use Yaoi\Migration;
+use Yaoi\Migration\ClosureMigration;
 use Yaoi\Migration\Manager;
+use Yaoi\Migration\Migration;
 use Yaoi\Migration\Needed;
 use Yaoi\Storage;
 use Yaoi\Storage\Driver\DatabaseProxy;
@@ -14,6 +15,7 @@ class StorageMysqlTest extends TestStorageBasic
 {
     protected $storage;
     protected $complexStorage;
+    /** @var  Database */
     protected $db;
 
     public function setUp()

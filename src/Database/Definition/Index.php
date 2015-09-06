@@ -28,30 +28,20 @@ class Index extends BaseClass
         return $this;
     }
 
-
     private $name;
     public function setName($name) {
         $this->name = $name;
         return $this;
     }
+
     public function getName() {
         if (!$this->name) {
-            $this->name = $this->getId();
-        }
-
-        return $this->name;
-    }
-
-
-    private $id;
-    public function getId() {
-        if (!$this->id) {
-            $this->id = $this->type;
+            $this->name = $this->type;
             foreach ($this->columns as $column) {
-                $this->id .= '_' . $column->schemaName;
+                $this->name .= '_' . $column->schemaName;
             }
         }
-        return $this->id;
+        return $this->name;
     }
 
 }
