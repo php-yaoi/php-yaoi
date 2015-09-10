@@ -22,6 +22,8 @@ class CreateTableReader
     public function getDefinition() {
         $statement = $this->statement;
 
+        echo $statement;
+
         $tokenizer = Utility::create()->getStatementTokenizer();
         $tokens = $tokenizer->tokenize($statement);
 
@@ -47,11 +49,14 @@ class CreateTableReader
 
 
         //echo $deQuoted;
-        //print_r($binds);
+
 
 
         $parser = new Parser($deQuoted);
-        $tableName = $parser->inner('CREATE TABLE ', '(');
+        $tableName = trim($parser->inner('CREATE TABLE ', '('));
+        if (isset($binds[$tableName])) {
+            $tableName = $binds[$tableName];
+        }
         $lines = $parser->inner(null, ')', true);
 
         $bracketTokenizer = new Tokenizer();
@@ -70,6 +75,7 @@ class CreateTableReader
             }
         }
 
+        //print_r($binds);
         //echo $deBracketed;
 
         $lines = explode(',', $deBracketed);
@@ -143,12 +149,67 @@ class CreateTableReader
 
                 $column->schemaName = $columnName;
 
+                //var_dump($columnName);
                 $columns->$columnName = $column;
             }
 
         }
 
+
         $table = new Table($columns, $this->database, $tableName);
+        //var_dump($indexes);
+        var_dump($foreignKeys);
+        foreach ($indexes as $indexData) {
+            $type = $indexData[0];
+            $name = trim($indexData[1]);
+            if (isset($binds[$name])) {
+                $name = $binds[$name];
+            }
+            $indexColumns = array();
+            if (isset($binds[$indexData[2]])) {
+                $indexData[2] = $binds[$indexData[2]];
+            }
+            foreach (explode(',',$indexData[2]) as $columnName) {
+                $columnName = trim($columnName);
+                //var_dump($columnName);
+
+                if (isset($binds[$columnName])) {
+                    $columnName = $binds[$columnName];
+                }
+                if (isset($binds[$columnName])) {
+                    $columnName = $binds[$columnName];
+                }
+
+                //var_dump($columnName);
+                $indexColumns []= $columns->$columnName;
+            }
+            $index = new Index($indexColumns);
+            $index->setName($name);
+            $index->setType($type);
+            $table->addIndex($index);
+        }
+
+
+        foreach ($foreignKeys as $data) {
+            $name = $data[0];
+            if (isset($binds[$data[0]])) {
+                $name = $binds[$data[0]];
+            }
+            $localColumnNames = $data[1];
+            if (isset($binds[$localColumnNames])) {
+                $localColumnNames = $binds[$localColumnNames];
+            }
+            $localColumnNames = explode(',', $localColumnNames);
+            foreach ($localColumnNames as &$columnName) {
+                $columnName = trim($columnName);
+                if (isset($binds[$columnName])) {
+                    $columnName = $binds[$columnName];
+                }
+            }
+            $foreignKey = new Database\Definition\ForeignKey();
+            $foreignKey->setName($name);
+            $table->addForeignKey($foreignKey);
+        }
 
         //print_r($table);
 

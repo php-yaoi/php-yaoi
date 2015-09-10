@@ -189,10 +189,10 @@ SQL;
   `modified_at` int(11) DEFAULT NULL,
   `total_seconds` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_id_item_id` (`user_id`,`item_id`),
+  UNIQUE KEY `unique_user_id_item_id` (`use``r_id`,`item_id`),
   KEY `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` (`item_id`),
   CONSTRAINT `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` FOREIGN KEY (`item_id`) REFERENCES `wtf_entity_waka_item` (`id`),
-  CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`user_id`) REFERENCES `wtf_entity_waka_user` (`id`)
+  CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`use``r_id`) REFERENCES `wtf_entity_waka_user` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8";
 
         $createTableReader = new Database\Mysql\CreateTableReader($sql, $this->db);
