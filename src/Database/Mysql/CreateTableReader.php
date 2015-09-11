@@ -22,7 +22,18 @@ class CreateTableReader
     private $tokens;
     private $binds = array();
     private $deQuoted = '';
+    private $deBracketed = '';
     private $bindIndex = 0;
+    private $tableName;
+    /** @var  \stdClass */
+    private $columns;
+    private $indexes = array();
+    private $foreignKeys = array();
+    /** @var  Table */
+    private $table;
+
+    /** @var  Parser */
+    private $tail;
 
     private function tokenize() {
         $tokenizer = Utility::create()->getStatementTokenizer();
@@ -44,127 +55,162 @@ class CreateTableReader
                 $this->deQuoted .= $token;
             }
         }
+
+        $this->deQuoted = preg_replace('/\s+/', ' ', $this->deQuoted);
+        //echo PHP_EOL, $this->deQuoted;
     }
-
-
-    public function getDefinition() {
-        $statement = $this->statement;
-
-        echo $statement;
-
-        $this->tokenize();
-        //echo $this->deQuoted;
-
-
-
+    private function bracketize() {
         $parser = new Parser($this->deQuoted);
-        $tableName = trim($parser->inner('CREATE TABLE ', '('));
-        if (isset($this->binds[$tableName])) {
-            $tableName = $this->binds[$tableName];
-        }
+        $this->tableName = $this->unbind(trim($parser->inner('CREATE TABLE ', '(')));
+
         $lines = $parser->inner(null, ')', true);
 
         $bracketTokenizer = new Tokenizer();
         $bracketTokenizer->addQuote('(', ')');
         $bracketTokens = $bracketTokenizer->tokenize($lines);
 
-        $deBracketed = '';
+        $this->deBracketed = '';
         foreach ($bracketTokens as $token) {
             if (is_string($token)) {
-                $deBracketed .= $token;
+                $this->deBracketed .= $token;
             }
             else {
                 $this->binds ['?' . $this->bindIndex . '?']= $token[0];
-                $deBracketed .= '(?' . $this->bindIndex . '?)';
+                $this->deBracketed .= '(?' . $this->bindIndex . '?)';
                 ++$this->bindIndex;
             }
         }
 
-        //print_r($this->binds);
-        //echo $deBracketed;
 
-        $lines = explode(',', $deBracketed);
-        $indexes = array();
-        $foreignKeys = array();
+        $this->tail = $parser->inner();
+        //echo PHP_EOL, 'deBracketed:', PHP_EOL, $this->deBracketed;
+    }
+    
+    private function unbind($value) {
+        if (isset($this->binds[trim($value)])) {
+            return $this->binds[trim($value)];
+        }
+        else {
+            return $value;
+        }
+    }
 
-        $columns = new \stdClass();
+    private function parseColumn($line) {
+        $parser = new Parser($line);
+        $columnName = trim($parser->inner(null, ' '), '`');
+        if (isset($this->binds[$columnName])) {
+            $columnName = $this->binds[$columnName];
+        }
+        $type = $parser->inner(null, ' ');
+        $notNull = strpos($line, 'NOT NULL') !== false;
+        $autoId = strpos($line, 'AUTO_INCREMENT') !== false;
+        $default = $parser->inner('DEFAULT ');
+        if (!$default->isEmpty()) {
+            $default = (string)$default;
+            if ('NULL' === $default) {
+                $default = null;
+            }
+            elseif (strpos($default, '?') !== false) {
+                $default = strtr($default, $this->binds);
+            }
+
+        }
+        else {
+            $default = false;
+        }
+
+        $type = strtr($type, $this->binds);
+        $flags = $this->getTypeByString($type);
+
+        if ($notNull) {
+            $flags += Column::NOT_NULL;
+        }
+
+        if ($autoId) {
+            $flags += Column::AUTO_ID;
+        }
+
+        $column = new Column($flags);
+
+        if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')')) {
+            $column->setStringLength($this->binds[$length], false);
+        }
+        elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')')) {
+            $column->setStringLength($this->binds[$length], true);
+        }
+
+
+        $column->setDefault($default);
+
+        $column->schemaName = $columnName;
+
+        //var_dump($columnName);
+        $this->columns->$columnName = $column;
+    }
+
+    private function parseLines() {
+        $lines = explode(',', $this->deBracketed);
+
+        $this->columns = new \stdClass();
+        $this->indexes = array();
+        $this->foreignKeys = array();
+
         foreach ($lines as $line) {
             $line = trim($line);
             $parser = new Parser($line);
 
-            if (Utils::starts($line, 'PRIMARY KEY')) {
+            if ($parser->starts('PRIMARY KEY')) {
                 $indexColumns = trim($parser->inner('(', ')'));
-                $indexes []= array(Index::TYPE_PRIMARY, Index::TYPE_PRIMARY, $indexColumns);
+                $this->indexes []= array(Index::TYPE_PRIMARY, Index::TYPE_PRIMARY, $indexColumns);
             }
-            elseif (Utils::starts($line, 'UNIQUE KEY')) {
+            elseif ($parser->starts('UNIQUE KEY')) {
                 $indexName = trim($parser->inner('KEY', '('), '`');
                 $indexColumns = trim($parser->inner(null, ')'));
-                $indexes []= array(Index::TYPE_UNIQUE, $indexName, $indexColumns);
+                $this->indexes []= array(Index::TYPE_UNIQUE, $indexName, $indexColumns);
             }
-            elseif (Utils::starts($line, 'KEY')) {
+            elseif ($parser->starts('KEY')) {
                 $indexName = trim($parser->inner('KEY', '('), '`');
                 $indexColumns = trim($parser->inner(null, ')'));
-                $indexes []= array(Index::TYPE_KEY, $indexName, $indexColumns);
+                $this->indexes []= array(Index::TYPE_KEY, $indexName, $indexColumns);
             }
-            elseif (Utils::starts($line, 'CONSTRAINT')) {
-                $indexName = trim($parser->inner('CONSTRAINT', 'FOREIGN KEY'), '`');
-                $indexColumns = trim($parser->inner('(', ')'));
-                $referenceName = trim($parser->inner('REFERENCES', '('), '`');
-                $referenceColumns = trim($parser->inner(null, ')'));
-                $foreignKeys []= array($indexName, $indexColumns, $referenceName, $referenceColumns);
+            elseif ($parser->starts('CONSTRAINT')) {
+                $this->parseConstraint($parser);
             }
             else {
-                $columnName = trim($parser->inner(null, ' '), '`');
-                if (isset($this->binds[$columnName])) {
-                    $columnName = $this->binds[$columnName];
-                }
-                $type = $parser->inner(null, ' ');
-                $notNull = strpos($line, 'NOT NULL') !== false;
-                $autoId = strpos($line, 'AUTO_INCREMENT') !== false;
-                $default = (string)$parser->inner('DEFAULT ');
-                if ('NULL' === $default) {
-                    $default = null;
-                }
-                elseif (strpos($default, '?') !== false) {
-                    $default = strtr($default, $this->binds);
-                }
-
-                $type = strtr($type, $this->binds);
-                $flags = $this->getTypeByString($type);
-
-                if ($notNull) {
-                    $flags += Column::NOT_NULL;
-                }
-
-                if ($autoId) {
-                    $flags += Column::AUTO_ID;
-                }
-
-                $column = new Column($flags);
-
-                if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')')) {
-                    $column->setStringLength($this->binds[$length], false);
-                }
-                elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')')) {
-                    $column->setStringLength($this->binds[$length], true);
-                }
-
-
-                $column->setDefault($default);
-
-                $column->schemaName = $columnName;
-
-                //var_dump($columnName);
-                $columns->$columnName = $column;
+                $this->parseColumn($line);
             }
 
         }
+    }
 
 
-        $table = new Table($columns, $this->database, $tableName);
-        //var_dump($indexes);
-        var_dump($foreignKeys);
-        foreach ($indexes as $indexData) {
+    private function parseConstraint(Parser $parser) {
+        $indexName = trim($parser->inner('CONSTRAINT', 'FOREIGN KEY'), '`');
+        $indexColumns = trim($parser->inner('(', ')'));
+        $referenceName = trim($parser->inner('REFERENCES', '('), '`');
+        $referenceColumns = trim($parser->inner(null, ')'));
+        $extra = $parser->inner();
+        $ons = explode('ON ', $extra);
+        $onUpdate = $onDelete = null;
+        if (count($ons) > 1) {
+            unset($ons[0]);
+            //var_dump($ons);
+            foreach ($ons as $on) {
+                $on = trim(strtoupper($on));
+                $on = explode(' ', $on, 2);
+                if ($on[0] === 'UPDATE') {
+                    $onUpdate = trim($on[1]);
+                }
+                elseif ($on[0] === 'DELETE') {
+                    $onDelete = trim($on[1]);
+                }
+            }
+        }
+        $this->foreignKeys []= array($indexName, $indexColumns, $referenceName, $referenceColumns, $onUpdate, $onDelete);
+    }
+
+    private function buildIndexes() {
+        foreach ($this->indexes as $indexData) {
             $type = $indexData[0];
             $name = trim($indexData[1]);
             if (isset($this->binds[$name])) {
@@ -186,16 +232,17 @@ class CreateTableReader
                 }
 
                 //var_dump($columnName);
-                $indexColumns []= $columns->$columnName;
+                $indexColumns []= $this->columns->$columnName;
             }
             $index = new Index($indexColumns);
             $index->setName($name);
             $index->setType($type);
-            $table->addIndex($index);
+            $this->table->addIndex($index);
         }
+    }
 
-
-        foreach ($foreignKeys as $data) {
+    private function buildForeignKeys() {
+        foreach ($this->foreignKeys as $data) {
             $name = trim($data[0]);
             if (isset($this->binds[$name])) {
                 $name = $this->binds[$name];
@@ -211,7 +258,7 @@ class CreateTableReader
                 if (isset($this->binds[$columnName])) {
                     $columnName = $this->binds[$columnName];
                 }
-                $localColumns []= $columns->$columnName;
+                $localColumns []= $this->columns->$columnName;
             }
 
 
@@ -235,19 +282,42 @@ class CreateTableReader
                 $column->table = new Table(null, null, $referenceTableName);
 
                 $referenceColumns []= $column;
-
             }
 
             $foreignKey = new Database\Definition\ForeignKey($localColumns, $referenceColumns);
+
+            //var_dump($data);
+
+            // ON UPDATE
+            if ($data[4]) {
+                $foreignKey->onUpdate = $data[4];
+            }
+
+            // ON DELETE
+            if ($data[5]) {
+                $foreignKey->onDelete = $data[5];
+            }
+
             $foreignKey->setName($name);
-            $table->addForeignKey($foreignKey);
+            $this->table->addForeignKey($foreignKey);
         }
+    }
 
-        //print_r($table);
+    public function getDefinition() {
+        //echo $this->statement;
 
-        $tail = $parser->inner();
+        $this->tokenize();
+        $this->bracketize();
+        $this->parseLines();
 
-        return $table;
+        //print_r(array_keys((array)$this->columns));
+
+        $this->table = new Table($this->columns, $this->database, $this->tableName);
+
+        $this->buildIndexes();
+        $this->buildForeignKeys();
+
+        return $this->table;
     }
 
 

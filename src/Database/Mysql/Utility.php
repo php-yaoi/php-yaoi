@@ -4,6 +4,7 @@ namespace Yaoi\Database\Mysql;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\Symbol;
 use Yaoi\String\Tokenizer;
 
 class Utility extends \Yaoi\Database\Utility
@@ -26,9 +27,15 @@ class Utility extends \Yaoi\Database\Utility
      */
     public function getTableDefinition($tableName)
     {
+        $statement = $this->database->query("SHOW CREATE TABLE ?", new Symbol($tableName))->fetchRow('Create Table');
+        $createTableReader = new CreateTableReader($statement, $this->database);
+        return $createTableReader->getDefinition();
+
+        /*
         $schemaReader = new SchemaReader($this->database);
         $definition = $schemaReader->getTableDefinition($tableName);
         return $definition;
+        */
     }
 
 

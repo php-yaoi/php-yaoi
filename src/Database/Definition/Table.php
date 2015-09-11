@@ -103,20 +103,23 @@ class Table extends BaseClass
             if (!empty($column->table) && $column->table->schemaName != $this->schemaName) {
                 $refColumn = $column;
                 $column = clone $column;
+
+                $column->propertyName = $name;
+                $column->schemaName = Utils::fromCamelCase($name);
+                $column->table = $this;
+
                 $this->columns->$name = $column;
                 $foreignKey = new ForeignKey(array($column), array($refColumn));
                 $this->columnForeignKeys [$name]= $foreignKey;
                 $this->addForeignKey($foreignKey);
                 $column->setFlag(Column::AUTO_ID, false);
             }
-
-            if ($foreignKey = $column->getForeignKey()) {
-                $this->addForeignKey($foreignKey);
+            else {
+                $column->propertyName = $name;
+                $column->schemaName = Utils::fromCamelCase($name);
+                $column->table = $this;
             }
 
-            $column->propertyName = $name;
-            $column->schemaName = Utils::fromCamelCase($name);
-            $column->table = $this;
 
             if ($column->flags & Column::AUTO_ID) {
                 $this->autoIdColumn = $column;
@@ -168,7 +171,12 @@ class Table extends BaseClass
             $index = Index::create($columns)->setType($type);
         }
 
-        $this->indexes [$index->getName()]= $index;
+        if ($index->type === Index::TYPE_PRIMARY) {
+            $this->setPrimaryKey($index->columns);
+            return $this;
+        }
+
+        $this->indexes []= $index;
 
         return $this;
     }

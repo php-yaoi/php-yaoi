@@ -39,14 +39,7 @@ abstract class CreateTable extends Batch
             return;
         }
         foreach ($this->table->foreignKeys as $foreignKey) {
-            $this->createLines->commaExpr(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)??',
-                new Symbol($foreignKey->getName()),
-                Symbol::prepareColumns($foreignKey->getLocalColumns()),
-                new Symbol($foreignKey->getReferencedTable()->schemaName),
-                Symbol::prepareColumns($foreignKey->getReferenceColumns()),
-                new Raw($foreignKey->onUpdate === ForeignKey::NO_ACTION ? '' : ' ON UPDATE ' . $foreignKey->onUpdate),
-                new Raw($foreignKey->onDelete === ForeignKey::NO_ACTION ? '' : ' ON DELETE ' . $foreignKey->onDelete)
-            );
+            $this->createLines->commaExpr($this->database->getUtility()->generateForeignKeyExpression($foreignKey));
         }
     }
 

@@ -129,19 +129,6 @@ class Column extends BaseClass
     }
 
 
-    /**
-     * @var ForeignKey
-     */
-    private $foreignKey;
-    public function setForeignKey(Column $column, $onUpdate = ForeignKey::NO_ACTION, $onDelete = ForeignKey::NO_ACTION) {
-        $this->foreignKey = new ForeignKey(array($this), array($column), $onUpdate, $onDelete);
-        return $this;
-    }
-
-    public function getForeignKey() {
-        return $this->foreignKey;
-    }
-
     public function getTypeString() {
         return $this->table->database()->getUtility()->getColumnTypeString($this);
     }

@@ -81,10 +81,6 @@ class DatabaseMysqliTest extends \YaoiTests\DatabaseTestUnified {
 
 
     public function testUtilityCreateTable() {
-        /** @var \Yaoi\Database\Mysql\Utility $utility */
-        $utility = $this->db->getUtility();
-
-
         $columns2 = new \stdClass();
         $columns2->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
         $columns2->meta = Column::create(Column::STRING);
@@ -93,8 +89,7 @@ class DatabaseMysqliTest extends \YaoiTests\DatabaseTestUnified {
 
         $columns = new \stdClass();
         $columns->id = Column::create(Column::INTEGER + Column::AUTO_ID + Column::NOT_NULL + Column::UNSIGNED);
-        $columns->fk_id = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED)
-            ->setForeignKey($table2->getColumns()->id);
+        $columns->fk_id = $table2->getColumns()->id;
 
         $columns->fk_id2 = Column::create(Column::INTEGER + Column::NOT_NULL + Column::UNSIGNED);
         $columns->dateUt = Column::create(Column::TIMESTAMP)->setDefault(null);
@@ -191,14 +186,32 @@ SQL;
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_user_id_item_id` (`use``r_id`,`item_id`),
   KEY `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` (`item_id`),
-  CONSTRAINT `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` FOREIGN KEY (`item_id`) REFERENCES `wtf_entity_waka_item` (`id`),
-  CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`use``r_id`) REFERENCES `wtf_entity_waka_user` (`id`)
+  CONSTRAINT `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` FOREIGN KEY (`item_id`) REFERENCES `wtf_entity_waka_item` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`use``r_id`) REFERENCES `wtf_entity_waka_user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8";
 
         $createTableReader = new Database\Mysql\CreateTableReader($sql, $this->db);
         $table = $createTableReader->getDefinition();
 
-        echo $table->getCreateTable();
+        $expected = <<<SQL
+CREATE TABLE `wtf_entity_waka_user_item` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `use``r_id` int NOT NULL,
+ `item_id` int NOT NULL,
+ `name` varchar(255) NOT NULL DEFAULT 'default',
+ `created_at` int DEFAULT NULL,
+ `modified_at` int DEFAULT NULL,
+ `total_seconds` int DEFAULT NULL,
+ UNIQUE KEY `unique_user_id_item_id` (`use``r_id`, `item_id`),
+ KEY `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` (`item_id`),
+ CONSTRAINT `fk_wtf_entity_waka_user_item_item_id_wtf_entity_waka_item_id` FOREIGN KEY (`item_id`) REFERENCES `wtf_entity_waka_item` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT,
+ CONSTRAINT `fk_wtf_entity_waka_user_item_user_id_wtf_entity_waka_user_id` FOREIGN KEY (`use``r_id`) REFERENCES `wtf_entity_waka_user` (`id`) ON DELETE SET NULL,
+ PRIMARY KEY (`id`)
+)
+SQL;
+
+
+        $this->assertSame($expected, (string)$table->getCreateTable());
 
     }
 

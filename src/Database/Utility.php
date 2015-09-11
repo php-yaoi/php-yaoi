@@ -2,14 +2,13 @@
 
 namespace Yaoi\Database;
 
-use Yaoi\Database\Definition\Column;
-use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Utility\Contract as UtilityContract;
 use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\Sql\AlterTable;
-use Yaoi\Sql\CreateTable;
+use Yaoi\Sql\Raw;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
+use Yaoi\Database\Definition\ForeignKey;
 
 abstract class Utility extends BaseClass implements UtilityContract
 {
@@ -38,4 +37,18 @@ abstract class Utility extends BaseClass implements UtilityContract
     {
         $this->database->query("DROP TABLE ?", new Symbol($tableName));
     }
+
+    public function generateForeignKeyExpression(Database\Definition\ForeignKey $foreignKey) {
+        return new SimpleExpression(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)??',
+            new Symbol($foreignKey->getName()),
+            Symbol::prepareColumns($foreignKey->getLocalColumns()),
+            new Symbol($foreignKey->getReferencedTable()->schemaName),
+            Symbol::prepareColumns($foreignKey->getReferenceColumns()),
+            new Raw($foreignKey->onUpdate === ForeignKey::NO_ACTION ? '' : ' ON UPDATE ' . $foreignKey->onUpdate),
+            new Raw($foreignKey->onDelete === ForeignKey::NO_ACTION ? '' : ' ON DELETE ' . $foreignKey->onDelete)
+        );
+
+    }
+
+
 }
