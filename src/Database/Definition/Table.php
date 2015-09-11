@@ -33,10 +33,12 @@ class Table extends BaseClass
 
     public $className;
 
-    public function __construct(\stdClass $columns, Database\Contract $database, $schemaName) {
+    public function __construct(\stdClass $columns = null, Database\Contract $database = null, $schemaName) {
         $this->schemaName = $schemaName;
         $this->database = $database;
-        $this->setColumns($columns);
+        if (null !== $columns) {
+            $this->setColumns($columns);
+        }
     }
 
     /**

@@ -19,43 +19,48 @@ class CreateTableReader
         $this->statement = $statement;
     }
 
+    private $tokens;
+    private $binds = array();
+    private $deQuoted = '';
+    private $bindIndex = 0;
+
+    private function tokenize() {
+        $tokenizer = Utility::create()->getStatementTokenizer();
+        $this->tokens = $tokenizer->tokenize($this->statement);
+
+        foreach ($this->tokens as $index => $token) {
+            if (is_array($token)) {
+                if ($token[1] == '#' || $token[1] == '-- ' || $token[1] === '/*') {
+                    unset($this->tokens[$index]);
+                }
+                else {
+                    $this->binds ['?' . $this->bindIndex . '?']= $token[0];
+                    $this->deQuoted .= '?' . $this->bindIndex . '?';
+                    ++$this->bindIndex;
+                }
+
+            }
+            else {
+                $this->deQuoted .= $token;
+            }
+        }
+    }
+
+
     public function getDefinition() {
         $statement = $this->statement;
 
         echo $statement;
 
-        $tokenizer = Utility::create()->getStatementTokenizer();
-        $tokens = $tokenizer->tokenize($statement);
-
-        $deQuoted = '';
-        $binds = array();
-        $bindIndex = 0;
-        foreach ($tokens as $index => $token) {
-            if (is_array($token)) {
-                if ($token[1] == '#' || $token[1] == '-- ' || $token[1] === '/*') {
-                    unset($tokens[$index]);
-                }
-                else {
-                    $binds ['?' . $bindIndex . '?']= $token[0];
-                    $deQuoted .= '?' . $bindIndex . '?';
-                    ++$bindIndex;
-                }
-
-            }
-            else {
-                $deQuoted .= $token;
-            }
-        }
-
-
-        //echo $deQuoted;
+        $this->tokenize();
+        //echo $this->deQuoted;
 
 
 
-        $parser = new Parser($deQuoted);
+        $parser = new Parser($this->deQuoted);
         $tableName = trim($parser->inner('CREATE TABLE ', '('));
-        if (isset($binds[$tableName])) {
-            $tableName = $binds[$tableName];
+        if (isset($this->binds[$tableName])) {
+            $tableName = $this->binds[$tableName];
         }
         $lines = $parser->inner(null, ')', true);
 
@@ -69,13 +74,13 @@ class CreateTableReader
                 $deBracketed .= $token;
             }
             else {
-                $binds ['?' . $bindIndex . '?']= $token[0];
-                $deBracketed .= '(?' . $bindIndex . '?)';
-                ++$bindIndex;
+                $this->binds ['?' . $this->bindIndex . '?']= $token[0];
+                $deBracketed .= '(?' . $this->bindIndex . '?)';
+                ++$this->bindIndex;
             }
         }
 
-        //print_r($binds);
+        //print_r($this->binds);
         //echo $deBracketed;
 
         $lines = explode(',', $deBracketed);
@@ -110,8 +115,8 @@ class CreateTableReader
             }
             else {
                 $columnName = trim($parser->inner(null, ' '), '`');
-                if (isset($binds[$columnName])) {
-                    $columnName = $binds[$columnName];
+                if (isset($this->binds[$columnName])) {
+                    $columnName = $this->binds[$columnName];
                 }
                 $type = $parser->inner(null, ' ');
                 $notNull = strpos($line, 'NOT NULL') !== false;
@@ -121,10 +126,10 @@ class CreateTableReader
                     $default = null;
                 }
                 elseif (strpos($default, '?') !== false) {
-                    $default = strtr($default, $binds);
+                    $default = strtr($default, $this->binds);
                 }
 
-                $type = strtr($type, $binds);
+                $type = strtr($type, $this->binds);
                 $flags = $this->getTypeByString($type);
 
                 if ($notNull) {
@@ -138,10 +143,10 @@ class CreateTableReader
                 $column = new Column($flags);
 
                 if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')')) {
-                    $column->setStringLength($binds[$length], false);
+                    $column->setStringLength($this->binds[$length], false);
                 }
                 elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')')) {
-                    $column->setStringLength($binds[$length], true);
+                    $column->setStringLength($this->binds[$length], true);
                 }
 
 
@@ -162,22 +167,22 @@ class CreateTableReader
         foreach ($indexes as $indexData) {
             $type = $indexData[0];
             $name = trim($indexData[1]);
-            if (isset($binds[$name])) {
-                $name = $binds[$name];
+            if (isset($this->binds[$name])) {
+                $name = $this->binds[$name];
             }
             $indexColumns = array();
-            if (isset($binds[$indexData[2]])) {
-                $indexData[2] = $binds[$indexData[2]];
+            if (isset($this->binds[$indexData[2]])) {
+                $indexData[2] = $this->binds[$indexData[2]];
             }
             foreach (explode(',',$indexData[2]) as $columnName) {
                 $columnName = trim($columnName);
                 //var_dump($columnName);
 
-                if (isset($binds[$columnName])) {
-                    $columnName = $binds[$columnName];
+                if (isset($this->binds[$columnName])) {
+                    $columnName = $this->binds[$columnName];
                 }
-                if (isset($binds[$columnName])) {
-                    $columnName = $binds[$columnName];
+                if (isset($this->binds[$columnName])) {
+                    $columnName = $this->binds[$columnName];
                 }
 
                 //var_dump($columnName);
@@ -191,22 +196,49 @@ class CreateTableReader
 
 
         foreach ($foreignKeys as $data) {
-            $name = $data[0];
-            if (isset($binds[$data[0]])) {
-                $name = $binds[$data[0]];
+            $name = trim($data[0]);
+            if (isset($this->binds[$name])) {
+                $name = $this->binds[$name];
             }
             $localColumnNames = $data[1];
-            if (isset($binds[$localColumnNames])) {
-                $localColumnNames = $binds[$localColumnNames];
+            if (isset($this->binds[$localColumnNames])) {
+                $localColumnNames = $this->binds[$localColumnNames];
             }
             $localColumnNames = explode(',', $localColumnNames);
+            $localColumns = array();
             foreach ($localColumnNames as &$columnName) {
                 $columnName = trim($columnName);
-                if (isset($binds[$columnName])) {
-                    $columnName = $binds[$columnName];
+                if (isset($this->binds[$columnName])) {
+                    $columnName = $this->binds[$columnName];
                 }
+                $localColumns []= $columns->$columnName;
             }
-            $foreignKey = new Database\Definition\ForeignKey();
+
+
+            $referenceTableName = trim($data[2]);
+            if (isset($this->binds[$referenceTableName])) {
+                $referenceTableName = $this->binds[$referenceTableName];
+            }
+            $referenceColumnNames = $data[3];
+            if (isset($this->binds[$referenceColumnNames])) {
+                $referenceColumnNames = $this->binds[$referenceColumnNames];
+            }
+            $referenceColumnNames = explode(',', $referenceColumnNames);
+            $referenceColumns = array();
+            foreach ($referenceColumnNames as &$columnName) {
+                $columnName = trim($columnName);
+                if (isset($this->binds[$columnName])) {
+                    $columnName = $this->binds[$columnName];
+                }
+                $column = new Column();
+                $column->schemaName = $columnName;
+                $column->table = new Table(null, null, $referenceTableName);
+
+                $referenceColumns []= $column;
+
+            }
+
+            $foreignKey = new Database\Definition\ForeignKey($localColumns, $referenceColumns);
             $foreignKey->setName($name);
             $table->addForeignKey($foreignKey);
         }
@@ -245,6 +277,9 @@ class CreateTableReader
         }
         return $phpType;
     }
+
+
+
 
 
 }
