@@ -123,5 +123,13 @@ class Formatter extends BaseClass
         return $this;
     }
 
+    public function getBinds() {
+        return $this->binds;
+    }
+
+    public function getStatement() {
+        return $this->statement;
+    }
+
 
 }

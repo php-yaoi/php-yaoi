@@ -8,11 +8,12 @@ use Yaoi\Test\PHPUnit\TestCase;
 class TokenizerTest extends TestCase
 {
     public function testTokenize() {
-        $tokenizer = new Tokenizer();
-        $tokenizer->addQuote("'", "'", array("''" => "'"));
-        $tokenizer->addQuote('/*', '*/');
-        $tokenizer->addLineStopper('-- ');
-        $tokenizer->addLineStopper('#');
+        $t2 = new Tokenizer\Parser();
+        $t2->addQuote("'", "'", array("''" => "'"));
+        $t2->addQuote('/*', '*/');
+        $t2->addLineStopper('-- ');
+        $t2->addLineStopper('#');
+
 
 
         $string = <<<EOD
@@ -22,20 +23,17 @@ Peace...
 /* some inline comment */ yup # and a line stopper /* not parsed */
 EOD;
 
-        $this->assertSame(array(
-            'Hello ',
-            array('World', '\''),
-            ' of ',
-            array('John O\'Connor', '\''),
-            "\n" . 'Welcome! ',
-            array('line prop \'not parsed\' here', '-- '),
-            "\n" . 'Peace...' . "\n",
-            array(' some inline comment ', '/*'),
-            ' yup ',
-            array(' and a line stopper /* not parsed */', '#'),
-        ),
 
-            $tokenizer->tokenize($string));
+        $result = $t2->tokenize($string);
+        $this->assertSame('Hello :B0 of :B1
+Welcome! :B2
+Peace...
+:B3 yup :B4', $result->getExpression()->getStatement());
+
+        $this->assertSame('Hello :B0 of :B1
+Welcome! :B2
+Peace...
+/* some inline comment */ yup ', $result->getExpression(array('#', ' --'), array('/*'))->getStatement());
     }
 
 
@@ -46,39 +44,33 @@ FROM `ta``ble` -- and here
 WHERE a = '1 AND b = 0'
 EOD;
 
-        $tokenizer = new Tokenizer();
+        $tokenizer = new Tokenizer\Parser();
         $tokenizer
             ->addLineStopper('#')
-            ->addLineStopper('--')
+            ->addLineStopper('-- ')
             ->addQuote('`', '`', array('``' => '`'))
             ->addQuote("'","'", array("''" => "'"));
 
 
-        $expected = array(
-            'SELECT ',
-            array('one', '\'',),
-            ', ',
-            array('ta`ble', '`',),
-            '.* ',
-            array(' hello there!', '#',),
-            "\n" . 'FROM ',
-            array('ta`ble', '`',),
-            ' ',
-            array(' and here', '--',),
-            "\n" . 'WHERE a = ',
-            array('1 AND b = 0', '\'',),
-        );
+        $this->assertSame('SELECT :B0, :B1.* :B2
+FROM :B3 :B4
+WHERE a = :B5', $tokenizer->tokenize($string)->getExpression()->getStatement());
 
-        $this->assertSame($expected, $tokenizer->tokenize($string));
+        $this->assertStringEqualsSpaceless('SELECT :B0, `ta``ble`.*
+FROM `ta``ble`
+WHERE a = :B1', $tokenizer->tokenize($string)->getExpression(array('#', '-- '), array('`'))->getStatement());
+
+        $expression = $tokenizer->tokenize($string)->getExpression();
+        $this->assertSame($string, $expression->build(new Tokenizer\Quoter()));
     }
 
     public function testThree() {
         $string = <<<EOD
 line 'line' line
 EOD;
-        $tokenizer = new Tokenizer();
+        $tokenizer = new Tokenizer\Parser();
         $tokenizer->addQuote("'", "'");
-        $this->assertSame(array('line ', array('line', "'"), ' line'), $tokenizer->tokenize($string));
+        $this->assertSame('line :B0 line', $tokenizer->tokenize($string)->getExpression()->getStatement());
     }
 
 
@@ -91,7 +83,7 @@ EOD;
         $string = <<<EOD
 line 'line line
 EOD;
-        $tokenizer = new Tokenizer();
+        $tokenizer = new Tokenizer\Parser();
         $tokenizer->addQuote("'", "'");
         $this->assertSame(array('line ', array('line', "'"), ' line'), $tokenizer->tokenize($string));
     }
