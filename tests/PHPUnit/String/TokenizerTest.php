@@ -88,4 +88,11 @@ EOD;
         $this->assertSame(array('line ', array('line', "'"), ' line'), $tokenizer->tokenize($string));
     }
 
+
+    public function testOneLetter() {
+        $string = "'a', 'b', 'c'";
+        $tokenizer = new Tokenizer\Parser();
+        $tokenizer->addQuote("'", "'");
+        $this->assertSame(':B0, :B1, :B2', $tokenizer->tokenize($string)->getExpression()->getStatement());
+    }
 }
