@@ -88,4 +88,55 @@ EOD;
         $this->assertSame(array('line ', array('line', "'"), ' line'), $tokenizer->tokenize($string));
     }
 
+
+    public function testElementary() {
+        $tokenizer = new Tokenizer\Parser();
+        $tokenizer->addQuote("q", "q", array("eq" => "q", 'nnq' => 'q2'));
+
+        $string = 'q eqnnq q';
+        $this->assertSame(":B0", $tokenizer->tokenize($string)->getExpression()->getStatement());
+        $this->assertSame("q eqnnq q", $tokenizer->tokenize($string)->getExpression(array(), array('q'))->getStatement());
+
+        /** @var Tokenizer\Token[] $binds */
+        $binds = $tokenizer->tokenize($string)->getExpression()->getBinds();
+        $this->assertSame(' eqnnq ', $binds['B0']->escapedContent);
+        $this->assertSame(' qq2 ', $binds['B0']->unEscapedContent);
+    }
+
+
+    public function testBracketsPre() {
+        $tokenizer = new Tokenizer\Parser();
+        $tokenizer->addBracket('(', ')');
+        $tokenizer->addBracket('[', ']');
+        $tokenizer->addBracket('{', '}');
+        $tokenizer->addQuote('\'','\'', array('\\\'' => '\''));
+        $tokenizer->addQuote('"', '"', array('\\"' => '"'));
+
+        $string = <<<'PHP'
+if (1 2 3,'''', 'aa') { $a } ;
+PHP;
+        $this->assertSame('if :B0 :B1 ;', $tokenizer->tokenize($string)->getExpression()->getStatement());
+        $this->assertSame('if :B0 { $a } ;', $tokenizer->tokenize($string)->getExpression(array(), array('{'))->getStatement());
+        $this->assertSame("if (1 2 3,'''', 'aa') :B0 ;", $tokenizer->tokenize($string)->getExpression(array(), array('(', "'"))->getStatement());
+        $this->assertSame("if (1 2 3,:B0:B1, :B2) :B3 ;", $tokenizer->tokenize($string)->getExpression(array(), array('('))->getStatement());
+    }
+
+    public function testBrackets() {
+        $tokenizer = new Tokenizer\Parser();
+        $tokenizer->addBracket('(', ')');
+        $tokenizer->addBracket('[', ']');
+        $tokenizer->addBracket('{', '}');
+        $tokenizer->addQuote('\'','\'', array('\\\'' => '\''));
+        $tokenizer->addQuote('"', '"', array('\\"' => '"'));
+
+        $string = <<<'PHP'
+if ('a' === "'a'") {
+    array('c') == ['c'];
+    $fff = 'O\'Lolo';
+};
+PHP;
+        $this->assertSame('if :B0 :B1;', $tokenizer->tokenize($string)->getExpression()->getStatement());
+        $this->assertSame('if (:B0 === :B1) :B2;', $tokenizer->tokenize($string)->getExpression(array(), array('('))->getStatement());
+    }
+
 }

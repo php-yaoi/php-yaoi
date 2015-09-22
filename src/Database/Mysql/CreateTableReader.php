@@ -6,9 +6,9 @@ use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\Symbol;
 use Yaoi\String\Parser;
 use Yaoi\String\Tokenizer;
-use Yaoi\String\Utils;
 
 class CreateTableReader
 {
@@ -20,6 +20,8 @@ class CreateTableReader
     }
 
     private $tokens;
+
+    /** @var Tokenizer\Token[]  */
     private $binds = array();
     private $deQuoted = '';
     private $deBracketed = '';
@@ -34,6 +36,51 @@ class CreateTableReader
 
     /** @var  Parser */
     private $tail;
+
+    const BIND_PREFIX = ':B';
+    const BIND_POSTFIX = 'B:';
+
+    private function resolve($index, $recursive = false) {
+        if (strpos($index, self::BIND_PREFIX) !== false) {
+            $index = (string)Parser::create($index)->inner(self::BIND_PREFIX, self::BIND_POSTFIX);
+        }
+
+        $key = self::BIND_PREFIX . $index . self::BIND_POSTFIX;
+        if (!isset($this->binds[$key])) {
+            return $index;
+        }
+
+        $bind = $this->binds[$key];
+        if ($bind instanceof Tokenizer\Token) {
+            return $bind->unEscapedContent;
+        }
+        elseif ($bind instanceof Tokenizer\Parsed) {
+            return $bind;
+        }
+    }
+
+    private function tokenize2() {
+        $tokenizer = Utility::create()->getStatementTokenizer();
+        $tokens = $tokenizer->tokenize($this->statement);
+        $tokens->bindKeyPostfix = self::BIND_POSTFIX;
+        $tokens->bindKeyPrefix = self::BIND_PREFIX;
+        $expression = $tokens->getExpression(array('#', ' --'));
+        $this->binds = $expression->getBinds();
+        $statement = new Parser($expression->getStatement());
+        $statement->inner('CREATE TABLE', self::BIND_PREFIX);
+        $this->tableName = $this->resolve($statement->inner(null, self::BIND_POSTFIX));
+        $lines = $this->resolve($statement->inner(self::BIND_PREFIX, self::BIND_POSTFIX));
+        if ($lines instanceof Tokenizer\Parsed) {
+            $expression = $lines->getExpression();
+            $this->deBracketed = $expression->getStatement();
+            $this->deBracketed = preg_replace('/\s+/', ' ', $this->deBracketed);
+
+            $this->binds = $expression->getBinds();
+        }
+        else {
+            throw new \Exception('Malformed');
+        }
+    }
 
     private function tokenize() {
         $tokenizer = Utility::create()->getStatementTokenizer();
@@ -96,12 +143,12 @@ class CreateTableReader
     }
 
     private function parseColumn($line) {
+        $line = strtoupper(trim($line));
         $parser = new Parser($line);
-        $columnName = trim($parser->inner(null, ' '), '`');
-        if (isset($this->binds[$columnName])) {
-            $columnName = $this->binds[$columnName];
-        }
-        $type = $parser->inner(null, ' ');
+        $columnName = $this->resolve($parser->inner(self::BIND_PREFIX, self::BIND_POSTFIX));
+
+        $type = (string)$parser->inner(' ', ' ');
+        $unsigned = strpos($line, 'UNSIGNED') !== false;
         $notNull = strpos($line, 'NOT NULL') !== false;
         $autoId = strpos($line, 'AUTO_INCREMENT') !== false;
         $default = $parser->inner('DEFAULT ');
@@ -110,16 +157,14 @@ class CreateTableReader
             if ('NULL' === $default) {
                 $default = null;
             }
-            elseif (strpos($default, '?') !== false) {
-                $default = strtr($default, $this->binds);
+            elseif (strpos($default, self::BIND_PREFIX) !== false) {
+                $default = $this->resolve($default);
             }
-
         }
         else {
             $default = false;
         }
 
-        $type = strtr($type, $this->binds);
         $flags = $this->getTypeByString($type);
 
         if ($notNull) {
@@ -130,13 +175,17 @@ class CreateTableReader
             $flags += Column::AUTO_ID;
         }
 
+        if ($unsigned) {
+            $flags += Column::UNSIGNED;
+        }
+
         $column = new Column($flags);
 
         if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')')) {
-            $column->setStringLength($this->binds[$length], false);
+            $column->setStringLength($length, false);
         }
         elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')')) {
-            $column->setStringLength($this->binds[$length], true);
+            $column->setStringLength($length, true);
         }
 
 
@@ -160,17 +209,20 @@ class CreateTableReader
             $parser = new Parser($line);
 
             if ($parser->starts('PRIMARY KEY')) {
-                $indexColumns = trim($parser->inner('(', ')'));
+                $data = explode(' ', trim($parser->inner('KEY ')));
+                $indexColumns = $this->resolve($data[0]);
                 $this->indexes []= array(Index::TYPE_PRIMARY, Index::TYPE_PRIMARY, $indexColumns);
             }
             elseif ($parser->starts('UNIQUE KEY')) {
-                $indexName = trim($parser->inner('KEY', '('), '`');
-                $indexColumns = trim($parser->inner(null, ')'));
+                $data = explode(' ', trim($parser->inner('KEY ')));
+                $indexName = $this->resolve($data[0]);
+                $indexColumns = $this->resolve($data[1]);
                 $this->indexes []= array(Index::TYPE_UNIQUE, $indexName, $indexColumns);
             }
             elseif ($parser->starts('KEY')) {
-                $indexName = trim($parser->inner('KEY', '('), '`');
-                $indexColumns = trim($parser->inner(null, ')'));
+                $data = explode(' ', trim($parser->inner('KEY ')));
+                $indexName = $this->resolve($data[0]);
+                $indexColumns = $this->resolve($data[1]);
                 $this->indexes []= array(Index::TYPE_KEY, $indexName, $indexColumns);
             }
             elseif ($parser->starts('CONSTRAINT')) {
@@ -211,27 +263,16 @@ class CreateTableReader
 
     private function buildIndexes() {
         foreach ($this->indexes as $indexData) {
+            var_dump($indexData);
+
             $type = $indexData[0];
-            $name = trim($indexData[1]);
-            if (isset($this->binds[$name])) {
-                $name = $this->binds[$name];
-            }
+            $name = $this->resolve(trim($indexData[1]));
+
             $indexColumns = array();
-            if (isset($this->binds[$indexData[2]])) {
-                $indexData[2] = $this->binds[$indexData[2]];
-            }
-            foreach (explode(',',$indexData[2]) as $columnName) {
-                $columnName = trim($columnName);
-                //var_dump($columnName);
-
-                if (isset($this->binds[$columnName])) {
-                    $columnName = $this->binds[$columnName];
-                }
-                if (isset($this->binds[$columnName])) {
-                    $columnName = $this->binds[$columnName];
-                }
-
-                //var_dump($columnName);
+            foreach (explode(',', $indexData[2]) as $columnName) {
+                var_dump($columnName);
+                $columnName = $this->resolve(trim($columnName));
+                var_dump($columnName);
                 $indexColumns []= $this->columns->$columnName;
             }
             $index = new Index($indexColumns);
@@ -306,9 +347,15 @@ class CreateTableReader
     public function getDefinition() {
         //echo $this->statement;
 
-        $this->tokenize();
-        $this->bracketize();
+        //$this->tokenize();
+        //$this->bracketize();
+        //$this->parseLines();
+
+
+        $this->tokenize2();
         $this->parseLines();
+
+
 
         //print_r(array_keys((array)$this->columns));
 
@@ -317,6 +364,10 @@ class CreateTableReader
         $this->buildIndexes();
         $this->buildForeignKeys();
 
+        print_r($this->table);
+
+        die('!');
+
         return $this->table;
     }
 
@@ -324,23 +375,23 @@ class CreateTableReader
     public function getTypeByString($type) {
         $phpType = Column::STRING;
         switch (true) {
-            case 'bigint' === substr($type, 0, 6):
-            case 'int' === substr($type, 0, 3):
-            case 'mediumint' === substr($type, 0, 9):
-            case 'smallint' === substr($type, 0, 8):
-            case 'tinyint' === substr($type, 0, 7):
+            case 'BIGINT' === substr($type, 0, 6):
+            case 'INT' === substr($type, 0, 3):
+            case 'MEDIUMINT' === substr($type, 0, 9):
+            case 'SMALLINT' === substr($type, 0, 8):
+            case 'TINYINT' === substr($type, 0, 7):
                 $phpType = Column::INTEGER;
                 break;
 
-            case 'decimal' === substr($type, 0, 7):
-            case 'double' === $type:
-            case 'float' === $type:
+            case 'DECIMAL' === substr($type, 0, 7):
+            case 'DOUBLE' === $type:
+            case 'FLOAT' === $type:
                 $phpType = Column::FLOAT;
                 break;
 
-            case 'date' === $type:
-            case 'datetime' === $type:
-            case 'timestamp' === $type:
+            case 'DATE' === $type:
+            case 'DATETIME' === $type:
+            case 'TIMESTAMP' === $type:
                 $phpType = Column::TIMESTAMP;
                 break;
 

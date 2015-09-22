@@ -6,7 +6,7 @@ use Yaoi\BaseClass;
 use Yaoi\Debug;
 use Yaoi\String\Quoter\Raw;
 
-class Formatter extends BaseClass
+class Expression extends BaseClass
 {
     const DEFAULT_PLACEHOLDER = '?';
     private $placeholder = self::DEFAULT_PLACEHOLDER;
@@ -36,6 +36,12 @@ class Formatter extends BaseClass
     public function setQuoter(Quoter $quoter = null) {
         $this->quoter = $quoter;
         return $this;
+    }
+
+    private $namedPrefix = ':';
+    public function setNamedPrefix($namedPrefix) {
+        $this->namedPrefix = $namedPrefix;
+        return null;
     }
 
     public function setPlaceholder($placeholder) {
@@ -94,7 +100,7 @@ class Formatter extends BaseClass
                 $result = $statement;
             } else {
                 foreach ($this->binds as $key => $value) {
-                    $replace [':' . $key] = $quoter->quote($value);
+                    $replace [$this->namedPrefix . $key] = $quoter->quote($value);
                 }
                 $result = strtr($statement, $replace);
             }

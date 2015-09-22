@@ -6,14 +6,14 @@ namespace Yaoi\String\Tokenizer;
 class Token
 {
     public $start;
-    public $deQuoted;
-    public $original;
+    public $unEscapedContent;
+    public $escapedContent;
     public $end;
 
-    public function __construct($deQuoted, $start, $end = null, $original = null) {
-        $this->deQuoted = $deQuoted;
+    public function __construct($unEscapedContent, $start, $end = null, $escapedContent = null) {
+        $this->unEscapedContent = $unEscapedContent;
         $this->start = $start;
         $this->end = $end;
-        $this->original = null === $original ? $deQuoted : $original;
+        $this->escapedContent = null === $escapedContent ? $unEscapedContent : $escapedContent;
     }
 }

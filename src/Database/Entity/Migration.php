@@ -6,7 +6,7 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\AbstractMigration;
-use Yaoi\String\Formatter;
+use Yaoi\String\Expression;
 
 class Migration extends AbstractMigration
 {
@@ -50,7 +50,7 @@ class Migration extends AbstractMigration
         $requires = (string)$statement;
         if ($this->log) {
             $this->log->push(
-                Formatter::create('Apply, table ? (?) ?',
+                Expression::create('Apply, table ? (?) ?',
                     $this->table->schemaName,
                     $this->table->className,
                     $requires ? 'requires migration' : 'is up to date'
@@ -109,7 +109,7 @@ class Migration extends AbstractMigration
         $requires = $tableExists;
         if ($this->log) {
             $this->log->push(
-                Formatter::create('Rollback, table ? (?) ?',
+                Expression::create('Rollback, table ? (?) ?',
                     $this->table->schemaName,
                     $this->table->className,
                     $requires ? 'requires deletion' : 'is already non-existent'

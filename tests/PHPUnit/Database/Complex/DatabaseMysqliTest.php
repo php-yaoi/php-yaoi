@@ -176,7 +176,7 @@ SQL;
 
     public function testCreateTableReader() {
         $sql = "CREATE TABLE `wtf_entity_waka_user_item` (
-  `id` int(11) NOT NULL AUTO_INCREMENT, #fff1
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT, #fff1
   `use``r_id` int(11) NOT NULL,-- fff2
   `item_id` int(11) NOT NULL,
   `name` VARCHAR(255) NOT NULL DEFAULT 'default',

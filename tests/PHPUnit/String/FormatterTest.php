@@ -5,7 +5,7 @@ namespace PHPUnit\String;
 use Yaoi\Database;
 use Yaoi\Sql\Symbol;
 use Yaoi\String\Exception;
-use Yaoi\String\Formatter;
+use Yaoi\String\Expression;
 use Yaoi\String\Quoter\DoubleQuote;
 use Yaoi\String\Quoter\Raw;
 use Yaoi\Test\PHPUnit\TestCase;
@@ -20,13 +20,13 @@ class FormatterTest extends TestCase
      * @see Formatter::__construct
      */
     public function testUnnamedPlaceholders() {
-        $expression = Formatter::create('?, ?, ?, ?', 1, 2, 'three', 'a "four"');
+        $expression = Expression::create('?, ?, ?, ?', 1, 2, 'three', 'a "four"');
         $this->assertSame('1, 2, three, a "four"', $expression->build(new Raw()));
 
-        $expression = Formatter::create('?, ?, ?, ?', array(1, 2, 'three', 'a "four"'));
+        $expression = Expression::create('?, ?, ?, ?', array(1, 2, 'three', 'a "four"'));
         $this->assertSame('1, 2, three, a "four"', $expression->build(new Raw()));
 
-        $expression = Formatter::create('? belong to ?', array('phone', 'car', 'camera'), 'Me');
+        $expression = Expression::create('? belong to ?', array('phone', 'car', 'camera'), 'Me');
         $this->assertSame('phone, car, camera belong to Me', $expression->build(new Raw()));
     }
 
@@ -39,7 +39,7 @@ class FormatterTest extends TestCase
      * @see Formatter::__construct
      */
     public function testRedundantPlaceholders() {
-        Formatter::create('?, ?, ?', 1, 2)->build(new Raw());
+        Expression::create('?, ?, ?', 1, 2)->build(new Raw());
     }
 
     /**
@@ -51,7 +51,7 @@ class FormatterTest extends TestCase
      * @see Formatter::__construct
      */
     public function testPlaceholderNotFound() {
-        Formatter::create('?, ?', 1, 2, 3)->build(new Raw());
+        Expression::create('?, ?', 1, 2, 3)->build(new Raw());
     }
 
 
@@ -65,7 +65,7 @@ class FormatterTest extends TestCase
     public function testCustomPlaceholder() {
         $this->assertSame(
             'Would you prefer cake or ice-cream?',
-            Formatter::create('Would you prefer @@ or @@?', 'cake', 'ice-cream')
+            Expression::create('Would you prefer @@ or @@?', 'cake', 'ice-cream')
                 ->setPlaceholder('@@')
                 ->build(new Raw())
         );
@@ -80,7 +80,7 @@ class FormatterTest extends TestCase
      * @see Formatter::__construct
      */
     public function testNamedPlaceholders() {
-        $expression = new Formatter(":one, :two, :three, :four, :five, :one again",
+        $expression = new Expression(":one, :two, :three, :four, :five, :one again",
             array('one' => 1, 'two' => 2, 'three' => 'three', 'four' => 'a "four"'));
         $this->assertSame('1, 2, three, a "four", :five, 1 again', $expression->build(new Raw()));
     }
@@ -94,7 +94,7 @@ class FormatterTest extends TestCase
      */
     public function testTroughPut() {
         $arguments = array('the ? and ? statement', 'small', 'safe');
-        $this->assertSame('the small and safe statement', Formatter::create($arguments)->build(new Raw()));
+        $this->assertSame('the small and safe statement', Expression::create($arguments)->build(new Raw()));
     }
 
     /**
@@ -105,8 +105,8 @@ class FormatterTest extends TestCase
      * @see Formatter::__toString
      */
     public function testNoBinds() {
-        $this->assertSame('no binds', Formatter::create('no binds')->build());
-        $this->assertSame('no binds', (string)Formatter::create('no binds'));
+        $this->assertSame('no binds', Expression::create('no binds')->build());
+        $this->assertSame('no binds', (string)Expression::create('no binds'));
     }
 
 
@@ -117,7 +117,7 @@ class FormatterTest extends TestCase
      * @see Formatter::setQuoter
      */
     public function testSetQuoter() {
-        $expression = Formatter::create('? AND ?', 'You', 'Me')->setQuoter(new Raw());
+        $expression = Expression::create('? AND ?', 'You', 'Me')->setQuoter(new Raw());
         $this->assertSame('You AND Me', (string)$expression);
         $this->assertSame('You AND Me', $expression->build());
         $this->assertSame('"You" AND "Me"', $expression->build(new DoubleQuote()));
@@ -136,8 +136,8 @@ class FormatterTest extends TestCase
      */
     public function testMissingQuoter() {
         $this->assertSame(
-            Formatter::create('? AND ?', 1, 2)->setQuoter(new Raw())->build(),
-            Formatter::create('? AND ?', 1, 2)->build()
+            Expression::create('? AND ?', 1, 2)->setQuoter(new Raw())->build(),
+            Expression::create('? AND ?', 1, 2)->build()
         );
     }
 
@@ -150,7 +150,7 @@ class FormatterTest extends TestCase
     public function testMissingQuotesToString() {
         $this->assertSame(
             '#ERROR: (2) Yaoi\Database\Driver\ () not found',
-            (string)Formatter::create('? AND ?', 1, 2)
+            (string)Expression::create('? AND ?', 1, 2)
                 ->setQuoter(new Database()));
     }
 
@@ -160,7 +160,7 @@ class FormatterTest extends TestCase
      * @see Formatter::setBinds
      */
     public function testSetBinds() {
-        $expression = Formatter::create('? AND ?', 'You', 'Me')->setQuoter(new Raw());
+        $expression = Expression::create('? AND ?', 'You', 'Me')->setQuoter(new Raw());
         $this->assertSame('You AND Me', (string)$expression);
 
         $expression->setBinds('Me', 'You');
@@ -170,7 +170,7 @@ class FormatterTest extends TestCase
     }
 
     public function testDoubleQuote() {
-        $expression = new Formatter('?, ?, ?, ?', 1, 2, 'three', 'a "four"');
+        $expression = new Expression('?, ?, ?, ?', 1, 2, 'three', 'a "four"');
         $this->assertSame('"1", "2", "three", "a \"four\""', $expression->build(new DoubleQuote()));
     }
 

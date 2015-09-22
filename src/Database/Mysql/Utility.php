@@ -82,7 +82,7 @@ class Utility extends \Yaoi\Database\Utility
     private $tokenizer;
     public function getStatementTokenizer() {
         if (null === $this->tokenizer) {
-            $this->tokenizer = $tokenizer = new Tokenizer();
+            $this->tokenizer = $tokenizer = new Tokenizer\Parser();
 
             $tokenizer
                 ->addQuote('`', '`', array('``' => '`'))
@@ -104,6 +104,7 @@ class Utility extends \Yaoi\Database\Utility
                 )
                 ->addLineStopper('#')
                 ->addLineStopper('-- ')
+                ->addBracket('(', ')')
                 ;
         }
         return $this->tokenizer;
