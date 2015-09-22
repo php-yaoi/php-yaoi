@@ -139,4 +139,11 @@ PHP;
         $this->assertSame('if (:B0 === :B1) :B2;', $tokenizer->tokenize($string)->getExpression(array(), array('('))->getStatement());
     }
 
+
+    public function testOneLetter() {
+        $string = "'a', 'b', 'c'";
+        $tokenizer = new Tokenizer\Parser();
+        $tokenizer->addQuote("'", "'");
+        $this->assertSame(':B0, :B1, :B2', $tokenizer->tokenize($string)->getExpression()->getStatement());
+    }
 }
