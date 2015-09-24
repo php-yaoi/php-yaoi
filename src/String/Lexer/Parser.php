@@ -1,6 +1,6 @@
 <?php
 
-namespace Yaoi\String\Tokenizer;
+namespace Yaoi\String\Lexer;
 
 
 use Yaoi\String\Exception;
@@ -38,6 +38,14 @@ class Parser
     public function addBracket($start, $end)
     {
         $this->brackets [$start] = new Bracket($start, $end);
+        return $this;
+    }
+
+    /** @var Delimiter[]|array */
+    protected $delimiters = array();
+    public function addDelimiter($start)
+    {
+        $this->delimiters [$start] = new Delimiter($start);
         return $this;
     }
 
@@ -149,10 +157,25 @@ class Parser
 
                         $position += $bracket->endLen - 1;
                         $prevPosition = $position + 1;
+                        $bracketParsed = $result;
                         $result = $result->parent;
+                        $bracketParsed->parent = null;
                         break 2;
                     }
                 }
+
+                foreach ($this->delimiters as $delimiter) {
+                    if (substr($string, $position, $delimiter->startLen) === $delimiter->start) {
+                        $result->tokens[] = substr($string, $prevPosition, $position - $prevPosition);
+                        $result->tokens[] = $delimiter;
+                        $position += $delimiter->startLen - 1;
+                        $prevPosition = $position + 1;
+
+
+                    }
+
+                }
+
             } while (false);
         }
         if ($quoteStarted) {
@@ -163,7 +186,7 @@ class Parser
             $result->tokens [] = substr($string, $prevPosition, $position - $prevPosition);
         }
 
-        return $result;
+        return $mainResult;
     }
 
 }

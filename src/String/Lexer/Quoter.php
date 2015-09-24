@@ -1,6 +1,6 @@
 <?php
 
-namespace Yaoi\String\Tokenizer;
+namespace Yaoi\String\Lexer;
 
 use Yaoi\String\Exception;
 

@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vpoturaev
- * Date: 9/14/15
- * Time: 08:35
- */
 
-namespace Yaoi\String\Tokenizer;
+namespace Yaoi\String\Lexer;
 
 
-class LineTerminator
+class Delimiter
 {
     public $start;
     public $startLen;
@@ -18,5 +12,4 @@ class LineTerminator
         $this->start = $start;
         $this->startLen = strlen($start);
     }
-
 }

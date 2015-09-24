@@ -111,4 +111,14 @@ class Parser extends BaseClass implements IsEmpty
         return substr($this->string, -strlen($needle)) === (string)$needle;
     }
 
+    public function contain($needle)
+    {
+        return strpos($this->string, $needle) !== false;
+    }
+
+    public function explode($delimiter, $limit = 10000)
+    {
+        return explode($delimiter, $this->string, $limit);
+    }
+
 }

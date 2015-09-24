@@ -1,6 +1,6 @@
 <?php
 
-namespace Yaoi\String\Tokenizer;
+namespace Yaoi\String\Lexer;
 
 
 class Token
