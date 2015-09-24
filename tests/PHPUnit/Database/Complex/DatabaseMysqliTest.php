@@ -167,7 +167,7 @@ CREATE TABLE `test_indexes` (
  `uni_two` int DEFAULT NULL,
  `default_null` float DEFAULT NULL,
  `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- `new_field` varchar(255) NOT NULL DEFAULT 'normal',
+ `new_field` char(15) NOT NULL DEFAULT 'normal',
  UNIQUE KEY `unique_updated` (`updated`),
  PRIMARY KEY (`id`)
 )
@@ -195,7 +195,7 @@ SQL;
 
         $expected = <<<SQL
 CREATE TABLE `wtf_entity_waka_user_item` (
- `id` int NOT NULL AUTO_INCREMENT,
+ `id` int unsigned NOT NULL AUTO_INCREMENT,
  `use``r_id` int NOT NULL,
  `item_id` int NOT NULL,
  `name` varchar(255) NOT NULL DEFAULT 'default',
@@ -211,7 +211,7 @@ CREATE TABLE `wtf_entity_waka_user_item` (
 SQL;
 
 
-        $this->assertSame($expected, (string)$table->getCreateTable());
+        $this->assertStringEqualsCRLF($expected, (string)$table->getCreateTable());
 
     }
 

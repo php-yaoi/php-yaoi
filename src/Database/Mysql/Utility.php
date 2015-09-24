@@ -5,7 +5,7 @@ namespace Yaoi\Database\Mysql;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\Symbol;
-use Yaoi\String\Tokenizer;
+use Yaoi\String\Lexer;
 
 class Utility extends \Yaoi\Database\Utility
 {
@@ -82,7 +82,7 @@ class Utility extends \Yaoi\Database\Utility
     private $tokenizer;
     public function getStatementTokenizer() {
         if (null === $this->tokenizer) {
-            $this->tokenizer = $tokenizer = new Tokenizer\Parser();
+            $this->tokenizer = $tokenizer = new Lexer\Parser();
 
             $tokenizer
                 ->addQuote('`', '`', array('``' => '`'))
@@ -105,6 +105,7 @@ class Utility extends \Yaoi\Database\Utility
                 ->addLineStopper('#')
                 ->addLineStopper('-- ')
                 ->addBracket('(', ')')
+                ->addDelimiter(',')
                 ;
         }
         return $this->tokenizer;
