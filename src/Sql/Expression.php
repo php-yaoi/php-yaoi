@@ -44,7 +44,7 @@ abstract class Expression extends BaseClass
     private $as;
     protected $statement;
     protected $binds;
-    private $queue = array();
+    protected $queue = array();
 
 
     public function asExpr($as)
@@ -62,6 +62,10 @@ abstract class Expression extends BaseClass
         return $this;
     }
 
+    protected function addExpr($operand, Expression $expression)
+    {
+        $this->queue []= array($operand, $expression);
+    }
 
     const OP_OR = ' OR ';
 
@@ -80,7 +84,8 @@ abstract class Expression extends BaseClass
         return $this;
     }
 
-    private $opComma = ', ';
+    const OP_COMMA = ', ';
+    private $opComma = self::OP_COMMA;
     public function setOpComma($separator) {
         $this->opComma = $separator;
         return $this;
@@ -99,23 +104,6 @@ abstract class Expression extends BaseClass
         $this->queue [] = array(self::OP_APPEND, SimpleExpression::createFromFuncArguments(func_get_args()));
         return $this;
     }
-
-    const OP_UNION = ' UNION ';
-
-    public function unionExpr($expression)
-    {
-        $this->queue [] = array(self::OP_UNION, SimpleExpression::createFromFuncArguments(func_get_args()));
-        return $this;
-    }
-
-    const OP_UNION_ALL = ' UNION ALL ';
-
-    public function unionAllExpr($expression)
-    {
-        $this->queue [] = array(self::OP_UNION_ALL, SimpleExpression::createFromFuncArguments(func_get_args()));
-        return $this;
-    }
-
 
     public function prependExpr($expression)
     {

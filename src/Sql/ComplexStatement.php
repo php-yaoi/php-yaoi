@@ -108,18 +108,26 @@ abstract class ComplexStatement extends Expression implements
      */
     protected $where;
 
-    public function where($expression, $binds = null)
+    private function initAdd($field, $operand, $arguments)
     {
-        if (null === $expression) {
+        if (empty($arguments[0])) {
             return $this;
         }
 
-        if (null === $this->where) {
-            $this->where = SimpleExpression::createFromFuncArguments(func_get_args());
+        /** @var SimpleExpression $property */
+        $property = &$this->$field;
+        if (null === $property) {
+            $property = SimpleExpression::createFromFuncArguments($arguments);
         } else {
-            $this->where->andExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
+            $property->addExpr($operand, SimpleExpression::createFromFuncArguments($arguments));
         }
         return $this;
+
+    }
+
+    public function where($expression, $binds = null)
+    {
+        return $this->initAdd('where', self::OP_AND, func_get_args());
     }
 
     protected function buildWhere(Quoter $quoter)
@@ -141,16 +149,7 @@ abstract class ComplexStatement extends Expression implements
 
     public function order($expression, $binds = null)
     {
-        if (null === $expression) {
-            return $this;
-        }
-
-        if (null === $this->order) {
-            $this->order = SimpleExpression::createFromFuncArguments(func_get_args());
-        } else {
-            $this->order->commaExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
-        }
-        return $this;
+        return $this->initAdd('order', self::OP_COMMA, func_get_args());
     }
 
     protected function buildOrder(Quoter $quoter)
@@ -199,17 +198,7 @@ abstract class ComplexStatement extends Expression implements
 
     public function groupBy($expression, $binds = null)
     {
-        if (null === $expression) {
-            return $this;
-        }
-
-        if (null === $this->groupBy) {
-            $this->groupBy = SimpleExpression::createFromFuncArguments(func_get_args());
-        } else {
-            $this->groupBy->commaExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
-        }
-
-        return $this;
+        return $this->initAdd('groupBy', self::OP_COMMA, func_get_args());
     }
 
     protected function buildGroupBy(Quoter $quoter)
@@ -229,17 +218,7 @@ abstract class ComplexStatement extends Expression implements
 
     public function having($expression, $binds = null)
     {
-        if (null === $expression) {
-            return $this;
-        }
-
-        if (null === $this->having) {
-            $this->having = SimpleExpression::createFromFuncArguments(func_get_args());
-        } else {
-            $this->having->andExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
-        }
-
-        return $this;
+        return $this->initAdd('having', self::OP_AND, func_get_args());
     }
 
     protected function buildHaving(Quoter $quoter)
@@ -257,6 +236,9 @@ abstract class ComplexStatement extends Expression implements
      */
     private $union;
 
+    const OP_UNION = ' UNION ';
+    const OP_UNION_ALL = ' UNION ALL ';
+
     /**
      * @param $expression
      * @param null $binds
@@ -264,15 +246,10 @@ abstract class ComplexStatement extends Expression implements
      */
     public function union($expression, $binds = null)
     {
-        if (null === $expression) {
-            return $this;
-        }
         if (null === $this->union) {
             $this->union = new SimpleExpression(' ');
         }
-        $this->union->unionExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
-
-        return $this;
+        return $this->initAdd('union', self::OP_UNION, func_get_args());
     }
 
 
@@ -283,16 +260,7 @@ abstract class ComplexStatement extends Expression implements
      */
     public function unionAll($expression, $binds = null)
     {
-        if (null === $expression) {
-            return $this;
-        }
-
-        if (null === $this->union) {
-            $this->union = new SimpleExpression();
-        }
-        $this->union->unionAllExpr(SimpleExpression::createFromFuncArguments(func_get_args()));
-
-        return $this;
+        return $this->initAdd('union', self::OP_UNION_ALL, func_get_args());
     }
 
     protected function buildUnion(Quoter $quoter)
@@ -361,11 +329,7 @@ abstract class ComplexStatement extends Expression implements
 
     public function valuesRow($array)
     {
-        if (null === $this->values) {
-            $this->values = array();
-        }
-        $this->values [] = $array;
-        return $this;
+        return $this->valuesRows(array($array));
     }
 
     public function valuesRows($collection)
