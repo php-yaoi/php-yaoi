@@ -27,6 +27,7 @@ class Tokenizer extends BaseClass
         return $this;
     }
 
+
     public function tokenize($string)
     {
         $quoteStarted = false;
@@ -69,11 +70,13 @@ class Tokenizer extends BaseClass
                             $position += strlen($lineStopper);
                             $newLine = strpos($string, "\n", $position);
                             if (false === $newLine) {
-                                $result [] = array(substr($string, $position), $lineStopper);
+                                $value = substr($string, $position);
+                                $result [] = array($value, $lineStopper, '', $value);
                                 $position = strlen($string);
                                 $prevPosition = $position + 1;
                             } else {
-                                $result [] = array(substr($string, $position, $newLine - $position), $lineStopper);
+                                $value = substr($string, $position, $newLine - $position);
+                                $result [] = array($value, $lineStopper, '', $value);
                                 $prevPosition = $newLine;
                                 $position = $newLine;
                             }
@@ -101,7 +104,7 @@ class Tokenizer extends BaseClass
                 if (substr($string, $position, strlen($end)) === $end) {
                     $escapedString = substr($string, $prevPosition, $position - $prevPosition);
                     $quotedString .= substr($string, $escapePosition, $position - $escapePosition);
-                    $result [] = array($quotedString, $start, $escapedString);
+                    $result []= array($quotedString, $start, $end, $escapedString);
                     $position += strlen($end);
                     $prevPosition = $position;
                     $quoteStarted = false;
@@ -117,25 +120,6 @@ class Tokenizer extends BaseClass
         }
 
         return $result;
-    }
-
-
-    public function stripQuotes($string, $replace = array()) {
-        $tokens = $this->tokenize($string);
-        $template = '';
-        $binds = array();
-
-        foreach ($tokens as $index => $token) {
-            if (is_string($token)) {
-                $template .= $token;
-            }
-            else {
-                $template .= '?';
-                $binds []= $token;
-            }
-        }
-
-        return array($template, $binds);
     }
 
 }

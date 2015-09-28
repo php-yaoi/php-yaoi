@@ -4,7 +4,8 @@ namespace Yaoi\Database\Mysql;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\String\Tokenizer;
+use Yaoi\Sql\Symbol;
+use Yaoi\String\Lexer;
 
 class Utility extends \Yaoi\Database\Utility
 {
@@ -26,9 +27,15 @@ class Utility extends \Yaoi\Database\Utility
      */
     public function getTableDefinition($tableName)
     {
+        $statement = $this->database->query("SHOW CREATE TABLE ?", new Symbol($tableName))->fetchRow('Create Table');
+        $createTableReader = new CreateTableReader($statement, $this->database);
+        return $createTableReader->getDefinition();
+
+        /*
         $schemaReader = new SchemaReader($this->database);
         $definition = $schemaReader->getTableDefinition($tableName);
         return $definition;
+        */
     }
 
 
@@ -75,7 +82,7 @@ class Utility extends \Yaoi\Database\Utility
     private $tokenizer;
     public function getStatementTokenizer() {
         if (null === $this->tokenizer) {
-            $this->tokenizer = $tokenizer = new Tokenizer();
+            $this->tokenizer = $tokenizer = new Lexer\Parser();
 
             $tokenizer
                 ->addQuote('`', '`', array('``' => '`'))
@@ -97,6 +104,8 @@ class Utility extends \Yaoi\Database\Utility
                 )
                 ->addLineStopper('#')
                 ->addLineStopper('-- ')
+                ->addBracket('(', ')')
+                ->addDelimiter(',')
                 ;
         }
         return $this->tokenizer;

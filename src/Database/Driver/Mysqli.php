@@ -148,7 +148,7 @@ class Mysqli extends Driver implements Driver\Contract
     {
         $result = '';
         foreach ($symbol->names as $name) {
-            $result .= '`' . $name . '`.';
+            $result .= '`' . str_replace('`', '``', $name) . '`.';
         }
         if ($result) {
             $result = substr($result, 0, -1);

@@ -60,19 +60,6 @@ class DatabaseEntityColumnTest extends TestCase
 
     }
 
-    /**
-     * @see Column::setForeignKey
-     */
-    public function testSetConstraint() {
-        $column1 = new Column(Column::AUTO_ID + Column::INTEGER);
-
-        $column2 = new Column(Column::AUTO_ID + Column::INTEGER);
-
-        $column1->setForeignKey($column2);
-
-        $this->assertSame(array($column2), $column1->getForeignKey()->getReferenceColumns());
-    }
-
 
     /**
      * @see Column::setStringLength

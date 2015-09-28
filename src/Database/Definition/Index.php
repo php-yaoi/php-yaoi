@@ -8,6 +8,7 @@ class Index extends BaseClass
 {
     const TYPE_KEY = 'key';
     const TYPE_UNIQUE = 'unique';
+    const TYPE_PRIMARY = 'primary';
 
     /** @var Column[]  */
     public $columns = array();

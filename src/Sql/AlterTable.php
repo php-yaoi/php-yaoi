@@ -3,9 +3,9 @@
 namespace Yaoi\Sql;
 
 
+use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Database\Exception;
 
 class AlterTable extends Batch
 {
@@ -29,6 +29,7 @@ class AlterTable extends Batch
 
         $this->processColumns();
         $this->processIndexes();
+        $this->processForeignKeys();
 
         if ($this->alterLines->isEmpty()) {
             $alterExpression->disable();
@@ -61,15 +62,20 @@ class AlterTable extends Batch
     }
 
     protected function processIndexes() {
-        $beforeIndexes = $this->before->indexes;
-        foreach ($this->after->indexes as $indexId => $index) {
-            if (!isset($beforeIndexes[$indexId])) {
+        /** @var Index[] $beforeIndexes */
+        $beforeIndexes = array();
+        foreach ($this->before->indexes as $index) {
+            $beforeIndexes [$index->getName()]= $index;
+        }
+
+        foreach ($this->after->indexes as $index) {
+            if (!isset($beforeIndexes[$index->getName()])) {
                 $this->alterLines->commaExpr('ADD '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? (?)', new Symbol($index->getName()), Symbol::prepareColumns($index->columns));
             }
             else {
-                unset($beforeIndexes[$indexId]);
+                unset($beforeIndexes[$index->getName()]);
             }
         }
         if ($beforeIndexes) {
@@ -78,10 +84,35 @@ class AlterTable extends Batch
                     unset($beforeIndexes[$foreignKey->getName()]);
                 }
             }
-            foreach ($beforeIndexes as $indexId => $index) {
+            foreach ($beforeIndexes as $index) {
                 $this->alterLines->commaExpr('DROP INDEX ?', new Symbol($index->getName()));
             }
         }
+    }
+
+
+    protected function processForeignKeys() {
+        /** @var ForeignKey[] $beforeForeignKeys */
+        $beforeForeignKeys = array();
+        if (!$this->before->disableForeignKeys) {
+            foreach ($this->before->foreignKeys as $foreignKey) {
+                $beforeForeignKeys [$foreignKey->getName()]= $foreignKey;
+            }
+        }
+        $afterForeignKeys = $this->after->foreignKeys;
+        if ($this->after->disableForeignKeys) {
+            $afterForeignKeys = array();
+        }
+        foreach ($afterForeignKeys as $afterForeignKey) {
+            if (!isset($beforeForeignKeys[$afterForeignKey->getName()])) {
+                $this->alterLines->commaExpr('ADD');
+                $this->alterLines->appendExpr($this->database->getUtility()->generateForeignKeyExpression($afterForeignKey));
+            }
+            else {
+                unset($beforeForeignKeys[$afterForeignKey->getName()]);
+            }
+        }
+
     }
 
 }

@@ -3,6 +3,7 @@
 namespace Yaoi\Database\Utility;
 
 use Yaoi\Database;
+use Yaoi\Database\Definition;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\AlterTable;
@@ -30,6 +31,8 @@ interface Contract
      * @return AlterTable
      */
     public function generateAlterTable(Table $before, Table $after);
+
+    public function generateForeignKeyExpression(Definition\ForeignKey $foreignKey);
 
     public function getColumnTypeString(Column $column);
 
