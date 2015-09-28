@@ -6,7 +6,6 @@ namespace Yaoi\Sql;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Database\Exception;
 
 class AlterTable extends Batch
 {

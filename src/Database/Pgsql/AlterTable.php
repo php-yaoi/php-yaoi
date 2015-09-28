@@ -3,16 +3,20 @@
 namespace Yaoi\Database\Pgsql;
 
 use Yaoi\Database\Definition\Index;
-use Yaoi\Sql\Batch;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
 {
     protected function processIndexes() {
-        $beforeIndexes = $this->before->indexes;
+        /** @var Index[] $beforeIndexes */
+        $beforeIndexes = array();
+        foreach ($this->before->indexes as $index) {
+            $beforeIndexes [$index->getName()]= $index;
+        }
 
-        foreach ($this->after->indexes as $indexId => $index) {
-            if (!isset($beforeIndexes[$indexId])) {
+        foreach ($this->after->indexes as $index) {
+            $indexName = $index->getName();
+            if (!isset($beforeIndexes[$indexName])) {
                 $this->add($this->database->expr('CREATE '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? ON ? (?)',
@@ -20,10 +24,10 @@ class AlterTable extends \Yaoi\Sql\AlterTable
                 );
             }
             else {
-                unset($beforeIndexes[$indexId]);
+                unset($beforeIndexes[$indexName]);
             }
         }
-        foreach ($beforeIndexes as $indexId => $index) {
+        foreach ($beforeIndexes as $index) {
             if ($index->type === Index::TYPE_UNIQUE) {
                 $this->alterLines->commaExpr('DROP CONSTRAINT ?', new Symbol($index->getName()));
             }
