@@ -6,6 +6,9 @@ use Yaoi\BaseClass;
 
 class Dsn extends BaseClass
 {
+    private $dsnUrl;
+    private $schemeDelimiterPos;
+
     public $scheme;
     public $username;
     public $password;
@@ -13,18 +16,10 @@ class Dsn extends BaseClass
     public $port;
     public $path;
 
-    /**
-     * @param null $dsnUrl
-     * @throws Exception
-     */
-    public function __construct($dsnUrl = null)
-    {
-        if (null === $dsnUrl) {
-            return;
-        }
 
-        if (strpos($dsnUrl, '\\') !== false) {
-            $dsnUrl = strtr($dsnUrl, array(
+    private function preUrlEncode() {
+        if (strpos($this->dsnUrl, '\\') !== false) {
+            $this->dsnUrl = strtr($this->dsnUrl, array(
                 '\@' => '%40',
                 '\/' => '%2F',
                 '\:' => '%3A',
@@ -32,34 +27,42 @@ class Dsn extends BaseClass
                 '\&' => '%26',
             ));
         }
+    }
 
-        if (false === ($pos = strpos($dsnUrl, '://'))) {
-            if (false === strpos($dsnUrl, ':')) {
-                $this->scheme = urldecode($dsnUrl);
+    private function checkUserPasswordSchema() {
+        if (false === $this->schemeDelimiterPos) {
+            if (false === strpos($this->dsnUrl, ':')) {
+                $this->scheme = urldecode($this->dsnUrl);
             }
             else {
-                $data = explode(':', $dsnUrl, 2);
+                $data = explode(':', $this->dsnUrl, 2);
                 $this->username = urldecode($data[0]);
                 $this->password = urldecode($data[1]);
             }
-            return;
+            return true;
         }
 
-        /*
-         * hostless schema like test:///path?333 or test:// or
-         */
-        if (strlen($dsnUrl) === $pos + 3) {
-            $this->scheme = substr($dsnUrl, 0, $pos);
-            return;
+        return false;
+    }
+
+    private function checkHostlessSchema() {
+        if (strlen($this->dsnUrl) === $this->schemeDelimiterPos + 3) {
+            $this->scheme = substr($this->dsnUrl, 0, $this->schemeDelimiterPos);
+            return true;
         }
 
-        if ('/' === $dsnUrl[$pos + 3]) {
-            $dsnUrl = substr($dsnUrl, 0, $pos) . '://dummy' . substr($dsnUrl, $pos + 3);
-            $p = parse_url($dsnUrl);
+        return false;
+    }
+
+    private function parseUrl() {
+        if ('/' === $this->dsnUrl[$this->schemeDelimiterPos + 3]) {
+            $this->dsnUrl = substr($this->dsnUrl, 0, $this->schemeDelimiterPos) . '://dummy'
+                . substr($this->dsnUrl, $this->schemeDelimiterPos + 3);
+            $p = parse_url($this->dsnUrl);
             $p['host'] = null;
         }
         else {
-            $p = parse_url($dsnUrl);
+            $p = parse_url($this->dsnUrl);
         }
 
         if (!$p) {
@@ -75,6 +78,7 @@ class Dsn extends BaseClass
             }
         }
         unset($p['query']);
+
         foreach ($p as $key => $value) {
             $p[$key] = urldecode($value);
         }
@@ -102,6 +106,40 @@ class Dsn extends BaseClass
         if (isset($p['port'])) {
             $this->port = (int)$p['port'];
         }
+    }
+
+
+    /**
+     * @param null $dsnUrl
+     * @throws Exception
+     */
+    public function __construct($dsnUrl = null)
+    {
+        if (null === $dsnUrl) {
+            return;
+        }
+
+        do {
+            $this->dsnUrl = $dsnUrl;
+
+            $this->preUrlEncode();
+            $this->schemeDelimiterPos = strpos($this->dsnUrl, '://');
+            if ($this->checkUserPasswordSchema()) {
+                break;
+            }
+
+            /*
+             * hostless schema like test:///path?333 or test:// or
+             */
+            if ($this->checkHostlessSchema()) {
+                break;
+            }
+
+            $this->parseUrl();
+        }
+        while (false);
+        unset($this->dsnUrl);
+        unset($this->schemeDelimiterPos);
     }
 
 

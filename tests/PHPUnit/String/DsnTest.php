@@ -12,22 +12,18 @@ class DsnTest extends TestCase  {
      * @see \Yaoi\String\Dsn
      */
     public function testUrlScheme() {
-        $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('scheme://user:pass@host:1234/path/deeper/?param1=1&param2=2'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] => scheme
-    [username] => user
-    [password] => pass
-    [hostname] => host
-    [port] => 1234
-    [path] => path/deeper/
-    [param1] => 1
-    [param2] => 2
-)
-
-EOD
+        $this->assertSame(
+            array (
+                'scheme' => 'scheme',
+                'username' => 'user',
+                'password' => 'pass',
+                'hostname' => 'host',
+                'port' => 1234,
+                'path' => 'path/deeper/',
+                'param1' => '1',
+                'param2' => '2',
+            ),
+            get_object_vars(new Dsn('scheme://user:pass@host:1234/path/deeper/?param1=1&param2=2'))
         );
     }
 
@@ -37,20 +33,16 @@ EOD
      * @see \Yaoi\String\Dsn
      */
     public function testCredentialsScheme() {
-        $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('user:password'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] =>
-    [username] => user
-    [password] => password
-    [hostname] =>
-    [port] =>
-    [path] =>
-)
-
-EOD
+        $this->assertSame(
+            array (
+                'scheme' => NULL,
+                'username' => 'user',
+                'password' => 'password',
+                'hostname' => NULL,
+                'port' => NULL,
+                'path' => NULL,
+            ),
+            get_object_vars(new Dsn('user:password'))
         );
     }
 
@@ -60,20 +52,16 @@ EOD
      * @see \Yaoi\String\Dsn
      */
     public function testSchemeOnly() {
-        $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('scheme'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] => scheme
-    [username] =>
-    [password] =>
-    [hostname] =>
-    [port] =>
-    [path] =>
-)
-
-EOD
+        $this->assertSame(
+            array (
+                'scheme' => 'scheme',
+                'username' => NULL,
+                'password' => NULL,
+                'hostname' => NULL,
+                'port' => NULL,
+                'path' => NULL,
+            ),
+            get_object_vars(new Dsn('scheme'))
         );
     }
 
@@ -86,60 +74,48 @@ EOD
         /**
          * URL scheme
          */
-        $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('scheme://john.doe\@mail.com:p\@ssw\:rd@host?company=Smith \& Wesson'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] => scheme
-    [username] => john.doe@mail.com
-    [password] => p@ssw:rd
-    [hostname] => host
-    [port] =>
-    [path] =>
-    [company] => Smith & Wesson
-)
-
-EOD
+        $this->assertSame(
+            array (
+                'scheme' => 'scheme',
+                'username' => 'john.doe@mail.com',
+                'password' => 'p@ssw:rd',
+                'hostname' => 'host',
+                'port' => NULL,
+                'path' => NULL,
+                'company' => 'Smith & Wesson',
+            ),
+            get_object_vars(new Dsn('scheme://john.doe\@mail.com:p\@ssw\:rd@host?company=Smith \& Wesson'))
         );
-
 
         /**
          * Credentials scheme
          */
-        $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('john.doe\@mail.com:p\@ssw\:rd'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] =>
-    [username] => john.doe@mail.com
-    [password] => p@ssw:rd
-    [hostname] =>
-    [port] =>
-    [path] =>
-)
-
-EOD
+        $this->assertSame(
+            array (
+                'scheme' => NULL,
+                'username' => 'john.doe@mail.com',
+                'password' => 'p@ssw:rd',
+                'hostname' => NULL,
+                'port' => NULL,
+                'path' => NULL,
+            ),
+            get_object_vars(new Dsn('john.doe\@mail.com:p\@ssw\:rd'))
         );
+
 
         /**
          * Scheme-only
          */
         $this->assertStringEqualsSpaceless(
-            print_r(new Dsn('sch\:eme'), 1),
-            <<<EOD
-Yaoi\String\Dsn Object
-(
-    [scheme] => sch:eme
-    [username] =>
-    [password] =>
-    [hostname] =>
-    [port] =>
-    [path] =>
-)
-
-EOD
+            array (
+                'scheme' => 'sch:eme',
+                'username' => NULL,
+                'password' => NULL,
+                'hostname' => NULL,
+                'port' => NULL,
+                'path' => NULL,
+            ),
+            get_object_vars(new Dsn('sch\:eme'))
         );
 
     }
