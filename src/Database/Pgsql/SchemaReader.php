@@ -31,7 +31,7 @@ class SchemaReader
     }
 
 
-    private function readIndexes($tableName) {
+    private function readIndexes(Table $def) {
         $query = <<<SQL
 select
   t.relname as table_name,
@@ -57,7 +57,7 @@ order by
   ix.indnatts;
 SQL;
 
-        $res = $this->database->query($query, $tableName)->fetchAll();
+        $res = $this->database->query($query, $def->schemaName)->fetchAll();
 
         $indexData = array();
         foreach ($res as $row) {
@@ -69,17 +69,67 @@ SQL;
             $indexData [$row['index_name']]['is_primary'] = $row['is_unique'];
         }
 
+        $columns = $def->getColumns();
 
-        return $indexData;
+        if (isset($indexData['PRIMARY'])) {
+            $primaryKey = array();
+            foreach ($indexData['PRIMARY']['columns'] as $columnName) {
+                $primaryKey []= $columns->$columnName;
+            }
+            $def->setPrimaryKey($primaryKey);
+            unset($indexData['PRIMARY']);
+        }
+
+        foreach ($indexData as $indexName => $indexInfo) {
+            $indexColumns = array();
+            foreach ($indexInfo['columns'] as $columnName) {
+                $indexColumns []= $columns->$columnName;
+            }
+            $index = new Index($indexColumns);
+            $index->setType($indexInfo['is_unique'] ? Index::TYPE_UNIQUE : Index::TYPE_KEY);
+            $def->addIndex($index);
+        }
+
+
     }
 
 
-    /**
-     * @param $tableName
-     * @return Table
-     */
-    public function getTableDefinition($tableName)
-    {
+    public function getColumnFlagsByString($typeString) {
+        $phpType = Column::AUTO_TYPE;
+
+        switch (true) {
+            case 'integer' === substr($typeString, 0, 7):
+            case 'smallint' === substr($typeString, 0, 8):
+            case 'bigint' === substr($typeString, 0, 6):
+                $phpType = Column::INTEGER;
+                break;
+
+            case 'numeric' === substr($typeString, 0, 7):
+            case 'double' === substr($typeString, 0, 6):
+            case 'real' === substr($typeString, 0, 4):
+                $phpType = Column::FLOAT;
+                break;
+
+            case 'character' === substr($typeString, 0, 9):
+            case 'text' === $typeString:
+                $phpType = Column::STRING;
+                break;
+
+            case 'time' === $typeString:
+            case 'time ' === substr($typeString, 0, 5):
+                $phpType = Column::STRING;
+                break;
+
+            case 'timestamp' === substr($typeString, 0, 9):
+            case 'date' === substr($typeString, 0, 4):
+                $phpType = Column::TIMESTAMP;
+                break;
+
+        }
+        return $phpType;
+    }
+
+    public function getColumns($tableName) {
         //echo PHP_EOL . 'table: ' . $tableName . PHP_EOL;
         $res = $this->database->query("select c.column_name, c.is_nullable, c.data_type, c.column_default, tc.constraint_type
 from INFORMATION_SCHEMA.COLUMNS AS c
@@ -94,39 +144,8 @@ where c.table_name = ? ORDER BY c.ordinal_position ASC;
 
             $field = $r['column_name'];
             //echo 'field: ' . $field . PHP_EOL;
-            $type = $r['data_type'];
-            $phpType = Column::AUTO_TYPE;
 
-            switch (true) {
-                case 'integer' === substr($type, 0, 7):
-                case 'smallint' === substr($type, 0, 8):
-                case 'bigint' === substr($type, 0, 6):
-                    $phpType = Column::INTEGER;
-                    break;
-
-                case 'numeric' === substr($type, 0, 7):
-                case 'double' === substr($type, 0, 6):
-                case 'real' === substr($type, 0, 4):
-                    $phpType = Column::FLOAT;
-                    break;
-
-                case 'character' === substr($type, 0, 9):
-                case 'text' === $type:
-                    $phpType = Column::STRING;
-                    break;
-
-                case 'time' === $type:
-                case 'time ' === substr($type, 0, 5):
-                    $phpType = Column::STRING;
-                    break;
-
-                case 'timestamp' === substr($type, 0, 9):
-                case 'date' === substr($type, 0, 4):
-                    $phpType = Column::TIMESTAMP;
-                    break;
-
-            }
-
+            $phpType = $this->getColumnFlagsByString($r['data_type']);
             $notNull = $r['is_nullable'] === 'NO';
             $column = new Column($phpType);
             $skipDefault = false;
@@ -159,27 +178,21 @@ where c.table_name = ? ORDER BY c.ordinal_position ASC;
             $columns->$field = $column;
         }
 
+        return $columns;
+    }
+
+
+
+    /**
+     * @param $tableName
+     * @return Table
+     */
+    public function getTableDefinition($tableName)
+    {
+        $columns = $this->getColumns($tableName);
+
         $def = new Table($columns, $this->database, $tableName);
-        $indexData = $this->readIndexes($tableName);
-
-        if (isset($indexData['PRIMARY'])) {
-            $primaryKey = array();
-            foreach ($indexData['PRIMARY']['columns'] as $columnName) {
-                $primaryKey []= $columns->$columnName;
-            }
-            $def->setPrimaryKey($primaryKey);
-            unset($indexData['PRIMARY']);
-        }
-
-        foreach ($indexData as $indexName => $indexInfo) {
-            $indexColumns = array();
-            foreach ($indexInfo['columns'] as $columnName) {
-                $indexColumns []= $columns->$columnName;
-            }
-            $index = new Index($indexColumns);
-            $index->setType($indexInfo['is_unique'] ? Index::TYPE_UNIQUE : Index::TYPE_KEY);
-            $def->addIndex($index);
-        }
+        $this->readIndexes($def);
 
         return $def;
     }
