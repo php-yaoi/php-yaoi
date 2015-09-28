@@ -54,7 +54,17 @@ class Dsn extends BaseClass
         return false;
     }
 
-    private function parseUrl() {
+    private static $map = array(
+        'scheme' => 'scheme',
+        'username' => 'user',
+        'password' => 'pass',
+        'hostname' => 'host',
+        'path' => 'path',
+        'port' => 'port'
+    );
+
+
+    private function prepareParseUrl() {
         if ('/' === $this->dsnUrl[$this->schemeDelimiterPos + 3]) {
             $this->dsnUrl = substr($this->dsnUrl, 0, $this->schemeDelimiterPos) . '://dummy'
                 . substr($this->dsnUrl, $this->schemeDelimiterPos + 3);
@@ -68,6 +78,11 @@ class Dsn extends BaseClass
         if (!$p) {
             throw new Exception('Malformed DSN URL', Exception::BAD_DSN);
         }
+        return $p;
+    }
+
+    private function parseUrl() {
+        $p = $this->prepareParseUrl();
 
         if (isset($p['query'])) {
             parse_str($p['query'], $parsed);
@@ -79,33 +94,15 @@ class Dsn extends BaseClass
         }
         unset($p['query']);
 
-        foreach ($p as $key => $value) {
-            $p[$key] = urldecode($value);
+        foreach (self::$map as $field => $key) {
+            if (isset($p[$key])) {
+                $this->$field = urldecode($p[$key]);
+            }
         }
 
-        if (isset($p['scheme'])) {
-            $this->scheme = $p['scheme'];
-        }
 
-        if (isset($p['path'])) {
-            $this->path = substr($p['path'], 1);
-        }
-
-        if (isset($p['user'])) {
-            $this->username = $p['user'];
-        }
-
-        if (isset($p['pass'])) {
-            $this->password = $p['pass'];
-        }
-
-        if (isset($p['host'])) {
-            $this->hostname = $p['host'];
-        }
-
-        if (isset($p['port'])) {
-            $this->port = (int)$p['port'];
-        }
+        $this->path = null === $this->path ? null : substr($this->path, 1);
+        $this->port = null === $this->port ? null : (int)$p['port'];
     }
 
 
