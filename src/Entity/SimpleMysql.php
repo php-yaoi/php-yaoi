@@ -36,7 +36,7 @@ class SimpleMysql extends BaseClass
     public static function getTableName()
     {
         if (null === static::$tableName) {
-            return get_called_class();
+            return basename(get_called_class());
         } else {
             return static::$tableName;
         }

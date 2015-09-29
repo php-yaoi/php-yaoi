@@ -6,10 +6,10 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
-use YaoiTests\Entity\Host;
-use YaoiTests\Entity\Session;
-use YaoiTests\Entity\SessionTag;
-use YaoiTests\Entity\Tag;
+use YaoiTests\Helper\Entity\Host;
+use YaoiTests\Helper\Entity\Session;
+use YaoiTests\Helper\Entity\SessionTag;
+use YaoiTests\Helper\Entity\Tag;
 use YaoiTests\EntityOneABBR;
 use YaoiTests\EntityTwo;
 
