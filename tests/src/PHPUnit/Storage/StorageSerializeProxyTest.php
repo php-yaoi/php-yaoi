@@ -1,21 +1,22 @@
 <?php
+namespace YaoiTests\PHPUnit\Storage;
+
 use Yaoi\Storage;
 use Yaoi\Storage\Driver\PhpVarExpire;
 use Yaoi\Storage\Driver\SerializeProxy;
 use Yaoi\Storage\Settings;
 
-
-require_once __DIR__ . '/TestStorageBasic.php';
-
-class StorageSerializeProxyTest extends TestStorageBasic {
+class StorageSerializeProxyTest extends TestStorageBasic
+{
     /**
      * @var Storage
      */
     protected $base;
 
-    protected function initStorage() {
+    protected function initStorage()
+    {
         $base = $this->base;
-        $this->storage = new Storage(function() use ($base) {
+        $this->storage = new Storage(function () use ($base) {
             $dsn = new Settings();
             $dsn->driverClassName = SerializeProxy::className();
             $dsn->proxyClient = $base;
@@ -23,8 +24,9 @@ class StorageSerializeProxyTest extends TestStorageBasic {
         });
     }
 
-    public function setUp() {
-        $this->base = new Storage(function(){
+    public function setUp()
+    {
+        $this->base = new Storage(function () {
             $dsn = new Settings();
             $dsn->driverClassName = PhpVarExpire::className();
             return $dsn;
@@ -32,7 +34,8 @@ class StorageSerializeProxyTest extends TestStorageBasic {
         $this->initStorage();
     }
 
-    public function testData() {
+    public function testData()
+    {
         $key = 'test';
         $value = array(1 => array(2 => array(3 => 'four')));
 

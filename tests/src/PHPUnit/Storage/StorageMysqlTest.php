@@ -1,4 +1,6 @@
 <?php
+namespace YaoiTests\PHPUnit\Storage;
+
 use Yaoi\Database;
 use Yaoi\Migration\ClosureMigration;
 use Yaoi\Migration\Manager;
@@ -7,9 +9,8 @@ use Yaoi\Migration\Needed;
 use Yaoi\Storage;
 use Yaoi\Storage\Driver\DatabaseProxy;
 use Yaoi\Storage\Settings;
+use YaoiTests\PHPUnit\Storage\TestStorageBasic;
 
-
-require_once __DIR__ . '/TestStorageBasic.php';
 
 class StorageMysqlTest extends TestStorageBasic
 {
@@ -22,8 +23,7 @@ class StorageMysqlTest extends TestStorageBasic
     {
         try {
             $this->db = Database::getInstance('test_mysqli');
-        }
-        catch (\Yaoi\Service\Exception $exception) {
+        } catch (\Yaoi\Service\Exception $exception) {
             $this->markTestSkipped($exception->getMessage());
         }
 
@@ -111,15 +111,15 @@ class StorageMysqlTest extends TestStorageBasic
     {
         // not working
     }
-/*
-    public function testTwo()
-    {
-        return;
+    /*
+        public function testTwo()
+        {
+            return;
 
-        $this->complexStorage->set('test2', array('vvvv' => 'hooy'));
+            $this->complexStorage->set('test2', array('vvvv' => 'hooy'));
 
-        var_dump($this->storage->get('test1'));
-        var_dump($this->complexStorage->get('test2'));
-    }
-*/
+            var_dump($this->storage->get('test1'));
+            var_dump($this->complexStorage->get('test2'));
+        }
+    */
 }

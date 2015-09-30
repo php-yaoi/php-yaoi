@@ -104,13 +104,13 @@ abstract class TestCase extends \Yaoi\Test\PHPUnit\TestCase
 
 
     protected $expectedMigrateLog = <<<EOD
-Rollback, table yaoi_tests_entity_session (YaoiTests\Entity\Session) is already non-existent
-Rollback, table yaoi_tests_entity_host (YaoiTests\Entity\Host) is already non-existent
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) is already non-existent
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) is already non-existent
-Apply, table yaoi_tests_entity_session (YaoiTests\Entity\Session) requires migration
+Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
+Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is already non-existent
+Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is already non-existent
+Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
+Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires migration
 Dependent migration required
-Apply, table yaoi_tests_entity_host (YaoiTests\Entity\Host) requires migration
+Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) requires migration
 CREATE TABLE `yaoi_tests_entity_host` (
  `id` int NOT NULL AUTO_INCREMENT,
  `name` varchar(255) NOT NULL,
@@ -127,8 +127,8 @@ CREATE TABLE `yaoi_tests_entity_session` (
  PRIMARY KEY (`id`)
 )
 OK
-Apply, table yaoi_tests_entity_host (YaoiTests\Entity\Host) is up to date
-Apply, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) requires migration
+Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) requires migration
 CREATE TABLE `yaoi_tests_entity_tag` (
  `id` int NOT NULL AUTO_INCREMENT,
  `name` varchar(255) NOT NULL,
@@ -136,11 +136,11 @@ CREATE TABLE `yaoi_tests_entity_tag` (
  PRIMARY KEY (`id`)
 )
 OK
-Apply, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) requires migration
+Apply, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) requires migration
 Dependent migration required
-Apply, table yaoi_tests_entity_session (YaoiTests\Entity\Session) is up to date
+Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
 Dependent migration required
-Apply, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) is up to date
+Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is up to date
 CREATE TABLE `yaoi_tests_entity_session_tag` (
  `session_id` int NOT NULL,
  `tag_id` int NOT NULL,
@@ -148,28 +148,28 @@ CREATE TABLE `yaoi_tests_entity_session_tag` (
  PRIMARY KEY (`session_id`, `tag_id`)
 )
 OK
-Apply, table yaoi_tests_entity_session (YaoiTests\Entity\Session) is up to date
-Apply, table yaoi_tests_entity_host (YaoiTests\Entity\Host) is up to date
-Apply, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) is up to date
-Apply, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) is up to date
-Rollback, table yaoi_tests_entity_session (YaoiTests\Entity\Session) requires deletion
+Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is up to date
+Apply, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is up to date
+Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires deletion
 Dependent migration required
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) requires deletion
+Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) requires deletion
 OK
 OK
-Rollback, table yaoi_tests_entity_host (YaoiTests\Entity\Host) requires deletion
+Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) requires deletion
 Dependent migration required
-Rollback, table yaoi_tests_entity_session (YaoiTests\Entity\Session) is already non-existent
+Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
 OK
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) requires deletion
+Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) requires deletion
 Dependent migration required
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) is already non-existent
+Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
 OK
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) is already non-existent
-Rollback, table yaoi_tests_entity_session (YaoiTests\Entity\Session) is already non-existent
-Rollback, table yaoi_tests_entity_host (YaoiTests\Entity\Host) is already non-existent
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Entity\Tag) is already non-existent
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Entity\SessionTag) is already non-existent
+Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
+Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
+Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is already non-existent
+Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is already non-existent
+Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
 
 EOD;
 
