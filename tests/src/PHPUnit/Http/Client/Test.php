@@ -179,7 +179,7 @@ one=1
         $httpClient->followLocation = true;
         //$httpClient->logContext(new Log('stdout'));
 
-        $storage = new Storage('serialized-file:///' . Test::getMocksPath() . 'HttpCompressedTest-testGet.dat?compression=1&ignoreErrors=1');
+        $storage = new Storage('serialized-file:///' . TestUtil::getMocksPath() . 'HttpCompressedTest-testGet.dat?compression=1&ignoreErrors=1');
 
         $mockSet = new Mock($storage);
 
@@ -238,7 +238,7 @@ one=1
         $httpClient->followLocation = true;
         //$httpClient->logContext(new Log('stdout'));
 
-        $storage = new Storage('serialized-file:///' . Test::getMocksPath() . '/HttpProxyTest.dat?compression=1&ignoreErrors=1');
+        $storage = new Storage('serialized-file:///' . TestUtil::getMocksPath() . '/HttpProxyTest.dat?compression=1&ignoreErrors=1');
 
         $mockSet = new Mock($storage);
 
