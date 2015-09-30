@@ -1,22 +1,19 @@
 <?php
+
 namespace YaoiTests\Helper\Entity;
 
-use Yaoi\Database\Definition\Column;
-use Yaoi\Database\Entity;
-use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\Database;
 
-/**
- * Class TestEntityDB
- */
-class TestEntityDB extends Entity
+use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Entity;
+
+class OneABBR extends Entity
 {
     public $id;
     public $name;
-    public $age;
-    public $weight;
-    public $url;
-    public $birthDate;
+    public $address;
+    public $createdAt;
+
 
     /**
      * Setup column types in provided columns object
@@ -25,21 +22,18 @@ class TestEntityDB extends Entity
     static function setUpColumns($columns)
     {
         $columns->id = Column::AUTO_ID;
-        $columns->name = Column::create()->setStringLength(15, true);
-        $columns->age = Column::INTEGER;
-        $columns->weight = Column::INTEGER + Column::UNSIGNED;
-        $columns->url = Column::STRING;
-        $columns->birthDate = Column::TIMESTAMP;
+        $columns->name = Column::create(Column::STRING + Column::NOT_NULL)->setUnique();
+        $columns->address = Column::create(Column::STRING)->setDefault('');
+        $columns->createdAt = Column::TIMESTAMP;
     }
 
     /**
      * Optional setup table indexes and other properties, can be left empty
-     * @param \Yaoi\Database\Definition\Table $table
+     * @param Table $table
      * @param static|\stdClass $columns
      * @return void
      */
     static function setUpTable(\Yaoi\Database\Definition\Table $table, $columns)
     {
-        $table->setSchemaName('test_entity_db');
     }
 }

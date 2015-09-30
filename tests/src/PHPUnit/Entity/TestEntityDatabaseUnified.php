@@ -7,7 +7,7 @@
  */
 namespace YaoiTests\PHPUnit\Entity;
 
-use YaoiTests\Helper\Entity\TestEntityDb;
+use YaoiTests\Helper\Entity\TestEntityDB;
 use Yaoi\Test\PHPUnit\TestCase;
 
 class TestEntityDatabaseUnified extends TestCase
@@ -21,7 +21,7 @@ class TestEntityDatabaseUnified extends TestCase
 
     public function testDefinition()
     {
-        $table = TestEntityDb::table();
+        $table = TestEntityDB::table();
 
         $this->assertSame(array(
             0 => 'id',
@@ -40,7 +40,7 @@ class TestEntityDatabaseUnified extends TestCase
 
     public function testSave()
     {
-        $item = new TestEntityDb();
+        $item = new TestEntityDB();
         $item->name = 'Dick Cocker';
         $item->age = 32;
         $item->weight = 78;
@@ -51,12 +51,12 @@ class TestEntityDatabaseUnified extends TestCase
         $item->save();
         $this->assertEquals(1, $item->id);
 
-        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
 
         $item->name = 'John Doe';
 
         $item->save();
-        $this->assertSame($item->name, TestEntityDb::find($item->id)->name);
+        $this->assertSame($item->name, TestEntityDB::find($item->id)->name);
 
     }
 

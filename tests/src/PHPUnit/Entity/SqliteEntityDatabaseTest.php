@@ -3,7 +3,7 @@
 namespace YaoiTests\PHPUnit\Entity;
 
 use Yaoi\Database;
-use YaoiTests\Helper\Entity\TestEntityDb;
+use YaoiTests\Helper\Entity\TestEntityDB;
 
 class SqliteEntityDatabaseTest extends TestEntityDatabaseUnified
 {
@@ -32,7 +32,7 @@ SQL;
         $db->query('DROP TABLE IF EXISTS "test_entity_db"');
         $db->query($createSQL);
 
-        TestEntityDb::bindDatabase($db);
+        TestEntityDB::bindDatabase($db);
     }
 
 }
