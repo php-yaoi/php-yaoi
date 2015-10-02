@@ -100,6 +100,8 @@ EOD;
         User::table()->migration()->setLog($log)->apply();
 
         User::table()->migration()->setLog($log)->rollback();
+        User::bindDatabase($this->database, true);
+        User::$revision = 1;
 
         $this->assertStringEqualsCRLF($this->expectedMigrationLog, $logString);
 
