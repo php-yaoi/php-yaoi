@@ -7,7 +7,7 @@ use Yaoi\Database;
 
 class CheckAvailable
 {
-    public static function checkMysqli() {
+    public static function getMysqli() {
         if (!class_exists('mysqli', false)) {
             throw new \PHPUnit_Framework_SkippedTestError('Mysqli extension is not available');
         }
@@ -17,14 +17,15 @@ class CheckAvailable
         catch (Database\Exception $e) {
             throw new \PHPUnit_Framework_SkippedTestError($e->getMessage());
         }
+        return Database::getInstance('test_mysqli');
     }
 
-    public static function checkPgsql() {
+    public static function getPgsql() {
         if (!function_exists('pg_connect')) {
             throw new \PHPUnit_Framework_SkippedTestError('pg_connect() is not available');
         }
         try {
-            Database::getInstance('test_pgsql');
+            return Database::getInstance('test_pgsql');
         }
         catch (\Yaoi\Service\Exception $exception) {
             throw new \PHPUnit_Framework_SkippedTestError($exception->getMessage());
@@ -32,7 +33,7 @@ class CheckAvailable
     }
 
 
-    public static function checkPdoPgsql() {
+    public static function getPdoPgsql() {
         if (extension_loaded('PDO')) {
             $drivers = pdo_drivers();
             if (!in_array('pgsql', $drivers)) {
@@ -44,7 +45,7 @@ class CheckAvailable
         }
 
         try {
-            Database::getInstance('test_pdo_pgsql');
+            return Database::getInstance('test_pdo_pgsql');
         }
         catch (\Yaoi\Service\Exception $exception) {
             throw new \PHPUnit_Framework_SkippedTestError($exception->getMessage());

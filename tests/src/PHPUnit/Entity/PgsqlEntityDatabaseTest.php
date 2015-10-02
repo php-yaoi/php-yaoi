@@ -11,7 +11,7 @@ class PgsqlEntityDatabaseTest extends TestEntityDatabaseUnified
 
     public function setUp()
     {
-        \YaoiTests\Helper\Database\CheckAvailable::checkPgsql();
+        \YaoiTests\Helper\Database\CheckAvailable::getPgsql();
         $db = Database::getInstance('test_pgsql');
 
         $createSQL = <<<SQL

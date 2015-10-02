@@ -14,7 +14,7 @@ class MockTest extends TestCase
 {
     public function setUp()
     {
-        \YaoiTests\Helper\Database\CheckAvailable::checkMysqli();
+        \YaoiTests\Helper\Database\CheckAvailable::getMysqli();
     }
 
 

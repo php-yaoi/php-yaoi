@@ -28,8 +28,7 @@ SQL;
 )";
 
     public function setUp() {
-        \YaoiTests\Helper\Database\CheckAvailable::checkMysqli();
-        $this->database = \Yaoi\Database::getInstance('test_mysqli');
+        $this->database = \YaoiTests\Helper\Database\CheckAvailable::getMysqli();
         parent::setUp();
     }
 

@@ -21,7 +21,7 @@ SQL;
 
     protected function setUp()
     {
-        \YaoiTests\Helper\Database\CheckAvailable::checkPgsql();
+        \YaoiTests\Helper\Database\CheckAvailable::getPgsql();
         $this->db = Database::getInstance('test_pgsql');
     }
 
