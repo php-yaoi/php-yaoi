@@ -7,6 +7,7 @@ use Yaoi\Log;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Database\CheckAvailable;
 use YaoiTests\Helper\Entity\Host;
+use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\User;
 
 class MysqlComplexTest extends TestCase
@@ -73,8 +74,10 @@ EOD;
 
         //$this->database->log(new Log('stdout'));
 
+        // prepare dependencies
         User::table()->migration()->rollback();
         Host::table()->migration()->apply();
+        Session::table()->migration()->apply();
 
 
         User::table()->migration()->setLog($log)->apply();
