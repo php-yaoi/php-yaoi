@@ -14,7 +14,7 @@ use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Settings;
 
-class String extends BaseClass implements Driver
+class StringVar extends BaseClass implements Driver
 {
     private $dsn;
 

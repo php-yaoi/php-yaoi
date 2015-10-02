@@ -64,7 +64,7 @@ EOD;
         $logString = '';
         $log = Log::getInstance(function()use(&$logString){
             $settings = new Log\Settings();
-            $settings->driverClassName = Log\Driver\String::className();
+            $settings->driverClassName = Log\Driver\StringVar::className();
             $settings->storage = &$logString;
             return $settings;
         });
