@@ -17,7 +17,7 @@ class Test extends TestCase
 
         $router->route($this->getRequest(array('./cli', 'help', 'one')));
 
-        $router->route($this->getRequest(array('./cli', 'help')));
+        //$router->route($this->getRequest(array('./cli', 'help')));
     }
 
 

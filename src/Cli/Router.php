@@ -14,19 +14,14 @@ class Router extends Command\Router
         $commandName = isset($argv[1]) ? $argv[1] : self::HELP;
 
         if (self::HELP === $commandName) {
-            $helpCommand = isset($argv[2]) ? $argv[2] : null;
-            $this->help($helpCommand);
-            return;
+            $documentation = new Documentation($argv, $this->commands);
+            $documentation->showUsage();
         }
     }
 
 
 
     public function help($helpCommand = null) {
-        echo 'HELPEENG!', PHP_EOL;
-
-        //var_dump($helpCommand);
-
         if ($helpCommand) {
             if (!isset($this->commands[$helpCommand])) {
                 $this->error("Command '$helpCommand' not found");
