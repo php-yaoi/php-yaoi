@@ -7,7 +7,7 @@ use Yaoi\Cli\Command;
 use Yaoi\Cli\UnnamedArgument;
 use Yaoi\Cli\Option;
 
-class CommandOne extends Command
+class CommandTheFirst extends Command
 {
     public $argumentA;
     public $argumentB;
@@ -33,7 +33,7 @@ class CommandOne extends Command
 
     public function getName()
     {
-        return 'one';
+        return 'the-first';
     }
 
     public function execute()

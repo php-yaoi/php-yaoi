@@ -24,7 +24,6 @@ class ConsoleTest extends TestCase
         echo Colored::get('hooy', Colored::FG_LIGHT_GREEN);
 
         $ref = new \ReflectionClass(Console::className());
-        print_r($ref->getConstants());
 
         foreach ($ref->getConstants() as $key => $value) {
             $con->set($value);
@@ -32,5 +31,11 @@ class ConsoleTest extends TestCase
             $con->set();
         }
 
+
+        $con->set();
+        for ($i = 0; $i < 100; ++$i) {
+            $con->returnCaret();
+            echo $i;
+        }
     }
 }

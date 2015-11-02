@@ -5,14 +5,14 @@ namespace YaoiTests\PHPUnit\Cli;
 use Yaoi\Cli\Router;
 use Yaoi\Request;
 use Yaoi\Test\PHPUnit\TestCase;
-use YaoiTests\Helper\Command\CommandOne;
+use YaoiTests\Helper\Command\CommandTheFirst;
 use YaoiTests\Helper\Command\CommandTwo;
 
 class Test extends TestCase
 {
     public function testHelp() {
         $router = new Router();
-        $router->addCommand(new CommandOne());
+        $router->addCommand(new CommandTheFirst());
         $router->addCommand(new CommandTwo());
 
         $router->route($this->getRequest(array('./cli', 'help', 'one')));

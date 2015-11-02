@@ -3,28 +3,36 @@
 namespace Yaoi\Cli;
 
 use Yaoi\BaseClass;
-use Yaoi\Console\Colored;
 use Yaoi\Log;
 
 class Documentation extends BaseClass
 {
+
     protected $arguments;
+    /** @var  Command[] */
     protected $commands;
     protected $output;
 
     public function __construct($arguments, $commands) {
         $this->arguments = $arguments;
         $this->commands = $commands;
-        $this->output = new Log('colored-stdout');
-        echo Colored::get('test', Colored::BG_GREEN, Colored::BG_CYAN);
+        $this->output = new Console();
     }
 
     public function showUsage() {
-        $this->output->push('Ololo!', Log::TYPE_ERROR);
-        $this->output->push('Ololo2!', Log::TYPE_SUCCESS);
-        $this->output->push('Ololo2!', Log::TYPE_MESSAGE);
-        //$helpCommand = isset($argv[2]) ? $argv[2] : null;
-        //$this->help($helpCommand);
+        $this->output->set(Console::BOLD)->printLine("Usage: ")->set();
+        $this->output->addPadding();
+        $commandsTable = new Table();
+        foreach ($this->commands as $name => $command) {
+            $commandsTable->addRow(array($name, $command->getDescription()));
+        }
+        foreach ($commandsTable->getLines() as $line) {
+            $this->output->printLine($line);
+        }
+
+        $this->output->addPadding('');
+        $this->output->eol()->eol();
+        $this->output->printLine("Thanks");
         return;
 
     }
