@@ -29,13 +29,11 @@ class ExpressionTest extends \YaoiTests\PHPUnit\Sql\TestBase
         $this->assertSame('', $s->build());
     }
 
-    /**
-     * @expectedException     \Yaoi\Sql\Exception
-     * @expectedExceptionCode \Yaoi\Sql\Exception::STATEMENT_REQUIRED
-     */
     public function testCreateFromArgumentsStatementRequired()
     {
-        SimpleExpression::createFromFuncArguments(array());
+        $expression = SimpleExpression::createFromFuncArguments(array());
+        $this->assertInstanceOf(SimpleExpression::className(), $expression);
+        $this->assertTrue($expression->isEmpty());
     }
 
 
@@ -54,6 +52,7 @@ class ExpressionTest extends \YaoiTests\PHPUnit\Sql\TestBase
             }
         )));
     }
+
 
 
     /**

@@ -4,8 +4,10 @@ namespace Yaoi\Database;
 
 use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Definition\Index;
 use Yaoi\Mappable;
 use Yaoi\Sql\SelectInterface;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Statement;
 use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
@@ -230,8 +232,69 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
 
     public function findOrSave() {
+        $table = $this->table();
+        $statement = self::statement();
+        $data = $this->toArray(true);
+
+        $uniqueIndex = false;
+
+
+        foreach ($table->indexes as $index) {
+            if ($index->type !== Index::TYPE_UNIQUE && $index->type !== Index::TYPE_PRIMARY) {
+                continue;
+            }
+
+            $uniqueIndex = new SimpleExpression();
+
+            foreach ($index->columns as $column) {
+                if ($column->flags & Column::AUTO_ID) {
+                    $uniqueIndex = false;
+                    break;
+                }
+
+                $schemaName = $column->schemaName;
+                // skip unique index if null column found
+                if (!isset($data[$schemaName])) {
+                    $uniqueIndex = false;
+                    break;
+                }
+                $uniqueIndex->andExpr(
+                    '? = ?',
+                    new Symbol($schemaName),
+                    $data[$schemaName]
+                );
+            }
+
+            if ($uniqueIndex) {
+                break;
+            }
+        }
+
+        if ($uniqueIndex) {
+            $statement->where($uniqueIndex);
+        }
+        else {
+            foreach ($table->getColumns(true) as $column) {
+                if ($column->flags & Column::AUTO_ID) {
+                    continue;
+                }
+                $schemaName = $column->schemaName;
+
+                if (!isset($data[$schemaName])) {
+                    continue;
+                }
+
+                $statement->where(
+                    '? = ?',
+                    new Symbol($schemaName),
+                    $data[$schemaName]
+                );
+            }
+        }
+
+
         /** @var static $item */
-        $item = self::statement($this)->query()->fetchRow();
+        $item = $statement->query()->fetchRow();
         if (!$item) {
             $this->save();
         }

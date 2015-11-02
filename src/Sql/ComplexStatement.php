@@ -30,35 +30,6 @@ abstract class ComplexStatement extends Expression implements
     DeleteInterface
 {
 
-    /**
-     * @var Expression[]
-     */
-    protected $from = array();
-
-    public function from($expression, $binds = null)
-    {
-        $this->from [] = SimpleExpression::createFromFuncArguments(func_get_args());
-        return $this;
-    }
-
-    protected function buildFrom(Quoter $quoter)
-    {
-        $from = '';
-        if ($this->from) {
-            foreach ($this->from as $expression) {
-                $from .= $expression->build($quoter);
-                $from .= ', ';
-            }
-
-            if ($from) {
-                $from = ' FROM ' . substr($from, 0, -2);
-            }
-        }
-
-        return $from;
-    }
-
-
     const JOIN_LEFT = 'LEFT';
     const JOIN_RIGHT = 'RIGHT';
     const JOIN_INNER = 'INNER';
@@ -124,6 +95,34 @@ abstract class ComplexStatement extends Expression implements
         return $this;
 
     }
+
+    /** @var  SimpleExpression */
+    protected $tables;
+    public function from($expression, $binds = null) {
+        return $this->initAdd('tables', self::OP_COMMA, func_get_args());
+    }
+
+    public function buildFrom(Quoter $quoter) {
+        $from = '';
+
+        if ($this->tables && !$this->tables->isEmpty()) {
+            $from = ' FROM ' . $this->tables->build($quoter);
+        }
+
+        return $from;
+    }
+
+
+    public function buildTable(Quoter $quoter) {
+        $tables = '';
+
+        if ($this->tables && !$this->tables->isEmpty()) {
+            $tables = ' ' . $this->tables->build($quoter);
+        }
+
+        return $tables;
+    }
+
 
     public function where($expression, $binds = null)
     {

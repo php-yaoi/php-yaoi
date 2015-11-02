@@ -123,7 +123,7 @@ class Table extends BaseClass
             if ($column->flags & Column::AUTO_ID) {
                 $this->autoIdColumn = $column;
                 if (!$this->primaryKey) {
-                    $this->primaryKey = array($column->schemaName => $column);
+                    $this->setPrimaryKey($column);
                 }
             }
 
@@ -154,6 +154,10 @@ class Table extends BaseClass
         }
         $this->primaryKey = array();
         /** @var Column $column */
+        $index = new Index($columns);
+        $index->setType(Index::TYPE_PRIMARY);
+        $this->indexes [Index::TYPE_PRIMARY]= $index;
+
         foreach ($columns as $column) {
             $this->primaryKey [$column->schemaName]= $column;
         }

@@ -18,4 +18,13 @@ class Raw extends BaseClass implements Quoter
         }
         return (string)$value;
     }
+
+    private static $instance;
+    public static function create() {
+        if (null === self::$instance) {
+            self::$instance = new static;
+        }
+        return self::$instance;
+    }
+
 }

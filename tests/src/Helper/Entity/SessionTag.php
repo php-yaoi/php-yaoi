@@ -12,7 +12,7 @@ class SessionTag extends Entity
 {
     public $sessionId;
     public $tagId;
-    public $addedAt;
+    public $addedAtUt;
 
     /**
      * Required setup column types in provided columns object
@@ -22,7 +22,7 @@ class SessionTag extends Entity
     {
         $columns->sessionId = Session::columns()->id;
         $columns->tagId = Tag::columns()->id;
-        $columns->addedAt = Column::TIMESTAMP;
+        $columns->addedAtUt = Column::INTEGER + Column::NOT_NULL;
     }
 
     /**

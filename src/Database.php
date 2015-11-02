@@ -156,7 +156,7 @@ class Database extends Service implements DatabaseContract
      * @return SimpleExpression
      * @throws Sql\Exception
      */
-    public function expr($expression, $binds = null)
+    public function expr($expression = null, $binds = null)
     {
         return SimpleExpression::createFromFuncArguments(func_get_args())->bindDatabase($this);
     }

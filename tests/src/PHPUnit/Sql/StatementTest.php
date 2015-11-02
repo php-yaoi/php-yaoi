@@ -46,4 +46,14 @@ class StatementTest extends \YaoiTests\PHPUnit\Sql\TestBase
         $s = Yaoi\Database::getInstance('test_mysqli')->statement();
         $this->assertSame('', $s->build());
     }
+
+
+    public function testUnion()
+    {
+        $statement = new Statement();
+        $statement->select('1');
+        $statement->union('2');
+        $statement->unionAll('3');
+        $this->assertSame('SELECT 1 UNION 2 UNION ALL 3', $statement->build(Yaoi\String\Quoter\Raw::create()));
+    }
 }

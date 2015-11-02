@@ -3,6 +3,7 @@ namespace YaoiTests\PHPUnit\Database\Entity;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
@@ -144,7 +145,7 @@ Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is up to date
 CREATE TABLE `yaoi_tests_entity_session_tag` (
  `session_id` int NOT NULL,
  `tag_id` int NOT NULL,
- `added_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `added_at_ut` int NOT NULL,
  PRIMARY KEY (`session_id`, `tag_id`)
 )
 OK
@@ -271,8 +272,28 @@ SQL;
         $sessionTag = new SessionTag();
         $sessionTag->sessionId = 123;
         $sessionTag->tagId = 456;
+        try {
+            SessionTag::statement($sessionTag)->delete()->query();
+        }
+        catch (Exception $exception) {
+            echo $exception->query;
+        }
+
+        $sessionTag = new SessionTag();
+        $sessionTag->sessionId = 123;
+        $sessionTag->tagId = 456;
+        $sessionTag->addedAtUt = 123123;
 
         $sessionTag->findOrSave();
+
+        $sessionTag = new SessionTag();
+        $sessionTag->sessionId = 123;
+        $sessionTag->tagId = 456;
+        $sessionTag->addedAtUt = 456456;
+
+        $sessionTag->findOrSave();
+
+        $this->assertSame(123123, $sessionTag->addedAtUt);
     }
 
     /**
@@ -291,7 +312,7 @@ SQL;
     public function testUpdateFullPrimaryRequired() {
         $sessionTag = new SessionTag();
         $sessionTag->sessionId = 123;
-        $sessionTag->addedAt = time();
+        $sessionTag->addedAtUt = time();
         $sessionTag->update();
     }
 
@@ -307,16 +328,13 @@ SQL;
     }
 
 
-
-
-
-
     public function setUp() {
         Host::bindDatabase($this->database);
         Session::bindDatabase($this->database);
         SessionTag::bindDatabase($this->database);
         Tag::bindDatabase($this->database);
     }
+
 
 
 }

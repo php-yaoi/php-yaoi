@@ -106,21 +106,21 @@ class Column extends BaseClass
     /** @var  Table */
     public $table;
 
-    public static function castField($value, $columnType)
+    public static function castField($value, $columnFlags)
     {
         if (is_object($value)) {
             $value = (string)$value;
         }
 
-        if ($columnType !== self::AUTO_TYPE) {
+        if ($columnFlags !== self::AUTO_TYPE) {
             switch (true) {
-                case self::FLOAT & $columnType:
+                case self::FLOAT & $columnFlags:
                     $value = (float)$value;
                     break;
-                case self::INTEGER & $columnType:
+                case self::INTEGER & $columnFlags:
                     $value = (int)$value;
                     break;
-                case self::STRING & $columnType:
+                case self::STRING & $columnFlags:
                     $value = (string)$value;
             }
         }

@@ -33,7 +33,7 @@ interface Contract extends Able, Quoter
      * @param null $binds
      * @return SimpleExpression
      */
-    public function expr($statement, $binds = null);
+    public function expr($statement = null, $binds = null);
 
     /**
      * @param null $from

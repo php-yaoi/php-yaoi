@@ -23,9 +23,8 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
      */
     public static function createFromFuncArguments($arguments)
     {
-        if (empty($arguments[0])) {
-            throw new \Yaoi\Sql\Exception('Literal statement or Sql_Expression required as first argument',
-                \Yaoi\Sql\Exception::STATEMENT_REQUIRED);
+        if (empty($arguments)) {
+            return new static();
         }
         if ($arguments[0] instanceof Expression) {
             return $arguments[0];

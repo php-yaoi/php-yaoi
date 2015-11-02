@@ -29,8 +29,6 @@ class Statement extends ComplexStatement
     const CMD_UPDATE = 'UPDATE';
     private $command;
 
-    protected $tables = array();
-
     public function update($table = null)
     {
         // TODO implement
@@ -38,7 +36,7 @@ class Statement extends ComplexStatement
         // UPDATE t1 SET dd = 1 WHERE ddd = 2
         $this->command = self::CMD_UPDATE;
         if (null !== $table) {
-            $this->tables [] = $table;
+            $this->from($table);
         }
         return $this;
     }
@@ -47,7 +45,7 @@ class Statement extends ComplexStatement
     {
         $this->command = self::CMD_INSERT;
         if (null !== $table) {
-            $this->tables [] = $table;
+            $this->from($table);
         }
         return $this;
     }
@@ -56,7 +54,7 @@ class Statement extends ComplexStatement
     {
         $this->command = self::CMD_DELETE;
         if (null !== $table) {
-            $this->tables [] = $table;
+            $this->from($table);
         }
         return $this;
     }
@@ -144,22 +142,6 @@ class Statement extends ComplexStatement
         }
 
         return $q;
-    }
-
-
-    private function buildTable(Quoter $quoter)
-    {
-        if ($this->tables) {
-            $tables = $this->tables;
-            foreach ($tables as &$table) {
-                if ($table instanceof Symbol) {
-                    $table = $quoter->quote($table);
-                }
-            }
-            return ' ' . implode(', ', $tables);
-        } else {
-            return '';
-        }
     }
 
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vpoturaev
- * Date: 8/6/15
- * Time: 12:50
- */
 
 namespace Yaoi\Sql;
 
@@ -130,6 +124,7 @@ abstract class Expression extends BaseClass
         }
 
 
+        $result = '';
         if ($this->binds) {
             if ($quoter === null) {
                 throw new Exception('Missing quoter', Exception::MISSING_QUOTER);
@@ -175,9 +170,10 @@ abstract class Expression extends BaseClass
                 }
                 $result = strtr($statement, $replace);
             }
-        } else {
+        } elseif ($this->statement) {
             $result = $this->statement;
         }
+
 
         foreach ($this->queue as $item) {
             /**
