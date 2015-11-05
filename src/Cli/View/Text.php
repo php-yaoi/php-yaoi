@@ -10,17 +10,21 @@ use Yaoi\View\Semantic\Semantic;
 class Text extends Hardcoded implements Renderer
 {
 
-    public function __construct(Semantic $item)
+    /** @var  \Yaoi\View\Semantic\Text */
+    private $text;
+    public function __construct(\Yaoi\View\Semantic\Text $item)
     {
+        $this->text = $item;
     }
 
-    public function setType() {
-
-    }
 
     public function render()
     {
-        // TODO: Implement render() method.
+        $console = Console::getInstance();
+        if ($this->text->type === \Yaoi\View\Semantic\Text::ERROR) {
+            $console->set(Console::FG_RED);
+        }
+        $console->printF($this->text);
     }
 
 
