@@ -15,7 +15,12 @@ class Expression extends BaseClass
     private $binds;
 
     public function __construct($statement, $binds = null) {
-        $arguments = func_get_args();
+        if (is_array($statement)) {
+            $arguments = $statement;
+        }
+        else {
+            $arguments = func_get_args();
+        }
 
         if (count($arguments) === 1 && is_array($arguments[0])) {
             $arguments = $arguments[0];

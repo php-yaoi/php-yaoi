@@ -42,4 +42,13 @@ abstract class BaseClass
     }
 
 
+    public static function __set_state(array $properties) {
+        $instance = new static;
+        foreach ($properties as $property => $value) {
+            $instance->$property = $value;
+        }
+        return $instance;
+    }
+
+
 }
