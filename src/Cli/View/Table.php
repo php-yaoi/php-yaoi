@@ -1,25 +1,24 @@
 <?php
 
-namespace Yaoi\Cli;
+namespace Yaoi\Cli\View;
 
-use Yaoi\BaseClass;
+use Yaoi\View\Hardcoded;
+use Yaoi\View\Semantic\Renderer;
+use Yaoi\View\Semantic\Semantic;
 
-class Table extends BaseClass
+class Table extends Hardcoded implements Renderer
 {
+    public $divider = '   ';
+    /** @var \Yaoi\View\Semantic\Rows  */
+    private $rows;
 
-    private $divider = '   ';
-    private $rows = array();
-
-    public function addRow(array $row)
+    public function __construct(Semantic $rows)
     {
-        $this->rows [] = $row;
-        return $this;
+        $this->rows = $rows;
     }
 
-
-    public function getLines()
+    public function render()
     {
-        $lines = array();
         $length = array();
         foreach ($this->rows as $row) {
             foreach ($row as $key => $value) {
@@ -43,8 +42,7 @@ class Table extends BaseClass
                 }
                 $line .= $value;
             }
-            $lines []= $line;
+            echo $line, PHP_EOL;
         }
-        return $lines;
     }
 }

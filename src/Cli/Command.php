@@ -2,7 +2,6 @@
 
 namespace Yaoi\Cli;
 
-
 use Yaoi\Command\Exception;
 use Yaoi\Request;
 use Yaoi\StringVar;

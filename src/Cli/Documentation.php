@@ -3,6 +3,7 @@
 namespace Yaoi\Cli;
 
 use Yaoi\BaseClass;
+use Yaoi\Cli\View\Table;
 use Yaoi\Log;
 
 class Documentation extends BaseClass
@@ -32,7 +33,6 @@ class Documentation extends BaseClass
 
         $this->output->addPadding('');
         $this->output->eol()->eol();
-        $this->output->printLine("Thanks");
         return;
 
     }

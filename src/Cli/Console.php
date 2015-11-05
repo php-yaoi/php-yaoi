@@ -101,4 +101,16 @@ class Console extends BaseClass
     }
 
 
+    /**
+     * @return static
+     */
+    public static function getInstance() {
+        static $instance;
+        if (null === $instance) {
+            $instance = new static;
+        }
+        return $instance;
+    }
+
+
 }

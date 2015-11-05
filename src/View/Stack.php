@@ -2,9 +2,7 @@
 
 namespace Yaoi\View;
 
-use Yaoi\BaseClass;
-
-class Stack extends BaseClass implements Renderer
+class Stack extends Hardcoded implements Renderer
 {
     /**
      * @var Renderer[]
@@ -30,16 +28,4 @@ class Stack extends BaseClass implements Renderer
         return $this;
     }
 
-    public function __toString()
-    {
-        ob_start();
-        try {
-            $this->render();
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
-        $result = ob_get_contents();
-        ob_end_clean();
-        return $result;
-    }
 }
