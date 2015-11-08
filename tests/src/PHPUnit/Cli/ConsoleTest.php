@@ -22,25 +22,25 @@ class ConsoleTest extends TestCase
             $con->set($value)->printLine($key)->set();
         }
         $out = ob_get_clean();
-        $this->assertSame("\x1B" . '[0mRESET' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[1mBOLD' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[30mFG_BLACK' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[31mFG_RED' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[32mFG_GREEN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[33mFG_BROWN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[34mFG_BLUE' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[35mFG_MAGENTA' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[36mFG_CYAN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[37mFG_WHITE' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[40mBG_BLACK' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[41mBG_RED' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[42mBG_GREEN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[43mBG_BROWN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[44mBG_BLUE' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[45mBG_MAGENTA' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[46mBG_CYAN' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[47mBG_WHITE' . "\r\n"
-            . "\x1B" . '[m' . "\x1B" . '[49mBG_DEFAULT' . "\r\n"
+        $this->assertSame("\x1B" . '[0mRESET' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[1mBOLD' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[30mFG_BLACK' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[31mFG_RED' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[32mFG_GREEN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[33mFG_BROWN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[34mFG_BLUE' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[35mFG_MAGENTA' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[36mFG_CYAN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[37mFG_WHITE' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[40mBG_BLACK' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[41mBG_RED' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[42mBG_GREEN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[43mBG_BROWN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[44mBG_BLUE' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[45mBG_MAGENTA' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[46mBG_CYAN' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[47mBG_WHITE' . PHP_EOL
+            . "\x1B" . '[m' . "\x1B" . '[49mBG_DEFAULT' . PHP_EOL
             . "\x1B" . '[m',
             $out);
         //echo $this->varExportString($out);
@@ -65,9 +65,9 @@ class ConsoleTest extends TestCase
 
         $result = Table::create($rows)->__toString();
         $this->assertSame(
-              '1       2      3    ' . "\r\n"
-            . 'one     two    three' . "\r\n"
-            . 'alpha   beta   gamma' . "\r\n"
+              '1       2      3    ' . PHP_EOL
+            . 'one     two    three' . PHP_EOL
+            . 'alpha   beta   gamma' . PHP_EOL
         , $result);
 
     }
