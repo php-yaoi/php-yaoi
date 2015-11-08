@@ -4,22 +4,33 @@ namespace Yaoi\Cli\View;
 
 use Yaoi\View\Hardcoded;
 use Yaoi\View\Semantic\Renderer;
-use Yaoi\View\Semantic\Semantic;
 
 class Table extends Hardcoded implements Renderer
 {
-    public $divider = '   ';
-    /** @var \Yaoi\View\Semantic\Rows  */
+    private $colDelimiter = '   ';
+    private $rowDelimiter = null;
+    /** @var \Iterator  */
     private $rows;
 
-    public function __construct(Semantic $rows)
+    public function __construct(\Iterator $rows)
     {
         $this->rows = $rows;
+    }
+
+    public function setColDelimiter($delimiter = '   ') {
+        $this->colDelimiter = $delimiter;
+        return $this;
+    }
+
+    public function setRowDelimiter($delimiter = null) {
+        $this->rowDelimiter = $delimiter;
+        return $this;
     }
 
     public function render()
     {
         $length = array();
+        $rowDelimiterLine = null;
         foreach ($this->rows as $row) {
             foreach ($row as $key => $value) {
                 $stringLength = strlen($value);
@@ -38,11 +49,22 @@ class Table extends Hardcoded implements Renderer
                     $value = str_pad($value, $maxLength, ' ');
                 }
                 if ($line) {
-                    $line .= $this->divider;
+                    $line .= $this->colDelimiter;
                 }
                 $line .= $value;
             }
             echo $line, PHP_EOL;
+            if ($this->rowDelimiter) {
+                if (null === $rowDelimiterLine) {
+                    $lineLength = strlen($line);
+                    $repeat = ceil($lineLength / strlen($this->rowDelimiter));
+                    $rowDelimiterLine = str_repeat($this->rowDelimiter, $repeat);
+                    if (strlen($rowDelimiterLine) > $lineLength) {
+                        $rowDelimiterLine = substr($rowDelimiterLine, 0, $lineLength);
+                    }
+                }
+                echo $rowDelimiterLine, PHP_EOL;
+            }
         }
     }
 }

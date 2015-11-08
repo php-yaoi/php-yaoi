@@ -45,7 +45,7 @@ class Console extends BaseClass
         if (!is_array($mode)) {
             $mode = func_get_args();
         }
-        echo "\033[", implode(';', $mode), 'm';
+        echo "\x1B[", implode(';', $mode), 'm';
         return $this;
     }
 
@@ -93,9 +93,22 @@ class Console extends BaseClass
         return $this;
     }
 
+    public function printLines($statement, $binds = null) {
+        if ($binds) {
+            $e = new Expression(func_get_args());
+            $statement = $e->build();
+        }
+
+        $lines = explode("\n", str_replace("\r\n", "\n", $statement));
+        foreach ($lines as $line) {
+            $this->printLine($line);
+        }
+        return $this;
+    }
+
     private $lineStarted = false;
     private $padding = '';
-    public function addPadding($padding = '   ') {
+    public function setPadding($padding = '   ') {
         $this->padding = $padding;
         return $this;
     }

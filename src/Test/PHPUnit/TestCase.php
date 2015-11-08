@@ -48,4 +48,57 @@ class TestCase extends PHPUnit_Framework_TestCase
             $this->assertNotEmpty($value & $actual[$key], $message);
         }
     }
+
+    public function varExportString($string) {
+        static $specialChars = array(
+            "\r" => '\r',
+            "\n" => '\n',
+            "\t" => '\t',
+        );
+        $result = '';
+        $started = false;
+        //*
+        for ($i = 0; $i < strlen($string); ++$i) {
+
+            $char = $string[$i];
+            $ord = ord($char);
+            if ($ord < 32) {
+                if (isset($specialChars[$char])) {
+                    $char = $specialChars[$char];
+                }
+                else {
+                    $char = strtoupper(dechex($ord));
+                    if (strlen($char) < 2) {
+                        $char = '0' . $char;
+                    }
+                    $char = '\x' . $char;
+                }
+                if ($started === '\'') {
+                    $result .= '\' . "';
+                }
+                elseif (!$started) {
+                    $result .= $result ? '. "' : '"';
+                }
+                $started = '"';
+            }
+            else {
+                if ($started === '"') {
+                    $result .= '" . \'';
+                }
+                elseif (!$started) {
+                    $result .= $result ? '. \'' : '\'';
+                }
+                $started = '\'';
+            }
+            $result .= $char;
+
+            if ('\n' === $char) {
+                $result .= '"' . PHP_EOL;
+                $started = '';
+            }
+
+        }
+        $result .= $started;
+        return $result;
+    }
 } 

@@ -51,4 +51,26 @@ abstract class BaseClass
     }
 
 
+    /**
+     * @param BaseClass $object
+     * @return static
+     * @throws \Exception
+     */
+    public static function cast(BaseClass $object) {
+        if ($object instanceof static) {
+            return $object;
+        }
+        $newObject = new static();
+        // todo check performance of reflection and cache meta if needed
+        $ref = new \ReflectionClass($object);
+        $properties = $ref->getProperties(
+            \ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED
+        );
+        foreach ($properties as $property) {
+            $propertyName = $property->name;
+            $newObject->$propertyName = $object->$propertyName;
+        }
+        return $newObject;
+    }
+
 }

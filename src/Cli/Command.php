@@ -2,15 +2,16 @@
 
 namespace Yaoi\Cli;
 
+use Yaoi\Cli\View\Table;
 use Yaoi\Command\Exception;
+use Yaoi\Command\Option;
 use Yaoi\Request;
-use Yaoi\StringVar;
 
 abstract class Command extends \Yaoi\Command
 {
     const OPTION_NAME = '--';
     const OPTION_SHORT = '-';
-    public function setup(Request $request) {
+    public function init(Request $request) {
         $tokens = $request->server()->argv;
         $argc = count($tokens);
         for ($index = 0; $index < $argc; ++$index) {
@@ -41,28 +42,39 @@ abstract class Command extends \Yaoi\Command
         }
     }
 
+    private static $headingColor = Console::FG_BLUE;
+    public static function help() {
+        $definition = static::definition();
+        $console = new Console();
+        $console
+            ->set(self::$headingColor, Console::BOLD)->printLine($definition->name)
+            ->set()->printLine($definition->description);
 
-    public function __construct() {
-        parent::__construct();
-        foreach ((array)$this->options as $name => $option) {
+        $usage = '';
+        //print_r($definition->options);
+        $optionsDescription = array();
+        foreach ((array)$definition->options as $name => $option) {
+            if (!$option instanceof Option) {
+                $option = Option::cast($option);
+            }
+
             if ($option instanceof UnnamedArgument) {
-                $this->arguments []= $option;
+                $usage .= ' ' . $option->getUsage();
             }
+            elseif ($option instanceof Option && $option->required) {
+                $usage .= ' ' . $option->getUsage();
+            }
+            //else {
+                $optionsDescription []= array($option->getUsage(), $option->description);
+            //}
 
-            if ($option instanceof Option && $option->shortName) {
-                $this->optionsByShortName [$option->shortName]= $option;
-            }
         }
+
+        $console->eol()->set(self::$headingColor)->printLine("Usage: ")
+            ->set()->setPadding('   ')->printLine($usage)->setPadding('');
+        $console->eol()->set(self::$headingColor)->printLine('Options: ')
+            ->set()->setPadding('   ')
+            ->printLines(Table::create(new \ArrayIterator($optionsDescription)));
     }
-
-    /**
-     * @var UnnamedArgument[]
-     */
-    public $arguments = array();
-
-    /**
-     * @var Option[]
-     */
-    public $optionsByShortName = array();
 
 }

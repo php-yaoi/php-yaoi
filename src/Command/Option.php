@@ -41,5 +41,6 @@ class Option extends BaseClass
         return $this;
     }
 
+
     public $type = self::TYPE_BOOL;
 }

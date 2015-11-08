@@ -13,7 +13,7 @@ class CommandTwo extends Command
      * @param static|\stdClass $options
      * @return void
      */
-    public function setUpOptions($options)
+    public function setUpDefinition($options)
     {
         $options->optionD = Command\Option::create();
     }
