@@ -28,7 +28,12 @@ class Raw extends BaseClass implements Renderer
 
     public function __toString()
     {
-        return $this->data;
+        try {
+            return (string)$this->data;
+        }
+        catch (\Exception $exception) {
+            return 'ERROR: (' . $exception->getCode() . ') ' . $exception->getMessage();
+        }
     }
 
 }

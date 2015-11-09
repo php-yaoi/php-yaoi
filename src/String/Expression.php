@@ -29,7 +29,7 @@ class Expression extends BaseClass
         $this->statement = $arguments[0];
 
         $count = count($arguments);
-        if ($count > 2) {
+        if ($count > 1) {
             array_shift($arguments);
             $this->binds = $arguments;
         } elseif (array_key_exists(1, $arguments)) {

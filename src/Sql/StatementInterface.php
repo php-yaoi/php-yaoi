@@ -6,6 +6,13 @@ use Yaoi\Database\Contract;
 use Yaoi\String\Quoter;
 use Yaoi\Database\Query;
 
+
+/**
+ * Interface StatementInterface
+ * @package Yaoi\Sql
+ *
+ * @method SelectInterface select($expression, ...$binds)
+ */
 interface StatementInterface
 {
     /**
@@ -37,13 +44,5 @@ interface StatementInterface
      * @return UpdateInterface
      */
     public function update($table = null);
-
-    /**
-     * @param $expression
-     * @param null $binds
-     * @param mixed $binds, ... unlimited OPTIONAL number of additional binds
-     * @return SelectInterface
-     */
-    public function select($expression = null, $binds = null);
 
 }

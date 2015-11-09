@@ -43,7 +43,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
     /**
-     * @return \stdClass|static
+     * @return static
      */
     public static function columns() {
         return static::table()->columns;
