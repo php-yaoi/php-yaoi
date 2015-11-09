@@ -29,11 +29,13 @@ class Expression extends BaseClass
         $this->statement = $arguments[0];
 
         $count = count($arguments);
-        if ($count > 1) {
+        if ($count > 2) {
             array_shift($arguments);
             $this->binds = $arguments;
         } elseif (array_key_exists(1, $arguments)) {
-            $this->binds = $arguments[1];
+            $this->binds = is_array($arguments[1])
+                ? $arguments[1]
+                : array($arguments[1]);
         }
     }
 
