@@ -14,7 +14,7 @@ use Yaoi\String\Quoter;
  * @method SelectInterface groupBy($expression, ...$binds)
  * @method SelectInterface having($expression, ...$binds)
  * @method SelectInterface order($expression, ...$binds)
- * @method SelectInterface limit($limit, $offset)
+ * @method SelectInterface limit($limit, $offset = null)
  * @method SelectInterface offset($offset)
  * @method SelectInterface union($expression, ...$binds)
  * @method SelectInterface unionAll($expression, ...$binds)

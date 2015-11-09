@@ -30,13 +30,13 @@ interface StatementInterface
      * @param $table
      * @return InsertInterface
      */
-    public function insert($table);
+    public function insert($table = null);
 
     /**
      * @param $table
      * @return UpdateInterface
      */
-    public function update($table);
+    public function update($table = null);
 
     /**
      * @param $expression

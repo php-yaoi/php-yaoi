@@ -41,7 +41,7 @@ class Statement extends ComplexStatement
         return $this;
     }
 
-    public function insert($table)
+    public function insert($table = null)
     {
         $this->command = self::CMD_INSERT;
         if (null !== $table) {

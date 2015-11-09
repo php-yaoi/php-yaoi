@@ -5,14 +5,14 @@ namespace Yaoi\Sql;
 /**
  * Interface UpdateInterface
  * @package Yaoi\Sql
- * @method SelectInterface innerJoin($expression, ...$binds)
- * @method SelectInterface leftJoin($expression, ...$binds)
- * @method SelectInterface rightJoin($expression, ...$binds)
- * @method SelectInterface where($expression, ...$binds)
- * @method SelectInterface order($expression, ...$binds)
- * @method SelectInterface set($expression, ...$binds)
- * @method SelectInterface limit($limit, $offset)
- * @method SelectInterface offset($offset)
+ * @method UpdateInterface innerJoin($expression, ...$binds)
+ * @method UpdateInterface leftJoin($expression, ...$binds)
+ * @method UpdateInterface rightJoin($expression, ...$binds)
+ * @method UpdateInterface where($expression, ...$binds)
+ * @method UpdateInterface order($expression, ...$binds)
+ * @method UpdateInterface set($expression, ...$binds)
+ * @method UpdateInterface limit($limit, $offset = null)
+ * @method UpdateInterface offset($offset)
  */
 interface UpdateInterface extends StatementInterface
 {
