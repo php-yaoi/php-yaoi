@@ -9,6 +9,7 @@ class Definition extends BaseClass
     public $options;
     public $description;
     public $name;
+    public $version;
 
     public function setOptions(\stdClass $options) {
         /**

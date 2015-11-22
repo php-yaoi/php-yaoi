@@ -20,7 +20,8 @@ class Option extends BaseClass
 
     public function setEnum($values) {
         $this->type = self::TYPE_ENUM;
-        $this->values = is_array($values) ? $values : func_get_args();
+        $values = is_array($values) ? $values : func_get_args();
+        $this->values = array_combine($values, $values);
         return $this;
     }
 
@@ -35,12 +36,24 @@ class Option extends BaseClass
         return $this;
     }
 
-    public $required;
-    public function setRequired($required = true) {
-        $this->required = $required;
+    public $isRequired;
+    public function setIsRequired($isRequired = true) {
+        $this->isRequired = $isRequired;
         return $this;
     }
 
+    public function validateFilterValue($value) {
+        if ($this->type === self::TYPE_ENUM) {
+            if (!isset($this->values[$value])) {
+                throw new Exception('Invalid value for ' . $this->name . ': ' . $value, Exception::INVALID_VALUE);
+            }
+            else {
+                return $value;
+            }
+
+        }
+        else return $value;
+    }
 
     public $type = self::TYPE_BOOL;
 }

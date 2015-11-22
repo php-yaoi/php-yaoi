@@ -77,7 +77,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @throws \Yaoi\Entity\Exception
      * @todo testdoc
      */
-    public static function find($id)
+    public static function getByPrimaryKey($id)
     {
         $className = get_called_class();
         $table = static::table();
@@ -94,6 +94,73 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             $statement->where('? = ?', new Symbol($table->schemaName, $keyField->schemaName), $keyValue);
         }
         return $statement->query()->fetchRow();
+    }
+
+    public function find() {
+        $table = $this->table();
+        $statement = self::statement();
+        $data = $this->toArray(true);
+
+        $uniqueIndex = false;
+
+
+        foreach ($table->indexes as $index) {
+            if ($index->type !== Index::TYPE_UNIQUE && $index->type !== Index::TYPE_PRIMARY) {
+                continue;
+            }
+
+            $uniqueIndex = new SimpleExpression();
+
+            foreach ($index->columns as $column) {
+                if ($column->flags & Column::AUTO_ID) {
+                    $uniqueIndex = false;
+                    break;
+                }
+
+                $schemaName = $column->schemaName;
+                // skip unique index if null column found
+                if (!isset($data[$schemaName])) {
+                    $uniqueIndex = false;
+                    break;
+                }
+                $uniqueIndex->andExpr(
+                    '? = ?',
+                    new Symbol($schemaName),
+                    $data[$schemaName]
+                );
+            }
+
+            if ($uniqueIndex) {
+                break;
+            }
+        }
+
+        if ($uniqueIndex) {
+            $statement->where($uniqueIndex);
+        }
+        else {
+            foreach ($table->getColumns(true) as $column) {
+                if ($column->flags & Column::AUTO_ID) {
+                    continue;
+                }
+                $schemaName = $column->schemaName;
+
+                if (!isset($data[$schemaName])) {
+                    continue;
+                }
+
+                $statement->where(
+                    '? = ?',
+                    new Symbol($schemaName),
+                    $data[$schemaName]
+                );
+            }
+        }
+
+
+        /** @var static $item */
+        $item = $statement->query()->fetchRow();
+        return $item;
     }
 
     static function fromArray(array $row, $object = null, $source = null)
@@ -113,7 +180,6 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
 
         return $object;
-
     }
 
     public function toArray($skipNotSetProperties = false)
@@ -231,75 +297,17 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
 
-    public function findOrSave() {
-        $table = $this->table();
-        $statement = self::statement();
-        $data = $this->toArray(true);
+    public function findOrSave($updateRecord = false) {
+        $item = $this->find();
 
-        $uniqueIndex = false;
-
-
-        foreach ($table->indexes as $index) {
-            if ($index->type !== Index::TYPE_UNIQUE && $index->type !== Index::TYPE_PRIMARY) {
-                continue;
-            }
-
-            $uniqueIndex = new SimpleExpression();
-
-            foreach ($index->columns as $column) {
-                if ($column->flags & Column::AUTO_ID) {
-                    $uniqueIndex = false;
-                    break;
-                }
-
-                $schemaName = $column->schemaName;
-                // skip unique index if null column found
-                if (!isset($data[$schemaName])) {
-                    $uniqueIndex = false;
-                    break;
-                }
-                $uniqueIndex->andExpr(
-                    '? = ?',
-                    new Symbol($schemaName),
-                    $data[$schemaName]
-                );
-            }
-
-            if ($uniqueIndex) {
-                break;
-            }
-        }
-
-        if ($uniqueIndex) {
-            $statement->where($uniqueIndex);
-        }
-        else {
-            foreach ($table->getColumns(true) as $column) {
-                if ($column->flags & Column::AUTO_ID) {
-                    continue;
-                }
-                $schemaName = $column->schemaName;
-
-                if (!isset($data[$schemaName])) {
-                    continue;
-                }
-
-                $statement->where(
-                    '? = ?',
-                    new Symbol($schemaName),
-                    $data[$schemaName]
-                );
-            }
-        }
-
-
-        /** @var static $item */
-        $item = $statement->query()->fetchRow();
         if (!$item) {
             $this->save();
         }
-        else {
+        elseif (!$updateRecord) {
             self::fromArray($item->toArray(), $this);
+        }
+        else {
+
         }
         return $this;
     }

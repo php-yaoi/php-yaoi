@@ -1,28 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vearutop
- * Date: 06.11.2015
- * Time: 3:11
- */
 
 namespace Yaoi\View\Semantic;
 
+use Yaoi\BaseClass;
 
-class Text
+class Text extends BaseClass
 {
     const SUCCESS = 'success';
     const INFO = 'info';
     const ERROR = 'error';
-    const NEUTRAL = 'neutral';
+    const TEXT = 'text';
+    const HEADING = 'heading';
 
     public $value;
-    public $type;
+    public $type = self::TEXT;
 
-    public function __construct($text, $type = self::NEUTRAL)
+    public function __construct($text)
     {
         $this->value = $text;
-        $this->type = $type;
     }
-
 }

@@ -6,32 +6,21 @@ use Yaoi\Command\Definition;
 use Yaoi\Command\Option;
 use Yaoi\String\Utils;
 
-abstract class Command implements Command\Contract
+abstract class Command extends BaseClass implements Command\Contract
 {
-    public function __construct() {
-        $this->options = new \stdClass();
-        $this->setUpDefinition($this->options);
-        /**
-         * @var string $name
-         * @var Option $option
-         */
-        foreach ((array)$this->options as $name => $option) {
-            if (empty($option->name)) {
-                $option->name = Utils::fromCamelCase($name, '-');
-            }
-
-            $this->optionsByName[$option->name] = $option;
-        }
-    }
-
-
     private static $definitions = array();
     /**
-     * @param bool|false $asArray
-     * @return Option[]|\stdClass|Command|static
+     * @return static
      */
-    public static function options($asArray = false) {
+    public static function options() {
         return static::definition()->options;
+    }
+
+    /**
+     * @return Option[]
+     */
+    public static function optionsArray() {
+        return (array)static::definition()->options;
     }
 
     /**
@@ -43,12 +32,22 @@ abstract class Command implements Command\Contract
         if (null !== $definition) {
             return $definition;
         }
-        $definition = new Definition();
-        $options = new \stdClass();
-        static::setUpDefinition($definition, $options);
-        $definition->setOptions($options);
+        $definition = static::createDefinition();
+        static::setUpDefinition($definition, $definition->options);
+        $definition->setOptions($definition->options);
         return $definition;
     }
 
-    public $optionsByName = array();
+    protected static function createDefinition() {
+        $definition = new Definition();
+        $definition->options = new \stdClass();
+        return $definition;
+    }
+
+    public function run() {
+        $this->performAction();
+    }
+
+    abstract protected function performAction();
+
 }

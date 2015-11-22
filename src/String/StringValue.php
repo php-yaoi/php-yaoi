@@ -22,7 +22,7 @@ class StringValue extends BaseClass
     }
 
     /**
-     * Returns substring after provided start
+     * Returns substring after provided start or false if string starts differently
      *
      * @param $substring
      * @param $ignoreCase

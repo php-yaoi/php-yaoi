@@ -41,11 +41,17 @@ class Console extends BaseClass
     const BG_WHITE = 47;      // set white background
     const BG_DEFAULT = 49;     // set default background color
 
+    private $mode = array(self::RESET);
+
     public function set($mode = self::RESET) {
         if (!is_array($mode)) {
             $mode = func_get_args();
         }
-        echo "\x1B[", implode(';', $mode), 'm';
+        if ($this->mode === $mode) {
+            return $this;
+        }
+        $this->mode = $mode;
+        echo "\x1B[" . implode(';', $mode) . 'm';
         return $this;
     }
 
