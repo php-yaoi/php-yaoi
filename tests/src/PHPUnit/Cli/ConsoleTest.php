@@ -22,7 +22,7 @@ class ConsoleTest extends TestCase
             $con->set($value)->printLine($key)->set();
         }
         $out = ob_get_clean();
-        $this->assertSame("\x1B" . '[0mRESET' . PHP_EOL
+        $this->assertSame('RESET' . PHP_EOL
             . "\x1B" . '[m' . "\x1B" . '[1mBOLD' . PHP_EOL
             . "\x1B" . '[m' . "\x1B" . '[30mFG_BLACK' . PHP_EOL
             . "\x1B" . '[m' . "\x1B" . '[31mFG_RED' . PHP_EOL
@@ -62,6 +62,8 @@ class ConsoleTest extends TestCase
             array('one', 'two', 'three'),
             array('alpha', 'beta', 'gamma'),
         ));
+
+        Console::getInstance()->set();
 
         $result = Table::create($rows)->__toString();
         $this->assertSame(

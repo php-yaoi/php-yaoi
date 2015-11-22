@@ -3,7 +3,7 @@
 namespace Yaoi\View;
 use Yaoi\BaseClass;
 
-class Void extends BaseClass implements Renderer
+class Nil extends BaseClass implements Renderer
 {
     public function isEmpty()
     {

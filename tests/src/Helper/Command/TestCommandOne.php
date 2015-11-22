@@ -8,7 +8,7 @@ use Yaoi\Cli\UnnamedArgument;
 use Yaoi\Cli\Option;
 use Yaoi\Command\Definition;
 
-class CommandTheFirst extends Command
+class TestCommandOne extends Command
 {
     public $action;
     public $argumentA;
@@ -27,30 +27,38 @@ class CommandTheFirst extends Command
         $definition->description = 'This is a command one for doing nothing';
         $definition->name = 'the-first';
 
-        $options->action = UnnamedArgument::create()->setRequired()
+        $options->action = Option::create()
+            ->setIsUnnamed()
+            ->setIsRequired()
             ->setEnum('get', 'delete', 'create')
             ->setDescription('Main action');
 
-        $options->argumentA = UnnamedArgument::create()->setDescription('Bee description follows');
+        $options->argumentA = Option::create()
+            ->setDescription('Bee description follows')
+            ->setIsUnnamed();
 
-        $options->argumentB = UnnamedArgument::create()->setIsVariadic()
-            ->setDescription('This is a variadic argument');
+        $options->argumentB = Option::create()
+            ->setIsVariadic()
+            ->setDescription('This is a variadic argument')
+            ->setIsUnnamed();
 
         $options->optionC = Option::create()
             ->setDescription('Some option for the C');
 
-        $options->optionD = Option::create()->setRequired()
-            ->setShortName('d')->setType()
+        $options->optionD = Option::create()
+            ->setIsRequired()
+            ->setShortName('d')
+            ->setType()
+            ->setIsVariadic()
             ->setDescription('Short name option with required value');
 
-        $options->someEnum = Option::create()->setRequired()
+        $options->someEnum = Option::create()->setIsRequired()
             ->setEnum('one', 'two', 'three')
             ->setDescription('Enumerated option to set up something');
     }
 
-    public function execute()
+    protected function performAction()
     {
-        print_r($this);
     }
 
 }

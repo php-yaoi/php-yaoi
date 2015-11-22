@@ -11,5 +11,5 @@ interface Contract
      * @param $options static|\stdClass
      */
     static function setUpDefinition(Definition $definition, $options);
-    public function execute();
+    public function run();
 }

@@ -4,6 +4,7 @@ namespace Yaoi\Cli\View;
 
 use Yaoi\View\Hardcoded;
 use Yaoi\View\Semantic\Renderer;
+use Yaoi\View\Semantic\Text;
 
 class Table extends Hardcoded implements Renderer
 {
@@ -29,41 +30,58 @@ class Table extends Hardcoded implements Renderer
 
     public function render()
     {
+
         $length = array();
         $rowDelimiterLine = null;
-        foreach ($this->rows as $row) {
+        $lines = array();
+
+        foreach ($this->rows as $rowIndex => $row) {
             foreach ($row as $key => $value) {
-                $stringLength = strlen($value);
-                if (!isset($length[$key]) || $length[$key] < $stringLength) {
-                    $length[$key] = $stringLength;
+                if (!$value instanceof Text) {
+                    $value = new Text($value);
+                }
+                $renderer = new \Yaoi\Cli\View\Text($value);
+                foreach ($renderer->lines() as $lineIndex => $line) {
+                    $stringLength = strlen($line->text->value);
+                    if (!isset($length[$key]) || $length[$key] < $stringLength) {
+                        $length[$key] = $stringLength;
+                    }
+                    $lines [$rowIndex][$lineIndex][$key] = $line;
                 }
             }
         }
 
-        foreach ($this->rows as $row) {
-            $line = '';
-            foreach ($length as $key => $maxLength) {
-                $value = isset($row[$key]) ? (string)$row[$key] : '';
-                $stringLength = strlen($value);
-                if ($stringLength < $maxLength) {
-                    $value = str_pad($value, $maxLength, ' ');
-                }
-                if ($line) {
-                    $line .= $this->colDelimiter;
-                }
-                $line .= $value;
-            }
-            echo $line, PHP_EOL;
-            if ($this->rowDelimiter) {
-                if (null === $rowDelimiterLine) {
-                    $lineLength = strlen($line);
-                    $repeat = ceil($lineLength / strlen($this->rowDelimiter));
-                    $rowDelimiterLine = str_repeat($this->rowDelimiter, $repeat);
-                    if (strlen($rowDelimiterLine) > $lineLength) {
-                        $rowDelimiterLine = substr($rowDelimiterLine, 0, $lineLength);
+
+        foreach ($lines as $rowIndex => $rowData) {
+            foreach ($rowData as $lineIndex => $row) {
+                $line = '';
+                foreach ($length as $key => $maxLength) {
+                    /** @var \Yaoi\Cli\View\Text $value */
+                    $value = isset($row[$key]) ? $row[$key] : null;
+
+                    if ($line) {
+                        $line .= $this->colDelimiter;
+                    }
+                    if ($value) {
+                        $value->strPad($maxLength);
+                        $line .= $value;
+                    }
+                    else {
+                        $line .= str_repeat(' ', $maxLength);
                     }
                 }
-                echo $rowDelimiterLine, PHP_EOL;
+                echo $line, PHP_EOL;
+                if ($this->rowDelimiter) {
+                    if (null === $rowDelimiterLine) {
+                        $lineLength = strlen($line);
+                        $repeat = ceil($lineLength / strlen($this->rowDelimiter));
+                        $rowDelimiterLine = str_repeat($this->rowDelimiter, $repeat);
+                        if (strlen($rowDelimiterLine) > $lineLength) {
+                            $rowDelimiterLine = substr($rowDelimiterLine, 0, $lineLength);
+                        }
+                    }
+                    echo $rowDelimiterLine, PHP_EOL;
+                }
             }
         }
     }

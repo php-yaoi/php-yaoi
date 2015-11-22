@@ -49,7 +49,7 @@ class TestCase extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function varExportString($string) {
+    public function varExportString($string, $usePhpEol = true) {
         static $specialChars = array(
             "\r" => '\r',
             "\n" => '\n',
@@ -99,6 +99,14 @@ class TestCase extends PHPUnit_Framework_TestCase
 
         }
         $result .= $started;
+        if ($usePhpEol) {
+            if (PHP_EOL === "\r\n") {
+                $result = str_replace('"\r\n"', 'PHP_EOL', $result);
+            }
+            else {
+                $result = str_replace('"\n"', 'PHP_EOL', $result);
+            }
+        }
         return $result;
     }
 } 

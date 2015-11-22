@@ -19,24 +19,49 @@ class Option extends \Yaoi\Command\Option
     public $isUnnamed = false;
     public function setIsUnnamed($isUnnamed = true) {
         $this->isUnnamed = $isUnnamed;
+        if ($isUnnamed && self::TYPE_BOOL === $this->type) {
+            $this->type = self::TYPE_VALUE;
+        }
         return $this;
     }
 
     public function getUsage() {
-        if ($this->shortName) {
-            $usage = Command::OPTION_SHORT . $this->shortName;
+        $usage = '';
+        if (!$this->isUnnamed) {
+            if ($this->shortName) {
+                $usage = Command::OPTION_SHORT . $this->shortName;
+            }
+            else {
+                $usage = Command::OPTION_NAME . $this->getName();
+            }
         }
-        else {
-            $usage = Command::OPTION_NAME . $this->getName();
-        }
-        if ($this->type === self::TYPE_VALUE) {
-            $usage .= ' <' . $this->name . ($this->isVariadic ? '...' : '') . '>';
+
+        $value = '';
+        if ($this->type === self::TYPE_VALUE || $this->isUnnamed) {
+            $value = $this->name;
         }
         elseif ($this->type === self::TYPE_ENUM) {
-            $usage .= ' <' . implode('|', $this->values) . '>';
+            $value = count($this->values) < 4
+                ? implode('|', $this->values)
+                : $this->name;
         }
-        return $usage;
+
+        if ($value && $this->isVariadic) {
+            $value .= '...';
+        }
+
+        if ($value) {
+            if ($this->isRequired || !$this->isUnnamed) {
+                $value = '<' . $value . '>';
+            }
+            else {
+                $value = '[' . $value . ']';
+            }
+        }
+        return $usage ? $usage . ' ' . $value : $value;
     }
+
+
 
     public $isVariadic = false;
     public function setIsVariadic($yes = true) {

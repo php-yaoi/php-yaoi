@@ -49,10 +49,10 @@ class ServiceDriverTest extends \Yaoi\Test\PHPUnit\TestCase
      */
     public function testDsn()
     {
-        $dsn = 'void://user:pass@host:1234/path1/path2?param1=1&param2=2';
+        $dsn = 'nil://user:pass@host:1234/path1/path2?param1=1&param2=2';
         $storage = new Storage($dsn);
 
-        $this->assertTrue($storage->getDriver() instanceof \Yaoi\Storage\Driver\Void);
+        $this->assertTrue($storage->getDriver() instanceof \Yaoi\Storage\Driver\Nil);
     }
 
     /**

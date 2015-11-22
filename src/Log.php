@@ -40,12 +40,12 @@ class Log extends Service
     }
 
 
-    private static $void;
-    public static function void() {
-        if (null === self::$void) {
-            self::$void = new Log('void');
+    private static $nil;
+    public static function nil() {
+        if (null === self::$nil) {
+            self::$nil = new Log('nil');
         }
-        return self::$void;
+        return self::$nil;
     }
 
 }

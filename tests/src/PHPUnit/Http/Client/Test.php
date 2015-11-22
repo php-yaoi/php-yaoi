@@ -231,7 +231,7 @@ one=1
     {
         $httpClient = Client::getInstance(function () {
             $dsn = new Settings();
-            $dsn->log = new Log('void');
+            $dsn->log = new Log('nil');
             $dsn->proxy = 'http://test:test@phph.tk:3129';
             return $dsn;
         });
