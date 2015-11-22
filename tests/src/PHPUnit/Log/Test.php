@@ -19,7 +19,7 @@ class Test extends TestCase
 
 
         ob_start();
-        Log::create(new Settings('void'))->push('test33');
+        Log::create(new Settings('nil'))->push('test33');
         $result = ob_get_contents();
         ob_end_clean();
         $this->assertSame('', $result);

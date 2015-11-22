@@ -3,7 +3,7 @@
 namespace YaoiTests\PHPUnit\View;
 
 use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\View\Void;
+use Yaoi\View\Nil;
 use Yaoi\View\Raw;
 use Yaoi\View\Stack;
 
@@ -18,6 +18,6 @@ class StackTest extends TestCase
             ->push(Raw::create('three')));
 
         $this->assertSame(true, Stack::create()->isEmpty());
-        $this->assertSame(false, Stack::create()->push(Void::create())->isEmpty());
+        $this->assertSame(false, Stack::create()->push(Nil::create())->isEmpty());
     }
 }

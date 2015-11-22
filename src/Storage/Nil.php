@@ -5,7 +5,7 @@ namespace Yaoi\Storage;
 use Closure;
 use Yaoi\Storage;
 
-class Void extends Storage
+class Nil extends Storage
 {
     /** @noinspection PhpMissingParentConstructorInspection */
     public function __construct()

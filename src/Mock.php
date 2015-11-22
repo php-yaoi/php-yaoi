@@ -6,7 +6,7 @@ use Closure;
 use Yaoi\Mock\Exception;
 use Yaoi\Storage;
 use Yaoi\Storage\PhpVar;
-use Yaoi\Storage\Void;
+use Yaoi\Storage\Nil;
 
 class Mock extends Service
 {
@@ -157,7 +157,7 @@ class Mock extends Service
     public static function getNull()
     {
         if (null === self::$nullMock) {
-            self::$nullMock = new self(new Void());
+            self::$nullMock = new self(new Nil());
         }
         return self::$nullMock;
     }

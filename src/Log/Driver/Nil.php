@@ -6,7 +6,7 @@ use Yaoi\Log;
 use Yaoi\Log\Driver;
 use Yaoi\Log\Settings;
 
-class Void implements Driver
+class Nil implements Driver
 {
     public function __construct(Settings $dsn = null)
     {

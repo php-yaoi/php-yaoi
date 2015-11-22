@@ -31,7 +31,7 @@ class ClosureMigration extends AbstractMigration
         $this->applyCallable = $apply;
         $this->rollbackCallable = $rollback;
         $this->hasInternalState = $hasInternalState;
-        $this->log = Log::void();
+        $this->log = Log::nil();
     }
 
     /**
