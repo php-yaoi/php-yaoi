@@ -243,7 +243,7 @@ SQL;
     /**
      * @see Entity::save
      * @see Entity::delete
-     * @see Entity::find
+     * @see Entity::getByPrimaryKey
      * @throws \Yaoi\Entity\Exception
      */
     public function testLifeCycle() {
@@ -260,10 +260,10 @@ SQL;
         $host2->save();
         $this->assertSame(2, $host2->id);
 
-        $this->assertSame('Test', Host::find($host->id)->name);
+        $this->assertSame('Test', Host::getByPrimaryKey($host->id)->name);
         $host->delete();
 
-        $this->assertNull(Host::find($host->id));
+        $this->assertNull(Host::getByPrimaryKey($host->id));
 
     }
 
@@ -302,7 +302,7 @@ SQL;
      * @throws \Yaoi\Entity\Exception
      */
     public function testFindFullPrimaryRequired() {
-        SessionTag::find(123);
+        SessionTag::getByPrimaryKey(123);
     }
     /**
      * @expectedException \Yaoi\Entity\Exception
