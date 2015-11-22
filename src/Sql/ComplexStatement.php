@@ -353,10 +353,13 @@ abstract class ComplexStatement extends Expression implements
                 }
             }
             $result .= ' (';
-            foreach ($fields as $field) {
-                $result .= $quoter->quote(new Symbol($field)) . ', ';
+            if ($fields) {
+                foreach ($fields as $field) {
+                    $result .= $quoter->quote(new Symbol($field)) . ', ';
+                }
+                $result = substr($result, 0, -2);
             }
-            $result = substr($result, 0, -2) . ') VALUES ';
+            $result .= ') VALUES ';
 
             foreach ($this->values as $row) {
                 $rowString = '';

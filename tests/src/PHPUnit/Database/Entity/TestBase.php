@@ -12,6 +12,7 @@ use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\SessionTag;
 use YaoiTests\Helper\Entity\Tag;
 use YaoiTests\Helper\Entity\OneABBR;
+use YaoiTests\Helper\Entity\TestEmptyInsert;
 use YaoiTests\Helper\Entity\Two;
 
 abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
@@ -296,6 +297,12 @@ SQL;
         $this->assertSame(123123, $sessionTag->addedAtUt);
     }
 
+    public function testEmptyInsert() {
+        $item = new TestEmptyInsert();
+        $item->save();
+        $this->assertSame(1, $item->id);
+    }
+
     /**
      * @expectedException \Yaoi\Entity\Exception
      * @expectedExceptionCode \Yaoi\Entity\Exception::KEY_MISSING
@@ -333,8 +340,17 @@ SQL;
         Session::bindDatabase($this->database);
         SessionTag::bindDatabase($this->database);
         Tag::bindDatabase($this->database);
+
+        TestEmptyInsert::bindDatabase($this->database);
+        TestEmptyInsert::table()->migration()->apply();
+
     }
 
+
+    public function tearDown()
+    {
+        TestEmptyInsert::table()->migration()->rollback();
+    }
 
 
 }
