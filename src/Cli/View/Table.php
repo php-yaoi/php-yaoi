@@ -4,7 +4,7 @@ namespace Yaoi\Cli\View;
 
 use Yaoi\View\Hardcoded;
 use Yaoi\View\Semantic\Renderer;
-use Yaoi\View\Semantic\Text;
+use Yaoi\View\Semantic;
 
 class Table extends Hardcoded implements Renderer
 {
@@ -37,10 +37,10 @@ class Table extends Hardcoded implements Renderer
 
         foreach ($this->rows as $rowIndex => $row) {
             foreach ($row as $key => $value) {
-                if (!$value instanceof Text) {
-                    $value = new Text($value);
+                if (!$value instanceof Semantic\Text) {
+                    $value = new Semantic\Text($value);
                 }
-                $renderer = new \Yaoi\Cli\View\Text($value);
+                $renderer = new Text($value);
                 foreach ($renderer->lines() as $lineIndex => $line) {
                     $stringLength = strlen($line->text->value);
                     if (!isset($length[$key]) || $length[$key] < $stringLength) {
