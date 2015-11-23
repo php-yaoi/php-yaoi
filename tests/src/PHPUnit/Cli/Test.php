@@ -140,8 +140,8 @@ class Test extends TestCase
                     'SCRIPT_NAME' => './cli',
                     'SCRIPT_FILENAME' => './cli',
                     'PHP_SELF' => './cli',
-                    'argv' => $argv,
-                    'argc' => count($argv),
+                    'argv' => array_merge(array('script.php'), $argv),
+                    'argc' => count($argv) + 1,
                 )),
             'isCli' => true,
         ));

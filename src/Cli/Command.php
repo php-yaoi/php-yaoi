@@ -26,6 +26,9 @@ abstract class Command extends \Yaoi\Command
 
 
         $tokens = $request->server()->argv;
+        $scriptName = array_shift($tokens);
+        $tokens = array_values($tokens);
+
         $argc = count($tokens);
 
         if ($argc === 1) {
