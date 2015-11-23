@@ -4,18 +4,17 @@ namespace YaoiTests\Helper\Command;
 
 
 use Yaoi\Cli\Command;
-use Yaoi\Command\Definition;
 use Yaoi\Cli\Option;
+use Yaoi\Command\Definition;
 
-class TestCommandWithOptionValue extends Command
+class TestCommandWithRequiredArgument extends Command
 {
-    public $boolOption;
-    public $valueOption;
-    public $unifiedOption;
+    public $argument;
+    public $argumentTwo;
+    public $option;
 
     protected function performAction()
     {
-        print_r($this);
     }
 
     /**
@@ -25,9 +24,9 @@ class TestCommandWithOptionValue extends Command
      */
     static function setUpDefinition(Definition $definition, $options)
     {
-        $options->valueOption = Option::create()->setType();
-        $options->boolOption = Option::create();
-        $options->unifiedOption = \Yaoi\Command\Option::create();
+        $options->argument = Option::create()->setIsUnnamed()->setIsRequired();
+        $options->argumentTwo = Option::create()->setIsUnnamed()->setIsRequired()->setIsVariadic();
+        $options->option = Option::create();
     }
 
 

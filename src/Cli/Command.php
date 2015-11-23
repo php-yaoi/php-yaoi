@@ -24,7 +24,6 @@ abstract class Command extends \Yaoi\Command
         $options = static::optionsArray();
         $def = new PrepareDefinition($options);
 
-
         $tokens = $request->server()->argv;
         $scriptName = array_shift($tokens);
         $tokens = array_values($tokens);
@@ -91,13 +90,14 @@ abstract class Command extends \Yaoi\Command
             if ($def->requiredArguments) {
                 /** @var Option $option */
                 $option = array_shift($def->requiredArguments);
+                $value = $option->validateFilterValue((string)$token);
                 if ($option->isVariadic) {
                     $variadicStarted = true;
-                    $variadicValues []= $option->validateFilterValue((string)$token);
+                    $variadicValues []= $value;
                     continue;
                 }
                 else {
-                    $this->{$option->name} = $option->validateFilterValue((string)$token);
+                    $this->{$option->name} = $value;
                     continue;
                 }
             }
@@ -144,6 +144,12 @@ abstract class Command extends \Yaoi\Command
 
         if ($variadicStarted) {
             $this->{$option->name} = $variadicValues;
+        }
+
+        if ($def->requiredArguments) {
+            foreach ($def->requiredArguments as $option) {
+                throw new Exception('Missing required argument: ' . $option->getUsage(), Exception::ARGUMENT_REQUIRED);
+            }
         }
 
         if ($def->requiredOptions) {

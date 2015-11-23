@@ -2,12 +2,12 @@
 
 namespace YaoiTests\PHPUnit\Cli;
 
-use Yaoi\Cli\Command\PrepareDefinition;
 use Yaoi\Request;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandOne;
 use YaoiTests\Helper\Command\TestCommandWithNonTailingOptionalArgument;
 use YaoiTests\Helper\Command\TestCommandWithOptionValue;
+use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
 use YaoiTests\Helper\Command\TestCommandWithSuccessMessage;
 use YaoiTests\Helper\Command\TestCommandWithVariadicError;
 use YaoiTests\Helper\Command\TestCommandWithVersion;
@@ -112,6 +112,54 @@ class Test extends TestCase
 
     /**
      * @expectedException \Yaoi\Cli\Exception
+     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     */
+    public function testArgumentRequiredEmpty() {
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array()));
+    }
+
+    /**
+     * @expectedException \Yaoi\Cli\Exception
+     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     */
+    public function testArgumentRequiredMissing() {
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1')));
+    }
+
+    /**
+     * @expectedException \Yaoi\Cli\Exception
+     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     */
+    public function testArgumentRequiredOptionFound() {
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1', '--option')));
+    }
+
+    public function testVariadicArgument() {
+        $command = TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1', 'arg2a', 'arg2b')));
+        $this->assertSame(array('arg2a', 'arg2b'), $command->argumentTwo);
+    }
+
+    public function testUnifiedOption() {
+        ob_start();
+        TestCommandWithOptionValue::showHelp();
+        $result = ob_get_clean();
+        //echo $this->varExportString($result);
+        $expected = PHP_EOL
+            . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
+            . '   ' . PHP_EOL
+            . "\x1B" . '[36;1mOptions: ' . "\x1B" . '[m' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--help                      ' . "\x1B" . '[m   Show usage information' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--version                   ' . "\x1B" . '[m   Show version          ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--value-option <valueOption>' . "\x1B" . '[m                         ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--bool-option               ' . "\x1B" . '[m                         ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--unified-option            ' . "\x1B" . '[m                         ' . PHP_EOL
+            . '   ' . PHP_EOL;
+        $this->assertSame($expected, $result);
+
+    }
+
+    /**
+     * @expectedException \Yaoi\Cli\Exception
      * @expectedExceptionCode \Yaoi\Cli\Exception::UNKNOWN_OPTION
      */
     public function testUnknownOption() {
@@ -200,6 +248,22 @@ class Test extends TestCase
             . "\x1B" . '[36;1mv1.0 ' . "\x1B" . '[m' . "\x1B" . '[36;1mcli-cli-cli' . "\x1B" . '[m' . PHP_EOL
             . 'Test command with version' . PHP_EOL
             . PHP_EOL;
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testError() {
+        ob_start();
+        TestCommandWithVersion::error("?, ?!", 'hello', 'world');
+        TestCommandWithVersion::success("?, ?!", 'hello', 'world');
+        TestCommandWithVersion::error('hello, world!');
+        TestCommandWithVersion::success('hello, world!');
+        $result = ob_get_clean();
+        //echo $this->varExportString($result);
+        $expected = "\x1B" . '[37;41m hello, world! ' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[37;41m hello, world! ' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL;
 
         $this->assertSame($expected, $result);
     }
