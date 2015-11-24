@@ -84,7 +84,7 @@ class Test extends TestCase
         TestCommandOne::create()->init($this->getRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c',
-            '--some-enum', 'two')));
+            '--some-enum', 'two')), true);
     }
 
     /**
@@ -95,7 +95,7 @@ class Test extends TestCase
         TestCommandOne::create()->init($this->getRequest(array('get',
             '-d',
             '--option-c',
-            '--some-enum', 'two')));
+            '--some-enum', 'two')), true);
     }
 
     /**
@@ -106,7 +106,7 @@ class Test extends TestCase
         TestCommandWithOptionValue::create()->init($this->getRequest(array(
             '--value-option', //'value',
             '--bool-option',
-        ))
+        )), true
         )->run();
     }
 
@@ -115,7 +115,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredEmpty() {
-        TestCommandWithRequiredArgument::create()->init($this->getRequest(array()));
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array()), true);
     }
 
     /**
@@ -123,7 +123,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredMissing() {
-        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1')));
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1')), true);
     }
 
     /**
@@ -131,7 +131,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredOptionFound() {
-        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1', '--option')));
+        TestCommandWithRequiredArgument::create()->init($this->getRequest(array('arg1', '--option')), true);
     }
 
     public function testVariadicArgument() {
@@ -167,7 +167,7 @@ class Test extends TestCase
             '--value-option', 'value',
             '--bool-option',
             '--unknown-option'
-        ))
+        )), true
         )->run();
     }
 
@@ -205,7 +205,7 @@ class Test extends TestCase
             $this->getRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c', 'THE-C-VALUE',
-            '--some-enum', 'two'))
+            '--some-enum', 'two')), true
         );
     }
 

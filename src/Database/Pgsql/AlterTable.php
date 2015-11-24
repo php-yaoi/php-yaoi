@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database\Pgsql;
 
+use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Sql\Symbol;
 
@@ -36,6 +37,45 @@ class AlterTable extends \Yaoi\Sql\AlterTable
             }
         }
 
+    }
+
+    protected function processColumns()
+    {
+        $beforeColumns = $this->before->getColumns(true, true);
+        foreach ($this->after->getColumns(true, true) as $columnName => $afterColumn) {
+            $afterTypeString = $afterColumn->getTypeString();
+
+            if (!isset($beforeColumns[$columnName])) {
+                $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
+            }
+            else {
+                $beforeColumn = $beforeColumns[$columnName];
+                if ($beforeColumn->getTypeString() !== $afterTypeString) {
+                    //var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
+                    $afterType = $afterColumn
+                        ->copy()
+                        ->setFlag(Column::NOT_NULL, false)
+                        ->setDefault(false)
+                        ->getTypeString();
+                    $this->alterLines->commaExpr('ALTER COLUMN ? TYPE ' . $afterType, new Symbol($afterColumn->schemaName));
+
+                    if (($beforeColumn->flags & Column::NOT_NULL) !== ($afterColumn->flags & Column::NOT_NULL)) {
+                        if ($afterColumn->flags & Column::NOT_NULL) {
+                            $this->alterLines->commaExpr('ALTER COLUMN ? SET NOT NULL', new Symbol($afterColumn->schemaName));
+                        }
+                        else {
+                            $this->alterLines->commaExpr('ALTER COLUMN ? DROP NOT NULL', new Symbol($afterColumn->schemaName));
+                        }
+                    }
+
+                    //if ($afterColumn->getDefault() !== $beforeColumn->getDefault())
+                }
+                unset($beforeColumns[$columnName]);
+            }
+        }
+        foreach ($beforeColumns as $columnName => $beforeColumn) {
+            $this->alterLines->commaExpr('DROP COLUMN ?', new Symbol($beforeColumn->schemaName));
+        }
     }
 
 

@@ -266,4 +266,9 @@ class Database extends Service implements DatabaseContract
         return Settings::className();
     }
 
+    public function getSchemaName()
+    {
+        return $this->settings->path;
+    }
+
 }

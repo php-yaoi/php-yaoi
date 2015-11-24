@@ -90,7 +90,7 @@ class TestCase extends PHPUnit_Framework_TestCase
                 }
                 $started = '\'';
             }
-            $result .= $char;
+            $result .= $char === '\'' ? '\\\'' : $char;
 
             if ('\n' === $char) {
                 $result .= '"' . PHP_EOL;

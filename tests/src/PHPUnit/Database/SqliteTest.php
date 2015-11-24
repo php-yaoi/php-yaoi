@@ -50,6 +50,18 @@ SQL;
     {
         $this->dbFileName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testSqlite.sqlite';
         $this->db = new Database('sqlite:///' . $this->dbFileName);
+
+        $this->testDefaultValueConsistency = 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration' . PHP_EOL
+            . 'CREATE TABLE test_columns (' . PHP_EOL
+            . ' id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,' . PHP_EOL
+            . ' int_column INTEGER NOT NULL DEFAULT \'2\',' . PHP_EOL
+            . ' int8_column INTEGER NOT NULL DEFAULT \'2\',' . PHP_EOL
+            . ' float_column float NOT NULL DEFAULT \'1.33\',' . PHP_EOL
+            . ' string_column varchar(255) NOT NULL DEFAULT \'11\'' . PHP_EOL
+            . ')' . PHP_EOL
+            . 'OK' . PHP_EOL
+            . 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date' . PHP_EOL;
+
     }
 
     public function tearDown()

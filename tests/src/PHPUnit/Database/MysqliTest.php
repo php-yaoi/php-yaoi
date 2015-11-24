@@ -13,6 +13,19 @@ class MysqliTest extends TestUnified
     {
         \YaoiTests\Helper\Database\CheckAvailable::getMysqli();
         $this->db = Database::getInstance('test_mysqli');
+
+        $this->testDefaultValueConsistency = 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration' . PHP_EOL
+            . 'CREATE TABLE `test_columns` (' . PHP_EOL
+            . ' `id` int NOT NULL AUTO_INCREMENT,' . PHP_EOL
+            . ' `int_column` int NOT NULL DEFAULT \'2\',' . PHP_EOL
+            . ' `int8_column` int NOT NULL DEFAULT \'2\',' . PHP_EOL
+            . ' `float_column` float NOT NULL DEFAULT \'1.33\',' . PHP_EOL
+            . ' `string_column` varchar(255) NOT NULL DEFAULT \'11\',' . PHP_EOL
+            . ' PRIMARY KEY (`id`)' . PHP_EOL
+            . ')' . PHP_EOL
+            . 'OK' . PHP_EOL
+            . 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date' . PHP_EOL;
+
     }
 
 
@@ -44,7 +57,7 @@ class MysqliTest extends TestUnified
         $utility = $this->db->getUtility();
 
         $this->assertSame(
-            'int unsigned NOT NULL DEFAULT 15',
+            'int unsigned NOT NULL DEFAULT \'15\'',
             $utility->getColumnTypeString(
                 Column::create(Column::INTEGER | Column::UNSIGNED | Column::NOT_NULL)->setDefault(15)
             )
@@ -114,7 +127,7 @@ class MysqliTest extends TestUnified
  `fk_id2` int unsigned NOT NULL,
  `date_ut` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `name` varchar(255) NOT NULL DEFAULT '',
- `seconds` float NOT NULL DEFAULT 0,
+ `seconds` float NOT NULL DEFAULT '0',
  `type` char(10) DEFAULT NULL,
  UNIQUE KEY `unique_date_ut_name_type` (`date_ut`, `name`, `type`),
  CONSTRAINT `fk_test_entity_fk_id_test2_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
@@ -218,8 +231,6 @@ SQL;
 
 
         $this->assertStringEqualsCRLF($expected, (string)$table->getCreateTable());
-
     }
-
 
 }

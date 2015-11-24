@@ -4,11 +4,12 @@ namespace YaoiTests\PHPUnit\Database;
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Log;
 use Yaoi\Sql\Symbol;
 use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\ForeignKey;
-use Yaoi\Sql\CreateTable;
+use YaoiTests\Helper\Entity\TestColumns;
 
 abstract class TestUnified extends TestCase {
     /** @var  Contract */
@@ -241,6 +242,28 @@ SQL;
         $createSql = $this->db->getUtility()->generateCreateTableOnDefinition($table);
         $this->assertStringEqualsCRLF($this->createTableStatement, (string)$createSql);
 
+    }
+
+
+    protected $testDefaultValueConsistency = '';
+
+    public function testDefaultValueConsistency() {
+        TestColumns::bindDatabase($this->db);
+
+        $migration = TestColumns::table()->migration();
+        $migration->rollback();
+
+        $log = new Log('stdout');
+        ob_start();
+        $migration->setLog($log);
+        $migration->apply();
+        $migration->apply();
+        $migration->setLog(null);
+        $result = ob_get_clean();
+
+        $migration->rollback();
+        //echo $this->varExportString($result);
+        $this->assertSame($this->testDefaultValueConsistency, $result);
     }
 
 }

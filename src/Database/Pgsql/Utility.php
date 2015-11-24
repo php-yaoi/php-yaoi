@@ -4,6 +4,7 @@ namespace Yaoi\Database\Pgsql;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Log;
 
 class Utility extends \Yaoi\Database\Utility
 {
@@ -45,8 +46,8 @@ class Utility extends \Yaoi\Database\Utility
     {
         $rows = $this->database->query("SELECT 1
    FROM   information_schema.tables
-   WHERE  table_schema = ?
-   AND    table_name = ?", $this->database->settings->path, $tableName)->fetchAll();
+   WHERE  table_catalog = ?
+   AND    table_name = ?", $this->database->getSchemaName(), $tableName)->fetchAll();
         return (bool)$rows;
     }
 
