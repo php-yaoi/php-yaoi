@@ -68,7 +68,17 @@ class AlterTable extends \Yaoi\Sql\AlterTable
                         }
                     }
 
-                    //if ($afterColumn->getDefault() !== $beforeColumn->getDefault())
+
+                    if ($afterColumn->getDefault() !== $beforeColumn->getDefault()) {
+                        if (null === $afterColumn->getDefault()) {
+                            $this->alterLines->commaExpr('ALTER COLUMN ? DROP DEFAULT', new Symbol($afterColumn->schemaName));
+                        }
+                        else {
+                            $this->alterLines->commaExpr('ALTER COLUMN ? SET DEFAULT ?',
+                                new Symbol($afterColumn->schemaName), $afterColumn->getDefault());
+                        }
+                    }
+
                 }
                 unset($beforeColumns[$columnName]);
             }

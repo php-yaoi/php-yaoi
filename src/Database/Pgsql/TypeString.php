@@ -25,7 +25,8 @@ class TypeString extends \Yaoi\Database\Mysql\TypeString
             $typeString .= ' NOT NULL';
         }
 
-        if (false !== ($default = $column->getDefault())) {
+        $default = $column->getDefault();
+        if ((false !== $default) && null !== $default) {
             $typeString .= $this->database->expr(" DEFAULT ?", $default);
         }
 

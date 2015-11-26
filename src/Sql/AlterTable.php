@@ -50,7 +50,7 @@ class AlterTable extends Batch
             else {
                 $beforeColumn = $beforeColumns[$columnName];
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
-                    var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
+                    //var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
                     $this->alterLines->commaExpr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
                 }
                 unset($beforeColumns[$columnName]);

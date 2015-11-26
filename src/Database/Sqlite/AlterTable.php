@@ -13,7 +13,10 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         $this->alterLines->disable();
 
         $intersect = array();
-        $changed = false;
+        //$changed = false;
+
+        $changed = (string)$this->before->getCreateTable() !== (string)$this->after->getCreateTable();
+
 
         $beforeColumns = $this->before->getColumns(true, true);
         foreach ($this->after->getColumns(true, true) as $columnName => $afterColumn) {

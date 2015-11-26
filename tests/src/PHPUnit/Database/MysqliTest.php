@@ -13,19 +13,6 @@ class MysqliTest extends TestUnified
     {
         \YaoiTests\Helper\Database\CheckAvailable::getMysqli();
         $this->db = Database::getInstance('test_mysqli');
-
-        $this->testDefaultValueConsistency = 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration' . PHP_EOL
-            . 'CREATE TABLE `test_columns` (' . PHP_EOL
-            . ' `id` int NOT NULL AUTO_INCREMENT,' . PHP_EOL
-            . ' `int_column` int NOT NULL DEFAULT \'2\',' . PHP_EOL
-            . ' `int8_column` int NOT NULL DEFAULT \'2\',' . PHP_EOL
-            . ' `float_column` float NOT NULL DEFAULT \'1.33\',' . PHP_EOL
-            . ' `string_column` varchar(255) NOT NULL DEFAULT \'11\',' . PHP_EOL
-            . ' PRIMARY KEY (`id`)' . PHP_EOL
-            . ')' . PHP_EOL
-            . 'OK' . PHP_EOL
-            . 'Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date' . PHP_EOL;
-
     }
 
 
@@ -37,8 +24,8 @@ class MysqliTest extends TestUnified
  `default_null` float DEFAULT NULL,
  `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `ref_id` int NOT NULL,
- `r_one` varchar(255) DEFAULT NULL,
- `r_two` varchar(255) DEFAULT NULL,
+ `r_one` int DEFAULT NULL,
+ `r_two` int DEFAULT NULL,
  UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
  KEY `key_name` (`name`),
  CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
@@ -232,5 +219,21 @@ SQL;
 
         $this->assertStringEqualsCRLF($expected, (string)$table->getCreateTable());
     }
+
+
+    protected $testDefaultValueConsistency = <<<LOG
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
+CREATE TABLE `test_columns` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `int_column` int NOT NULL DEFAULT '2',
+ `int8_column` int NOT NULL DEFAULT '2',
+ `float_column` float NOT NULL DEFAULT '1.33',
+ `string_column` varchar(255) NOT NULL DEFAULT '11',
+ PRIMARY KEY (`id`)
+)
+OK
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
+
+LOG;
 
 }

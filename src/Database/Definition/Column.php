@@ -49,7 +49,7 @@ class Column extends BaseClass
     }
 
 
-    private $default = false;
+    private $default = false; // todo properly deprecate false value in favour of null
     public function setDefault($value) {
 
         $this->default = $value;
