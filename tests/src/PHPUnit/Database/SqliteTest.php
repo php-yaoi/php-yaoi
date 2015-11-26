@@ -28,8 +28,8 @@ CREATE TABLE test_indexes (
  default_null float DEFAULT NULL,
  updated timestamp DEFAULT NULL,
  ref_id INTEGER NOT NULL,
- r_one varchar(255) DEFAULT NULL,
- r_two varchar(255) DEFAULT NULL,
+ r_one INTEGER DEFAULT NULL,
+ r_two INTEGER DEFAULT NULL,
  CONSTRAINT fk_test_indexes_ref_id_table_a_id FOREIGN KEY (ref_id) REFERENCES table_a (id),
  CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two)
 );
@@ -50,6 +50,7 @@ SQL;
     {
         $this->dbFileName = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'testSqlite.sqlite';
         $this->db = new Database('sqlite:///' . $this->dbFileName);
+
     }
 
     public function tearDown()
@@ -96,6 +97,22 @@ CREATE TABLE test_indexes (
 CREATE UNIQUE INDEX unique_updated ON test_indexes (updated);
 
 SQL;
+
+
+    protected $testDefaultValueConsistency = <<<LOG
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
+CREATE TABLE test_columns (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ int_column INTEGER NOT NULL DEFAULT '2',
+ int8_column INTEGER NOT NULL DEFAULT '2',
+ float_column float NOT NULL DEFAULT '1.33',
+ string_column varchar(255) NOT NULL DEFAULT '11'
+)
+OK
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
+
+LOG;
+
 
 
 }

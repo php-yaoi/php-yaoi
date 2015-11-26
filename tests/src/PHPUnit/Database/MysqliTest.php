@@ -24,8 +24,8 @@ class MysqliTest extends TestUnified
  `default_null` float DEFAULT NULL,
  `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `ref_id` int NOT NULL,
- `r_one` varchar(255) DEFAULT NULL,
- `r_two` varchar(255) DEFAULT NULL,
+ `r_one` int DEFAULT NULL,
+ `r_two` int DEFAULT NULL,
  UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
  KEY `key_name` (`name`),
  CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
@@ -44,7 +44,7 @@ class MysqliTest extends TestUnified
         $utility = $this->db->getUtility();
 
         $this->assertSame(
-            'int unsigned NOT NULL DEFAULT 15',
+            'int unsigned NOT NULL DEFAULT \'15\'',
             $utility->getColumnTypeString(
                 Column::create(Column::INTEGER | Column::UNSIGNED | Column::NOT_NULL)->setDefault(15)
             )
@@ -114,7 +114,7 @@ class MysqliTest extends TestUnified
  `fk_id2` int unsigned NOT NULL,
  `date_ut` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `name` varchar(255) NOT NULL DEFAULT '',
- `seconds` float NOT NULL DEFAULT 0,
+ `seconds` float NOT NULL DEFAULT '0',
  `type` char(10) DEFAULT NULL,
  UNIQUE KEY `unique_date_ut_name_type` (`date_ut`, `name`, `type`),
  CONSTRAINT `fk_test_entity_fk_id_test2_id` FOREIGN KEY (`fk_id`) REFERENCES `test2` (`id`),
@@ -218,8 +218,22 @@ SQL;
 
 
         $this->assertStringEqualsCRLF($expected, (string)$table->getCreateTable());
-
     }
 
+
+    protected $testDefaultValueConsistency = <<<LOG
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
+CREATE TABLE `test_columns` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `int_column` int NOT NULL DEFAULT '2',
+ `int8_column` int NOT NULL DEFAULT '2',
+ `float_column` float NOT NULL DEFAULT '1.33',
+ `string_column` varchar(255) NOT NULL DEFAULT '11',
+ PRIMARY KEY (`id`)
+)
+OK
+Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
+
+LOG;
 
 }

@@ -15,7 +15,7 @@ class Test extends TestCase
         Log::create(new Settings('stdout'))->push('test33');
         $result = ob_get_contents();
         ob_end_clean();
-        $this->assertSame('test33' . "\r\n", $result);
+        $this->assertSame('test33' . "\n", $result);
 
 
         ob_start();

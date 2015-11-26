@@ -49,8 +49,9 @@ class Column extends BaseClass
     }
 
 
-    private $default = false;
+    private $default = false; // todo properly deprecate false value in favour of null
     public function setDefault($value) {
+
         $this->default = $value;
         return $this;
     }
@@ -60,12 +61,20 @@ class Column extends BaseClass
      * @todo move custom logic to utility
      */
     public function getDefault() {
-        if (false === $this->default && !($this->flags & self::NOT_NULL)) {
-            return null;
+        if (is_string($this->default)) {
+            if ($this->flags & Column::INTEGER) {
+                $this->default = (int)$this->default;
+            }
+            elseif ($this->flags & Column::FLOAT) {
+                $this->default = (float)$this->default;
+            }
         }
-        else {
-            return $this->default;
+        elseif ($this->flags & Column::STRING) {
+            if (is_int($this->default) || is_float($this->default)) {
+                $this->default = (string)$this->default;
+            }
         }
+        return $this->default;
     }
 
     public $stringLength;

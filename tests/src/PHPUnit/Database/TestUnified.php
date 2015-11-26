@@ -4,11 +4,12 @@ namespace YaoiTests\PHPUnit\Database;
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Log;
 use Yaoi\Sql\Symbol;
 use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\ForeignKey;
-use Yaoi\Sql\CreateTable;
+use YaoiTests\Helper\Entity\TestColumns;
 
 abstract class TestUnified extends TestCase {
     /** @var  Contract */
@@ -221,6 +222,7 @@ SQL;
         $columnsA->mOne = Column::INTEGER;
         $columnsA->mTwo = Column::INTEGER;
         $tableA = new Table($columnsA, $this->db, 'table_a');
+        $tableA->addIndex(Index::TYPE_UNIQUE, $tableA->columns->mOne, $tableA->columns->mTwo);
 
         $columns = new \stdClass();
         $columns->id = Column::AUTO_ID;
@@ -230,8 +232,8 @@ SQL;
         $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
         $columns->updated = Column::TIMESTAMP;
         $columns->refId = $columnsA->id;
-        $columns->rOne = new Column();
-        $columns->rTwo = new Column();
+        $columns->rOne = Column::INTEGER;
+        $columns->rTwo = Column::INTEGER;
 
         $table = new Table($columns, $this->db, 'test_indexes');
         $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
@@ -239,8 +241,107 @@ SQL;
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
 
         $createSql = $this->db->getUtility()->generateCreateTableOnDefinition($table);
-        $this->assertStringEqualsCRLF($this->createTableStatement, (string)$createSql);
 
+        //$this->db->log(new Log('stdout'));
+        $this->db->getUtility()->dropTableIfExists('test_indexes');
+        $this->db->getUtility()->dropTableIfExists('table_a');
+        $this->db->query($tableA->getCreateTable());
+        $this->db->query($createSql);
+        $this->db->getUtility()->dropTableIfExists('test_indexes');
+        $this->db->getUtility()->dropTableIfExists('table_a');
+        //$this->db->log(null);
+
+        $this->assertStringEqualsCRLF($this->createTableStatement, (string)$createSql);
+    }
+
+
+    protected $testDefaultValueConsistency = '';
+
+    public function testDefaultValueConsistency() {
+        TestColumns::bindDatabase($this->db);
+
+        $migration = TestColumns::table()->migration();
+        $migration->rollback();
+
+        $log = new Log('stdout');
+        ob_start();
+        $migration->setLog($log);
+        $migration->apply();
+        $migration->apply();
+        $migration->setLog(null);
+        $result = ob_get_clean();
+
+        $migration->rollback();
+        //echo $this->varExportString($result);
+        $this->assertSame($this->testDefaultValueConsistency, $result);
+    }
+
+
+    protected function assertEqualColumn(Column $one, Column $two) {
+        $this->assertSame($one->schemaName, $two->schemaName);
+        $this->assertSame($one->flags, $two->flags, 'Column flags are different for ' . $one->schemaName);
+        $oneDefault = $one->getDefault();
+        $twoDefault = $two->getDefault();
+        $this->assertSame($oneDefault === false ? null : $oneDefault, $twoDefault === false ? null : $twoDefault,
+            'Column default values are different for ' . $one->schemaName);
+    }
+
+
+    protected function assertEqualTables(Table $one, Table $two) {
+        $oneColumns = $one->getColumns(true, true);
+        $twoColumns = $two->getColumns(true, true);
+
+        foreach ($oneColumns as $oneColumn) {
+            $this->assertArrayHasKey($oneColumn->schemaName, $twoColumns);
+            $this->assertEqualColumn($oneColumn, $twoColumns[$oneColumn->schemaName]);
+        }
+    }
+
+    public function testAlterTableCycle() {
+        $columns = new \stdClass();
+        $columns->id = Column::AUTO_ID;
+        $columns->fieldOne = Column::INTEGER;
+        $columns->fieldTwo = Column::STRING;
+        $table = new Table($columns, $this->db, 'test_alter');
+
+        $table->migration()->apply();
+        $table->getColumn('fieldOne')->setDefault('123');
+        $table->migration()->apply();
+
+        $actualTable = $this->db->getUtility()->getTableDefinition('test_alter');
+        $this->assertEqualTables($actualTable, $table);
+
+        $table->getColumn('fieldTwo')->setDefault('hello');
+        $table->migration()->apply();
+        $actualTable = $this->db->getUtility()->getTableDefinition('test_alter');
+        $this->assertSame(
+            $actualTable->getColumn('field_two')->getDefault(),
+            $table->getColumn('fieldTwo')->getDefault()
+        );
+
+
+        $actualTable = $this->db->getUtility()->getTableDefinition('test_alter');
+        $this->assertSame(
+            $actualTable->getColumn('field_one')->getDefault(),
+            $table->getColumn('fieldOne')->getDefault()
+        );
+
+        $table->addIndex(Index::TYPE_KEY, $table->getColumn('fieldOne'));
+        $table->migration()->apply();
+
+        $this->db->log(null);
+
+        $actualTable = $this->db->getUtility()->getTableDefinition('test_alter');
+        $this->assertSame(
+            'field_one',
+            $actualTable->
+            indexes[0]->
+            columns[0]->
+            schemaName
+        );
+
+
+        $table->migration()->rollback();
     }
 
 }

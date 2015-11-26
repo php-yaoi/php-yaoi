@@ -10,7 +10,7 @@ use Yaoi\Database\Exception;
 class TypeString
 {
 
-    private $database;
+    protected $database;
     public function __construct(Contract $database) {
         $this->database = $database;
     }
@@ -91,6 +91,7 @@ class TypeString
 
     }
 
+
     public function getByColumn(Column $column) {
         $flags = $column->flags;
 
@@ -104,7 +105,15 @@ class TypeString
             $typeString .= ' NOT NULL';
         }
 
-        if (false !== ($default = $column->getDefault())) {
+        $default = $column->getDefault();
+        if (false === $default && !($column->flags & Column::NOT_NULL)) {
+            $default = null;
+        }
+
+        if (false !== $default) {
+            if (is_int($default) || is_float($default)) {
+                $default = (string)$default;
+            }
             $typeString .= $this->database->expr(" DEFAULT ?", $default);
         }
 

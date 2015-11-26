@@ -13,6 +13,23 @@ class TypeString extends \Yaoi\Database\Mysql\TypeString
             return 'SERIAL';
         }
 
-        return parent::getByColumn($column);
+        $flags = $column->flags;
+
+        $typeString = $this->getBaseType($column);
+
+        if ($flags & Column::UNSIGNED) {
+            $typeString .= ' unsigned';
+        }
+
+        if ($flags & Column::NOT_NULL) {
+            $typeString .= ' NOT NULL';
+        }
+
+        $default = $column->getDefault();
+        if ((false !== $default) && null !== $default) {
+            $typeString .= $this->database->expr(" DEFAULT ?", $default);
+        }
+
+        return $typeString;
     }
 }

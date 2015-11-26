@@ -25,7 +25,7 @@ class Stdout implements Driver
         if (is_object($message) && method_exists($message, '__toString')) {
             $message = (string)$message;
         }
-        echo $this->dsn->prefix, print_r($message, 1), "\r\n";
+        echo $this->dsn->prefix, print_r($message, 1), "\n";
         return $this;
     }
 
