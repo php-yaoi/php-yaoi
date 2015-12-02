@@ -14,7 +14,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
 {
 
     protected function appendColumns() {
-        $utility = $this->database->getUtility();
+        $utility = $this->database()->getUtility();
 
         foreach ($this->table->getColumns(true) as $column) {
             if ($column->flags & Column::AUTO_ID) {
@@ -32,7 +32,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
     private $skipPrimary;
     public function appendPrimaryKey() {
         if (!$this->skipPrimary) {
-            $this->createLines->commaExpr(' PRIMARY KEY (?)' . PHP_EOL, Symbol::prepareColumns($this->table->primaryKey));
+            $this->createLines->commaExpr(' PRIMARY KEY (?)' . PHP_EOL, array(Symbol::prepareColumns($this->table->primaryKey)));
         }
     }
 
@@ -48,7 +48,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
                     new Symbol($this->table->schemaName),
                     $columns
                 );
-                $createIndex->bindDatabase($this->database);
+                $createIndex->bindDatabase($this->database());
                 $this->add($createIndex);
                 //$this->appendExpr(' KEY ? (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
             }
@@ -59,7 +59,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
                     new Symbol($this->table->schemaName),
                     $columns
                 );
-                $createIndex->bindDatabase($this->database);
+                $createIndex->bindDatabase($this->database());
                 $this->add($createIndex);
                 //$this->appendExpr(' CONSTRAINT ? UNIQUE (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
             }

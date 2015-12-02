@@ -13,6 +13,7 @@ use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
 use Yaoi\String\Utils;
+use Yaoi\Undefined;
 
 abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Contract
 {
@@ -163,15 +164,21 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $item;
     }
 
+
+    private $originalData;
+
     static function fromArray(array $row, $object = null, $source = null)
     {
         if (is_null($object)) {
             $object = new static;
         }
 
+        $object->originalData = array();
         foreach (static::table()->getColumns(true) as $column) {
             if (array_key_exists($column->schemaName, $row)) {
-                $object->{$column->propertyName} = Column::castField($row[$column->schemaName], $column->flags);
+                $value = Column::castField($row[$column->schemaName], $column->flags);
+                $object->{$column->propertyName} = $value;
+                $object->originalData [$column->propertyName] = $value;
             }
         }
 
@@ -182,14 +189,24 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $object;
     }
 
+    public function __construct() {
+        foreach (static::table()->getColumns(true) as $column) {
+            $this->{$column->propertyName} = Undefined::get();
+        }
+    }
+
+
     public function toArray($skipNotSetProperties = false)
     {
         $result = array();
         foreach (static::table()->getColumns(true) as $column) {
             $value = $this->{$column->propertyName};
-            if (null === $value) {
+            if ($value instanceof Undefined) {
                 if ($skipNotSetProperties) {
                     continue;
+                }
+                else {
+                    $value = $column->getDefault();
                 }
             } else {
                 $value = Column::castField($value, $column->flags);
@@ -251,7 +268,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     {
         $table = static::table();
         $insert = $table->database()->insert($table->schemaName);
-        $data = $this->toArray();
+        $data = $this->toArray(true);
 
         if ($autoId = $table->autoIdColumn) {
             if (empty($data[$autoId->schemaName])) {

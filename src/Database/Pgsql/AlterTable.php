@@ -18,7 +18,7 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         foreach ($this->after->indexes as $index) {
             $indexName = $index->getName();
             if (!isset($beforeIndexes[$indexName])) {
-                $this->add($this->database->expr('CREATE '
+                $this->add($this->database()->expr('CREATE '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? ON ? (?)',
                     new Symbol($index->getName()), new Symbol($this->before->schemaName), Symbol::prepareColumns($index->columns))
@@ -33,7 +33,7 @@ class AlterTable extends \Yaoi\Sql\AlterTable
                 $this->alterLines->commaExpr('DROP CONSTRAINT ?', new Symbol($index->getName()));
             }
             else {
-                $this->add($this->database->expr('DROP INDEX ?', new Symbol($index->getName())));
+                $this->add($this->database()->expr('DROP INDEX ?', new Symbol($index->getName())));
             }
         }
 

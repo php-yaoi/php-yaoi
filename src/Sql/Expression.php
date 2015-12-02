@@ -6,29 +6,34 @@ namespace Yaoi\Sql;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Debug;
+use Yaoi\DependencyRepository;
 use Yaoi\String\Quoter;
 
 abstract class Expression extends BaseClass
 {
+    private $databaseRefId;
+
     /**
-     * @var Database
+     * @return Database|null
      */
-    protected $database;
+    protected function database() {
+         return DependencyRepository::get($this->databaseRefId);
+    }
 
     public function bindDatabase(Database\Contract $client = null)
     {
-        $this->database = $client;
+        $this->databaseRefId = DependencyRepository::add($client);
         return $this;
     }
 
     public function __toString()
     {
-        if (!$this->database) {
+        if (!$this->database()) {
             return '/* ERROR: Unknown database */';
         }
 
         try {
-            $res = $this->build($this->database->getDriver());
+            $res = $this->build($this->database()->getDriver());
             return $res;
         } catch (\Exception $e) {
             return '/* ERROR: ' . $e->getMessage() . ' */';
@@ -118,8 +123,8 @@ abstract class Expression extends BaseClass
         }
 
         if (null === $quoter) {
-            if ($this->database) {
-                $quoter = $this->database->getDriver();
+            if ($this->database()) {
+                $quoter = $this->database()->getDriver();
             }
         }
 

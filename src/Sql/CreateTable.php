@@ -12,7 +12,7 @@ abstract class CreateTable extends Batch
     protected $table;
 
     protected function appendColumns() {
-        $utility = $this->database->getUtility();
+        $utility = $this->database()->getUtility();
 
         foreach ($this->table->getColumns(true) as $column) {
             $this->createLines->commaExpr(' ? ' . $utility->getColumnTypeString($column), new Symbol($column->schemaName));
@@ -39,7 +39,7 @@ abstract class CreateTable extends Batch
             return;
         }
         foreach ($this->table->foreignKeys as $foreignKey) {
-            $this->createLines->commaExpr($this->database->getUtility()->generateForeignKeyExpression($foreignKey));
+            $this->createLines->commaExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
         }
     }
 
@@ -57,7 +57,7 @@ abstract class CreateTable extends Batch
 
     public function __construct(Table $table) {
         $this->table = $table;
-        $this->database = $table->database();
+        $this->bindDatabase($table->database());
         $this->createLines = new SimpleExpression();
         $this->createLines->setOpComma(',' . PHP_EOL);
 

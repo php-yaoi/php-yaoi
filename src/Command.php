@@ -49,5 +49,5 @@ abstract class Command extends BaseClass implements Command\Contract
     }
 
     abstract protected function performAction();
-
 }
+

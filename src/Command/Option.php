@@ -3,6 +3,7 @@
 namespace Yaoi\Command;
 
 use Yaoi\BaseClass;
+use Yaoi\String\Utils;
 
 class Option extends BaseClass
 {
@@ -53,6 +54,11 @@ class Option extends BaseClass
 
         }
         else return $value;
+    }
+
+
+    public function getName() {
+        return Utils::fromCamelCase($this->name, '_');
     }
 
     public $type = self::TYPE_BOOL;

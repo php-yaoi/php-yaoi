@@ -12,7 +12,7 @@ class Statement extends ComplexStatement
     public function query(Contract $client = null)
     {
         if (null === $client) {
-            $query = $this->database->query($this);
+            $query = $this->database()->query($this);
         } else {
             $query = $client->query($this);
         }
@@ -100,7 +100,7 @@ class Statement extends ComplexStatement
     public function build(Quoter $quoter = null)
     {
         if (null === $quoter) {
-            $quoter = $this->database->getDriver();
+            $quoter = $this->database()->getDriver();
         }
 
         $q = '';
