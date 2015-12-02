@@ -4,6 +4,7 @@ namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
 use Yaoi\Database;
+use Yaoi\DependencyRepository;
 use Yaoi\Log;
 use Yaoi\Sql\CreateTable;
 use Yaoi\String\Utils;
@@ -34,7 +35,7 @@ class Table extends BaseClass
 
     public function __construct(\stdClass $columns = null, Database\Contract $database = null, $schemaName) {
         $this->schemaName = $schemaName;
-        $this->database = $database;
+        $this->databaseId = DependencyRepository::add($database);
         if (null !== $columns) {
             $this->setColumns($columns);
         }
@@ -139,7 +140,7 @@ class Table extends BaseClass
             }
         }
 
-        $this->database->getUtility()->checkTable($this);
+        $this->database()->getUtility()->checkTable($this);
 
         return $this;
     }
@@ -197,15 +198,14 @@ class Table extends BaseClass
     }
 
 
-    private $database;
+
+    private $databaseId;
 
     /**
-     * @return Database\Contract
-     * @throws Database\Exception
+     * @return Database|null
      */
-    public function database()
-    {
-        return $this->database;
+    public function database() {
+        return DependencyRepository::get($this->databaseId);
     }
 
 

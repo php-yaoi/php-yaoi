@@ -7,6 +7,7 @@
  */
 namespace YaoiTests\PHPUnit\Entity;
 
+use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\TestEntityDB;
 use Yaoi\Test\PHPUnit\TestCase;
 
@@ -46,7 +47,7 @@ class TestEntityDatabaseUnified extends TestCase
         $item->weight = 78;
         $item->url = 'http://veadev.tk';
         $item->birthDate = '1983-04-10';
-        $this->assertSame(null, $item->id);
+        $this->assertInstanceOf(get_class(Undefined::get()), $item->id);
 
         $item->save();
         $this->assertEquals(1, $item->id);

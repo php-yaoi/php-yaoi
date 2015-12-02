@@ -53,17 +53,17 @@ class AlterTable extends \Yaoi\Sql\AlterTable
 
              */
 
-            $this->add($this->database->expr(
+            $this->add($this->database()->expr(
                 "ALTER TABLE ? RENAME TO _temp_table",
                 new Symbol($this->before->schemaName)
             ));
 
             $this->add($this->after->getCreateTable());
-            $this->add($this->database->expr(
+            $this->add($this->database()->expr(
                 "INSERT INTO ? (?) SELECT ? FROM _temp_table",
                 new Symbol($this->after->schemaName), $intersect, $intersect)
             );
-            $this->add($this->database->expr("DROP TABLE _temp_table"));
+            $this->add($this->database()->expr("DROP TABLE _temp_table"));
         }
 
     }

@@ -21,7 +21,7 @@ class AlterTable extends Batch
         $this->before = $before;
         $this->after = $after;
 
-        $this->database = $before->database();
+        $this->bindDatabase($before->database());
         $alterExpression = new SimpleExpression('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
         $this->alterLines = new SimpleExpression();
         $this->alterLines->setOpComma(',' . PHP_EOL);
@@ -106,7 +106,7 @@ class AlterTable extends Batch
         foreach ($afterForeignKeys as $foreignKey) {
             if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
                 $this->alterLines->commaExpr('ADD');
-                $this->alterLines->appendExpr($this->database->getUtility()->generateForeignKeyExpression($foreignKey));
+                $this->alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
             }
             else {
                 unset($beforeForeignKeys[$foreignKey->getName()]);

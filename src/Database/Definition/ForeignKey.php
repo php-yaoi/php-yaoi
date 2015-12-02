@@ -98,7 +98,7 @@ class ForeignKey extends BaseClass
             }
 
             if (strlen($this->name) > 64) {
-                $this->name = md5($this->name);
+                $this->name = 'k' . md5($this->name);
             }
         }
         return $this->name;

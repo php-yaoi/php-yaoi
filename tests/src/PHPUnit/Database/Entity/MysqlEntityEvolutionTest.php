@@ -36,7 +36,7 @@ ALTER TABLE `yaoi_tests_helper_entity_user`
 ADD COLUMN `age` int DEFAULT NULL,
 ADD COLUMN `host_id` int NOT NULL,
 ADD INDEX `key_age` (`age`),
-ADD CONSTRAINT `432f6fb01e8766435a432e5ed8ffb2ef` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`)
+ADD CONSTRAINT `k432f6fb01e8766435a432e5ed8ffb2ef` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`)
 OK
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
@@ -49,9 +49,9 @@ ADD COLUMN `last_name` varchar(255) NOT NULL,
 DROP COLUMN `name`,
 DROP COLUMN `host_id`,
 ADD UNIQUE INDEX `unique_last_name_first_name` (`last_name`, `first_name`),
-DROP INDEX `432f6fb01e8766435a432e5ed8ffb2ef`,
-ADD CONSTRAINT `42405537c0e04845e2902c8a7fb322be` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`),
-DROP FOREIGN KEY `432f6fb01e8766435a432e5ed8ffb2ef`
+DROP INDEX `k432f6fb01e8766435a432e5ed8ffb2ef`,
+ADD CONSTRAINT `k42405537c0e04845e2902c8a7fb322be` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`),
+DROP FOREIGN KEY `k432f6fb01e8766435a432e5ed8ffb2ef`
 OK
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion

@@ -76,7 +76,7 @@ class Migration extends AbstractMigration
         }
 
         if ($this->log) {
-            $this->log->push((string)$statement);
+            $this->log->push($statement->build());
         }
 
         if (!$this->dryRun) {

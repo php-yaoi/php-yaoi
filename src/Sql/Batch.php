@@ -39,7 +39,7 @@ class Batch extends Expression
         try {
             $result = '';
             if (null === $quoter) {
-                $quoter = $this->database->getDriver();
+                $quoter = $this->database()->getDriver();
             }
             $flatStatements = $this->get();
             $builds = array();
