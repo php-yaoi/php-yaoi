@@ -249,7 +249,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     {
         $table = static::table();
         $update = $table->database()->update($table->schemaName);
-        $data = $this->toArray();
+        $data = $this->toArray(true);
 
         foreach ($table->primaryKey as $keyField) {
             if (!isset($data[$keyField->schemaName])) {
@@ -258,6 +258,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             $update->where("? = ?", new Symbol($keyField->schemaName), $data[$keyField->schemaName]);
             unset($data[$keyField->schemaName]);
         }
+
+        foreach ($data as $key => $value) {
+            if ($this->originalData[$key] === $value) {
+                unset($data[$key]);
+            }
+        }
+
         $update->set($data);
         $update->query();
         $this->persistent = true;
@@ -270,18 +277,14 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $insert = $table->database()->insert($table->schemaName);
         $data = $this->toArray(true);
 
-        if ($autoId = $table->autoIdColumn) {
-            if (empty($data[$autoId->schemaName])) {
-                unset($data[$autoId->schemaName]);
-            }
-        }
+        $autoId = $table->autoIdColumn;
 
         $insert->valuesRow($data);
 
         $query = $insert->query();
 
         if ($autoId) {
-            if (empty($this->{$autoId->propertyName})) {
+            if ($this->{$autoId->propertyName} instanceof Undefined) {
                 $this->{$autoId->propertyName} = $query->lastInsertId();
             }
         }

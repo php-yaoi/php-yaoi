@@ -60,7 +60,7 @@ class Query implements \Iterator
                 /**
                  * @var Log $log
                  */
-                $log = DependencyRepository::$items[$this->logResourceId];
+                $log = DependencyRepository::get($this->logResourceId);
                 $log->push('(-1) ' . $query . "\n: " . $error . ' ' . $query, Log::TYPE_ERROR);
             }
             $exception = new Database\Exception($error, Database\Exception::QUERY_ERROR);
@@ -69,12 +69,12 @@ class Query implements \Iterator
         }
 
         if (null !== $this->logResourceId
-            && isset(DependencyRepository::$items[$this->logResourceId])
+            && DependencyRepository::get($this->logResourceId) !== null
         ) {
             /**
              * @var Log $log
              */
-            $log = DependencyRepository::$items[$this->logResourceId];
+            $log = DependencyRepository::get($this->logResourceId);
             $log->push(round(microtime(1) - $start, 4) . ' s. (' . $this->rowsAffected() . ') ' . $query);
         }
 

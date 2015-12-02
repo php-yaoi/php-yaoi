@@ -32,6 +32,6 @@ class ForeignKeyTest extends TestCase
         $localColumns = array(SessionTag::columns()->sessionId, SessionTag::columns()->tagId);
         $referenceColumns = array(Session::columns()->id, Tag::columns()->id);
         $foreignKey = new ForeignKey($localColumns, $referenceColumns);
-        $this->assertSame('90e2866a506c1bf228b66310920c52ef', $foreignKey->getName());
+        $this->assertSame('k90e2866a506c1bf228b66310920c52ef', $foreignKey->getName());
     }
 }
