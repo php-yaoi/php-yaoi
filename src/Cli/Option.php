@@ -29,10 +29,10 @@ class Option extends \Yaoi\Command\Option
         $usage = '';
         if (!$this->isUnnamed) {
             if ($this->shortName) {
-                $usage = Command::OPTION_SHORT . $this->shortName;
+                $usage = Runner::OPTION_SHORT . $this->shortName;
             }
             else {
-                $usage = Command::OPTION_NAME . $this->getName();
+                $usage = Runner::OPTION_NAME . $this->getName();
             }
         }
 

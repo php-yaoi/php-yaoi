@@ -72,39 +72,27 @@ class Console extends BaseClass
      * @throws \Yaoi\String\Exception
      * @return static
      */
-    public function printF($statement, $binds = null) {
+    public function printF($statement) {
         if ($this->padding && !$this->lineStarted) {
             echo $this->padding;
             $this->lineStarted = true;
         }
-        if ($binds) {
-            $e = new Expression(func_get_args());
-            echo $e->build();
-        }
-        else {
-            echo $statement;
-        }
+        echo $statement;
 
         return $this;
     }
 
     /**
      * @param string $statement
-     * @param mixed ...$binds
      * @throws \Yaoi\String\Exception
      * @return static
      */
-    public function printLine($statement, $binds = null) {
-        $this->printF($statement, $binds)->eol();
+    public function printLine($statement) {
+        $this->printF($statement)->eol();
         return $this;
     }
 
-    public function printLines($statement, $binds = null) {
-        if ($binds) {
-            $e = new Expression(func_get_args());
-            $statement = $e->build();
-        }
-
+    public function printLines($statement) {
         $lines = explode("\n", str_replace("\r\n", "\n", $statement));
         foreach ($lines as $line) {
             $this->printLine($line);

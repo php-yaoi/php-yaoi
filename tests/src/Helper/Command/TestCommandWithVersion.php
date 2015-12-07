@@ -3,12 +3,12 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Cli\Command;
+use Yaoi\Command;
 use Yaoi\Command\Definition;
 
 class TestCommandWithVersion extends Command
 {
-    protected function performAction()
+    public function performAction()
     {
     }
 
