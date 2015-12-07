@@ -192,7 +192,7 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
             }
             else {
                 static::error($exception->getMessage());
-                static::showHelp();
+                $this->showHelp = true;
             }
         }
 
