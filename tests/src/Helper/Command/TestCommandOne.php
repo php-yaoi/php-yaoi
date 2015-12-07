@@ -3,8 +3,7 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Cli\Command;
-use Yaoi\Cli\UnnamedArgument;
+use Yaoi\Command;
 use Yaoi\Cli\Option;
 use Yaoi\Command\Definition;
 
@@ -57,7 +56,7 @@ class TestCommandOne extends Command
             ->setDescription('Enumerated option to set up something');
     }
 
-    protected function performAction()
+    public function performAction()
     {
     }
 

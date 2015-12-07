@@ -94,7 +94,8 @@ class FormatterTest extends TestCase
      */
     public function testTroughPut() {
         $arguments = array('the ? and ? statement', 'small', 'safe');
-        $this->assertSame('the small and safe statement', Expression::create($arguments)->build(new Raw()));
+        $this->assertSame('the small and safe statement',
+            Expression::createFromArguments($arguments)->build(new Raw()));
     }
 
     /**

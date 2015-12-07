@@ -3,7 +3,7 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Cli\Command;
+use Yaoi\Command;
 use Yaoi\Command\Definition;
 
 class TestCommandWithSuccessMessage extends Command
@@ -20,7 +20,7 @@ class TestCommandWithSuccessMessage extends Command
 
     public function performAction()
     {
-        $this->success('Congratulations!');
+        $this->runner->success('Congratulations!');
     }
 
 }

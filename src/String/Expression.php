@@ -14,29 +14,35 @@ class Expression extends BaseClass
     private $statement;
     private $binds;
 
-    public function __construct($statement, $binds = null) {
-        if (is_array($statement)) {
-            $arguments = $statement;
+    /**
+     * Expression constructor.
+     * @param null $statement
+     * @param null ...$binds
+     */
+    public function __construct($statement = null, $binds = null) {
+        if ($statement != null) {
+            self::createFromArguments(func_get_args(), $this);
         }
-        else {
-            $arguments = func_get_args();
+    }
+
+    public static function createFromArguments(array $arguments, Expression $expression = null) {
+        if (null === $expression) {
+            $expression = new static;
         }
 
-        if (count($arguments) === 1 && is_array($arguments[0])) {
-            $arguments = $arguments[0];
-        }
-
-        $this->statement = $arguments[0];
+        $expression->statement = $arguments[0];
 
         $count = count($arguments);
         if ($count > 2) {
             array_shift($arguments);
-            $this->binds = $arguments;
+            $expression->binds = $arguments;
         } elseif (array_key_exists(1, $arguments)) {
-            $this->binds = is_array($arguments[1])
+            $expression->binds = is_array($arguments[1])
                 ? $arguments[1]
                 : array($arguments[1]);
         }
+
+        return $expression;
     }
 
     private $quoter;

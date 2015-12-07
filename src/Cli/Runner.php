@@ -2,24 +2,50 @@
 
 namespace Yaoi\Cli;
 
+use Yaoi\BaseClass;
 use Yaoi\Cli\Command\PrepareDefinition;
-use Yaoi\Cli\View\Table;
+use Yaoi\Command;
 use Yaoi\Request;
 use Yaoi\String\Expression;
 use Yaoi\String\StringValue;
 use Yaoi\View\Semantic\Error;
+use Yaoi\View\Semantic\Success;
+use Yaoi\Cli\View\Table;
 use Yaoi\View\Semantic\Heading;
 use Yaoi\View\Semantic\Info;
-use Yaoi\View\Semantic\Success;
 use \Yaoi\Cli\View\Text as ViewText;
 
-abstract class Command extends \Yaoi\Command
-{
-    public $help;
-    public $version;
 
+
+class Runner extends BaseClass implements \Yaoi\Command\Runner
+{
     const OPTION_NAME = '--';
     const OPTION_SHORT = '-';
+
+    const HELP = 'help';
+    const VERSION = 'version';
+
+    /** @var Command */
+    protected $command;
+
+    /** @var \Yaoi\Command\Definition  */
+    protected $definition;
+
+    /** @var \Yaoi\Command\Option[]  */
+    protected $optionsArray;
+
+    protected $console;
+
+    public function __construct(Command $command) {
+        $this->command = $command;
+        $this->definition = $command->definition();
+        $this->optionsArray = $this->command->optionsArray();
+        $this->console = new Console();
+        $command->setRunner($this);
+    }
+
+    protected $showHelp;
+    protected $showVersion;
 
     public function init(Request $request = null, $throw = false)
     {
@@ -28,8 +54,7 @@ abstract class Command extends \Yaoi\Command
         }
 
         try {
-            $options = static::optionsArray();
-            $def = new PrepareDefinition($options);
+            $def = new PrepareDefinition($this->optionsArray);
 
             $tokens = $request->server()->argv;
             $scriptName = array_shift($tokens);
@@ -38,13 +63,13 @@ abstract class Command extends \Yaoi\Command
             $argc = count($tokens);
 
             if ($argc === 1) {
-                if ($tokens[0] === self::OPTION_NAME . Option::cast(static::options()->help)->getName()) {
-                    $this->help = true;
+                if ($tokens[0] === self::OPTION_NAME . self::HELP) {
+                    $this->showHelp = true;
                     return $this;
                 }
 
-                if ($tokens[0] === self::OPTION_NAME . Option::cast(static::options()->version)->getName()) {
-                    $this->version = true;
+                if ($tokens[0] === self::OPTION_NAME . self::VERSION) {
+                    $this->showVersion = true;
                     return $this;
                 }
             }
@@ -70,7 +95,7 @@ abstract class Command extends \Yaoi\Command
                     if (!$variadicValues) {
                         throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
                     }
-                    $this->{$option->name} = $variadicValues;
+                    $this->command->{$option->name} = $variadicValues;
                     $variadicValues = array();
                     $variadicStarted = false;
                 }
@@ -88,7 +113,7 @@ abstract class Command extends \Yaoi\Command
                     if ($optionFound) {
                         throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
                     }
-                    $this->{$option->name} = $option->validateFilterValue((string)$token);
+                    $this->command->{$option->name} = $option->validateFilterValue((string)$token);
                     $valueRequired = false;
                     continue;
                 }
@@ -102,7 +127,7 @@ abstract class Command extends \Yaoi\Command
                         $variadicValues [] = $value;
                         continue;
                     } else {
-                        $this->{$option->name} = $value;
+                        $this->command->{$option->name} = $value;
                         continue;
                     }
                 }
@@ -116,7 +141,7 @@ abstract class Command extends \Yaoi\Command
 
                     $def->optionalArguments = false;
                     if ($option->type === Option::TYPE_BOOL) {
-                        $this->{$option->name} = true;
+                        $this->command->{$option->name} = true;
                         continue;
                     }
                     if ($option->isVariadic) {
@@ -136,7 +161,7 @@ abstract class Command extends \Yaoi\Command
                         $variadicValues [] = $option->validateFilterValue((string)$token);
                         continue;
                     } else {
-                        $this->{$option->name} = $option->validateFilterValue((string)$token);
+                        $this->command->{$option->name} = $option->validateFilterValue((string)$token);
                         continue;
                     }
                 }
@@ -146,7 +171,7 @@ abstract class Command extends \Yaoi\Command
             }
 
             if ($variadicStarted) {
-                $this->{$option->name} = $variadicValues;
+                $this->command->{$option->name} = $variadicValues;
             }
 
             if ($def->requiredArguments) {
@@ -174,32 +199,83 @@ abstract class Command extends \Yaoi\Command
         return $this;
     }
 
-    public static function showVersion()
-    {
-        $definition = static::definition();
-        $console = new Console();
-        $console->eol();
-        if ($definition->name) {
-            if ($definition->version) {
-                ViewText::create(new Heading($definition->version . ' '))->render();
-            }
 
-            ViewText::create(new Heading($definition->name))->render();
-            $console->eol();
-        }
-        if ($definition->description) {
-            $console->printLine($definition->description)->eol();
+    public function error($message)
+    {
+        $this->console->printLines(
+            new ViewText(
+                new Error(
+                    (string)$message
+                )
+            )
+        );
+        return $this;
+    }
+
+    public function success($message)
+    {
+        $this->console->printLines(
+            new ViewText(
+                new Success(
+                    (string)$message
+                )
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function respond($message)
+    {
+        $this->console->printLines($message);
+        return $this;
+    }
+
+
+    public function run()
+    {
+        if ($this->showHelp) {
+            $this->showHelp();
+            return;
+        } elseif ($this->showVersion) {
+            $this->showVersion();
+            return;
+        } else {
+            $this->command->performAction();
         }
     }
 
-    public static function showHelp()
+
+    public function showVersion()
     {
-        $definition = static::definition();
-        $console = new Console();
-        self::showVersion();
+        $this->console->eol();
+        if ($this->definition->name) {
+            if ($this->definition->version) {
+                $this->console->printF(
+                    new ViewText(
+                        new Heading($this->definition->version . ' ')
+                    )
+                );
+            }
+
+            $this->console->printF(
+                new ViewText(new Heading($this->definition->name))
+            );
+            $this->console->eol();
+        }
+        if ($this->definition->description) {
+            $this->console->printLine($this->definition->description)->eol();
+        }
+    }
+
+    public function showHelp()
+    {
+        $this->showVersion();
 
         try {
-            new PrepareDefinition(static::optionsArray());
+            new PrepareDefinition($this->optionsArray);
         } catch (Exception $exception) {
             self::error('Command definition error: ' . $exception->getMessage());
             return;
@@ -208,7 +284,7 @@ abstract class Command extends \Yaoi\Command
         $usage = '';
         $optionsDescription = array();
         $argumentsDescription = array();
-        foreach ((array)$definition->options as $name => $option) {
+        foreach ($this->optionsArray as $name => $option) {
             if (!$option instanceof Option) {
                 $option = Option::cast($option);
             }
@@ -230,65 +306,31 @@ abstract class Command extends \Yaoi\Command
                     $optionsDescription [] = array(new Info($option->getUsage()), $description);
                 }
             }
-
         }
+        $help = Option::create()->setDescription('Show usage information')->setName(self::HELP);
+        $version = Option::create()->setDescription('Show version')->setName(self::VERSION);
+
+        $optionsDescription []= array(new Info($help->getUsage()), $help->description);
+        $optionsDescription []= array(new Info($version->getUsage()), $version->description);
 
         ViewText::create(new Heading("Usage: "))->render();
-        $console->eol()->setPadding('   ')->printLine($usage)->setPadding('');
+        $this->console->eol()->setPadding('   ')->printLine($usage)->setPadding('');
 
         if ($argumentsDescription) {
-            $console->eol()->setPadding('   ')
+            $this->console->eol()->setPadding('   ')
                 ->printLines(Table::create(new \ArrayIterator($argumentsDescription)));
 
         }
 
-        $console->setPadding('');
+        $this->console->setPadding('');
         if ($optionsDescription) {
             ViewText::create(new Heading("Options: "))->render();
-            $console->eol()->setPadding('   ')
+            $this->console->eol()->setPadding('   ')
                 ->printLines(Table::create(new \ArrayIterator($optionsDescription)));
         }
     }
 
-    public static function error($message, $binds = null)
-    {
-        if ($binds !== null) {
-            $message = (string)Expression::create(func_get_args());
-        }
-        ViewText::create(new Error($message))->render();
-        Console::getInstance()->eol();
-    }
-
-    public static function success($message, $binds = null)
-    {
-        if ($binds !== null) {
-            $message = (string)Expression::create(func_get_args());
-        }
-        ViewText::create(new Success($message))->render();
-        Console::getInstance()->eol();
-    }
 
 
-    protected static function createDefinition()
-    {
-        $definition = parent::createDefinition();
-        /** @var static $options */
-        $options = $definition->options;
-        $options->help = Option::create()->setDescription('Show usage information');
-        $options->version = Option::create()->setDescription('Show version');
-        return $definition;
-    }
 
-    public function run()
-    {
-        if ($this->help) {
-            $this->showHelp();
-            return;
-        } elseif ($this->version) {
-            $this->showVersion();
-            return;
-        } else {
-            $this->performAction();
-        }
-    }
 }

@@ -3,7 +3,7 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Cli\Command;
+use Yaoi\Command;
 use Yaoi\Command\Definition;
 use Yaoi\Cli\Option;
 
@@ -13,7 +13,7 @@ class TestCommandWithOptionValue extends Command
     public $valueOption;
     public $unifiedOption;
 
-    protected function performAction()
+    public function performAction()
     {
         print_r($this);
     }

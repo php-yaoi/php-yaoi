@@ -3,7 +3,7 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Cli\Command;
+use Yaoi\Command;
 use Yaoi\Cli\Option;
 use Yaoi\Command\Definition;
 
@@ -13,7 +13,7 @@ class TestCommandWithRequiredArgument extends Command
     public $argumentTwo;
     public $option;
 
-    protected function performAction()
+    public function performAction()
     {
     }
 

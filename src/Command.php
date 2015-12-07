@@ -4,6 +4,7 @@ namespace Yaoi;
 
 use Yaoi\Command\Definition;
 use Yaoi\Command\Option;
+use Yaoi\Command\Runner;
 use Yaoi\String\Utils;
 
 abstract class Command extends BaseClass implements Command\Contract
@@ -44,10 +45,12 @@ abstract class Command extends BaseClass implements Command\Contract
         return $definition;
     }
 
-    public function run() {
-        $this->performAction();
+    /** @var  Runner */
+    protected $runner;
+    public function setRunner(Runner $runner)
+    {
+        $this->runner = $runner;
+        return $this;
     }
-
-    abstract protected function performAction();
 }
 
