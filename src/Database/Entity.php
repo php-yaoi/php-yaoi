@@ -26,10 +26,10 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * Method should return table definition of entity
      * @return Table
      */
-    public static function table()
+    public static function table($alias = null)
     {
         $className = get_called_class();
-        $table = &self::$tables[$className];
+        $table = &self::$tables[$className . ($alias ? ':' . $alias : '')];
         if (null !== $table) {
             return $table;
         }
@@ -38,16 +38,20 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $schemaName = Utils::fromCamelCase(str_replace('\\', '', $className));
         $table = new Table($columns, self::getDatabase($className), $schemaName);
         $table->className = $className;
+        $table->alias = $alias;
         static::setUpTable($table, $columns);
 
         return $table;
     }
 
     /**
+     * @param Table|null $table
      * @return static
      */
-    public static function columns() {
-        return static::table()->columns;
+    public static function columns(Table $table = null) {
+        return null === $table
+            ? static::table()->columns
+            : $table->columns;
     }
 
 
