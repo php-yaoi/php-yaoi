@@ -2,7 +2,7 @@
 
 namespace YaoiTests\PHPUnit\Cli;
 
-use Yaoi\Cli\Runner;
+use Yaoi\Cli\Command\Runner;
 use Yaoi\Request;
 use Yaoi\String\Expression;
 use Yaoi\Test\PHPUnit\TestCase;

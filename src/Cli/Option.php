@@ -2,6 +2,7 @@
 
 namespace Yaoi\Cli;
 
+use Yaoi\Cli\Command\Runner;
 use Yaoi\String\Utils;
 
 class Option extends \Yaoi\Command\Option
@@ -59,14 +60,6 @@ class Option extends \Yaoi\Command\Option
             }
         }
         return $usage ? $usage . ' ' . $value : $value;
-    }
-
-
-
-    public $isVariadic = false;
-    public function setIsVariadic($yes = true) {
-        $this->isVariadic = $yes;
-        return $this;
     }
 
 }

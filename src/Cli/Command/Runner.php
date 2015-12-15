@@ -1,14 +1,18 @@
 <?php
 
-namespace Yaoi\Cli;
+namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Cli\Command\PrepareDefinition;
+use Yaoi\Cli\Console;
+use Yaoi\Cli\Exception;
+use Yaoi\Cli\Option;
 use Yaoi\Command;
 use Yaoi\Request;
 use Yaoi\String\Expression;
 use Yaoi\String\StringValue;
 use Yaoi\View\Semantic\Error;
+use Yaoi\View\Semantic\Rows;
 use Yaoi\View\Semantic\Success;
 use Yaoi\Cli\View\Table;
 use Yaoi\View\Semantic\Heading;
@@ -229,6 +233,10 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
      */
     public function respond($message)
     {
+        if ($message instanceof Rows) {
+            $message = (string)Table::create($message->getIterator())->setShowHeader();
+        }
+
         $this->console->printLines($message);
         return $this;
     }

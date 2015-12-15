@@ -61,5 +61,12 @@ class Option extends BaseClass
         return Utils::fromCamelCase($this->name, '_');
     }
 
+    public $isVariadic = false;
+    public function setIsVariadic($yes = true) {
+        $this->isVariadic = $yes;
+        return $this;
+    }
+
+
     public $type = self::TYPE_BOOL;
 }
