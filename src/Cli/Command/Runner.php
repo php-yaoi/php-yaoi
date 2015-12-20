@@ -28,6 +28,7 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
     const HELP = 'help';
     const VERSION = 'version';
+    const BASH_COMPLETION = 'bash-completion';
 
     /** @var Command */
     protected $command;
@@ -50,6 +51,7 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
     protected $showHelp;
     protected $showVersion;
+    protected $showBashCompletion;
 
     public function init(Request $request = null, $throw = false)
     {
@@ -74,6 +76,11 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
                 if ($tokens[0] === self::OPTION_NAME . self::VERSION) {
                     $this->showVersion = true;
+                    return $this;
+                }
+
+                if ($tokens[0] === self::OPTION_NAME . self::BASH_COMPLETION) {
+                    $this->showBashCompletion = true;
                     return $this;
                 }
             }
@@ -250,6 +257,9 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
         } elseif ($this->showVersion) {
             $this->showVersion();
             return;
+        } elseif ($this->showBashCompletion) {
+            $this->showBashCompletion();
+            return;
         } else {
             $this->command->performAction();
         }
@@ -278,63 +288,39 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
         }
     }
 
+    public function showBashCompletion()
+    {
+        $completion = new Completion($this->command);
+        $completion->render();
+    }
+
     public function showHelp()
     {
         $this->showVersion();
 
         try {
-            new PrepareDefinition($this->optionsArray);
+            $def = new PrepareDefinition($this->optionsArray);
         } catch (Exception $exception) {
             self::error('Command definition error: ' . $exception->getMessage());
             return;
         }
 
-        $usage = '';
-        $optionsDescription = array();
-        $argumentsDescription = array();
-        foreach ($this->optionsArray as $name => $option) {
-            if (!$option instanceof Option) {
-                $option = Option::cast($option);
-            }
-
-            if ($option instanceof Option) {
-                if ($option->isUnnamed || $option->isRequired) {
-                    $usage .= ' ' . $option->getUsage();
-                }
-
-                $description = $option->description;
-                if ($option->type === Option::TYPE_ENUM) {
-                    $description .= ($description ? PHP_EOL : '') . 'Allowed values: ' . implode(', ', $option->values);
-                }
-
-                if ($option->isUnnamed) {
-                    $argumentsDescription [] = array(new Info($option->name), $description);
-
-                } else {
-                    $optionsDescription [] = array(new Info($option->getUsage()), $description);
-                }
-            }
-        }
-        $help = Option::create()->setDescription('Show usage information')->setName(self::HELP);
-        $version = Option::create()->setDescription('Show version')->setName(self::VERSION);
-
-        $optionsDescription []= array(new Info($help->getUsage()), $help->description);
-        $optionsDescription []= array(new Info($version->getUsage()), $version->description);
+        $def->initOptions();
 
         ViewText::create(new Heading("Usage: "))->render();
-        $this->console->eol()->setPadding('   ')->printLine($usage)->setPadding('');
+        $this->console->eol()->setPadding('   ')->printLine($this->command->definition()->name . $def->usage)->setPadding('');
 
-        if ($argumentsDescription) {
+        if ($def->argumentsDescription) {
             $this->console->eol()->setPadding('   ')
-                ->printLines(Table::create(new \ArrayIterator($argumentsDescription)));
+                ->printLines(Table::create(new \ArrayIterator($def->argumentsDescription)));
 
         }
 
         $this->console->setPadding('');
-        if ($optionsDescription) {
+        if ($def->optionsDescription) {
             ViewText::create(new Heading("Options: "))->render();
             $this->console->eol()->setPadding('   ')
-                ->printLines(Table::create(new \ArrayIterator($optionsDescription)));
+                ->printLines(Table::create(new \ArrayIterator($def->optionsDescription)));
         }
     }
 

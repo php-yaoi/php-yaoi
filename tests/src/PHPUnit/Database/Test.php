@@ -33,7 +33,7 @@ class Test extends TestCase
         Migration_Client::getInstance()
             ->add('test1',
                 function () {
-                    $db = App::db('test_mysqli')->mock();
+                    $db = CommandSet::db('test_mysqli')->mock();
                     $db->query("DROP TABLE IF EXISTS test1");
                     $db->query("CREATE TABLE test1 (id integer unsigned auto_increment, PRIMARY KEY(id)) ENGINE=InnoDB");
                     $db->query("INSERT INTO test1 (id) VALUES (1),(2),(3)");
