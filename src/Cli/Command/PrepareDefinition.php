@@ -25,7 +25,8 @@ class PrepareDefinition extends BaseClass
     public $requiredOptions = array();
 
 
-    private $optionsArray;
+    /** @var  Option[] */
+    public $optionsArray;
 
     public function __construct($options)
     {
@@ -34,13 +35,28 @@ class PrepareDefinition extends BaseClass
         /** @var Option $hasVariadicArgument */
         $hasVariadicArgument = null;
 
-        $options[Runner::HELP] = Option::create()->setDescription('Show usage information')->setName(Runner::HELP);
-        $options[Runner::VERSION] = Option::create()->setDescription('Show version')->setName(Runner::VERSION);
-        $options[Runner::BASH_COMPLETION] = Option::create()->setDescription('Generate bash completion')
+        $this->optionsArray[Runner::HELP] = Option::create()
+            ->setDescription('Show usage information')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::HELP);
+
+        $this->optionsArray[Runner::VERSION] = Option::create()
+            ->setDescription('Show version')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::VERSION);
+
+        $this->optionsArray[Runner::BASH_COMPLETION] = Option::create()
+            ->setDescription('Generate bash completion')
+            ->setGroup(Runner::GROUP_MISC)
             ->setName(Runner::BASH_COMPLETION);
 
+        $this->optionsArray[Runner::INSTALL] = Option::create()
+            ->setDescription('Install to /usr/local/bin/')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::INSTALL);
 
-        foreach ($options as $option) {
+
+        foreach ($this->optionsArray as &$option) {
             $option = Option::cast($option);
             if ($option->isUnnamed) {
                 if ($hasVariadicArgument) {
@@ -102,7 +118,7 @@ class PrepareDefinition extends BaseClass
                     $this->argumentsDescription [] = array(new Info($option->name), $description);
 
                 } else {
-                    $this->optionsDescription [] = array(new Info($option->getUsage()), $description);
+                    $this->optionsDescription [$option->group][] = array(new Info($option->getUsage()), $description);
                 }
             }
         }

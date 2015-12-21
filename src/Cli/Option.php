@@ -26,6 +26,12 @@ class Option extends \Yaoi\Command\Option
         return $this;
     }
 
+    public $group = Runner::GROUP_DEFAULT;
+    public function setGroup($group) {
+        $this->group = $group;
+        return $this;
+    }
+
     public function getUsage() {
         $usage = '';
         if (!$this->isUnnamed) {

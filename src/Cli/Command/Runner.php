@@ -29,6 +29,10 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
     const HELP = 'help';
     const VERSION = 'version';
     const BASH_COMPLETION = 'bash-completion';
+    const INSTALL = 'install';
+
+    const GROUP_MISC = 'Misc';
+    const GROUP_DEFAULT = 'Options';
 
     /** @var Command */
     protected $command;
@@ -318,9 +322,11 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
         $this->console->setPadding('');
         if ($def->optionsDescription) {
-            ViewText::create(new Heading("Options: "))->render();
-            $this->console->eol()->setPadding('   ')
-                ->printLines(Table::create(new \ArrayIterator($def->optionsDescription)));
+            foreach ($def->optionsDescription as $group => $descriptions) {
+                ViewText::create(new Heading($group . ": "))->render();
+                $this->console->eol()->setPadding('   ')
+                    ->printLines(Table::create(new \ArrayIterator($descriptions)));
+            }
         }
     }
 

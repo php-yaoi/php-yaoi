@@ -2,6 +2,7 @@
 
 namespace Yaoi\Cli\Command;
 
+use Yaoi\Cli\Option;
 use Yaoi\Command;
 use Yaoi\View\Hardcoded;
 
@@ -25,11 +26,34 @@ class Completion extends Hardcoded
 
         foreach ($prep->requiredArguments as $index => $argument) {
             if ($argument->type === Command\Option::TYPE_ENUM) {
+                $arguments[$index] = '';
                 foreach ($argument->values as $value) {
-                    $arguments[$index][]= '"' . $value . '"';
+                    $arguments[$index] .= '"' . $value . '" ';
                 }
             }
         }
+
+        $optionsStrings = array(
+            Runner::GROUP_MISC => '',
+            Runner::GROUP_DEFAULT => '',
+        );
+
+        foreach ($prep->optionsArray as $option) {
+            if ($option instanceof Option && $option->isUnnamed) {
+                continue;
+            }
+
+            $group = $option->group === Runner::GROUP_MISC
+                ? Runner::GROUP_MISC
+                : Runner::GROUP_DEFAULT;
+
+            $optionsStrings [$group] .= '"' . Runner::OPTION_NAME . $option->getName() . '" ';
+            if ($option->shortName) {
+                $optionsStrings [$group] .= '"' . Runner::OPTION_SHORT . $option->shortName . '" ';
+            }
+        }
+
+        $arguments[0] .= $optionsStrings[Runner::GROUP_MISC];
 
 ?>
 #!/bin/bash
@@ -39,40 +63,35 @@ class Completion extends Hardcoded
 _<?=$def->name?>() {
     COMPREPLY=()
     local self=${COMP_WORDS[0]}
+    local first=${COMP_WORDS[0]}
     local cur=${COMP_WORDS[COMP_CWORD]}
     local prev=${COMP_WORDS[COMP_CWORD-1]}
-    local options=(<?php
-        if ($prep->byShortName) {
-            echo '"-' . implode('" "-', array_keys($prep->byShortName)) . '" ';
-        }
-        if ($prep->byName) {
-            echo '"--' . implode('" "--', array_keys($prep->byName)) . '" ';
-        }
-        ?>)
-    local arguments=()
-    local arrayOptions=()
+    local options=(<?php echo $optionsStrings[Runner::GROUP_DEFAULT] ?>)
 
-<?php
-foreach ($arguments as $index => $values) {
-?>
-    if [ $COMP_CWORD = <?=$index + 1?> ]; then
-        commands=(<?=implode(' ', $values)?>)
-        COMPREPLY=( $( compgen -W "${commands[*]}" -- $cur) )
-        return 0
-    fi
-<?php
-}
-?>
 
-    if [ $COMP_CWORD -eq 1 ]; then
-        if [[ ${cur} == -* ]] ; then
-            COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
-        else
-            commands=("help" "list" "delete" "diff" "get" "say")
-            COMPREPLY=( $( compgen -W "${commands[*]}" -- $cur) )
+    for opt in "<?= $optionsStrings[Runner::GROUP_MISC]?>"; do
+        if [[ $opt == $first ]]; then
+            COMPREPLY=()
+            return 0
         fi
+    done
+
+<?php foreach ($arguments as $index => $values) { ?>
+    if [ $COMP_CWORD = <?=$index + 1?> ]; then
+        enum=(<?php echo $values ?>)
+        COMPREPLY=( $( compgen -W "${enum[*]}" -- $cur) )
         return 0
     fi
+<?php } ?>
+
+
+
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
+        return 0
+    fi
+
 
     filteredOptions=()
     for opt in "${options[@]}"; do
