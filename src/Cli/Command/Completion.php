@@ -25,11 +25,14 @@ class Completion extends Hardcoded
         $arguments = array();
 
         foreach ($prep->requiredArguments as $index => $argument) {
-            if ($argument->type === Command\Option::TYPE_ENUM) {
+            if ($argument->type === Option::TYPE_ENUM) {
                 $arguments[$index] = '';
                 foreach ($argument->values as $value) {
                     $arguments[$index] .= '"' . $value . '" ';
                 }
+            }
+            elseif ($argument->type === Option::TYPE_VALUE) {
+                $arguments[$index] = '';
             }
         }
 
@@ -37,6 +40,8 @@ class Completion extends Hardcoded
             Runner::GROUP_MISC => '',
             Runner::GROUP_DEFAULT => '',
         );
+
+        $valuedOptions = array();
 
         foreach ($prep->optionsArray as $option) {
             if ($option instanceof Option && $option->isUnnamed) {
@@ -48,8 +53,17 @@ class Completion extends Hardcoded
                 : Runner::GROUP_DEFAULT;
 
             $optionsStrings [$group] .= '"' . Runner::OPTION_NAME . $option->getName() . '" ';
+            /*
             if ($option->shortName) {
                 $optionsStrings [$group] .= '"' . Runner::OPTION_SHORT . $option->shortName . '" ';
+            }
+            */
+
+            if ($option->type === Option::TYPE_VALUE) {
+                $valuedOptions [Runner::OPTION_NAME . $option->getName()] = '';
+            }
+            elseif ($option->type === Option::TYPE_ENUM) {
+                $valuedOptions [Runner::OPTION_NAME . $option->getName()] = '"' . implode('" "', $option->values) . '" ';
             }
         }
 
@@ -63,28 +77,43 @@ class Completion extends Hardcoded
 _<?=$def->name?>() {
     COMPREPLY=()
     local self=${COMP_WORDS[0]}
-    local first=${COMP_WORDS[0]}
+    local first=${COMP_WORDS[1]}
     local cur=${COMP_WORDS[COMP_CWORD]}
     local prev=${COMP_WORDS[COMP_CWORD-1]}
-    local options=(<?php echo $optionsStrings[Runner::GROUP_DEFAULT] ?>)
+    local available_options=(<?php echo $optionsStrings[Runner::GROUP_DEFAULT] ?>)
+    local options=()
+
+    for opt in "${available_options[@]}"; do
+        skip=
+        for word in "${COMP_WORDS[@]}"; do
+            if [[ $opt == $word ]]; then
+                skip=1
+                break;
+            fi
+        done
+        [[ -n $skip ]] || options+=("$opt");
+    done
 
 
-    for opt in "<?= $optionsStrings[Runner::GROUP_MISC]?>"; do
+    for opt in <?= $optionsStrings[Runner::GROUP_MISC]?>; do
         if [[ $opt == $first ]]; then
-            COMPREPLY=()
             return 0
         fi
     done
 
 <?php foreach ($arguments as $index => $values) { ?>
     if [ $COMP_CWORD = <?=$index + 1?> ]; then
-        enum=(<?php echo $values ?>)
-        COMPREPLY=( $( compgen -W "${enum[*]}" -- $cur) )
-        return 0
+        options=(<?php echo $values ?>)
     fi
 <?php } ?>
 
-
+    case "$prev" in
+<?php foreach ($valuedOptions as $name => $values) { ?>
+        "<?php echo $name?>")
+            options=(<?php echo $values;?>)
+        ;;
+<?php } ?>
+    esac
 
 
     if [[ ${cur} == -* ]] ; then
@@ -92,23 +121,7 @@ _<?=$def->name?>() {
         return 0
     fi
 
-
-    filteredOptions=()
-    for opt in "${options[@]}"; do
-        skip=
-        for word in "${COMP_WORDS[@]}"; do
-            if [[ $opt == $word ]]; then
-                skip=1
-                for optArr in "${arrayOptions[@]}"; do
-                    [[ $opt == $optArr ]] && { skip=; break; }
-                done
-                [[ -n $skip ]] && break;
-            fi
-        done
-        [[ -n $skip ]] || filteredOptions+=("$opt");
-    done
-
-    COMPREPLY=( $( compgen -W "${filteredOptions[*]}" -- $cur) )
+    COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
 complete -F _<?=$def->name?> <?=$def->name?>
