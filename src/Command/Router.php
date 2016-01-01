@@ -4,7 +4,7 @@ namespace Yaoi\Command;
 
 
 use Yaoi\Command;
-use Yaoi\Request;
+use Yaoi\Io\Request;
 
 abstract class Router extends \Yaoi\Router
 {

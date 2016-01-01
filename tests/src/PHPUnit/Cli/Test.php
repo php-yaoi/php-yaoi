@@ -2,8 +2,11 @@
 
 namespace YaoiTests\PHPUnit\Cli;
 
-use Yaoi\Cli\Runner;
-use Yaoi\Request;
+use Yaoi\Cli\Command\RequestReader;
+use Yaoi\Cli\Command\Runner;
+use Yaoi\Cli\Response;
+use Yaoi\Io\Request;
+use Yaoi\Io\Request\Server;
 use Yaoi\String\Expression;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandOne;
@@ -13,7 +16,6 @@ use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
 use YaoiTests\Helper\Command\TestCommandWithSuccessMessage;
 use YaoiTests\Helper\Command\TestCommandWithVariadicError;
 use YaoiTests\Helper\Command\TestCommandWithVersion;
-use Yaoi\Helpers;
 
 class Test extends TestCase
 {
@@ -23,14 +25,11 @@ class Test extends TestCase
         Runner::create(new TestCommandOne())->showHelp();
         $result = ob_get_clean();
         //echo $result;
-        //echo $this->varExportString($result);
-        $expected = PHP_EOL
-            . "\x1B" . '[36;1mthe-first' . "\x1B" . '[m' . PHP_EOL
-            . 'This is a command one for doing nothing' . PHP_EOL
-            . PHP_EOL
+        //echo $this->varExportString($result);die();
+        $expected = "\x1B" . '[36;1mthe-first' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[36;1mThis is a command one for doing nothing' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
-            . '    <action> [argumentA] [argumentB...] -d <optionD...> --some-enum <one|two|three>' . PHP_EOL
-            . PHP_EOL
+            . '   the-first <action> [argumentA] [argumentB...] -d <optionD...> --some-enum <one|two|three>' . PHP_EOL
             . '   ' . "\x1B" . '[32;1maction   ' . "\x1B" . '[m   Main action                        ' . PHP_EOL
             . '               Allowed values: get, delete, create' . PHP_EOL
             . '   ' . "\x1B" . '[32;1margumentA' . "\x1B" . '[m   Bee description follows            ' . PHP_EOL
@@ -41,10 +40,13 @@ class Test extends TestCase
             . '   ' . "\x1B" . '[32;1m-d <optionD...>            ' . "\x1B" . '[m   Short name option with required value' . PHP_EOL
             . '   ' . "\x1B" . '[32;1m--some-enum <one|two|three>' . "\x1B" . '[m   Enumerated option to set up something' . PHP_EOL
             . '                                 Allowed values: one, two, three      ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--help                     ' . "\x1B" . '[m   Show usage information               ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--version                  ' . "\x1B" . '[m   Show version                         ' . PHP_EOL
             . '   ' . PHP_EOL
-        ;
+            . "\x1B" . '[36;1mMisc: ' . "\x1B" . '[m' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--help            ' . "\x1B" . '[m   Show usage information    ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--version         ' . "\x1B" . '[m   Show version              ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--bash-completion ' . "\x1B" . '[m   Generate bash completion  ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--install         ' . "\x1B" . '[m   Install to /usr/local/bin/' . PHP_EOL
+            . '   ' . PHP_EOL;
 
         $this->assertSame($expected, $result);
     }
@@ -55,15 +57,15 @@ class Test extends TestCase
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);
-        $this->assertSame(PHP_EOL
-            . "\x1B" . '[37;41m Command definition error: Non-tailing variadic argument [variadicArgument...] ' . "\x1B" . '[m' . PHP_EOL
+        $this->assertSame(
+            "\x1B" . '[37;41m Command definition error: Non-tailing variadic argument [variadicArgument...] ' . "\x1B" . '[m' . PHP_EOL
             , $result);
 
     }
 
     public function testSuccessMessage() {
         ob_start();
-        Runner::create(new TestCommandWithSuccessMessage)->init($this->getRequest(array()))->run();
+        Runner::create(new TestCommandWithSuccessMessage)->run($this->getRequest(array()));
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);
@@ -72,7 +74,7 @@ class Test extends TestCase
     }
 
     public function testInit() {
-        Runner::create(new TestCommandOne)->init($this->getRequest(array('get','123A','456B', '789B',
+        Runner::create(new TestCommandOne)->run($this->getRequest(array('get','123A','456B', '789B',
             '-d', 'd1', 'd2', 'd3',
             '--option-c',
             '--some-enum', 'two')));
@@ -84,10 +86,10 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
      */
     public function testOptionRequired() {
-        Runner::create(new TestCommandOne)->init($this->getRequest(array('get','123A','456B', '789B',
+        RequestReader::create()->read($this->getRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c',
-            '--some-enum', 'two')), true);
+            '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
     }
 
     /**
@@ -95,10 +97,10 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired() {
-        Runner::create(new TestCommandOne)->init($this->getRequest(array('get',
+        RequestReader::create()->read($this->getRequest(array('get',
             '-d',
             '--option-c',
-            '--some-enum', 'two')), true);
+            '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
     }
 
     /**
@@ -106,11 +108,10 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired2() {
-        Runner::create(new TestCommandWithOptionValue)->init($this->getRequest(array(
+        RequestReader::create()->read($this->getRequest(array(
             '--value-option', //'value',
             '--bool-option',
-        )), true
-        )->run();
+        )), (array)TestCommandWithOptionValue::definition()->options);
     }
 
     /**
@@ -118,7 +119,10 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredEmpty() {
-        Runner::create(new TestCommandWithRequiredArgument)->init($this->getRequest(array()), true);
+        RequestReader::create()->read(
+            $this->getRequest(array()),
+            (array)TestCommandWithRequiredArgument::definition()->options
+        );
     }
 
     /**
@@ -126,7 +130,10 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredMissing() {
-        Runner::create(new TestCommandWithRequiredArgument)->init($this->getRequest(array('arg1')), true);
+        RequestReader::create()->read(
+            $this->getRequest(array('arg1')),
+            (array)TestCommandWithRequiredArgument::definition()->options
+        );
     }
 
     /**
@@ -134,12 +141,15 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredOptionFound() {
-        Runner::create(new TestCommandWithRequiredArgument)->init($this->getRequest(array('arg1', '--option')), true);
+        RequestReader::create()->read(
+            $this->getRequest(array('arg1', '--option')),
+            (array)TestCommandWithRequiredArgument::definition()->options
+        );
     }
 
     public function testVariadicArgument() {
         $command = new TestCommandWithRequiredArgument;
-        Runner::create($command)->init($this->getRequest(array('arg1', 'arg2a', 'arg2b')));
+        Runner::create($command)->run($this->getRequest(array('arg1', 'arg2a', 'arg2b')));
         $this->assertSame(array('arg2a', 'arg2b'), $command->argumentTwo);
     }
 
@@ -147,16 +157,19 @@ class Test extends TestCase
         ob_start();
         Runner::create(new TestCommandWithOptionValue)->showHelp();
         $result = ob_get_clean();
-        //echo $this->varExportString($result);
-        $expected = PHP_EOL
-            . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
+        //echo $this->varExportString($result);die();
+        $expected = "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
             . '   ' . PHP_EOL
             . "\x1B" . '[36;1mOptions: ' . "\x1B" . '[m' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--value-option <valueOption>' . "\x1B" . '[m                         ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--bool-option               ' . "\x1B" . '[m                         ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--unified-option            ' . "\x1B" . '[m                         ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--help                      ' . "\x1B" . '[m   Show usage information' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--version                   ' . "\x1B" . '[m   Show version          ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--value-option <valueOption>' . "\x1B" . '[m   ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--bool-option               ' . "\x1B" . '[m   ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--unified-option            ' . "\x1B" . '[m   ' . PHP_EOL
+            . '   ' . PHP_EOL
+            . "\x1B" . '[36;1mMisc: ' . "\x1B" . '[m' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--help            ' . "\x1B" . '[m   Show usage information    ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--version         ' . "\x1B" . '[m   Show version              ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--bash-completion ' . "\x1B" . '[m   Generate bash completion  ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--install         ' . "\x1B" . '[m   Install to /usr/local/bin/' . PHP_EOL
             . '   ' . PHP_EOL;
         $this->assertSame($expected, $result);
 
@@ -167,12 +180,11 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::UNKNOWN_OPTION
      */
     public function testUnknownOption() {
-        Runner::create(new TestCommandWithOptionValue)->init($this->getRequest(array(
+        RequestReader::create()->read($this->getRequest(array(
             '--value-option', 'value',
             '--bool-option',
             '--unknown-option'
-        )), true
-        )->run();
+        )), (array)TestCommandWithOptionValue::definition()->options);
     }
 
 
@@ -188,7 +200,7 @@ class Test extends TestCase
             'cookie' =>
                 array(),
             'server' =>
-                Request\Server::__set_state(array(
+                Server::__set_state(array(
                     'SCRIPT_NAME' => './cli',
                     'SCRIPT_FILENAME' => './cli',
                     'PHP_SELF' => './cli',
@@ -205,27 +217,25 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::NON_TAILING_OPTIONAL_ARGUMENT
      */
     public function testNonTailingOptionalArgument() {
-        Runner::create(new TestCommandWithNonTailingOptionalArgument)->init(
+        RequestReader::create()->read(
             $this->getRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c', 'THE-C-VALUE',
-            '--some-enum', 'two')), true
+            '--some-enum', 'two')),
+            (array)TestCommandWithNonTailingOptionalArgument::definition()->options
         );
     }
 
 
     public function testHelpRun() {
         ob_start();
-        Runner::create(new TestCommandOne)->init($this->getRequest(array('--help')))->run();
+        Runner::create(new TestCommandOne)->run($this->getRequest(array('--help')));
         $result = ob_get_clean();
-        //echo $this->varExportString($result);
-        $expected = PHP_EOL
-            . "\x1B" . '[36;1mthe-first' . "\x1B" . '[m' . PHP_EOL
-            . 'This is a command one for doing nothing' . PHP_EOL
-            . PHP_EOL
+        //echo $this->varExportString($result);die();
+        $expected = "\x1B" . '[36;1mthe-first' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[36;1mThis is a command one for doing nothing' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
-            . '    <action> [argumentA] [argumentB...] -d <optionD...> --some-enum <one|two|three>' . PHP_EOL
-            . PHP_EOL
+            . '   the-first <action> [argumentA] [argumentB...] -d <optionD...> --some-enum <one|two|three>' . PHP_EOL
             . '   ' . "\x1B" . '[32;1maction   ' . "\x1B" . '[m   Main action                        ' . PHP_EOL
             . '               Allowed values: get, delete, create' . PHP_EOL
             . '   ' . "\x1B" . '[32;1margumentA' . "\x1B" . '[m   Bee description follows            ' . PHP_EOL
@@ -236,33 +246,35 @@ class Test extends TestCase
             . '   ' . "\x1B" . '[32;1m-d <optionD...>            ' . "\x1B" . '[m   Short name option with required value' . PHP_EOL
             . '   ' . "\x1B" . '[32;1m--some-enum <one|two|three>' . "\x1B" . '[m   Enumerated option to set up something' . PHP_EOL
             . '                                 Allowed values: one, two, three      ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--help                     ' . "\x1B" . '[m   Show usage information               ' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1m--version                  ' . "\x1B" . '[m   Show version                         ' . PHP_EOL
+            . '   ' . PHP_EOL
+            . "\x1B" . '[36;1mMisc: ' . "\x1B" . '[m' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--help            ' . "\x1B" . '[m   Show usage information    ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--version         ' . "\x1B" . '[m   Show version              ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--bash-completion ' . "\x1B" . '[m   Generate bash completion  ' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1m--install         ' . "\x1B" . '[m   Install to /usr/local/bin/' . PHP_EOL
             . '   ' . PHP_EOL;
         $this->assertSame($expected, $result);
     }
 
     public function testVersionRun() {
         ob_start();
-        Runner::create(new TestCommandWithVersion)->init($this->getRequest(array('--version')))->run();
+        Runner::create(new TestCommandWithVersion)->run($this->getRequest(array('--version')));
         $result = ob_get_clean();
         //echo $result;
-        //echo $this->varExportString($result);
-        $expected = PHP_EOL
-            . "\x1B" . '[36;1mv1.0 ' . "\x1B" . '[m' . "\x1B" . '[36;1mcli-cli-cli' . "\x1B" . '[m' . PHP_EOL
-            . 'Test command with version' . PHP_EOL
-            . PHP_EOL;
+        //echo $this->varExportString($result);die();
+        $expected = "\x1B" . '[36;1mv1.0 cli-cli-cli' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[36;1mTest command with version' . "\x1B" . '[m' . PHP_EOL;
 
         $this->assertSame($expected, $result);
     }
 
     public function testError() {
         ob_start();
-        $runner = Runner::create(new TestCommandWithVersion);
-        $runner->error(new Expression("?, ?!", 'hello', 'world'));
-        $runner->success(new Expression("?, ?!", 'hello', 'world'));
-        $runner->error('hello, world!');
-        $runner->success('hello, world!');
+        $response = new Response();
+        $response->error(new Expression("?, ?!", 'hello', 'world'));
+        $response->success(new Expression("?, ?!", 'hello', 'world'));
+        $response->error('hello, world!');
+        $response->success('hello, world!');
         $result = ob_get_clean();
         //echo $this->varExportString($result);
         $expected = "\x1B" . '[37;41m hello, world! ' . "\x1B" . '[m' . PHP_EOL

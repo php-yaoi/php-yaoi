@@ -1,6 +1,6 @@
 <?php
 
-namespace Yaoi\View\Semantic;
+namespace Yaoi\Io\Content;
 
 interface Renderer extends \Yaoi\View\Renderer
 {

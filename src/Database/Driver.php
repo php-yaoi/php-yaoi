@@ -45,9 +45,12 @@ abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contrac
         } elseif ($value instanceof Raw) {
             return $value->value;
         } elseif ($value instanceof Column) {
-            return $this->quoteSymbol(new Symbol($value->table->schemaName, $value->schemaName));
+            return $this->quoteSymbol(new Symbol($value->table->alias ?: $value->table->schemaName, $value->schemaName));
         } elseif ($value instanceof Table) {
-            return $this->quoteSymbol(new Symbol($value->schemaName));
+            return $this->quoteSymbol(new Symbol($value->schemaName))
+            . ($value->alias
+                ? ' AS ' . $this->quoteSymbol(new Symbol($value->alias))
+                : '');
         } elseif ($value instanceof DefaultValue) {
             return 'DEFAULT';
         } else {

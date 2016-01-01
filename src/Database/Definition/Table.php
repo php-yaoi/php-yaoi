@@ -234,4 +234,6 @@ class Table extends BaseClass
         return $this;
     }
 
+    public $alias;
+
 }

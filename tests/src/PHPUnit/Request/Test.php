@@ -2,7 +2,7 @@
 
 namespace YaoiTests\PHPUnit\Request;
 
-use Yaoi\Request;
+use Yaoi\Io\Request;
 use Yaoi\Test\PHPUnit\TestCase;
 
 class Test extends TestCase

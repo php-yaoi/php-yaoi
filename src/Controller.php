@@ -4,6 +4,7 @@ namespace Yaoi;
 
 
 use Yaoi\BaseClass;
+use Yaoi\Io\Request;
 
 /**
  * Class Controller

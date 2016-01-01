@@ -20,7 +20,7 @@ class TestCommandWithSuccessMessage extends Command
 
     public function performAction()
     {
-        $this->runner->success('Congratulations!');
+        $this->response->success('Congratulations!');
     }
 
 }

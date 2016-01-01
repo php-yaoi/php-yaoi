@@ -7,6 +7,7 @@ use Yaoi\Sql\Symbol;
 use SQLite3;
 use SQLite3Result;
 use Yaoi\Database;
+use Yaoi\Undefined;
 
 class Sqlite extends Driver
 {
@@ -24,6 +25,10 @@ class Sqlite extends Driver
     }
 
 
+    /**
+     * @param $statement
+     * @return SQLite3Result
+     */
     public function query($statement)
     {
         if (null === $this->dbHandle) {
@@ -37,6 +42,10 @@ class Sqlite extends Driver
         return $this->dbHandle->lastInsertRowID();
     }
 
+    /**
+     * @param SQLite3Result $result
+     * @return int
+     */
     public function rowsAffected($result)
     {
         return $this->dbHandle->changes();
@@ -47,6 +56,10 @@ class Sqlite extends Driver
         if (null === $this->dbHandle) {
             $this->connect();
         }
+        if ($value instanceof Undefined) {
+            $value = null;
+        }
+
         return $this->dbHandle->escapeString($value);
     }
 
@@ -84,12 +97,11 @@ class Sqlite extends Driver
     {
         $result = '';
         foreach ($symbol->names as $name) {
-            $result .= $name . '.';
+            $result .= '`' . str_replace('`', '``', $name) . '`.';
         }
         if ($result) {
             $result = substr($result, 0, -1);
         }
-
         return $result;
     }
 

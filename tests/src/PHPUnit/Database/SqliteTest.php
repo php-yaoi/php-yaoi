@@ -20,21 +20,21 @@ SQL;
 
 
     protected $createTableStatement = <<<SQL
-CREATE TABLE test_indexes (
- id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
- name varchar(255) NOT NULL,
- uni_one INTEGER DEFAULT NULL,
- uni_two INTEGER DEFAULT NULL,
- default_null float DEFAULT NULL,
- updated timestamp DEFAULT NULL,
- ref_id INTEGER NOT NULL,
- r_one INTEGER DEFAULT NULL,
- r_two INTEGER DEFAULT NULL,
- CONSTRAINT fk_test_indexes_ref_id_table_a_id FOREIGN KEY (ref_id) REFERENCES table_a (id),
- CONSTRAINT fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two FOREIGN KEY (r_one, r_two) REFERENCES table_a (m_one, m_two)
+CREATE TABLE `test_indexes` (
+ `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ `name` varchar(255) NOT NULL,
+ `uni_one` INTEGER DEFAULT NULL,
+ `uni_two` INTEGER DEFAULT NULL,
+ `default_null` float DEFAULT NULL,
+ `updated` timestamp DEFAULT NULL,
+ `ref_id` INTEGER NOT NULL,
+ `r_one` INTEGER DEFAULT NULL,
+ `r_two` INTEGER DEFAULT NULL,
+ CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
+ CONSTRAINT `fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two` FOREIGN KEY (`r_one`, `r_two`) REFERENCES `table_a` (`m_one`, `m_two`)
 );
-CREATE UNIQUE INDEX unique_uni_one_uni_two ON test_indexes (uni_one, uni_two);
-CREATE INDEX key_name ON test_indexes (name);
+CREATE UNIQUE INDEX `unique_uni_one_uni_two` ON `test_indexes` (`uni_one`, `uni_two`);
+CREATE INDEX `key_name` ON `test_indexes` (`name`);
 
 SQL;
 
@@ -68,45 +68,45 @@ SQL;
 
 
     protected $testCreateIndexesAlterExpected = <<<SQL
-ALTER TABLE test_indexes RENAME TO _temp_table;
-CREATE TABLE test_indexes (
- id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
- name varchar(255) NOT NULL,
- uni_one INTEGER DEFAULT NULL,
- uni_two INTEGER DEFAULT NULL,
- default_null float DEFAULT NULL,
- updated timestamp DEFAULT NULL,
- new_field char(15) NOT NULL DEFAULT 'normal'
+ALTER TABLE `test_indexes` RENAME TO _temp_table;
+CREATE TABLE `test_indexes` (
+ `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ `name` varchar(255) NOT NULL,
+ `uni_one` INTEGER DEFAULT NULL,
+ `uni_two` INTEGER DEFAULT NULL,
+ `default_null` float DEFAULT NULL,
+ `updated` timestamp DEFAULT NULL,
+ `new_field` char(15) NOT NULL DEFAULT 'normal'
 );
-CREATE UNIQUE INDEX unique_updated ON test_indexes (updated);
-INSERT INTO test_indexes (id, name, uni_one, uni_two, default_null, updated) SELECT id, name, uni_one, uni_two, default_null, updated FROM _temp_table;
+CREATE UNIQUE INDEX `unique_updated` ON `test_indexes` (`updated`);
+INSERT INTO `test_indexes` (`id`, `name`, `uni_one`, `uni_two`, `default_null`, `updated`) SELECT `id`, `name`, `uni_one`, `uni_two`, `default_null`, `updated` FROM _temp_table;
 DROP TABLE _temp_table;
 
 SQL;
 
     protected $testCreateTableAfterAlter = <<<SQL
-CREATE TABLE test_indexes (
- id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
- name varchar(255) NOT NULL,
- uni_one INTEGER DEFAULT NULL,
- uni_two INTEGER DEFAULT NULL,
- default_null float DEFAULT NULL,
- updated timestamp DEFAULT NULL,
- new_field varchar(255) NOT NULL DEFAULT 'normal'
+CREATE TABLE `test_indexes` (
+ `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ `name` varchar(255) NOT NULL,
+ `uni_one` INTEGER DEFAULT NULL,
+ `uni_two` INTEGER DEFAULT NULL,
+ `default_null` float DEFAULT NULL,
+ `updated` timestamp DEFAULT NULL,
+ `new_field` varchar(255) NOT NULL DEFAULT 'normal'
 );
-CREATE UNIQUE INDEX unique_updated ON test_indexes (updated);
+CREATE UNIQUE INDEX `unique_updated` ON `test_indexes` (`updated`);
 
 SQL;
 
 
     protected $testDefaultValueConsistency = <<<LOG
 Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
-CREATE TABLE test_columns (
- id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
- int_column INTEGER NOT NULL DEFAULT '2',
- int8_column INTEGER NOT NULL DEFAULT '2',
- float_column float NOT NULL DEFAULT '1.33',
- string_column varchar(255) NOT NULL DEFAULT '11'
+CREATE TABLE `test_columns` (
+ `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ `int_column` INTEGER NOT NULL DEFAULT '2',
+ `int8_column` INTEGER NOT NULL DEFAULT '2',
+ `float_column` float NOT NULL DEFAULT '1.33',
+ `string_column` varchar(255) NOT NULL DEFAULT '11'
 )
 OK
 Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date

@@ -2,10 +2,10 @@
 
 namespace Yaoi\Cli\Command;
 
-
 use Yaoi\BaseClass;
 use Yaoi\Cli\Exception;
 use Yaoi\Cli\Option;
+use Yaoi\Io\Content\Info;
 
 class PrepareDefinition extends BaseClass
 {
@@ -25,12 +25,38 @@ class PrepareDefinition extends BaseClass
     public $requiredOptions = array();
 
 
+    /** @var  Option[] */
+    public $optionsArray;
+
     public function __construct($options)
     {
+        $this->optionsArray = $options;
+
         /** @var Option $hasVariadicArgument */
         $hasVariadicArgument = null;
 
-        foreach ($options as $option) {
+        $this->optionsArray[Runner::HELP] = Option::create()
+            ->setDescription('Show usage information')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::HELP);
+
+        $this->optionsArray[Runner::VERSION] = Option::create()
+            ->setDescription('Show version')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::VERSION);
+
+        $this->optionsArray[Runner::BASH_COMPLETION] = Option::create()
+            ->setDescription('Generate bash completion')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::BASH_COMPLETION);
+
+        $this->optionsArray[Runner::INSTALL] = Option::create()
+            ->setDescription('Install to /usr/local/bin/')
+            ->setGroup(Runner::GROUP_MISC)
+            ->setName(Runner::INSTALL);
+
+
+        foreach ($this->optionsArray as &$option) {
             $option = Option::cast($option);
             if ($option->isUnnamed) {
                 if ($hasVariadicArgument) {
@@ -64,6 +90,38 @@ class PrepareDefinition extends BaseClass
             $this->byName[$option->getName()] = $option;
         }
 
+    }
+
+
+    public $argumentsDescription = array();
+    public $optionsDescription = array();
+    public $usage = '';
+
+    public function initOptions()
+    {
+        foreach ($this->optionsArray as $name => $option) {
+            if (!$option instanceof Option) {
+                $option = Option::cast($option);
+            }
+
+            if ($option instanceof Option) {
+                if ($option->isUnnamed || $option->isRequired) {
+                    $this->usage .= ' ' . $option->getUsage();
+                }
+
+                $description = $option->description;
+                if ($option->type === Option::TYPE_ENUM) {
+                    $description .= ($description ? PHP_EOL : '') . 'Allowed values: ' . implode(', ', $option->values);
+                }
+
+                if ($option->isUnnamed) {
+                    $this->argumentsDescription [] = array(new Info($option->name), $description);
+
+                } else {
+                    $this->optionsDescription [$option->group][] = array(new Info($option->getUsage()), $description);
+                }
+            }
+        }
     }
 
 }

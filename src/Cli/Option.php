@@ -2,6 +2,7 @@
 
 namespace Yaoi\Cli;
 
+use Yaoi\Cli\Command\Runner;
 use Yaoi\String\Utils;
 
 class Option extends \Yaoi\Command\Option
@@ -22,6 +23,12 @@ class Option extends \Yaoi\Command\Option
         if ($isUnnamed && self::TYPE_BOOL === $this->type) {
             $this->type = self::TYPE_VALUE;
         }
+        return $this;
+    }
+
+    public $group = Runner::GROUP_DEFAULT;
+    public function setGroup($group) {
+        $this->group = $group;
         return $this;
     }
 
@@ -59,14 +66,6 @@ class Option extends \Yaoi\Command\Option
             }
         }
         return $usage ? $usage . ' ' . $value : $value;
-    }
-
-
-
-    public $isVariadic = false;
-    public function setIsVariadic($yes = true) {
-        $this->isVariadic = $yes;
-        return $this;
     }
 
 }

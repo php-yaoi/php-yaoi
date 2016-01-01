@@ -3,8 +3,8 @@
 namespace Yaoi\Cli\View;
 
 use Yaoi\View\Hardcoded;
-use Yaoi\View\Semantic\Renderer;
-use Yaoi\View\Semantic;
+use Yaoi\Io\Content\Renderer;
+use Yaoi\Io\Content;
 
 class Table extends Hardcoded implements Renderer
 {
@@ -28,6 +28,12 @@ class Table extends Hardcoded implements Renderer
         return $this;
     }
 
+    private $showHeader = false;
+    public function setShowHeader($yes = true) {
+        $this->showHeader = $yes;
+        return $this;
+    }
+
     public function render()
     {
 
@@ -35,10 +41,23 @@ class Table extends Hardcoded implements Renderer
         $rowDelimiterLine = null;
         $lines = array();
 
+        $rows = array(0 => array());
+        $keys = array();
         foreach ($this->rows as $rowIndex => $row) {
+            $rows [] = $row;
+
             foreach ($row as $key => $value) {
-                if (!$value instanceof Semantic\Text) {
-                    $value = new Semantic\Text($value);
+                $keys [$key] = $key;
+            }
+        }
+        if ($this->showHeader) {
+            $rows[0] = $keys;
+        }
+
+        foreach ($rows as $rowIndex => $row) {
+            foreach ($row as $key => $value) {
+                if (!$value instanceof Content\Text) {
+                    $value = new Content\Text($value);
                 }
                 $renderer = new Text($value);
                 foreach ($renderer->lines() as $lineIndex => $line) {

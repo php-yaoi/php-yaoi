@@ -5,7 +5,33 @@ namespace Yaoi;
 use Yaoi\Command\Definition;
 use Yaoi\Command\Option;
 use Yaoi\Command\Runner;
+use Yaoi\Io\Response;
 use Yaoi\String\Utils;
+
+
+/**
+ * @see Command is a unit of high level action.
+ * Information may be passed to @see Command via a list of public properties described by list
+ * of @see \Yaoi\Command\Option definitions.
+ *
+ * @see Definition contains list of
+ * @see Option alongside with additional
+ * @see Command information.
+ *
+ * @see RequestParser gets option values from
+ * @see Request.
+ *
+ * @see Response provides methods for returning response data.
+ *
+ * @see ResponseRenderer generates output based on
+ * @see Response data.
+ *
+ * @see \Yaoi\Command\Runner is setting up
+ * @see Command with
+ * @see RequestParser and invoking action.
+ *
+ */
+
 
 abstract class Command extends BaseClass implements Command\Contract
 {
@@ -34,6 +60,7 @@ abstract class Command extends BaseClass implements Command\Contract
             return $definition;
         }
         $definition = static::createDefinition();
+        $definition->commandClass = $className;
         static::setUpDefinition($definition, $definition->options);
         $definition->setOptions($definition->options);
         return $definition;
@@ -45,11 +72,10 @@ abstract class Command extends BaseClass implements Command\Contract
         return $definition;
     }
 
-    /** @var  Runner */
-    protected $runner;
-    public function setRunner(Runner $runner)
-    {
-        $this->runner = $runner;
+    /** @var Response */
+    protected $response;
+    public function setResponse(Response $response) {
+        $this->response = $response;
         return $this;
     }
 }
