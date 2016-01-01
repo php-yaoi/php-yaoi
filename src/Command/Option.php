@@ -26,7 +26,7 @@ class Option extends BaseClass
         return $this;
     }
 
-    public function setType($type = self::TYPE_VALUE) {
+    public function setType($type = Option::TYPE_VALUE) {
         $this->type = $type;
         return $this;
     }
@@ -46,7 +46,8 @@ class Option extends BaseClass
     public function validateFilterValue($value) {
         if ($this->type === self::TYPE_ENUM) {
             if (!isset($this->values[$value])) {
-                throw new Exception('Invalid value for ' . $this->name . ': ' . $value, Exception::INVALID_VALUE);
+                throw new Exception('Invalid value for `' . $this->name . '`: ' . $value .'. '
+                    .'Allowed values: ' . implode(', ', $this->values) . '.', Exception::INVALID_VALUE);
             }
             else {
                 return $value;

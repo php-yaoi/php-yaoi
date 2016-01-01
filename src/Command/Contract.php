@@ -1,5 +1,4 @@
 <?php
-
 namespace Yaoi\Command;
 
 
@@ -12,6 +11,5 @@ interface Contract
      */
     static function setUpDefinition(Definition $definition, $options);
     public function performAction();
-    public function setRunner(Runner $runner);
 
 }

@@ -3,23 +3,13 @@
 namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
-use Yaoi\Cli\Command\PrepareDefinition;
-use Yaoi\Cli\Console;
-use Yaoi\Cli\Exception;
-use Yaoi\Cli\Option;
+use Yaoi\Command\Exception;
+use Yaoi\Cli\Response;
 use Yaoi\Command;
-use Yaoi\Request;
-use Yaoi\String\Expression;
-use Yaoi\String\StringValue;
-use Yaoi\View\Semantic\Error;
-use Yaoi\View\Semantic\Rows;
-use Yaoi\View\Semantic\Success;
+use Yaoi\Io\Content\SubContent;
+use Yaoi\Io\Request;
 use Yaoi\Cli\View\Table;
-use Yaoi\View\Semantic\Heading;
-use Yaoi\View\Semantic\Info;
-use \Yaoi\Cli\View\Text as ViewText;
-
-
+use Yaoi\Io\Content\Heading;
 
 class Runner extends BaseClass implements \Yaoi\Command\Runner
 {
@@ -43,252 +33,87 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
     /** @var \Yaoi\Command\Option[]  */
     protected $optionsArray;
 
-    protected $console;
-
     public function __construct(Command $command) {
         $this->command = $command;
         $this->definition = $command->definition();
         $this->optionsArray = $this->command->optionsArray();
-        $this->console = new Console();
-        $command->setRunner($this);
+        $this->response = new Response();
+        $command->setResponse($this->response);
     }
 
     protected $showHelp;
     protected $showVersion;
     protected $showBashCompletion;
 
-    public function init(Request $request = null, $throw = false)
+    /** @var Request */
+    protected $request;
+
+    /** @var Response */
+    protected $response;
+
+    /** @var RequestReader */
+    protected $reader;
+
+    /**
+     * @var int Skips specified count of tokens at `argv` head, for embedding in application runner
+     */
+    protected $skipFirstTokens = 0;
+
+
+    public function run(Request $request = null)
     {
         if (null === $request) {
             $request = Request::createAuto();
         }
 
+        $this->request = $request;
+
         try {
-            $def = new PrepareDefinition($this->optionsArray);
-
-            $tokens = $request->server()->argv;
-            $scriptName = array_shift($tokens);
-            $tokens = array_values($tokens);
-
-            $argc = count($tokens);
-
-            if ($argc === 1) {
-                if ($tokens[0] === self::OPTION_NAME . self::HELP) {
-                    $this->showHelp = true;
-                    return $this;
-                }
-
-                if ($tokens[0] === self::OPTION_NAME . self::VERSION) {
-                    $this->showVersion = true;
-                    return $this;
-                }
-
-                if ($tokens[0] === self::OPTION_NAME . self::BASH_COMPLETION) {
-                    $this->showBashCompletion = true;
-                    return $this;
-                }
-            }
-
-            $variadicStarted = false;
-            $variadicValues = array();
-            $valueRequired = false;
-
-            /** @var Option $option */
-            $option = null;
-
-            for ($index = 0; $index < $argc; ++$index) {
-                $token = new StringValue($tokens[$index]);
-
-                $optionFound = null;
-                if (($optionName = $token->afterStarts(static::OPTION_NAME)) && isset($def->byName[$optionName])) {
-                    $optionFound = $def->byName[$optionName];
-                } elseif (($optionName = $token->afterStarts(static::OPTION_SHORT)) && isset($def->byShortName[$optionName])) {
-                    $optionFound = $def->byShortName[$optionName];
-                }
-
-                if ($variadicStarted && $optionFound) {
-                    if (!$variadicValues) {
-                        throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
-                    }
-                    $this->command->{$option->name} = $variadicValues;
-                    $variadicValues = array();
-                    $variadicStarted = false;
-                }
-
-                if ($def->requiredArguments && $optionFound) {
-                    throw new Exception('Unexpected option, argument required', Exception::ARGUMENT_REQUIRED);
-                }
-
-                if ($variadicStarted) {
-                    $variadicValues [] = $option->validateFilterValue((string)$token);
-                    continue;
-                }
-
-                if ($valueRequired) {
-                    if ($optionFound) {
-                        throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
-                    }
-                    $this->command->{$option->name} = $option->validateFilterValue((string)$token);
-                    $valueRequired = false;
-                    continue;
-                }
-
-                if ($def->requiredArguments) {
-                    /** @var Option $option */
-                    $option = array_shift($def->requiredArguments);
-                    $value = $option->validateFilterValue((string)$token);
-                    if ($option->isVariadic) {
-                        $variadicStarted = true;
-                        $variadicValues [] = $value;
-                        continue;
-                    } else {
-                        $this->command->{$option->name} = $value;
-                        continue;
-                    }
-                }
-
-                if ($optionFound) {
-                    $option = $optionFound;
-
-                    if ($option->isRequired) {
-                        unset($def->requiredOptions[$option->name]);
-                    }
-
-                    $def->optionalArguments = false;
-                    if ($option->type === Option::TYPE_BOOL) {
-                        $this->command->{$option->name} = true;
-                        continue;
-                    }
-                    if ($option->isVariadic) {
-                        $variadicStarted = true;
-                        continue;
-                    } else {
-                        $valueRequired = true;
-                        continue;
-                    }
-                }
-
-                if ($def->optionalArguments) {
-                    /** @var Option $option */
-                    $option = array_shift($def->optionalArguments);
-                    if ($option->isVariadic) {
-                        $variadicStarted = true;
-                        $variadicValues [] = $option->validateFilterValue((string)$token);
-                        continue;
-                    } else {
-                        $this->command->{$option->name} = $option->validateFilterValue((string)$token);
-                        continue;
-                    }
-                }
-
-                throw new Exception('Unexpected token: ' . $token, Exception::UNKNOWN_OPTION);
-
-            }
-
-            if ($variadicStarted) {
-                $this->command->{$option->name} = $variadicValues;
-            }
-
-            if ($def->requiredArguments) {
-                foreach ($def->requiredArguments as $option) {
-                    throw new Exception('Missing required argument: ' . $option->getUsage(), Exception::ARGUMENT_REQUIRED);
-                }
-            }
-
-            if ($def->requiredOptions) {
-                foreach ($def->requiredOptions as $option) {
-                    throw new Exception('Option required: ' . $option->getUsage(), Exception::OPTION_REQUIRED);
-                }
-            }
-
+            $this->reader = new RequestReader();
+            $this->reader->skipFirstTokens = $this->skipFirstTokens;
+            $this->reader->read($request, $this->command->optionsArray());
         } catch (Exception $exception) {
-            if ($throw) {
-                throw $exception;
-            }
-            else {
-                static::error($exception->getMessage());
-                $this->showHelp = true;
-            }
+            $this->response->error($exception->getMessage());
+            $this->response->addContent('Use --help to show information.');
+            return $this;
         }
 
-        return $this;
-    }
-
-
-    public function error($message)
-    {
-        $this->console->printLines(
-            new ViewText(
-                new Error(
-                    (string)$message
-                )
-            )
-        );
-        return $this;
-    }
-
-    public function success($message)
-    {
-        $this->console->printLines(
-            new ViewText(
-                new Success(
-                    (string)$message
-                )
-            )
-        );
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function respond($message)
-    {
-        if ($message instanceof Rows) {
-            $message = (string)Table::create($message->getIterator())->setShowHeader();
-        }
-
-        $this->console->printLines($message);
-        return $this;
-    }
-
-
-    public function run()
-    {
-        if ($this->showHelp) {
+        if (!empty($this->reader->values[self::HELP])) {
             $this->showHelp();
-            return;
-        } elseif ($this->showVersion) {
+            return $this;
+        } elseif (!empty($this->reader->values[self::VERSION])) {
             $this->showVersion();
-            return;
-        } elseif ($this->showBashCompletion) {
+            return $this;
+        } elseif (!empty($this->reader->values[self::BASH_COMPLETION])) {
             $this->showBashCompletion();
-            return;
+            return $this;
+        } elseif (!empty($this->reader->values[self::INSTALL])) {
+            $this->install();
+            return $this;
         } else {
+            foreach ($this->reader->values as $name => $value) {
+                $this->command->$name = $value;
+            }
             $this->command->performAction();
+            return $this;
         }
     }
 
 
     public function showVersion()
     {
-        $this->console->eol();
         if ($this->definition->name) {
+
+            $versionText = '';
             if ($this->definition->version) {
-                $this->console->printF(
-                    new ViewText(
-                        new Heading($this->definition->version . ' ')
-                    )
-                );
+                $versionText .= $this->definition->version . ' ';
             }
 
-            $this->console->printF(
-                new ViewText(new Heading($this->definition->name))
-            );
-            $this->console->eol();
+            $versionText .= $this->definition->name;
+            $this->response->addContent(new Heading($versionText));
         }
         if ($this->definition->description) {
-            $this->console->printLine($this->definition->description)->eol();
+            $this->response->addContent(new Heading($this->definition->description));
         }
     }
 
@@ -305,32 +130,75 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
         try {
             $def = new PrepareDefinition($this->optionsArray);
         } catch (Exception $exception) {
-            self::error('Command definition error: ' . $exception->getMessage());
+            $this->response->error('Command definition error: ' . $exception->getMessage());
             return;
         }
 
         $def->initOptions();
 
-        ViewText::create(new Heading("Usage: "))->render();
-        $this->console->eol()->setPadding('   ')->printLine($this->command->definition()->name . $def->usage)->setPadding('');
+
+        $this->response->addContent(new Heading('Usage: '));
+        $this->response->addContent(new SubContent($this->command->definition()->name . $def->usage));
 
         if ($def->argumentsDescription) {
-            $this->console->eol()->setPadding('   ')
-                ->printLines(Table::create(new \ArrayIterator($def->argumentsDescription)));
-
+            $this->response->addContent(new SubContent(Table::create(new \ArrayIterator($def->argumentsDescription))));
         }
 
-        $this->console->setPadding('');
         if ($def->optionsDescription) {
             foreach ($def->optionsDescription as $group => $descriptions) {
-                ViewText::create(new Heading($group . ": "))->render();
-                $this->console->eol()->setPadding('   ')
-                    ->printLines(Table::create(new \ArrayIterator($descriptions)));
+                $this->response->addContent(new Heading($group . ": "));
+                $this->response->addContent(new SubContent(Table::create(new \ArrayIterator($descriptions))));
             }
         }
     }
 
+    public function install()
+    {
+        $this->response->addContent('Installing');
 
+        $request = Request::createAuto();
+        if (!$request->isCli()) {
+            $this->response->error('CLI mode required');
+            return;
+        }
 
+        $scriptFilename = $request->server()->SCRIPT_NAME;
+        $basename = basename($scriptFilename);
 
+        ob_start();
+        $this->showBashCompletion();
+        $completion = ob_get_clean();
+
+        $completionDirs = array(
+            '/usr/local/etc/bash_completion.d/',
+            '/etc/bash_completion.d/',
+        );
+
+        $completionDir = null;
+        foreach ($completionDirs as $dir) {
+            if (file_exists($dir)) {
+                $completionDir = $dir;
+                break;
+            }
+        }
+
+        if (null === $completionDir) {
+            $this->response->error('bash_completion.d not found');
+            return;
+        }
+
+        $result = file_put_contents($completionDir . $basename, $completion)
+            && chmod($completionDir . $basename, 0755);
+
+        if (!$result) {
+            $this->response->error('Unable to save bash completion');
+            return;
+        }
+
+        $scriptFilenameInstall = '/usr/local/bin/' . $basename;
+        system('ln -s ' . $scriptFilename . ' ' . $scriptFilenameInstall, $result);
+        if ($result) {
+            $this->response->error('Unable to create symlink to ' . $scriptFilenameInstall);
+        }
+    }
 }

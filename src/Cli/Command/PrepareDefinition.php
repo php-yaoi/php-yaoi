@@ -5,7 +5,7 @@ namespace Yaoi\Cli\Command;
 use Yaoi\BaseClass;
 use Yaoi\Cli\Exception;
 use Yaoi\Cli\Option;
-use Yaoi\View\Semantic\Info;
+use Yaoi\Io\Content\Info;
 
 class PrepareDefinition extends BaseClass
 {

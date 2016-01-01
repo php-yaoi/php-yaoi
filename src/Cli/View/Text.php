@@ -4,14 +4,14 @@ namespace Yaoi\Cli\View;
 
 use Yaoi\Cli\Console;
 use Yaoi\View\Hardcoded;
-use Yaoi\View\Semantic\Renderer;
+use Yaoi\Io\Content\Renderer;
 
 class Text extends Hardcoded implements Renderer
 {
 
-    /** @var  \Yaoi\View\Semantic\Text */
+    /** @var  \Yaoi\Io\Content\Text */
     public $text;
-    public function __construct(\Yaoi\View\Semantic\Text $item)
+    public function __construct(\Yaoi\Io\Content\Text $item)
     {
         $this->text = $item;
     }
@@ -43,25 +43,25 @@ class Text extends Hardcoded implements Renderer
         $value = $this->text->value;
 
         switch ($this->text->type) {
-            case \Yaoi\View\Semantic\Text::ERROR:
+            case \Yaoi\Io\Content\Text::ERROR:
                 $value = ' ' . $value . ' ';
                 $console->set(Console::FG_WHITE, Console::BG_RED);
                 break;
 
-            case \Yaoi\View\Semantic\Text::INFO:
+            case \Yaoi\Io\Content\Text::INFO:
                 $console->set(Console::FG_GREEN, Console::BOLD);
                 break;
 
-            case \Yaoi\View\Semantic\Text::SUCCESS:
+            case \Yaoi\Io\Content\Text::SUCCESS:
                 $value = ' ' . $value . ' ';
                 $console->set(Console::FG_BLACK, Console::BG_GREEN);
                 break;
 
-            case \Yaoi\View\Semantic\Text::HEADING:
+            case \Yaoi\Io\Content\Text::HEADING:
                 $console->set(Console::FG_CYAN, Console::BOLD);
                 break;
 
-            case \Yaoi\View\Semantic\Text::TEXT:
+            case \Yaoi\Io\Content\Text::TEXT:
                 $console->set();
                 break;
 

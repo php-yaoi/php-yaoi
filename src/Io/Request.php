@@ -1,8 +1,9 @@
 <?php
 
-namespace Yaoi;
+namespace Yaoi\Io;
 
-use Yaoi\Request\Server;
+use Yaoi\BaseClass;
+use Yaoi\Io\Request\Server;
 
 class Request extends BaseClass
 {

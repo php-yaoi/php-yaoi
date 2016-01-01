@@ -1,8 +1,6 @@
 <?php
 
-namespace Yaoi\View\Semantic;
-
-use Yaoi\BaseClass;
+namespace Yaoi\Io\Content;
 
 class Rows {
     /** @var \Iterator */

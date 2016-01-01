@@ -2,20 +2,12 @@
 
 namespace Yaoi\Command;
 
+use Yaoi\Command;
+use Yaoi\Io\Request;
+
 interface Runner
 {
-    /**
-     * @return $this
-     */
-    public function error($message);
+    public function __construct(Command $command);
 
-    /**
-     * @return $this
-     */
-    public function success($message);
-
-    /**
-     * @return $this
-     */
-    public function respond($message);
+    public function run(Request $request = null);
 }

@@ -3,8 +3,8 @@
 namespace Yaoi\Cli\View;
 
 use Yaoi\View\Hardcoded;
-use Yaoi\View\Semantic\Renderer;
-use Yaoi\View\Semantic;
+use Yaoi\Io\Content\Renderer;
+use Yaoi\Io\Content;
 
 class Table extends Hardcoded implements Renderer
 {
@@ -56,8 +56,8 @@ class Table extends Hardcoded implements Renderer
 
         foreach ($rows as $rowIndex => $row) {
             foreach ($row as $key => $value) {
-                if (!$value instanceof Semantic\Text) {
-                    $value = new Semantic\Text($value);
+                if (!$value instanceof Content\Text) {
+                    $value = new Content\Text($value);
                 }
                 $renderer = new Text($value);
                 foreach ($renderer->lines() as $lineIndex => $line) {

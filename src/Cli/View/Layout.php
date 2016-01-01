@@ -3,10 +3,9 @@
 namespace Yaoi\Cli\View;
 
 use Yaoi\View\Renderer;
-use Yaoi\View\Semantic\Error;
-use Yaoi\View\Semantic\Semantic;
-use Yaoi\View\Semantic\Rows;
-use Yaoi\View\Semantic\Text;
+use Yaoi\Io\Content\Semantic;
+use Yaoi\Io\Content\Rows;
+use Yaoi\Io\Content\Text;
 use Yaoi\View\Stack;
 
 class Layout extends Stack

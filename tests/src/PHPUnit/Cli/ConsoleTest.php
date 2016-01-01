@@ -5,9 +5,7 @@ namespace YaoiTests\PHPUnit\Cli;
 
 use Yaoi\Cli\Console;
 use Yaoi\Cli\View\Table;
-use Yaoi\Console\Colored;
 use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\View\Semantic\Rows;
 
 class ConsoleTest extends TestCase
 {

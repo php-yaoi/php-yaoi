@@ -2,6 +2,8 @@
 
 namespace Yaoi;
 
+use Yaoi\Io\Request;
+
 abstract class Router extends BaseClass
 {
     protected $basePath = '/';

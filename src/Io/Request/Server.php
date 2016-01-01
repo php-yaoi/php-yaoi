@@ -1,6 +1,6 @@
 <?php
 
-namespace Yaoi\Request;
+namespace Yaoi\Io\Request;
 
 use Yaoi\BaseClass;
 use Yaoi\Mappable\Contract;
