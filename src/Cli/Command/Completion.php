@@ -91,7 +91,7 @@ for opt in <?php echo $this->optionsStrings[Runner::GROUP_MISC] ?>; do
 done
 
 <?php foreach ($this->requiredArguments as $index => $values) { ?>
-if [ $COMP_CWORD = <?= $index ?> ]; then
+if [ $COMP_CWORD = <?php echo $index ?> ]; then
     options=(<?php echo $values ?>)
 fi
 <?php } ?>
@@ -135,9 +135,9 @@ esac
 ?>
 #!/bin/bash
 
-# Bash Completion for <?=$def->description?>
+# Bash Completion for <?php echo $def->description?>
 
-_<?= $def->name ?>() {
+_<?php echo $def->name ?>() {
 COMPREPLY=()
 local self=${COMP_WORDS[0]}
 local first=${COMP_WORDS[1]}
@@ -155,7 +155,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _<?= $def->name ?> <?= $def->name ?>
+complete -F _<?php echo $def->name ?> <?php echo $def->name ?>
 
 <?php
 }

@@ -93,8 +93,10 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
             $this->showBashCompletion();
             return $this;
         } elseif (!empty($this->reader->values[self::INSTALL])) {
+            // @codeCoverageIgnoreStart
             $this->install();
             return $this;
+            // @codeCoverageIgnoreEnd
         } else {
             foreach ($this->reader->values as $name => $value) {
                 $this->command->$name = $value;

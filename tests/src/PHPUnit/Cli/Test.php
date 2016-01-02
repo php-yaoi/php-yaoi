@@ -13,6 +13,7 @@ use YaoiTests\Helper\Command\TestCommandOne;
 use YaoiTests\Helper\Command\TestCommandWithNonTailingOptionalArgument;
 use YaoiTests\Helper\Command\TestCommandWithOptionValue;
 use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
+use YaoiTests\Helper\Command\TestCommandWithRequiredOption;
 use YaoiTests\Helper\Command\TestCommandWithSuccessMessage;
 use YaoiTests\Helper\Command\TestCommandWithVariadicError;
 use YaoiTests\Helper\Command\TestCommandWithVersion;
@@ -141,7 +142,8 @@ class Test extends TestCase
      * @expectedException \Yaoi\Cli\Exception
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
-    public function testArgumentRequiredOptionFound() {
+    public function testArgumentRequiredOptionFound()
+    {
         RequestReader::create()->read(
             TestRequestHelper::getCliRequest(array('arg1', '--option')),
             (array)TestCommandWithRequiredArgument::definition()->options
@@ -259,5 +261,12 @@ class Test extends TestCase
             . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL;
 
         $this->assertSame($expected, $result);
+    }
+
+    public function testRunException() {
+        ob_start();
+        Runner::create(new TestCommandWithRequiredOption)->run();
+        $result = ob_get_clean();
+        $this->assertStringStartsWith("\x1B" . '[37;41m', $result);
     }
 }
