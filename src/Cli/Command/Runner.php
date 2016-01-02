@@ -10,8 +10,9 @@ use Yaoi\Io\Content\SubContent;
 use Yaoi\Io\Request;
 use Yaoi\Cli\View\Table;
 use Yaoi\Io\Content\Heading;
+use Yaoi\String\Utils;
 
-class Runner extends BaseClass implements \Yaoi\Command\Runner
+class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
 {
     const OPTION_NAME = '--';
     const OPTION_SHORT = '-';
@@ -27,15 +28,19 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
     /** @var Command */
     protected $command;
 
-    /** @var \Yaoi\Command\Definition  */
-    protected $definition;
-
     /** @var \Yaoi\Command\Option[]  */
     protected $optionsArray;
 
+    protected $commandName;
+    protected $commandDescription;
+    protected $commandVersion;
+
     public function __construct(Command $command) {
         $this->command = $command;
-        $this->definition = $command->definition();
+        $definition = $command->definition();
+        $this->commandName = $definition->name;
+        $this->commandVersion = $definition->version;
+        $this->commandDescription = $definition->description;
         $this->optionsArray = $this->command->optionsArray();
         $this->response = new Response();
         $command->setResponse($this->response);
@@ -88,8 +93,10 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
             $this->showBashCompletion();
             return $this;
         } elseif (!empty($this->reader->values[self::INSTALL])) {
+            // @codeCoverageIgnoreStart
             $this->install();
             return $this;
+            // @codeCoverageIgnoreEnd
         } else {
             foreach ($this->reader->values as $name => $value) {
                 $this->command->$name = $value;
@@ -102,18 +109,18 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
     public function showVersion()
     {
-        if ($this->definition->name) {
+        if ($this->commandName) {
 
             $versionText = '';
-            if ($this->definition->version) {
-                $versionText .= $this->definition->version . ' ';
+            if ($this->commandVersion) {
+                $versionText .= $this->commandVersion . ' ';
             }
 
-            $versionText .= $this->definition->name;
+            $versionText .= $this->commandName;
             $this->response->addContent(new Heading($versionText));
         }
-        if ($this->definition->description) {
-            $this->response->addContent(new Heading($this->definition->description));
+        if ($this->commandDescription) {
+            $this->response->addContent(new Heading($this->commandDescription));
         }
     }
 
@@ -138,7 +145,7 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
 
 
         $this->response->addContent(new Heading('Usage: '));
-        $this->response->addContent(new SubContent($this->command->definition()->name . $def->usage));
+        $this->response->addContent(new SubContent($this->commandName . $def->usage));
 
         if ($def->argumentsDescription) {
             $this->response->addContent(new SubContent(Table::create(new \ArrayIterator($def->argumentsDescription))));
@@ -152,6 +159,9 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function install()
     {
         $this->response->addContent('Installing');
@@ -162,7 +172,7 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
             return;
         }
 
-        $scriptFilename = $request->server()->SCRIPT_NAME;
+        $scriptFilename = realpath($request->server()->SCRIPT_NAME);
         $basename = basename($scriptFilename);
 
         ob_start();
@@ -196,9 +206,16 @@ class Runner extends BaseClass implements \Yaoi\Command\Runner
         }
 
         $scriptFilenameInstall = '/usr/local/bin/' . $basename;
-        system('ln -s ' . $scriptFilename . ' ' . $scriptFilenameInstall, $result);
+        $cmd = 'ln -s ' . $scriptFilename . ' ' . $scriptFilenameInstall;
+        $this->response->addContent($cmd);
+        system($cmd, $result);
         if ($result) {
             $this->response->error('Unable to create symlink to ' . $scriptFilenameInstall);
         }
     }
+
+    public static function getPublicName($name) {
+        return Utils::fromCamelCase($name, '-');
+    }
+
 }

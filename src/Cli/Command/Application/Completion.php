@@ -23,9 +23,9 @@ class Completion extends \Yaoi\Cli\Command\Completion
         ?>
 #!/bin/bash
 
-# Bash Completion for <?= $def->description ?>
+# Bash Completion for <?php echo $def->description ?>
 
-_<?= $def->name ?>() {
+_<?php echo $def->name ?>() {
 COMPREPLY=()
 local self=${COMP_WORDS[0]}
 local action=${COMP_WORDS[1]}
@@ -52,7 +52,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _<?= $def->name ?> <?= $def->name ?>
+complete -F _<?php echo $def->name ?> <?php echo $def->name ?>
 <?php
     }
 }

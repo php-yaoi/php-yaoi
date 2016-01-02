@@ -13,9 +13,11 @@ use YaoiTests\Helper\Command\TestCommandOne;
 use YaoiTests\Helper\Command\TestCommandWithNonTailingOptionalArgument;
 use YaoiTests\Helper\Command\TestCommandWithOptionValue;
 use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
+use YaoiTests\Helper\Command\TestCommandWithRequiredOption;
 use YaoiTests\Helper\Command\TestCommandWithSuccessMessage;
 use YaoiTests\Helper\Command\TestCommandWithVariadicError;
 use YaoiTests\Helper\Command\TestCommandWithVersion;
+use YaoiTests\Helper\TestRequestHelper;
 
 class Test extends TestCase
 {
@@ -65,7 +67,7 @@ class Test extends TestCase
 
     public function testSuccessMessage() {
         ob_start();
-        Runner::create(new TestCommandWithSuccessMessage)->run($this->getRequest(array()));
+        Runner::create(new TestCommandWithSuccessMessage)->run(TestRequestHelper::getCliRequest(array()));
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);
@@ -74,7 +76,7 @@ class Test extends TestCase
     }
 
     public function testInit() {
-        Runner::create(new TestCommandOne)->run($this->getRequest(array('get','123A','456B', '789B',
+        Runner::create(new TestCommandOne)->run(TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
             '-d', 'd1', 'd2', 'd3',
             '--option-c',
             '--some-enum', 'two')));
@@ -86,7 +88,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
      */
     public function testOptionRequired() {
-        RequestReader::create()->read($this->getRequest(array('get','123A','456B', '789B',
+        RequestReader::create()->read(TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c',
             '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
@@ -97,7 +99,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired() {
-        RequestReader::create()->read($this->getRequest(array('get',
+        RequestReader::create()->read(TestRequestHelper::getCliRequest(array('get',
             '-d',
             '--option-c',
             '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
@@ -108,7 +110,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired2() {
-        RequestReader::create()->read($this->getRequest(array(
+        RequestReader::create()->read(TestRequestHelper::getCliRequest(array(
             '--value-option', //'value',
             '--bool-option',
         )), (array)TestCommandWithOptionValue::definition()->options);
@@ -120,7 +122,7 @@ class Test extends TestCase
      */
     public function testArgumentRequiredEmpty() {
         RequestReader::create()->read(
-            $this->getRequest(array()),
+            TestRequestHelper::getCliRequest(array()),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
     }
@@ -131,7 +133,7 @@ class Test extends TestCase
      */
     public function testArgumentRequiredMissing() {
         RequestReader::create()->read(
-            $this->getRequest(array('arg1')),
+            TestRequestHelper::getCliRequest(array('arg1')),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
     }
@@ -140,16 +142,17 @@ class Test extends TestCase
      * @expectedException \Yaoi\Cli\Exception
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
-    public function testArgumentRequiredOptionFound() {
+    public function testArgumentRequiredOptionFound()
+    {
         RequestReader::create()->read(
-            $this->getRequest(array('arg1', '--option')),
+            TestRequestHelper::getCliRequest(array('arg1', '--option')),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
     }
 
     public function testVariadicArgument() {
         $command = new TestCommandWithRequiredArgument;
-        Runner::create($command)->run($this->getRequest(array('arg1', 'arg2a', 'arg2b')));
+        Runner::create($command)->run(TestRequestHelper::getCliRequest(array('arg1', 'arg2a', 'arg2b')));
         $this->assertSame(array('arg2a', 'arg2b'), $command->argumentTwo);
     }
 
@@ -180,36 +183,11 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::UNKNOWN_OPTION
      */
     public function testUnknownOption() {
-        RequestReader::create()->read($this->getRequest(array(
+        RequestReader::create()->read(TestRequestHelper::getCliRequest(array(
             '--value-option', 'value',
             '--bool-option',
             '--unknown-option'
         )), (array)TestCommandWithOptionValue::definition()->options);
-    }
-
-
-    private function getRequest(array $argv) {
-        $request = Request::__set_state(array(
-            'baseUrl' => '/',
-            'get' =>
-                array(),
-            'post' =>
-                array(),
-            'request' =>
-                array(),
-            'cookie' =>
-                array(),
-            'server' =>
-                Server::__set_state(array(
-                    'SCRIPT_NAME' => './cli',
-                    'SCRIPT_FILENAME' => './cli',
-                    'PHP_SELF' => './cli',
-                    'argv' => array_merge(array('script.php'), $argv),
-                    'argc' => count($argv) + 1,
-                )),
-            'isCli' => true,
-        ));
-        return $request;
     }
 
     /**
@@ -218,7 +196,7 @@ class Test extends TestCase
      */
     public function testNonTailingOptionalArgument() {
         RequestReader::create()->read(
-            $this->getRequest(array('get','123A','456B', '789B',
+            TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c', 'THE-C-VALUE',
             '--some-enum', 'two')),
@@ -229,7 +207,7 @@ class Test extends TestCase
 
     public function testHelpRun() {
         ob_start();
-        Runner::create(new TestCommandOne)->run($this->getRequest(array('--help')));
+        Runner::create(new TestCommandOne)->run(TestRequestHelper::getCliRequest(array('--help')));
         $result = ob_get_clean();
         //echo $this->varExportString($result);die();
         $expected = "\x1B" . '[36;1mthe-first' . "\x1B" . '[m' . PHP_EOL
@@ -258,7 +236,7 @@ class Test extends TestCase
 
     public function testVersionRun() {
         ob_start();
-        Runner::create(new TestCommandWithVersion)->run($this->getRequest(array('--version')));
+        Runner::create(new TestCommandWithVersion)->run(TestRequestHelper::getCliRequest(array('--version')));
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);die();
@@ -283,5 +261,12 @@ class Test extends TestCase
             . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL;
 
         $this->assertSame($expected, $result);
+    }
+
+    public function testRunException() {
+        ob_start();
+        Runner::create(new TestCommandWithRequiredOption)->run();
+        $result = ob_get_clean();
+        $this->assertStringStartsWith("\x1B" . '[37;41m', $result);
     }
 }
