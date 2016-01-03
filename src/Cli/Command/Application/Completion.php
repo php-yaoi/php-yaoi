@@ -52,7 +52,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _<?php echo $def->name ?> <?php echo $def->name ?>
+complete -F _<?php echo $def->name ?> -o default <?php echo $def->name ?>
 <?php
     }
 }

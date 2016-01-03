@@ -206,7 +206,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _test-application test-application';
+complete -F _test-application -o default test-application';
 
         ob_start();
         \Yaoi\Cli\Command\Application\Runner::create(new TestApplication())->run(
