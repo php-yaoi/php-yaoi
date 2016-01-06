@@ -21,6 +21,7 @@ drop table test2
  */
 
 namespace Yaoi\Sql;
+use Yaoi\Database\Entity;
 use Yaoi\String\Quoter;
 
 abstract class ComplexStatement extends Expression implements
@@ -336,8 +337,13 @@ abstract class ComplexStatement extends Expression implements
         if (null === $this->values) {
             $this->values = array();
         }
-        foreach ($collection as $array) {
-            $this->values [] = $array;
+        foreach ($collection as $item) {
+            if ($item instanceof Entity) {
+                $this->values [] = $item->toArray();
+            }
+            else {
+                $this->values [] = $item;
+            }
         }
         return $this;
     }

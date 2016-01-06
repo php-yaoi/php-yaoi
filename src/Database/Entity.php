@@ -37,7 +37,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         static::setUpColumns($columns);
         $schemaName = Utils::fromCamelCase(str_replace('\\', '', $className));
         $table = new Table($columns, self::getDatabase($className), $schemaName);
-        $table->className = $className;
+        $table->entityClassName = $className;
         $table->alias = $alias;
         static::setUpTable($table, $columns);
 
@@ -82,7 +82,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @throws \Yaoi\Entity\Exception
      * @todo testdoc
      */
-    public static function getByPrimaryKey($id)
+    public static function findByPrimaryKey($id)
     {
         $className = get_called_class();
         $table = static::table();
@@ -101,7 +101,10 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $statement->query()->fetchRow();
     }
 
-    public function find() {
+    /**
+     * @return static
+     */
+    public function findSaved() {
         $table = $this->table();
         $statement = self::statement();
         $data = $this->toArray(true);
@@ -145,9 +148,6 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
         else {
             foreach ($table->getColumns(true) as $column) {
-                if ($column->flags & Column::AUTO_ID) {
-                    continue;
-                }
                 $schemaName = $column->schemaName;
 
                 if (!isset($data[$schemaName])) {
@@ -324,7 +324,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
 
     public function findOrSave($updateRecord = false) {
-        $item = $this->find();
+        $item = $this->findSaved();
 
         if (!$item) {
             $this->save();
