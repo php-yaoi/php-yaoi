@@ -16,6 +16,13 @@ class Migration extends AbstractMigration
 
     private static $applied = array();
     private static $rolledBack = array();
+    public static $enableStateCache = true;
+
+    public static function dropStateCache()
+    {
+        self::$applied = array();
+        self::$rolledBack = array();
+    }
 
     public function __construct(Table $table) {
         $this->id = null;
@@ -46,7 +53,7 @@ class Migration extends AbstractMigration
      */
     public function apply()
     {
-        if (isset(self::$applied[$this->table->entityClassName])) {
+        if (self::$enableStateCache && isset(self::$applied[$this->table->entityClassName])) {
             if ($this->log) {
                 $this->log->push(Expression::create(
                     'Migration for table ? (?) already applied, skipping',
@@ -124,7 +131,7 @@ class Migration extends AbstractMigration
      */
     public function rollback()
     {
-        if (isset(self::$rolledBack[$this->table->entityClassName])) {
+        if (self::$enableStateCache && isset(self::$rolledBack[$this->table->entityClassName])) {
             if ($this->log) {
                 $this->log->push(Expression::create(
                     'Migration for table ? (?) already rolled back, skipping',

@@ -79,6 +79,7 @@ EOD;
         Host::table()->migration()->apply();
         Session::table()->migration()->apply();
 
+        Database\Entity\Migration::$enableStateCache = false;
 
         User::table()->migration()->setLog($log)->apply();
 
