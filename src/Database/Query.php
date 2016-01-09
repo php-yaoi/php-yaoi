@@ -178,14 +178,14 @@ class Query implements \Iterator
             $this->execute();
         }
         $result = $this->driver->fetchAssoc($this->result);
-        if (null === $result) {
+        if (false === $result || null === $result) {
             return null;
         }
         if ($field) {
             return $result[$field];
         } else {
             if ($this->resultClass) {
-                /** @var Contract $class */
+                /** @var Entity $class */
                 $class = $this->resultClass;
                 $result = $class::fromArray($result, null, true);
             }

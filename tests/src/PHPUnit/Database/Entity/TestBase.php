@@ -7,6 +7,7 @@ use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
+use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\SessionTag;
@@ -14,6 +15,7 @@ use YaoiTests\Helper\Entity\Tag;
 use YaoiTests\Helper\Entity\OneABBR;
 use YaoiTests\Helper\Entity\TestEmptyInsert;
 use YaoiTests\Helper\Entity\Two;
+use YaoiTests\Helper\Entity\User;
 
 abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
 {
@@ -344,6 +346,17 @@ SQL;
         TestEmptyInsert::bindDatabase($this->database);
         TestEmptyInsert::table()->migration()->apply();
 
+    }
+
+    public function testFindSaved() {
+        User::table()->migration()->apply();
+
+        $user = new User();
+        $user->name = 123;
+        $this->assertSame(Undefined::get(), $user->id);
+
+        $user->findOrSave();
+        $this->assertInternalType('int', $user->id);
     }
 
 

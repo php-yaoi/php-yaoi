@@ -11,7 +11,7 @@ use Yaoi\Database\Query;
  * Interface StatementInterface
  * @package Yaoi\Sql
  *
- * @method SelectInterface select($expression, ...$binds)
+ * @method SelectInterface select($expression, ...$binds) // TODO rename to columns
  */
 interface StatementInterface
 {

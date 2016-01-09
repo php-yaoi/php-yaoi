@@ -3,8 +3,7 @@
 namespace Yaoi\Database\Sqlite;
 
 
-use Yaoi\Database\Definition\Table;
-use Yaoi\Sql\Batch;
+use Yaoi\Database\Definition\Index;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
@@ -52,6 +51,13 @@ class AlterTable extends \Yaoi\Sql\AlterTable
             DROP TABLE TempOldTable;
 
              */
+
+            foreach ($this->before->indexes as $index) {
+                if ($index->type === Index::TYPE_PRIMARY) {
+                    continue;
+                }
+                $this->add($this->database()->expr("DROP INDEX ?", $this->before->schemaName . '_' . $index->getName()));
+            }
 
             $this->add($this->database()->expr(
                 "ALTER TABLE ? RENAME TO _temp_table",

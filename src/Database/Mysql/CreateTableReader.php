@@ -79,13 +79,17 @@ class CreateTableReader
         $this->lines = $lines->split(',');
     }
 
+    protected function isAutoId(Parser $column) {
+        return $column->contain('AUTO_INCREMENT');
+    }
+
     private function parseColumn(Parser $parser) {
         $columnName = $this->resolve($parser->inner(self::BIND_PREFIX, self::BIND_POSTFIX));
 
         $type = (string)$parser->inner(' ', ' ');
         $unsigned = $parser->contain('UNSIGNED');
         $notNull = $parser->contain('NOT NULL');
-        $autoId = $parser->contain('AUTO_INCREMENT');
+        $autoId = $this->isAutoId($parser);
         $default = $parser->inner('DEFAULT ');
         if (!$default->isEmpty()) {
             $default = (string)$default;

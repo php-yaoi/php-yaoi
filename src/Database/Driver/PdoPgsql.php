@@ -104,7 +104,7 @@ class PdoPgsql extends Driver
 
     /**
      * @param PDOStatement $result
-     * @return array
+     * @return array|false
      */
     public function fetchAssoc($result)
     {
