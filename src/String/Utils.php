@@ -22,4 +22,49 @@ class Utils
     {
         return substr($haystack, -strlen($needle)) === (string)$needle;
     }
+
+    public static $strPosLastFound;
+    public static function strPos($haystack, $needles, $offset = 0, $reverse = false, $ignoreCase = false)
+    {
+        self::$strPosLastFound = null;
+        $result = false;
+        if (!is_array($needles)) {
+            $needles = array($needles);
+        }
+
+        $strpos = 'strpos';
+
+        if ($reverse) {
+            $strpos = $ignoreCase ? 'strripos' : 'strrpos';
+        }
+        elseif ($ignoreCase) {
+            $strpos = 'stripos';
+        }
+
+        foreach ($needles as $needle) {
+            if (false !== $position = $strpos($haystack, (string)$needle, $offset)) {
+                if ($result === false) {
+                    $result = $position;
+                    self::$strPosLastFound = $needle;
+                } else {
+                    if ($reverse) {
+                        if ($position > $result) {
+                            self::$strPosLastFound = $needle;
+                            $result = $position;
+                        }
+                    }
+                    else {
+                        if ($position < $result) {
+                            self::$strPosLastFound = $needle;
+                            $result = $position;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return $result;
+    }
+
 } 

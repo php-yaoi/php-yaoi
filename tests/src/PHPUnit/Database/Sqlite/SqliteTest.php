@@ -1,20 +1,21 @@
 <?php
 
-namespace YaoiTests\PHPUnit\Database;
+namespace YaoiTests\PHPUnit\Database\Sqlite;
 
 use Yaoi\Database;
 use Yaoi\Database\Definition\Table;
+use YaoiTests\PHPUnit\Database\TestUnified;
 
 
 class SqliteTest extends TestUnified
 {
     protected $createTable1 = <<<SQL
-CREATE TABLE IF NOT EXISTS test_def (
+Create TABLE IF NOT EXISTS test_def (
   id1 INTEGER NOT NULL,
   id2 INTEGER NOT NULL DEFAULT 1,
   name VARCHAR(10) NOT NULL DEFAULT 'Jon Snow',
   address CHAR(10),
-  PRIMARY KEY(id1, id2)
+  Primary KEY(id1, id2)
 );
 SQL;
 
