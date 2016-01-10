@@ -20,11 +20,12 @@ class CreateTableReaderTest extends TestCase
     }
 
     protected $createTableStatement = "CREATE TABLE `test_indexes` (
- `id` int NOT NULL AUTO_INCREMENT,
+ `id` int unsigned NOT NULL AUTO_INCREMENT,
  `name` varchar(255) NOT NULL,
  `uni_one` int DEFAULT NULL,
- `uni_two` int DEFAULT NULL,
+ `uni_two` int DEFAULT '4',
  `default_null` float DEFAULT NULL,
+ `string` varchar(255) DEFAULT 'def',
  `updated` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
  `ref_id` int NOT NULL,
  `r_one` int DEFAULT NULL,

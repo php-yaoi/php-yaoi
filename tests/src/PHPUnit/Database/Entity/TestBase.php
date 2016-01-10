@@ -349,6 +349,7 @@ SQL;
     }
 
     public function testFindSaved() {
+        User::bindDatabase($this->database, true);
         User::table()->migration()->apply();
 
         $user = new User();

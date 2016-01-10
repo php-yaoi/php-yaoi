@@ -93,7 +93,7 @@ class CreateTableReader extends BaseClass
         $unsigned = $parser->contain('UNSIGNED', true);
         $notNull = $parser->contain('NOT NULL', true);
         $autoId = $this->isAutoId($parser);
-        $default = $parser->inner('DEFAULT ', true);
+        $default = $parser->inner('DEFAULT ', null, false, true);
         if (!$default->isEmpty()) {
             $default = (string)$default;
             if ('NULL' === strtoupper($default)) {

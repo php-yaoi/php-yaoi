@@ -122,7 +122,7 @@ class Parser extends BaseClass implements IsEmpty
 
     public function contain($needle, $ignoreCase = false)
     {
-        return Utils::strPos($this->string, $needle, false, $ignoreCase) !== false;
+        return Utils::strPos($this->string, $needle, 0, false, $ignoreCase) !== false;
     }
 
     public function explode($delimiter, $limit = 10000)

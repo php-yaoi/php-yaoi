@@ -45,6 +45,11 @@ class UtilsTest extends TestCase
 
         $this->assertSame(2, Utils::strPos(1234, 34));
 
+
+    }
+
+    public function testIgnoreCaseBug() {
+        $this->assertSame(11, Utils::strPos('":B0B: int unsigned NOT NULL AUTO_INCREMENT"', 'UNSIGNED', 0, false, true));
     }
 
 }

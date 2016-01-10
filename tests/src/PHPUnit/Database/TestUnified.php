@@ -4,6 +4,7 @@ namespace YaoiTests\PHPUnit\Database;
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Database\Entity;
 use Yaoi\Log;
 use Yaoi\Sql\Symbol;
 use Yaoi\Test\PHPUnit\TestCase;
@@ -259,6 +260,7 @@ SQL;
 
     public function testDefaultValueConsistency() {
         TestColumns::bindDatabase($this->db);
+        Entity\Migration::$enableStateCache = false;
 
         $migration = TestColumns::table()->migration();
         $migration->rollback();
