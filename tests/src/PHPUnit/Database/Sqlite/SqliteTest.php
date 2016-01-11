@@ -34,8 +34,8 @@ CREATE TABLE `test_indexes` (
  CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
  CONSTRAINT `fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two` FOREIGN KEY (`r_one`, `r_two`) REFERENCES `table_a` (`m_one`, `m_two`)
 );
-CREATE UNIQUE INDEX `unique_uni_one_uni_two` ON `test_indexes` (`uni_one`, `uni_two`);
-CREATE INDEX `key_name` ON `test_indexes` (`name`);
+CREATE UNIQUE INDEX `test_indexes_unique_uni_one_uni_two` ON `test_indexes` (`uni_one`, `uni_two`);
+CREATE INDEX `test_indexes_key_name` ON `test_indexes` (`name`);
 
 SQL;
 
@@ -69,6 +69,8 @@ SQL;
 
 
     protected $testCreateIndexesAlterExpected = <<<SQL
+DROP INDEX 'test_indexes_unique_uni_one_uni_two';
+DROP INDEX 'test_indexes_key_name';
 ALTER TABLE `test_indexes` RENAME TO _temp_table;
 CREATE TABLE `test_indexes` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -79,7 +81,7 @@ CREATE TABLE `test_indexes` (
  `updated` timestamp DEFAULT NULL,
  `new_field` char(15) NOT NULL DEFAULT 'normal'
 );
-CREATE UNIQUE INDEX `unique_updated` ON `test_indexes` (`updated`);
+CREATE UNIQUE INDEX `test_indexes_unique_updated` ON `test_indexes` (`updated`);
 INSERT INTO `test_indexes` (`id`, `name`, `uni_one`, `uni_two`, `default_null`, `updated`) SELECT `id`, `name`, `uni_one`, `uni_two`, `default_null`, `updated` FROM _temp_table;
 DROP TABLE _temp_table;
 
@@ -93,9 +95,9 @@ CREATE TABLE `test_indexes` (
  `uni_two` INTEGER DEFAULT NULL,
  `default_null` float DEFAULT NULL,
  `updated` timestamp DEFAULT NULL,
- `new_field` varchar(255) NOT NULL DEFAULT 'normal'
+ `new_field` char(15) NOT NULL DEFAULT 'normal'
 );
-CREATE UNIQUE INDEX `unique_updated` ON `test_indexes` (`updated`);
+CREATE UNIQUE INDEX `test_indexes_unique_updated` ON `test_indexes` (`updated`);
 
 SQL;
 
