@@ -1,11 +1,20 @@
 <?php
 
+/**
+ * @see \Yaoi\Cli\Command\Runner equals
+ * @see \Yaoi\Router
+ * TODO merge them
+ */
+
 namespace Yaoi;
 
 use Yaoi\Io\Request;
 
 abstract class Router extends BaseClass
 {
+    /**
+     * @var string | array
+     */
     protected $basePath = '/';
 
     public function setBasePath($basePath) {

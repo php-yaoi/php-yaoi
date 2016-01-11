@@ -78,5 +78,33 @@ abstract class Command extends BaseClass implements Command\Contract
         $this->response = $response;
         return $this;
     }
+
+
+    /**
+     * @var \stdClass
+     */
+    private $currentState;
+
+    /**
+     * Router gets state and renders it to url/form/commandline, `base path` also required
+     * @param bool $copyCurrent
+     * @return static
+     */
+    public function createState($copyCurrent = true)
+    {
+        if ($copyCurrent) {
+            if (null === $this->currentState) {
+                $this->currentState = new \stdClass();
+                foreach (self::optionsArray() as $name => $option) {
+                    $this->currentState->$name = $this->$name;
+                }
+            }
+            $state = clone $this->currentState;
+        }
+        else {
+            $state = new \stdClass();
+        }
+        return $state;
+    }
 }
 

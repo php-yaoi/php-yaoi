@@ -18,6 +18,10 @@ interface Contract extends Quoter
 
     public function rewind($result);
 
+    /**
+     * @param $result
+     * @return array|false|null
+     */
     public function fetchAssoc($result);
 
     public function queryErrorMessage($result);

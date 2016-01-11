@@ -31,7 +31,7 @@ class Table extends BaseClass
         return $this;
     }
 
-    public $className;
+    public $entityClassName;
 
     public function __construct(\stdClass $columns = null, Database\Contract $database = null, $schemaName) {
         $this->schemaName = $schemaName;

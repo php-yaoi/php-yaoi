@@ -1,8 +1,9 @@
 <?php
 
-namespace YaoiTests\PHPUnit\Database;
+namespace YaoiTests\PHPUnit\Database\Pgsql;
 
 use Yaoi\Database;
+use YaoiTests\PHPUnit\Database\Pgsql\PgsqlTest;
 
 class PdoPgsqlTest extends PgsqlTest
 {

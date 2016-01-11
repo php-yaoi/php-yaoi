@@ -10,4 +10,5 @@ class Settings extends \Yaoi\Service\Settings
     public $unixSocket;
     public $charset;
     public $timezone;
+    public $emulateNumRows = false;
 }

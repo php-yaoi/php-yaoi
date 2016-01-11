@@ -44,7 +44,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
             if ($index->type === Index::TYPE_KEY) {
                 $createIndex = new SimpleExpression(
                     "CREATE INDEX ? ON ? (?)",
-                    new Symbol($index->getName()),
+                    new Symbol($this->table->schemaName . '_' . $index->getName()),
                     new Symbol($this->table->schemaName),
                     $columns
                 );
@@ -55,7 +55,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
             elseif ($index->type === Index::TYPE_UNIQUE) {
                 $createIndex = new SimpleExpression(
                     "CREATE UNIQUE INDEX ? ON ? (?)",
-                    new Symbol($index->getName()),
+                    new Symbol($this->table->schemaName . '_' . $index->getName()),
                     new Symbol($this->table->schemaName),
                     $columns
                 );

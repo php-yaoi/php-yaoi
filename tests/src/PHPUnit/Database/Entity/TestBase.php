@@ -7,6 +7,7 @@ use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
+use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\SessionTag;
@@ -14,6 +15,7 @@ use YaoiTests\Helper\Entity\Tag;
 use YaoiTests\Helper\Entity\OneABBR;
 use YaoiTests\Helper\Entity\TestEmptyInsert;
 use YaoiTests\Helper\Entity\Two;
+use YaoiTests\Helper\Entity\User;
 
 abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
 {
@@ -81,8 +83,8 @@ abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
      * @see Yaoi\Database\Definition\Table::schemaName
      */
     public function testClassName() {
-        $this->assertSame('YaoiTests\Helper\Entity\OneABBR', OneABBR::table()->className);
-        $this->assertSame('YaoiTests\Helper\Entity\Two', Two::table()->className);
+        $this->assertSame('YaoiTests\Helper\Entity\OneABBR', OneABBR::table()->entityClassName);
+        $this->assertSame('YaoiTests\Helper\Entity\Two', Two::table()->entityClassName);
     }
 
 
@@ -244,7 +246,7 @@ SQL;
     /**
      * @see Entity::save
      * @see Entity::delete
-     * @see Entity::getByPrimaryKey
+     * @see Entity::findByPrimaryKey
      * @throws \Yaoi\Entity\Exception
      */
     public function testLifeCycle() {
@@ -261,10 +263,10 @@ SQL;
         $host2->save();
         $this->assertSame(2, $host2->id);
 
-        $this->assertSame('Test', Host::getByPrimaryKey($host->id)->name);
+        $this->assertSame('Test', Host::findByPrimaryKey($host->id)->name);
         $host->delete();
 
-        $this->assertNull(Host::getByPrimaryKey($host->id));
+        $this->assertNull(Host::findByPrimaryKey($host->id));
 
     }
 
@@ -309,7 +311,7 @@ SQL;
      * @throws \Yaoi\Entity\Exception
      */
     public function testFindFullPrimaryRequired() {
-        SessionTag::getByPrimaryKey(123);
+        SessionTag::findByPrimaryKey(123);
     }
     /**
      * @expectedException \Yaoi\Entity\Exception
@@ -344,6 +346,18 @@ SQL;
         TestEmptyInsert::bindDatabase($this->database);
         TestEmptyInsert::table()->migration()->apply();
 
+    }
+
+    public function testFindSaved() {
+        User::bindDatabase($this->database, true);
+        User::table()->migration()->apply();
+
+        $user = new User();
+        $user->name = 123;
+        $this->assertSame(Undefined::get(), $user->id);
+
+        $user->findOrSave();
+        $this->assertInternalType('int', $user->id);
     }
 
 

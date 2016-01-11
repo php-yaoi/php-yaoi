@@ -2,6 +2,7 @@
 
 namespace Yaoi\Database\Mysql;
 
+use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
@@ -9,7 +10,7 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\String\Parser;
 use Yaoi\String\Lexer;
 
-class CreateTableReader
+class CreateTableReader extends BaseClass
 {
     private $statement;
     private $database;
@@ -71,25 +72,31 @@ class CreateTableReader
         $this->binds = $expression->getBinds();
 
         $statement = new Parser($expression->getStatement());
-        $statement->inner('CREATE TABLE', self::BIND_PREFIX);
+        $tableName = trim($statement->inner('CREATE TABLE', '(', false, true));
 
-        $this->tableName = $this->resolve($statement->inner(null, self::BIND_POSTFIX));
+        $this->tableName = $this->resolve($tableName);
         /** @var Lexer\Parsed $lines */
-        $lines = $this->resolve($statement->inner('(', ')'));
+        $bind = $statement->inner(null, ')');
+        $lines = $this->resolve($bind);
         $this->lines = $lines->split(',');
     }
 
-    private function parseColumn(Parser $parser) {
-        $columnName = $this->resolve($parser->inner(self::BIND_PREFIX, self::BIND_POSTFIX));
+    protected function isAutoId(Parser $column) {
+        return $column->contain('AUTO_INCREMENT', true);
+    }
 
-        $type = (string)$parser->inner(' ', ' ');
-        $unsigned = $parser->contain('UNSIGNED');
-        $notNull = $parser->contain('NOT NULL');
-        $autoId = $parser->contain('AUTO_INCREMENT');
-        $default = $parser->inner('DEFAULT ');
+    private function parseColumn(Parser $parser) {
+        $columnName = $parser->inner(null, array(' ',"\r", "\n", "\t"));
+        $columnName = (string)$this->resolve(trim($columnName));
+
+        $type = (string)$parser->inner(null, ' ');
+        $unsigned = $parser->contain('UNSIGNED', true);
+        $notNull = $parser->contain('NOT NULL', true);
+        $autoId = $this->isAutoId($parser);
+        $default = $parser->inner('DEFAULT ', null, false, true);
         if (!$default->isEmpty()) {
             $default = (string)$default;
-            if ('NULL' === $default) {
+            if ('NULL' === strtoupper($default)) {
                 $default = null;
             }
             elseif (strpos($default, self::BIND_PREFIX) !== false) {
@@ -116,10 +123,10 @@ class CreateTableReader
 
         $column = new Column($flags);
 
-        if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')')) {
+        if ($length = (string)$parser->setOffset(0)->inner('VARCHAR(', ')', false, true)) {
             $column->setStringLength($length, false);
         }
-        elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')')) {
+        elseif ($length = (string)$parser->setOffset(0)->inner('CHAR(', ')', false, true)) {
             $column->setStringLength($length, true);
         }
 
@@ -127,7 +134,6 @@ class CreateTableReader
         $column->setDefault($default);
 
         $column->schemaName = $columnName;
-
         $this->columns->$columnName = $column;
     }
 
@@ -149,17 +155,17 @@ class CreateTableReader
 
             $this->binds = $expression->getBinds();
 
-            $statement = strtoupper(trim($statement));
+            $statement = trim($statement);
             $parser = new Parser($statement);
 
-            if ($parser->starts('PRIMARY KEY')) {
+            if ($parser->starts('PRIMARY KEY', true)) {
                 $indexColumns = $parser->inner('(', ')')->explode(',');
                 foreach ($indexColumns as &$columnName) {
-                    $columnName = $this->resolve($columnName);
+                    $columnName = $this->resolve(trim($columnName));
                 }
                 $this->indexes []= array(Index::TYPE_PRIMARY, Index::TYPE_PRIMARY, $indexColumns);
             }
-            elseif ($parser->starts('UNIQUE KEY')) {
+            elseif ($parser->starts('UNIQUE KEY', true)) {
                 $indexName = $this->resolve(trim($parser->inner('KEY', '(')));
                 $indexColumns = $parser->inner(null, ')')->explode(',');
 
@@ -168,15 +174,15 @@ class CreateTableReader
                 }
                 $this->indexes []= array(Index::TYPE_UNIQUE, $indexName, $indexColumns);
             }
-            elseif ($parser->starts('KEY')) {
-                $indexName = $this->resolve(trim($parser->inner('KEY', '(')));
+            elseif ($parser->starts('KEY', true)) {
+                $indexName = $this->resolve(trim($parser->inner('KEY', '(', false, true)));
                 $indexColumns = $parser->inner(null, ')')->explode(',');
                 foreach ($indexColumns as &$columnName) {
                     $columnName = $this->resolve($columnName);
                 }
                 $this->indexes []= array(Index::TYPE_KEY, $indexName, $indexColumns);
             }
-            elseif ($parser->starts('CONSTRAINT')) {
+            elseif ($parser->starts('CONSTRAINT', true)) {
                 $this->parseConstraint($parser);
             }
             else {
@@ -188,13 +194,13 @@ class CreateTableReader
 
 
     private function parseConstraint(Parser $parser) {
-        $indexName = $this->resolve($parser->inner('CONSTRAINT', 'FOREIGN KEY'));
+        $indexName = $this->resolve($parser->inner('CONSTRAINT', 'FOREIGN KEY', false, true));
         $indexColumns = $parser->inner('(', ')')->explode(',');
         foreach ($indexColumns as &$columnName) {
             $columnName = $this->resolve($columnName);
         }
 
-        $referenceName = $this->resolve($parser->inner('REFERENCES', '('));
+        $referenceName = $this->resolve($parser->inner('REFERENCES', '(', false, true));
         $referenceColumns = $parser->inner(null, ')')->explode(',');
         foreach ($referenceColumns as &$columnName) {
             $columnName = $this->resolve($columnName);
@@ -288,6 +294,7 @@ class CreateTableReader
 
     public function getTypeByString($type) {
         $phpType = Column::STRING;
+        $type = strtoupper($type);
         switch (true) {
             case 'BIGINT' === substr($type, 0, 6):
             case 'INT' === substr($type, 0, 3):

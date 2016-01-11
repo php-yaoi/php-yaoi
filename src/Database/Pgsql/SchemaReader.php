@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vpoturaev
- * Date: 8/5/15
- * Time: 02:08
- */
 
 namespace Yaoi\Database\Pgsql;
 
@@ -32,32 +26,19 @@ class SchemaReader
 
 
     private function readIndexes(Table $def) {
-        $query = <<<SQL
-select
-  t.relname as table_name,
-  i.relname as index_name,
-  a.attname as column_name,
-  ix.indisunique::int as is_unique,
-  ix.indisprimary::int as is_primary
-from
-  pg_class t,
-  pg_class i,
-  pg_index ix,
-  pg_attribute a
-where
-  t.oid = ix.indrelid
-  and i.oid = ix.indexrelid
-  and a.attrelid = t.oid
-  and a.attnum = ANY(ix.indkey)
-  and t.relkind = 'r'
-  and t.relname = ?
-order by
-  t.relname,
-  i.relname,
-  ix.indnatts;
-SQL;
-
-        $res = $this->database->query($query, $def->schemaName)->fetchAll();
+        $res = $this->database->select()
+            ->select('t.relname as table_name, i.relname as index_name, a.attname as column_name')
+            ->select('ix.indisunique::int as is_unique,ix.indisprimary::int as is_primary')
+            ->from('pg_class t, pg_class i, pg_index ix, pg_attribute a')
+            ->where('t.oid = ix.indrelid')
+            ->where('i.oid = ix.indexrelid')
+            ->where('a.attrelid = t.oid')
+            ->where('a.attnum = ANY(ix.indkey)')
+            ->where('t.relkind = \'r\'')
+            ->where('t.relname = ?', $def->schemaName)
+            ->order('t.relname, i.relname, ix.indnatts')
+            ->query()
+            ->fetchAll();
 
         $indexData = array();
         foreach ($res as $row) {
@@ -87,6 +68,7 @@ SQL;
             }
             $index = new Index($indexColumns);
             $index->setType($indexInfo['is_unique'] ? Index::TYPE_UNIQUE : Index::TYPE_KEY);
+            $index->setName($indexName);
             $def->addIndex($index);
         }
 
@@ -131,12 +113,17 @@ SQL;
 
     public function getColumns($tableName) {
         //echo PHP_EOL . 'table: ' . $tableName . PHP_EOL;
-        $res = $this->database->query("select c.column_name, c.is_nullable, c.data_type, c.column_default, tc.constraint_type
-from INFORMATION_SCHEMA.COLUMNS AS c
-  LEFT JOIN INFORMATION_SCHEMA.constraint_column_usage AS ccu ON c.column_name = ccu.column_name AND c.table_name = ccu.table_name
-  LEFT JOIN INFORMATION_SCHEMA.table_constraints AS tc ON ccu.constraint_name = tc.constraint_name
-where c.table_name = ? ORDER BY c.ordinal_position ASC;
-", $tableName);
+        $res = $this->database
+            ->select()
+            ->select('c.column_name, c.is_nullable, c.data_type, c.column_default, tc.constraint_type')
+            ->from('INFORMATION_SCHEMA.COLUMNS AS c')
+            ->leftJoin('INFORMATION_SCHEMA.constraint_column_usage AS ccu ON c.column_name = ccu.column_name AND c.table_name = ccu.table_name')
+            ->leftJoin('INFORMATION_SCHEMA.table_constraints AS tc ON ccu.constraint_name = tc.constraint_name')
+            ->where('c.table_name = ?', $tableName)
+            ->order('c.ordinal_position ASC')
+            ->query();
+
+
         $columns = new \stdClass();
 
         while ($r = $res->fetchRow()) {
@@ -181,6 +168,42 @@ where c.table_name = ? ORDER BY c.ordinal_position ASC;
         return $columns;
     }
 
+    private function readForeignKeys(Table $def) {
+        $res = $this->database
+            ->select()
+            ->select('tc.constraint_name, kcu.column_name')
+            ->select('ccu.table_name  AS foreign_table_name, ccu.column_name AS foreign_column_name')
+            ->from('information_schema.table_constraints AS tc')
+            ->innerJoin('information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name')
+            ->innerJoin('information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name')
+            ->where('constraint_type = \'FOREIGN KEY\'')
+            ->where('tc.table_name = ?', $def->schemaName)
+            ->query()
+            ->fetchAll();
+
+        $fk = array();
+        foreach ($res as $r) {
+            $fk[$r['constraint_name']][$r['column_name']] = array($r['foreign_table_name'], $r['foreign_column_name']);
+        }
+
+        foreach ($fk as $constraintName => $constraintColumns) {
+            $localColumns = array();
+            $referenceColumns = array();
+            foreach ($constraintColumns as $localName => $refData) {
+                $localColumns []= $def->columns->$localName;
+
+                $column = new Column();
+                $column->table = new Table(null, null, $refData[0]);
+                $column->schemaName = $refData[1];
+
+                $referenceColumns [] = $column;
+            }
+            $foreignKey = new Database\Definition\ForeignKey($localColumns, $referenceColumns);
+            $foreignKey->setName($constraintName);
+            $def->addForeignKey($foreignKey);
+        }
+    }
+
 
 
     /**
@@ -193,6 +216,7 @@ where c.table_name = ? ORDER BY c.ordinal_position ASC;
 
         $def = new Table($columns, $this->database, $tableName);
         $this->readIndexes($def);
+        $this->readForeignKeys($def);
 
         return $def;
     }

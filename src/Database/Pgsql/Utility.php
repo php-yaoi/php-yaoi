@@ -44,10 +44,13 @@ class Utility extends \Yaoi\Database\Utility
 
     public function tableExists($tableName)
     {
-        $rows = $this->database->query("SELECT 1
-   FROM   information_schema.tables
-   WHERE  table_catalog = ?
-   AND    table_name = ?", $this->database->getSchemaName(), $tableName)->fetchAll();
+        $rows = $this->database->select()
+            ->select('/* table exists check */ 1')
+            ->from('information_schema.tables')
+            ->where('table_catalog = ?', $this->database->getSchemaName())
+            ->where('table_name = ?', $tableName)
+            ->query()
+            ->fetchRow();
         return (bool)$rows;
     }
 

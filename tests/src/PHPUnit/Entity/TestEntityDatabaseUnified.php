@@ -52,12 +52,12 @@ class TestEntityDatabaseUnified extends TestCase
         $item->save();
         $this->assertEquals(1, $item->id);
 
-        $this->assertSame($item->name, TestEntityDB::getByPrimaryKey($item->id)->name);
+        $this->assertSame($item->name, TestEntityDB::findByPrimaryKey($item->id)->name);
 
         $item->name = 'John Doe';
 
         $item->save();
-        $this->assertSame($item->name, TestEntityDB::getByPrimaryKey($item->id)->name);
+        $this->assertSame($item->name, TestEntityDB::findByPrimaryKey($item->id)->name);
 
     }
 

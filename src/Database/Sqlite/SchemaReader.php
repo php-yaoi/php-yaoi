@@ -1,16 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vpoturaev
- * Date: 8/5/15
- * Time: 15:33
- */
-
 namespace Yaoi\Database\Sqlite;
 
 
 use Yaoi\Database;
-use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Definition\Index;
 
@@ -18,60 +10,18 @@ class SchemaReader extends Database\Mysql\SchemaReader
 {
     public function getTableDefinition($tableName)
     {
-        $res = $this->database->query("PRAGMA table_info($tableName)");
+        $statement = $this->database->select()
+            ->select('sql')
+            ->from('sqlite_master')
+            ->where('type = "table"')
+            ->where('`tbl_name` = ?', $tableName)
+            ->query()
+            ->fetchRow('sql');
 
-        /** @var Column[] $primaryKey */
-        $primaryKey = array();
-        $columns = new \stdClass();
-        while ($r = $res->fetchRow()) {
-            //print_r($r);
-            $field = $r['name'];
-
-            //if ('id' === $field) {
-            //    print_r($r);
-            //}
-
-            $phpType = $this->getTypeByString(strtolower($r['type']));
-            //echo $phpType;
-
-
-            $column = new Column($phpType);
-            $notNull = (bool)$r['notnull'];
-            $column->setFlag(Column::NOT_NULL, $notNull);
-
-            $default = $r['dflt_value'];
-            //var_dump($r);
-            if (null === $default) {
-                $default = false;
-            }
-            elseif ("NULL" === $default) {
-                $default = null;
-            }
-            elseif ("'" === $default[0]) {
-                $default = substr($default, 1, -1);
-            }
-
-            if (null === $default && !$notNull) {
-                $default = false;
-            }
-
-            $column->setDefault($default);
-
-            if ($r['pk']) {
-                $primaryKey []= $column;
-            }
-
-            $columns->$field = $column;
-        }
-        if (count($primaryKey) === 1) {
-            $primaryKey[0]->setFlag(Column::AUTO_ID);
-        }
-
-        $definition = new Table($columns, $this->database, $tableName);
-        $definition->setPrimaryKey($primaryKey);
+        $createTableReader = new CreateTableReader($statement, $this->database);
+        $definition = $createTableReader->getDefinition();
 
         $this->readIndexes($definition);
-
         return $definition;
     }
 

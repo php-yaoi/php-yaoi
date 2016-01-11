@@ -21,39 +21,35 @@ class Parser extends BaseClass implements IsEmpty
     /**
      * @param null $start
      * @param null $end
+     * @param bool $reverse
      * @return Parser
      */
-    public function inner($start = null, $end = null, $reverse = false)
+    public function inner($start = null, $end = null, $reverse = false, $ignoreCase = false)
     {
-        if (is_null($this->string)) {
+        if (null === $this->string) {
             return $this;
         }
 
-        if (is_null($start)) {
+        if ($start === null) {
             $startOffset = $this->offset;
         } else {
-            $startOffset = strpos($this->string, (string)$start, $this->offset);
+            $startOffset = Utils::strPos($this->string, $start, $this->offset, false, $ignoreCase);
             if (false === $startOffset) {
                 return new static();
             }
             $startOffset += strlen($start);
         }
 
-        if (is_null($end)) {
+        if ($end === null) {
             $endOffset = strlen($this->string);
         } else {
-            if ($reverse) {
-                $endOffset = strrpos($this->string, (string)$end, $startOffset);
-            }
-            else {
-                $endOffset = strpos($this->string, (string)$end, $startOffset);
-            }
+            $endOffset = Utils::strPos($this->string, $end, $startOffset, $reverse, $ignoreCase);
             if (false === $endOffset) {
                 return new static();
             }
         }
 
-        $this->offset = $endOffset + strlen($end);
+        $this->offset = $endOffset + strlen(Utils::$strPosLastFound);
         return new static(substr($this->string, $startOffset, $endOffset - $startOffset));
     }
 
@@ -101,19 +97,32 @@ class Parser extends BaseClass implements IsEmpty
         return strtolower(ltrim(preg_replace('/([A-Z])/', $delimiter . '$1', $this->string), $delimiter));
     }
 
-    public function starts($needle)
+    public function starts($needle, $ignoreCase = false)
     {
-        return substr($this->string, 0, strlen($needle)) === (string)$needle;
+        if ($ignoreCase) {
+            $string = strtolower($this->string);
+            $needle = strtolower($needle);
+        }
+        else {
+            $string = $this->string;
+        }
+        return substr($string, 0, strlen($needle)) === (string)$needle;
     }
 
-    public function ends($needle)
+    public function ends($needle, $ignoreCase = false)
     {
-        return substr($this->string, -strlen($needle)) === (string)$needle;
+        if ($ignoreCase) {
+            $string = strtolower($this->string);
+            $needle = strtolower($needle);
+        } else {
+            $string = $this->string;
+        }
+        return substr($string, -strlen($needle)) === (string)$needle;
     }
 
-    public function contain($needle)
+    public function contain($needle, $ignoreCase = false)
     {
-        return strpos($this->string, $needle) !== false;
+        return Utils::strPos($this->string, $needle, 0, false, $ignoreCase) !== false;
     }
 
     public function explode($delimiter, $limit = 10000)

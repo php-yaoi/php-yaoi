@@ -75,7 +75,7 @@ class Mysqli extends Driver implements Driver\Contract
 
     /**
      * @param \mysqli_result $result
-     * @return mixed
+     * @return array|null
      */
     public function fetchAssoc($result)
     {

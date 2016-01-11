@@ -3,6 +3,7 @@
 namespace Yaoi\Database\Pgsql;
 
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Sql\Symbol;
 
@@ -86,6 +87,34 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         foreach ($beforeColumns as $columnName => $beforeColumn) {
             $this->alterLines->commaExpr('DROP COLUMN ?', new Symbol($beforeColumn->schemaName));
         }
+    }
+
+
+    protected function processForeignKeys()
+    {
+        /** @var ForeignKey[] $beforeForeignKeys */
+        $beforeForeignKeys = array();
+        if (!$this->before->disableForeignKeys) {
+            foreach ($this->before->foreignKeys as $foreignKey) {
+                $beforeForeignKeys [$foreignKey->getName()] = $foreignKey;
+            }
+        }
+        $afterForeignKeys = $this->after->foreignKeys;
+        if ($this->after->disableForeignKeys) {
+            $afterForeignKeys = array();
+        }
+        foreach ($afterForeignKeys as $foreignKey) {
+            if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
+                $this->alterLines->commaExpr('ADD');
+                $this->alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
+            } else {
+                unset($beforeForeignKeys[$foreignKey->getName()]);
+            }
+        }
+        foreach ($beforeForeignKeys as $foreignKey) {
+            $this->alterLines->commaExpr('DROP CONSTRAINT IF EXISTS ?', new Symbol($foreignKey->getName()));
+        }
+
     }
 
 

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @see \Yaoi\Cli\Command\Runner equals
+ * @see \Yaoi\Router
+ * TODO merge them
+ */
 
 namespace Yaoi\Cli\Command;
 
@@ -61,6 +66,7 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
 
     /**
      * @var int Skips specified count of tokens at `argv` head, for embedding in application runner
+     * TODO refactor this to basePath (in array form here) from @see \Yaoi\Router
      */
     protected $skipFirstTokens = 0;
 
@@ -217,5 +223,4 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
     public static function getPublicName($name) {
         return Utils::fromCamelCase($name, '-');
     }
-
 }

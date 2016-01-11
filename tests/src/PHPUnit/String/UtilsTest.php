@@ -25,4 +25,31 @@ class UtilsTest extends TestCase
         $this->assertSame(true, Utils::ends('the string', 'string'));
     }
 
+
+    public function testStrPos()
+    {
+        $this->assertSame(4, Utils::strPos('the string', 's'));
+
+        $this->assertSame(3, Utils::strPos("one\ttwo one", array(' ', "\t")));
+        $this->assertSame(3, Utils::strPos("one two one", array(' ', "\t")));
+
+        $this->assertSame(0, Utils::strPos("one two one", array('one', 'two')));
+        $this->assertSame(4, Utils::strPos("one two one", array('one', 'two'), 1));
+
+        $this->assertSame(8, Utils::strPos("one two one", array('one', 'two'), 1, true));
+        $this->assertSame(8, Utils::strPos("one two one", array('ONE', 'TWO'), 1, true, true));
+
+        $this->assertSame(false, Utils::strPos("one two one", 'TWO', 0, true));
+        $this->assertSame(4, Utils::strPos("one two one", 'TWO', 0, true, true));
+        $this->assertSame('TWO', Utils::$strPosLastFound);
+
+        $this->assertSame(2, Utils::strPos(1234, 34));
+
+
+    }
+
+    public function testIgnoreCaseBug() {
+        $this->assertSame(11, Utils::strPos('":B0B: int unsigned NOT NULL AUTO_INCREMENT"', 'UNSIGNED', 0, false, true));
+    }
+
 }

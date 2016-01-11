@@ -81,7 +81,7 @@ class Query implements \Iterator
         return $this;
     }
 
-    public function fetchAll($keyField = null)
+    public function fetchAll($keyField = null, $valueField = null)
     {
         if (!$this->executed) {
             $this->execute();
@@ -90,7 +90,21 @@ class Query implements \Iterator
 
         $result = array();
 
-        if ($this->resultClass) {
+        if ($valueField) {
+            if ($valueField instanceof Database\Definition\Column) {
+                $valueField = $valueField->schemaName;
+                if ($keyField !== null) {
+                    while ($r = $this->driver->fetchAssoc($this->result)) {
+                        $result [$r[$keyField]] = $r[$valueField];
+                    }
+                } else {
+                    while ($r = $this->driver->fetchAssoc($this->result)) {
+                        $result [] = $r[$valueField];
+                    }
+                }
+            }
+        }
+        elseif ($this->resultClass) {
             /** @var \Yaoi\Mappable\Contract $class */
             $class = $this->resultClass;
 
@@ -119,14 +133,40 @@ class Query implements \Iterator
         return $result;
     }
 
-    public function fetchPairs($key = 0, $value = 1)
+    /**
+     * @deprecated
+     *
+     * @param null $key
+     * @param null $value
+     * @return array
+     */
+    public function fetchColumns($key = null, $value = null)
     {
         $this->rewind();
 
         $result = array();
 
+        if ($key instanceof Database\Definition\Column) {
+            $key = $key->schemaName;
+        }
+
+        if ($value instanceof Database\Definition\Column) {
+            $value = $value->schemaName;
+        }
+
+        if (null === $key || null === $value) {
+            $r = $this->driver->fetchAssoc($this->result);
+            $keys = array_keys($r);
+            if (null === $key) {
+                $key = $keys[0];
+            }
+            if (null === $value) {
+                $value = $keys[1];
+            }
+            $result [$r[$key]] = $r[$value];
+        }
+
         while ($r = $this->driver->fetchAssoc($this->result)) {
-            $r = array_values($r);
             $result [$r[$key]] = $r[$value];
         }
         return $result;
@@ -138,14 +178,14 @@ class Query implements \Iterator
             $this->execute();
         }
         $result = $this->driver->fetchAssoc($this->result);
-        if (null === $result) {
+        if (false === $result || null === $result) {
             return null;
         }
         if ($field) {
             return $result[$field];
         } else {
             if ($this->resultClass) {
-                /** @var Contract $class */
+                /** @var Entity $class */
                 $class = $this->resultClass;
                 $result = $class::fromArray($result, null, true);
             }
@@ -179,17 +219,18 @@ class Query implements \Iterator
     public function next()
     {
         $this->current = $this->driver->fetchAssoc($this->result);
-        if ($this->resultClass) {
-            /** @var Contract $class */
-            $class = $this->resultClass;
-            $this->current = $class::fromArray($this->current, null, true);
-        }
 
         if (null === $this->current) {
             $this->valid = false;
             $this->position = -1;
         } else {
             $this->valid = true;
+            if ($this->resultClass) {
+                /** @var Contract $class */
+                $class = $this->resultClass;
+                $this->current = $class::fromArray($this->current, null, true);
+            }
+
             ++$this->position;
         }
     }

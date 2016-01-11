@@ -1,6 +1,6 @@
 <?php
 
-namespace YaoiTests\PHPUnit\Database\Entity;
+namespace YaoiTests\PHPUnit\Database\Entity\Migration;
 
 use Yaoi\Database;
 use Yaoi\Log;
@@ -10,7 +10,7 @@ use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\User;
 
-class MysqlComplexTest extends TestCase
+class MysqlTest extends TestCase
 {
     /** @var  Database */
     protected $database;
@@ -20,6 +20,7 @@ class MysqlComplexTest extends TestCase
     }
 
     protected $expectedMigrationLog = <<<EOD
+Table creation expected
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 CREATE TABLE `yaoi_tests_helper_entity_user` (
  `id` int NOT NULL AUTO_INCREMENT,
@@ -27,8 +28,11 @@ CREATE TABLE `yaoi_tests_helper_entity_user` (
  PRIMARY KEY (`id`)
 )
 OK
+No action (up to date) expected
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+No action (up to date) expected
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+Table revision increased, added age, hostId
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 Dependent migration required
 Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
@@ -38,7 +42,9 @@ ADD COLUMN `host_id` int NOT NULL,
 ADD INDEX `key_age` (`age`),
 ADD CONSTRAINT `k432f6fb01e8766435a432e5ed8ffb2ef` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`)
 OK
+No action (up to date) expected
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+Table revision increased, removed hostId, name, added sessionId, firstName, lastName
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 Dependent migration required
 Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
@@ -53,9 +59,13 @@ DROP INDEX `k432f6fb01e8766435a432e5ed8ffb2ef`,
 ADD CONSTRAINT `k42405537c0e04845e2902c8a7fb322be` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`),
 DROP FOREIGN KEY `k432f6fb01e8766435a432e5ed8ffb2ef`
 OK
+No action (up to date) expected
 Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+Table removal expected
 Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion
 OK
+No action (is already non-existent) expected
+Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is already non-existent
 
 EOD;
 
@@ -71,40 +81,57 @@ EOD;
 
         User::$revision = 1;
         User::bindDatabase($this->database, true);
+        Host::bindDatabase($this->database, true);
+        Session::bindDatabase($this->database, true);
 
-        //$this->database->log(new Log('stdout'));
+        //$this->database->log(new Log('colored-stdout'));
 
         // prepare dependencies
         User::table()->migration()->rollback();
         Host::table()->migration()->apply();
         Session::table()->migration()->apply();
 
+        Database\Entity\Migration::$enableStateCache = false;
+        //$log = new Log('colored-stdout');
 
+        $log->push('Table creation expected');
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('Table revision increased, added age, hostId');
         User::$revision = 2;
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('Table revision increased, removed hostId, name, added sessionId, firstName, lastName');
         User::$revision = 3;
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
         User::table()->migration()->setLog($log)->apply();
 
+        $log->push('Table removal expected');
         User::table()->migration()->setLog($log)->rollback();
         User::bindDatabase($this->database, true);
         User::$revision = 1;
+
+        $log->push('No action (is already non-existent) expected');
+        User::bindDatabase($this->database, true);
+        User::table()->migration()->setLog($log)->rollback();
+
 
         $this->assertStringEqualsCRLF($this->expectedMigrationLog, $logString);
 
