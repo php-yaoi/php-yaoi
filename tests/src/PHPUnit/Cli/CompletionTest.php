@@ -100,7 +100,7 @@ for opt in "--help" "--version" "--bash-completion" "--install" ; do
 done
 
 if [ $COMP_CWORD = 1 ]; then
-    options=("actionOne" "actionTwo" "actionThree" )
+    options=("action-one" "action-two" "action-three" )
 fi
 
 if [ $COMP_CWORD = 1 ]; then
@@ -111,7 +111,7 @@ fi
 
 
 case "$action" in
-    "actionOne")
+    "action-one")
     for opt in "--help" "--version" "--bash-completion" "--install" ; do
     if [[ $opt == $prev ]]; then
         return 0
@@ -143,7 +143,7 @@ for opt in "--option" ; do
 done
 
     ;;
-    "actionTwo")
+    "action-two")
     for opt in "--help" "--version" "--bash-completion" "--install" ; do
     if [[ $opt == $prev ]]; then
         return 0
@@ -177,7 +177,7 @@ case "$prev" in
     ;;
 esac
     ;;
-    "actionThree")
+    "action-three")
     for opt in "--help" "--version" "--bash-completion" "--install" ; do
     if [[ $opt == $prev ]]; then
         return 0
@@ -214,7 +214,7 @@ complete -F _test-application -o default test-application';
         );
         $result = ob_get_clean();
         //echo $result;
-        $this->assertStringEqualsSpaceless($expected, $result);
+        $this->assertStringEqualsCRLF($expected, $result);
 
     }
 
