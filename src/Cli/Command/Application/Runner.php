@@ -3,7 +3,7 @@
 namespace Yaoi\Cli\Command\Application;
 
 
-use Yaoi\Cli\Command\RequestReader;
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Command;
 use Yaoi\Command\Application;
 use Yaoi\Io\Request;
@@ -32,7 +32,7 @@ class Runner extends \Yaoi\Cli\Command\Runner
                 throw new Command\Exception('Application required', Command\Exception::INVALID_ARGUMENT);
             }
 
-            $this->reader = new RequestReader();
+            $this->reader = new RequestMapper();
             $this->reader->read($request, $this->command->optionsArray());
         } catch (Command\Exception $exception) {
             if (empty($this->reader->values['action'])) { // TODO symbolize 'action' literal

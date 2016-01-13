@@ -2,6 +2,7 @@
 
 namespace Yaoi\Command;
 
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Command;
 
 abstract class Application extends Command implements Command\Application\Contract
@@ -17,6 +18,7 @@ abstract class Application extends Command implements Command\Application\Contra
 
 
         foreach ((array)$commandDefinitions as $name => $commandDefinition) {
+            $name = RequestMapper::getPublicName($name);
             $actions []= $name;
             $definition->actions [$name]= $commandDefinition;
         }

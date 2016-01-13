@@ -15,8 +15,12 @@ use Yaoi\Io\Content\SubContent;
 use Yaoi\Io\Request;
 use Yaoi\Cli\View\Table;
 use Yaoi\Io\Content\Heading;
-use Yaoi\String\Utils;
 
+/**
+ * Class Runner
+ * @package Yaoi\Cli\Command
+ * @todo move embedded actions (bash-completion, help, install ...) to separate commands
+ */
 class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
 {
     const OPTION_NAME = '--';
@@ -61,7 +65,7 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
     /** @var Response */
     protected $response;
 
-    /** @var RequestReader */
+    /** @var RequestMapper */
     protected $reader;
 
     /**
@@ -80,7 +84,7 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
         $this->request = $request;
 
         try {
-            $this->reader = new RequestReader();
+            $this->reader = new RequestMapper();
             $this->reader->skipFirstTokens = $this->skipFirstTokens;
             $this->reader->read($request, $this->command->optionsArray());
         } catch (Exception $exception) {
@@ -212,15 +216,16 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
         }
 
         $scriptFilenameInstall = '/usr/local/bin/' . $basename;
-        $cmd = 'ln -s ' . $scriptFilename . ' ' . $scriptFilenameInstall;
-        $this->response->addContent($cmd);
-        system($cmd, $result);
-        if ($result) {
-            $this->response->error('Unable to create symlink to ' . $scriptFilenameInstall);
+        if (!file_exists($scriptFilenameInstall)) {
+            $cmd = 'ln -s ' . $scriptFilename . ' ' . $scriptFilenameInstall;
+            $this->response->addContent($cmd);
+            system($cmd, $result);
+            if ($result) {
+                $this->response->error('Unable to create symlink to ' . $scriptFilenameInstall);
+            }
         }
+
+        system('. ' . $completionDir . $basename);
     }
 
-    public static function getPublicName($name) {
-        return Utils::fromCamelCase($name, '-');
-    }
 }

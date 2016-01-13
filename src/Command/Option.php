@@ -65,6 +65,9 @@ class Option extends BaseClass
     public $isVariadic = false;
     public function setIsVariadic($yes = true) {
         $this->isVariadic = $yes;
+        if (self::TYPE_BOOL === $this->type) {
+            $this->type = self::TYPE_VALUE;
+        }
         return $this;
     }
 

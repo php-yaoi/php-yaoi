@@ -9,8 +9,9 @@ use Yaoi\Command\Exception as Exception1;
 use Yaoi\Command\Option;
 use Yaoi\Io\Request;
 use Yaoi\String\StringValue;
+use Yaoi\String\Utils;
 
-class RequestReader extends BaseClass
+class RequestMapper extends BaseClass
 {
     public $scriptName;
     public $showHelp;
@@ -31,6 +32,11 @@ class RequestReader extends BaseClass
     private $variadicValues = array();
     /** @var StringValue */
     private $token;
+
+    public static function getPublicName($name)
+    {
+        return Utils::fromCamelCase($name, '-');
+    }
 
 
     private function processOption()

@@ -2,7 +2,7 @@
 
 namespace YaoiTests\PHPUnit\Cli;
 
-use Yaoi\Cli\Command\RequestReader;
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Cli\Command\Runner;
 use Yaoi\Cli\Response;
 use Yaoi\Io\Request;
@@ -88,7 +88,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
      */
     public function testOptionRequired() {
-        RequestReader::create()->read(TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
+        RequestMapper::create()->read(TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c',
             '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
@@ -99,7 +99,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired() {
-        RequestReader::create()->read(TestRequestHelper::getCliRequest(array('get',
+        RequestMapper::create()->read(TestRequestHelper::getCliRequest(array('get',
             '-d',
             '--option-c',
             '--some-enum', 'two')), (array)TestCommandOne::definition()->options);
@@ -110,7 +110,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired2() {
-        RequestReader::create()->read(TestRequestHelper::getCliRequest(array(
+        RequestMapper::create()->read(TestRequestHelper::getCliRequest(array(
             '--value-option', //'value',
             '--bool-option',
         )), (array)TestCommandWithOptionValue::definition()->options);
@@ -121,7 +121,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredEmpty() {
-        RequestReader::create()->read(
+        RequestMapper::create()->read(
             TestRequestHelper::getCliRequest(array()),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
@@ -132,7 +132,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredMissing() {
-        RequestReader::create()->read(
+        RequestMapper::create()->read(
             TestRequestHelper::getCliRequest(array('arg1')),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
@@ -144,7 +144,7 @@ class Test extends TestCase
      */
     public function testArgumentRequiredOptionFound()
     {
-        RequestReader::create()->read(
+        RequestMapper::create()->read(
             TestRequestHelper::getCliRequest(array('arg1', '--option')),
             (array)TestCommandWithRequiredArgument::definition()->options
         );
@@ -183,7 +183,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::UNKNOWN_OPTION
      */
     public function testUnknownOption() {
-        RequestReader::create()->read(TestRequestHelper::getCliRequest(array(
+        RequestMapper::create()->read(TestRequestHelper::getCliRequest(array(
             '--value-option', 'value',
             '--bool-option',
             '--unknown-option'
@@ -195,7 +195,7 @@ class Test extends TestCase
      * @expectedExceptionCode \Yaoi\Cli\Exception::NON_TAILING_OPTIONAL_ARGUMENT
      */
     public function testNonTailingOptionalArgument() {
-        RequestReader::create()->read(
+        RequestMapper::create()->read(
             TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
             //'-d', 'd1', 'd2', 'd3',
             '--option-c', 'THE-C-VALUE',

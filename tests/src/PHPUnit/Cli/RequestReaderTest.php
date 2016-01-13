@@ -3,7 +3,7 @@
 namespace YaoiTests\PHPUnit\Cli;
 
 
-use Yaoi\Cli\Command\RequestReader;
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
 use YaoiTests\Helper\Command\TestCommandWithRequiredOption;
@@ -17,7 +17,7 @@ class RequestReaderTest extends TestCase
      */
     public function testArgumentRequiredException()
     {
-        $reader = new RequestReader();
+        $reader = new RequestMapper();
         $reader->read(
             TestRequestHelper::getCliRequest('--non-existent'),
             TestCommandWithRequiredArgument::optionsArray()
@@ -30,7 +30,7 @@ class RequestReaderTest extends TestCase
      */
     public function testOptionRequiredException()
     {
-        $reader = new RequestReader();
+        $reader = new RequestMapper();
         $reader->read(
             TestRequestHelper::getCliRequest('--optional'),
             TestCommandWithRequiredOption::optionsArray()
