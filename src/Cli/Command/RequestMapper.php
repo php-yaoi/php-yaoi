@@ -3,9 +3,9 @@
 namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
-use Yaoi\Cli\Exception;
+use Yaoi\Cli\Exception as CliException;
 use Yaoi\Command;
-use Yaoi\Command\Exception as Exception1;
+use Yaoi\Command\Exception;
 use Yaoi\Command\Option;
 use Yaoi\Io\Request;
 use Yaoi\String\StringValue;
@@ -97,13 +97,13 @@ class RequestMapper extends BaseClass
 
         if ($this->variadicStarted && $optionFound) {
             if (empty($this->variadicValues)) {
-                throw new Exception('Unexpected option, value required', Exception1::VALUE_REQUIRED);
+                throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
             }
             $this->finishVariadic();
         }
 
         if (!empty($this->def->requiredArguments) && $optionFound) {
-            throw new Exception('Unexpected option, argument required', Exception1::ARGUMENT_REQUIRED);
+            throw new Exception('Unexpected option, argument required', Exception::ARGUMENT_REQUIRED);
         }
 
         if ($this->variadicStarted) {
@@ -113,7 +113,7 @@ class RequestMapper extends BaseClass
 
         if ($this->valueRequired) {
             if ($optionFound) {
-                throw new Exception('Unexpected option, value required', Exception1::VALUE_REQUIRED);
+                throw new Exception('Unexpected option, value required', Exception::VALUE_REQUIRED);
             }
             $this->valueRequired();
             return;
@@ -137,7 +137,7 @@ class RequestMapper extends BaseClass
             return;
         }
 
-        throw new Exception('Unexpected token: ' . $this->token, Exception::UNKNOWN_OPTION);
+        throw new CliException('Unexpected token: ' . $this->token, CliException::UNKNOWN_OPTION);
     }
 
     public function read(Request $request, array $options)
@@ -175,13 +175,13 @@ class RequestMapper extends BaseClass
 
         if (!empty($this->def->requiredArguments)) {
             foreach ($this->def->requiredArguments as $this->option) {
-                throw new Exception('Missing required argument: ' . $this->option->getUsage(), Exception1::ARGUMENT_REQUIRED);
+                throw new Exception('Missing required argument: ' . $this->option->getUsage(), Exception::ARGUMENT_REQUIRED);
             }
         }
 
         if (!empty($this->def->requiredOptions)) {
             foreach ($this->def->requiredOptions as $this->option) {
-                throw new Exception('Option required: ' . $this->option->getUsage(), Exception1::OPTION_REQUIRED);
+                throw new Exception('Option required: ' . $this->option->getUsage(), Exception::OPTION_REQUIRED);
             }
         }
 

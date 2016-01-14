@@ -84,8 +84,8 @@ class Test extends TestCase
 
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::OPTION_REQUIRED
      */
     public function testOptionRequired() {
         RequestMapper::create()->read(TestRequestHelper::getCliRequest(array('get','123A','456B', '789B',
@@ -95,8 +95,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired() {
         RequestMapper::create()->read(TestRequestHelper::getCliRequest(array('get',
@@ -106,8 +106,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::VALUE_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::VALUE_REQUIRED
      */
     public function testArgumentRequired2() {
         RequestMapper::create()->read(TestRequestHelper::getCliRequest(array(
@@ -117,8 +117,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredEmpty() {
         RequestMapper::create()->read(
@@ -128,8 +128,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredMissing() {
         RequestMapper::create()->read(
@@ -139,8 +139,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredOptionFound()
     {
@@ -179,8 +179,8 @@ class Test extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::UNKNOWN_OPTION
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::UNKNOWN_OPTION
      */
     public function testUnknownOption() {
         RequestMapper::create()->read(TestRequestHelper::getCliRequest(array(

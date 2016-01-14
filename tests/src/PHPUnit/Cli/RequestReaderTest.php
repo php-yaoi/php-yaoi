@@ -12,8 +12,8 @@ use YaoiTests\Helper\TestRequestHelper;
 class RequestReaderTest extends TestCase
 {
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredException()
     {
@@ -25,8 +25,8 @@ class RequestReaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::OPTION_REQUIRED
      */
     public function testOptionRequiredException()
     {
