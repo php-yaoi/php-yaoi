@@ -12,13 +12,19 @@ class Definition extends BaseClass
     public $name;
     public $version;
 
-    /** @var string */
+    /** @var string|Command */
     public $commandClass;
 
     /** @var Definition[] */
     public $actions = array();
 
     public $allowUnexpectedOptions;
+
+    /** @var Option[] */
+    public function optionsArray()
+    {
+        return (array)$this->options;
+    }
 
     public function setOptions(\stdClass $options) {
         /**

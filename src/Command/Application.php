@@ -5,6 +5,12 @@ namespace Yaoi\Command;
 use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Command;
 
+/**
+ * This looks like an ActionSet, not Application
+ *
+ * Class Application
+ * @package Yaoi\Command
+ */
 abstract class Application extends Command implements Command\Application\Contract
 {
     public $action;

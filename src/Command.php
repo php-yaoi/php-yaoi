@@ -2,6 +2,7 @@
 
 namespace Yaoi;
 
+use Phperf\Xhprof\Ui\Io;
 use Yaoi\Command\Definition;
 use Yaoi\Command\Option;
 use Yaoi\Command\RunnerContract;
@@ -30,6 +31,8 @@ use Yaoi\String\Utils;
  * @see Command with
  * @see RequestParser and invoking action.
  *
+ *
+ * @todo automated definition name by class name
  */
 
 
@@ -106,5 +109,25 @@ abstract class Command extends BaseClass implements Command\Contract
         }
         return $state;
     }
+
+
+    public function importState(\stdClass $state)
+    {
+        foreach ((array)$state as $name => $value) {
+            $this->$name = $value;
+        }
+        return $this;
+    }
+
+
+    /**
+     * @var RunnerContract
+     */
+    public $runner;
+
+    /**
+     * @var Io
+     */
+    public $io;
 }
 

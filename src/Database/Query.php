@@ -134,7 +134,7 @@ class Query implements \Iterator
     }
 
     /**
-     * @deprecated
+     * @deprecated use fetchAll($keyField, $valueField)
      *
      * @param null $key
      * @param null $value
@@ -172,6 +172,11 @@ class Query implements \Iterator
         return $result;
     }
 
+    /**
+     * @param null $field
+     * @return array|object
+     * @throws Exception
+     */
     public function fetchRow($field = null)
     {
         if (!$this->executed) {

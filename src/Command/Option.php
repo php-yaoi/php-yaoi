@@ -10,6 +10,7 @@ class Option extends BaseClass
     const TYPE_BOOL = 'bool';
     const TYPE_VALUE = 'value';
     const TYPE_ENUM = 'enum';
+    const TYPE_COMMANDS = 'commands';
 
     public $values = array();
 
@@ -28,6 +29,20 @@ class Option extends BaseClass
 
     public function setType($type = Option::TYPE_VALUE) {
         $this->type = $type;
+        return $this;
+    }
+
+    public function addToEnum($value, $name = null) {
+        $this->type = Option::TYPE_ENUM;
+        if (null === $name) {
+            if ($value instanceof Definition) {
+                $name = $value->name;
+            }
+            else {
+                $name = $value;
+            }
+        }
+        $this->values[$name] = $value;
         return $this;
     }
 
