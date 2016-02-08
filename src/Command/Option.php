@@ -36,7 +36,7 @@ class Option extends BaseClass
         $this->type = Option::TYPE_ENUM;
         if (null === $name) {
             if ($value instanceof Definition) {
-                $name = $value->name;
+                $name = $value->getName();
             }
             else {
                 $name = $value;

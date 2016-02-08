@@ -4,6 +4,7 @@ namespace Yaoi\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Command;
+use Yaoi\String\Utils;
 
 class Definition extends BaseClass
 {
@@ -36,5 +37,14 @@ class Definition extends BaseClass
         }
         $this->options = $options;
         return $this;
+    }
+
+    public function getName() {
+        if ($this->name) {
+            return $this->name;
+        }
+        else {
+            return substr($this->commandClass, strrpos($this->commandClass, '\\') + 1);
+        }
     }
 }

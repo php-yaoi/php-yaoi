@@ -2,8 +2,8 @@
 
 namespace Yaoi;
 
-use Phperf\Xhprof\Ui\Io;
 use Yaoi\Command\Definition;
+use Yaoi\Command\Io;
 use Yaoi\Command\Option;
 use Yaoi\Command\RunnerContract;
 use Yaoi\Io\Response;
@@ -121,13 +121,9 @@ abstract class Command extends BaseClass implements Command\Contract
 
 
     /**
-     * @var RunnerContract
-     */
-    public $runner;
-
-    /**
      * @var Io
      */
     public $io;
+
 }
 
