@@ -14,8 +14,8 @@ class Io extends BaseClass
 {
     public $globalState;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestMapperContract */
+    protected $requestMapper;
 
     /** @var Response  */
     protected $response;
@@ -31,9 +31,17 @@ class Io extends BaseClass
     /** @var Command */
     public $command;
 
-    public function __construct(Command\Definition $definition, Request $request, Response $response)
+    /**
+     * @return Command
+     */
+    public function getCommand()
     {
-        $this->request = $request;
+        return $this->command;
+    }
+
+    public function __construct(Command\Definition $definition, RequestMapperContract $requestMapper, Response $response)
+    {
+        $this->requestMapper = $requestMapper;
         $this->response = $response;
         $this->definition = $definition;
         $this->globalState = new \stdClass();
@@ -47,10 +55,11 @@ class Io extends BaseClass
         /** @var Command $command */
         $command = new $commandClass;
         $command->setResponse($this->response);
-        $command->io = $this;
+        $command->setRequestMapper($this->requestMapper);
 
         $commandOptions = $definition->optionsArray();
-        $commandState = $this->readOptions($commandOptions);
+        $commandState = $this->requestMapper->readOptions($commandOptions);
+        //var_dump($commandState);
         $this->commandStates[$definition->commandClass] = $commandState;
 
         foreach ($commandOptions as $option) {
@@ -59,7 +68,10 @@ class Io extends BaseClass
                 continue;
             }
             $value = $commandState->{$option->name};
+            //var_dump($option->name, $value);
             $this->globalState->{$option->name} = $value;
+
+            $command->{$option->name} = $value;
 
             if ($option->type === Option::TYPE_ENUM) {
                 if ($value instanceof Command\Definition) {
@@ -77,67 +89,6 @@ class Io extends BaseClass
         Command::cast($commandState)->createState();
     }
 
-    /**
-     * @param Option[] $commandOptions
-     * @return \stdClass
-     * @throws Command\Exception
-     */
-    protected function readOptions(array $commandOptions)
-    {
-        $commandState = new \stdClass();
-
-        foreach ($commandOptions as $option) {
-            $publicName = $this->getPublicName($option->name);
-            if (false !== ($value = $this->request->request($publicName, false)
-                )
-            ) {
-
-                if (Option::TYPE_ENUM === $option->type) {
-                    $valueFound = false;
-                    foreach ($option->values as $enumName => $enumValue) {
-                        $enumPublicName = $this->getPublicName($enumName);
-                        if ($enumPublicName === $value) {
-                            $valueFound = true;
-                            $value = $enumValue;
-                            break;
-                        }
-                    }
-                    if (!$valueFound) {
-                        throw new Command\Exception('Invalid value for ' . $publicName, Command\Exception::INVALID_VALUE);
-                    }
-                }
-
-                if (!$value && Option::TYPE_VALUE === $option->type) {
-                    throw new Command\Exception('Value required for ' . $publicName, Command\Exception::VALUE_REQUIRED);
-                }
-
-                if ($option->isVariadic) {
-                    if (!is_array($value)) {
-                        $value = array($value);
-                    }
-                }
-
-                if (Option::TYPE_BOOL === $option->type) {
-                    $value = (bool)$value;
-                }
-
-                $commandState->{$option->name} = $value;
-            }
-            else {
-                if ($option->isRequired) {
-                    throw new Command\Exception('Option '. $publicName .' required', Command\Exception::OPTION_REQUIRED);
-                }
-            }
-        }
-
-        return $commandState;
-    }
-
-
-    public static function getPublicName($name)
-    {
-        return Utils::fromCamelCase($name, '_');
-    }
 
     public function makeUri(Command $command)
     {

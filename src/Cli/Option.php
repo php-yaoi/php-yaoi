@@ -40,8 +40,8 @@ class Option extends \Yaoi\Command\Option
             $value = $this->name;
         }
         elseif ($this->type === self::TYPE_ENUM) {
-            $value = count($this->values) < 4
-                ? implode('|', $this->values)
+            $value = count($this->enumValues) < 4
+                ? implode('|', $this->enumValues)
                 : $this->name;
         }
 

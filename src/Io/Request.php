@@ -4,6 +4,8 @@ namespace Yaoi\Io;
 
 use Yaoi\BaseClass;
 use Yaoi\Io\Request\Server;
+use Yaoi\String\Parser;
+use Yaoi\String\StringValue;
 
 class Request extends BaseClass
 {
@@ -57,8 +59,15 @@ class Request extends BaseClass
         return $this->server->HTTP_HOST;
     }
 
+    private $path;
     public function path() {
-        return $this->server->REQUEST_URI;
+        if (null === $this->path) {
+            $this->path = $this->server->REQUEST_URI;
+            if (false !== $position = strpos($this->path, '?')) {
+                $this->path = substr($this->path, 0, $position);
+            }
+        }
+        return $this->path;
     }
 
     protected $isCli;

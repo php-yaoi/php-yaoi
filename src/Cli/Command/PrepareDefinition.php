@@ -107,7 +107,7 @@ class PrepareDefinition extends BaseClass
 
                 $description = $option->description;
                 if ($option->type === Option::TYPE_ENUM) {
-                    $description .= ($description ? PHP_EOL : '') . 'Allowed values: ' . implode(', ', $option->values);
+                    $description .= ($description ? PHP_EOL : '') . 'Allowed values: ' . implode(', ', $option->enumValues);
                 }
 
                 if ($option->isUnnamed) {

@@ -5,6 +5,7 @@ namespace Yaoi;
 use Yaoi\Command\Definition;
 use Yaoi\Command\Io;
 use Yaoi\Command\Option;
+use Yaoi\Command\RequestMapperContract;
 use Yaoi\Command\RunnerContract;
 use Yaoi\Io\Response;
 use Yaoi\String\Utils;
@@ -82,6 +83,13 @@ abstract class Command extends BaseClass implements Command\Contract
         return $this;
     }
 
+    /** @var  RequestMapperContract */
+    protected $requestMapper;
+    public function setRequestMapper(RequestMapperContract $requestMapper) {
+        $this->requestMapper = $requestMapper;
+        return $this;
+    }
+
 
     /**
      * @var \stdClass
@@ -118,12 +126,5 @@ abstract class Command extends BaseClass implements Command\Contract
         }
         return $this;
     }
-
-
-    /**
-     * @var Io
-     */
-    public $io;
-
 }
 

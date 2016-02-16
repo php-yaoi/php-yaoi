@@ -32,7 +32,7 @@ class Completion extends Hardcoded
 
             if ($argument->type === Option::TYPE_ENUM) {
                 $this->requiredArguments[$index] = '';
-                foreach ($argument->values as $value) {
+                foreach ($argument->enumValues as $value) {
                     $this->requiredArguments[$index] .= '"' . $value . '" ';
                 }
             } else {
@@ -64,7 +64,7 @@ class Completion extends Hardcoded
             if ($option->type === Option::TYPE_VALUE) {
                 $this->optionsValues [Runner::OPTION_NAME . $option->getPublicName()] = '';
             } elseif ($option->type === Option::TYPE_ENUM) {
-                $this->optionsValues [Runner::OPTION_NAME . $option->getPublicName()] = '"' . implode('" "', $option->values) . '" ';
+                $this->optionsValues [Runner::OPTION_NAME . $option->getPublicName()] = '"' . implode('" "', $option->enumValues) . '" ';
             }
         }
 

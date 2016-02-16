@@ -10,9 +10,22 @@ class Option extends BaseClass
     const TYPE_BOOL = 'bool';
     const TYPE_VALUE = 'value';
     const TYPE_ENUM = 'enum';
-    const TYPE_COMMANDS = 'commands';
 
-    public $values = array();
+    public $enumValues = array(); // TODO hide
+
+    /** @var  array|string[] Enum values mapping */
+    private $enumMap;
+    public function setEnumMapper(\Closure $mapper = null) {
+        if (null === $mapper) {
+            $this->enumMap = null;
+        }
+        else {
+            foreach ($this->enumValues as $name => $value) {
+                $this->enumMap [$mapper($name)] = $value;
+            }
+        }
+        return $this;
+    }
 
     public $name;
     public function setName($name) {
@@ -23,7 +36,7 @@ class Option extends BaseClass
     public function setEnum($values) {
         $this->type = self::TYPE_ENUM;
         $values = is_array($values) ? $values : func_get_args();
-        $this->values = array_combine($values, $values);
+        $this->enumValues = array_combine($values, $values);
         return $this;
     }
 
@@ -42,7 +55,7 @@ class Option extends BaseClass
                 $name = $value;
             }
         }
-        $this->values[$name] = $value;
+        $this->enumValues[$name] = $value;
         return $this;
     }
 
@@ -60,16 +73,22 @@ class Option extends BaseClass
 
     public function validateFilterValue($value) {
         if ($this->type === self::TYPE_ENUM) {
-            if (!isset($this->values[$value])) {
+            $enumValues = empty($this->enumMap) ? $this->enumValues : $this->enumMap;
+            if (!isset($enumValues[$value])) {
                 throw new Exception('Invalid value for `' . $this->name . '`: ' . $value .'. '
-                    .'Allowed values: ' . implode(', ', $this->values) . '.', Exception::INVALID_VALUE);
+                    .'Allowed values: ' . implode(', ', array_keys($enumValues)) . '.', Exception::INVALID_VALUE);
             }
             else {
-                return $value;
+                return $enumValues[$value];
             }
 
         }
-        else return $value;
+        elseif ($this->type === Option::TYPE_BOOL) {
+            return (bool)$value;
+        }
+        else {
+            return $value;
+        }
     }
 
 
