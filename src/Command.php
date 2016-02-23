@@ -59,6 +59,8 @@ abstract class Command extends BaseClass implements Command\Contract
      */
     public static function definition() {
         $className = get_called_class();
+        //var_dump('Getting Definition of ' . $className);
+
         $definition = &self::$definitions[$className];
         if (null !== $definition) {
             return $definition;
@@ -90,31 +92,34 @@ abstract class Command extends BaseClass implements Command\Contract
         return $this;
     }
 
+    /** @var Io */
+    protected $io;
+    public function setIo(Io $io)
+    {
+        $this->io = $io;
+    }
+
+
+    public $commandClass;
 
     /**
-     * @var \stdClass
-     */
-    private $currentState;
-
-    /**
-     * Router gets state and renders it to url/form/commandline, `base path` also required
-     * @param bool $copyCurrent
+     * @param Io|null $fillFrom
      * @return static
      */
-    public function createState($copyCurrent = true)
+    public static function createState(Io $fillFrom = null)
     {
-        if ($copyCurrent) {
-            if (null === $this->currentState) {
-                $this->currentState = new \stdClass();
-                foreach (self::optionsArray() as $name => $option) {
-                    $this->currentState->$name = $this->$name;
-                }
-            }
-            $state = clone $this->currentState;
+        $commandClass = get_called_class();
+
+        /** @var static $state */
+        $state = null;
+        if ($fillFrom !== null) {
+            $state = $fillFrom->getCommandState($commandClass);
         }
-        else {
+        if (!$state) {
             $state = new \stdClass();
         }
+        $state->commandClass = $commandClass;
+
         return $state;
     }
 

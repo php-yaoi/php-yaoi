@@ -21,7 +21,9 @@ class Definition extends BaseClass
 
     public $allowUnexpectedOptions;
 
-    /** @var Option[] */
+    /**
+     * @return Option[]
+     */
     public function optionsArray()
     {
         return (array)$this->options;

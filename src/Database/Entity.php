@@ -202,7 +202,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
 
-    public function toArray($skipNotSetProperties = false)
+    public function toArray($skipNotSetProperties = false, $skipCast = false)
     {
         $result = array();
         foreach (static::table()->getColumns(true) as $column) {
@@ -214,7 +214,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
                 else {
                     $value = $column->getDefault();
                 }
-            } else {
+            } elseif (!$skipCast) {
                 $value = Column::castField($value, $column->flags);
             }
 
