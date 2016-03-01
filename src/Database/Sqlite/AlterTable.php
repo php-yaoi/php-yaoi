@@ -59,6 +59,8 @@ class AlterTable extends \Yaoi\Sql\AlterTable
                 $this->add($this->database()->expr("DROP INDEX ?", $this->before->schemaName . '_' . $index->getName()));
             }
 
+
+            $this->database()->getUtility()->dropTableIfExists('_temp_table');
             $this->add($this->database()->expr(
                 "ALTER TABLE ? RENAME TO _temp_table",
                 new Symbol($this->before->schemaName)

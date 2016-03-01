@@ -3,7 +3,7 @@
 namespace YaoiTests\PHPUnit\Cli;
 
 
-use Yaoi\Cli\Command\RequestReader;
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandWithRequiredArgument;
 use YaoiTests\Helper\Command\TestCommandWithRequiredOption;
@@ -12,12 +12,12 @@ use YaoiTests\Helper\TestRequestHelper;
 class RequestReaderTest extends TestCase
 {
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::ARGUMENT_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::ARGUMENT_REQUIRED
      */
     public function testArgumentRequiredException()
     {
-        $reader = new RequestReader();
+        $reader = new RequestMapper();
         $reader->read(
             TestRequestHelper::getCliRequest('--non-existent'),
             TestCommandWithRequiredArgument::optionsArray()
@@ -25,12 +25,12 @@ class RequestReaderTest extends TestCase
     }
 
     /**
-     * @expectedException \Yaoi\Cli\Exception
-     * @expectedExceptionCode \Yaoi\Cli\Exception::OPTION_REQUIRED
+     * @expectedException \Yaoi\Command\Exception
+     * @expectedExceptionCode \Yaoi\Command\Exception::OPTION_REQUIRED
      */
     public function testOptionRequiredException()
     {
-        $reader = new RequestReader();
+        $reader = new RequestMapper();
         $reader->read(
             TestRequestHelper::getCliRequest('--optional'),
             TestCommandWithRequiredOption::optionsArray()

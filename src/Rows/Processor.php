@@ -32,6 +32,14 @@ class Processor extends IteratorIterator
         return $this;
     }
 
+    /** @var \Closure */
+    private $callback;
+    public function map(callable $callback)
+    {
+        $this->callback = $callback;
+        return $this;
+    }
+
     private $combineOffset = array();
 
     /**
@@ -56,6 +64,10 @@ class Processor extends IteratorIterator
     public function current()
     {
         $row = parent::current();
+        if ($this->callback) {
+            $row = $this->callback->__invoke($row);
+        }
+
         if ($this->skipFields) {
             foreach ($this->skipFields as $field) {
                 if (isset($row[$field])) {

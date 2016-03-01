@@ -11,7 +11,21 @@ class Option extends BaseClass
     const TYPE_VALUE = 'value';
     const TYPE_ENUM = 'enum';
 
-    public $values = array();
+    public $enumValues = array(); // TODO hide
+
+    /** @var  array|string[] Enum values mapping */
+    private $enumMap;
+    public function setEnumMapper(\Closure $mapper = null) {
+        if (null === $mapper) {
+            $this->enumMap = null;
+        }
+        else {
+            foreach ($this->enumValues as $name => $value) {
+                $this->enumMap [$mapper($name)] = $value;
+            }
+        }
+        return $this;
+    }
 
     public $name;
     public function setName($name) {
@@ -22,12 +36,26 @@ class Option extends BaseClass
     public function setEnum($values) {
         $this->type = self::TYPE_ENUM;
         $values = is_array($values) ? $values : func_get_args();
-        $this->values = array_combine($values, $values);
+        $this->enumValues = array_combine($values, $values);
         return $this;
     }
 
     public function setType($type = Option::TYPE_VALUE) {
         $this->type = $type;
+        return $this;
+    }
+
+    public function addToEnum($value, $name = null) {
+        $this->type = Option::TYPE_ENUM;
+        if (null === $name) {
+            if ($value instanceof Definition) {
+                $name = $value->getName();
+            }
+            else {
+                $name = $value;
+            }
+        }
+        $this->enumValues[$name] = $value;
         return $this;
     }
 
@@ -45,16 +73,25 @@ class Option extends BaseClass
 
     public function validateFilterValue($value) {
         if ($this->type === self::TYPE_ENUM) {
-            if (!isset($this->values[$value])) {
+            $enumValues = empty($this->enumMap) ? $this->enumValues : $this->enumMap;
+            if (!isset($enumValues[$value])) {
                 throw new Exception('Invalid value for `' . $this->name . '`: ' . $value .'. '
-                    .'Allowed values: ' . implode(', ', $this->values) . '.', Exception::INVALID_VALUE);
+                    .'Allowed values: ' . implode(', ', array_keys($enumValues)) . '.', Exception::INVALID_VALUE);
             }
             else {
-                return $value;
+                return $enumValues[$value];
             }
 
         }
-        else return $value;
+        elseif ($this->type === Option::TYPE_BOOL) {
+            return (bool)$value;
+        }
+        elseif ($this->type === Option::TYPE_VALUE && empty($value) && $this->isRequired) {
+            throw new Exception('Option `' . $this->name . '` can not be empty', Exception::OPTION_REQUIRED);
+        }
+        else {
+            return $value;
+        }
     }
 
 
@@ -65,6 +102,9 @@ class Option extends BaseClass
     public $isVariadic = false;
     public function setIsVariadic($yes = true) {
         $this->isVariadic = $yes;
+        if (self::TYPE_BOOL === $this->type) {
+            $this->type = self::TYPE_VALUE;
+        }
         return $this;
     }
 

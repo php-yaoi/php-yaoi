@@ -52,11 +52,11 @@ abstract class BaseClass
 
 
     /**
-     * @param BaseClass $object
+     * @param $object
      * @return static
      * @throws \Exception
      */
-    public static function cast(BaseClass $object) {
+    public static function cast($object) {
         if ($object instanceof static) {
             return $object;
         }

@@ -3,7 +3,9 @@
 namespace Yaoi;
 
 use Yaoi\Command\Definition;
+use Yaoi\Command\Io;
 use Yaoi\Command\Option;
+use Yaoi\Command\RequestMapperContract;
 use Yaoi\Command\RunnerContract;
 use Yaoi\Io\Response;
 use Yaoi\String\Utils;
@@ -30,6 +32,8 @@ use Yaoi\String\Utils;
  * @see Command with
  * @see RequestParser and invoking action.
  *
+ *
+ * @todo automated definition name by class name
  */
 
 
@@ -79,32 +83,51 @@ abstract class Command extends BaseClass implements Command\Contract
         return $this;
     }
 
+    /** @var  RequestMapperContract */
+    protected $requestMapper;
+    public function setRequestMapper(RequestMapperContract $requestMapper) {
+        $this->requestMapper = $requestMapper;
+        return $this;
+    }
+
+    /** @var Io */
+    protected $io;
+    public function setIo(Io $io)
+    {
+        $this->io = $io;
+    }
+
+
+    public $commandClass;
 
     /**
-     * @var \stdClass
-     */
-    private $currentState;
-
-    /**
-     * Router gets state and renders it to url/form/commandline, `base path` also required
-     * @param bool $copyCurrent
+     * @param Io|null $fillFromIo
      * @return static
      */
-    public function createState($copyCurrent = true)
+    public static function createState(Io $fillFromIo = null)
     {
-        if ($copyCurrent) {
-            if (null === $this->currentState) {
-                $this->currentState = new \stdClass();
-                foreach (self::optionsArray() as $name => $option) {
-                    $this->currentState->$name = $this->$name;
-                }
-            }
-            $state = clone $this->currentState;
+        $commandClass = get_called_class();
+
+        /** @var static $state */
+        $state = null;
+        if ($fillFromIo !== null) {
+            $state = $fillFromIo->getCommandState($commandClass);
         }
-        else {
+        if (!$state) {
             $state = new \stdClass();
         }
+        $state->commandClass = $commandClass;
+
         return $state;
+    }
+
+
+    public function importState(\stdClass $state)
+    {
+        foreach ((array)$state as $name => $value) {
+            $this->$name = $value;
+        }
+        return $this;
     }
 }
 

@@ -3,13 +3,15 @@
 namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
-use Yaoi\Cli\Exception;
+use Yaoi\Cli\Exception as CliException;
 use Yaoi\Command;
+use Yaoi\Command\Exception;
 use Yaoi\Command\Option;
 use Yaoi\Io\Request;
 use Yaoi\String\StringValue;
+use Yaoi\String\Utils;
 
-class RequestReader extends BaseClass
+class RequestMapper extends BaseClass
 {
     public $scriptName;
     public $showHelp;
@@ -30,6 +32,11 @@ class RequestReader extends BaseClass
     private $variadicValues = array();
     /** @var StringValue */
     private $token;
+
+    public static function getPublicName($name)
+    {
+        return Utils::fromCamelCase($name, '-');
+    }
 
 
     private function processOption()
@@ -130,7 +137,7 @@ class RequestReader extends BaseClass
             return;
         }
 
-        throw new Exception('Unexpected token: ' . $this->token, Exception::UNKNOWN_OPTION);
+        throw new CliException('Unexpected token: ' . $this->token, CliException::UNKNOWN_OPTION);
     }
 
     public function read(Request $request, array $options)

@@ -2,6 +2,7 @@
 
 namespace Yaoi\Cli;
 
+use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Cli\Command\Runner;
 use Yaoi\String\Utils;
 
@@ -14,7 +15,7 @@ class Option extends \Yaoi\Command\Option
     }
 
     public function getPublicName() {
-        return Runner::getPublicName($this->name);
+        return RequestMapper::getPublicName($this->name);
     }
 
     public $group = Runner::GROUP_DEFAULT;
@@ -39,8 +40,8 @@ class Option extends \Yaoi\Command\Option
             $value = $this->name;
         }
         elseif ($this->type === self::TYPE_ENUM) {
-            $value = count($this->values) < 4
-                ? implode('|', $this->values)
+            $value = count($this->enumValues) < 4
+                ? implode('|', $this->enumValues)
                 : $this->name;
         }
 

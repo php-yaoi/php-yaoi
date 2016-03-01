@@ -16,8 +16,8 @@ class ApplicationTest extends TestCase
             . "\x1B" . '[36;1mTest application description' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
             . '   test-application <action>' . PHP_EOL
-            . '   ' . "\x1B" . '[32;1maction' . "\x1B" . '[m   Action name                                      ' . PHP_EOL
-            . '            Allowed values: actionOne, actionTwo, actionThree' . PHP_EOL
+            . '   ' . "\x1B" . '[32;1maction' . "\x1B" . '[m   Action name                                         ' . PHP_EOL
+            . '            Allowed values: action-one, action-two, action-three' . PHP_EOL
             . '   ' . PHP_EOL
             . "\x1B" . '[36;1mMisc: ' . "\x1B" . '[m' . PHP_EOL
             . '   ' . "\x1B" . '[32;1m--help            ' . "\x1B" . '[m   Show usage information    ' . PHP_EOL
@@ -49,10 +49,10 @@ class ApplicationTest extends TestCase
 
     public function testActionHelp()
     {
-        $expected = "\x1B" . '[36;1mv1.0 test-application actionOne' . "\x1B" . '[m' . PHP_EOL
+        $expected = "\x1B" . '[36;1mv1.0 test-application action-one' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mTest application description' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mUsage: ' . "\x1B" . '[m' . PHP_EOL
-            . '   test-application actionOne <argument> <argumentTwo...>' . PHP_EOL
+            . '   test-application action-one <argument> <argumentTwo...>' . PHP_EOL
             . '   ' . "\x1B" . '[32;1margument   ' . "\x1B" . '[m   ' . PHP_EOL
             . '   ' . "\x1B" . '[32;1margumentTwo' . "\x1B" . '[m   ' . PHP_EOL
             . '   ' . PHP_EOL
@@ -68,7 +68,7 @@ class ApplicationTest extends TestCase
 
 
         ob_start();
-        Runner::create(new TestApplication)->run(TestRequestHelper::getCliRequest(array('actionOne', '--help')));
+        Runner::create(new TestApplication)->run(TestRequestHelper::getCliRequest(array('action-one', '--help')));
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);die();
