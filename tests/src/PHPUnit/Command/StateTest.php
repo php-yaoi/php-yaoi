@@ -32,10 +32,7 @@ class StateTest extends TestCase
         $commandState = TestCommandOne::createState($this->getIo());
         $this->assertSame(array (
             'action' => 'get',
-            'optionD' =>
-                array (
-                    0 => 15,
-                ),
+            'optionD' => 15,
             'someEnum' => 'one',
             'commandClass' => 'YaoiTests\\Helper\\Command\\TestCommandOne',
         ), (array)$commandState);
@@ -47,6 +44,7 @@ class StateTest extends TestCase
         $state = $io->getCommandState(TestCommandOne::className());
         $this->assertSame(array (
             'action' => 'get',
+            //'optionC' => false,
             'optionD' =>
                 array (
                     0 => 15,

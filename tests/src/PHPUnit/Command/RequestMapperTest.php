@@ -18,8 +18,10 @@ class RequestMapperTest extends TestCase
 
         $requestMapper = new RequestMapper($request);
         $options = array(
-            Option::create()->setIsUnnamed()
+            Option::create()->setIsUnnamed()->setName('name')
         );
-        $requestMapper->readOptions($options);
+        $commandState = new \stdClass();
+        $requestState = new \stdClass();
+        $requestMapper->readOptions($options, $commandState, $requestState);
     }
 }
