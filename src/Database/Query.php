@@ -94,6 +94,9 @@ class Query implements \Iterator
             if ($valueField instanceof Database\Definition\Column) {
                 $valueField = $valueField->schemaName;
                 if ($keyField !== null) {
+                    if ($keyField instanceof Database\Definition\Column) {
+                        $keyField = $keyField->schemaName;
+                    }
                     while ($r = $this->driver->fetchAssoc($this->result)) {
                         $result [$r[$keyField]] = $r[$valueField];
                     }
