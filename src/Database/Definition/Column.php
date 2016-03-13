@@ -117,6 +117,10 @@ class Column extends BaseClass
 
     public static function castField($value, $columnFlags)
     {
+        if ((!$columnFlags & self::NOT_NULL) && $value === null) {
+            return null;
+        }
+
         if (is_object($value)) {
             $value = (string)$value;
         }

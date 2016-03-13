@@ -265,7 +265,10 @@ abstract class ComplexStatement extends Expression implements
 
     protected function buildUnion(Quoter $quoter)
     {
-        if ($this->union && !$this->union->isEmpty()) {
+        if (!$this->isEmpty()) {
+            return ' ' . $this->union->build($quoter);
+        }
+        elseif ($this->union && !$this->union->isEmpty()) {
             return substr($this->union->build($quoter), 1);
         } else {
             return '';
