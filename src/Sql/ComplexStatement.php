@@ -274,7 +274,7 @@ abstract class ComplexStatement extends Expression implements
             if ($this->union->statement === ' ') {
                 return substr($this->union->build($quoter), 1);
             } else {
-                return ' ' . $this->union->build($quoter);
+                return $this->union->queue[0][0] . $this->union->build($quoter);
             }
         } else {
             return '';
