@@ -84,7 +84,10 @@ class Option extends BaseClass
 
         }
         elseif ($this->type === Option::TYPE_BOOL) {
-            return (bool)$value;
+            return null === $value ? null : (bool)$value;
+        }
+        elseif ($this->type === Option::TYPE_VALUE && empty($value) && $this->isRequired) {
+            throw new Exception('Option `' . $this->name . '` can not be empty', Exception::OPTION_REQUIRED);
         }
         else {
             return $value;

@@ -92,4 +92,10 @@ class Request extends BaseClass
         $request->isCli = PHP_SAPI === 'cli';
         return $request;
     }
+
+    public function setParam($type, $param, $value)
+    {
+        $this->data[$type][$param] = $value;
+        return $this;
+    }
 }

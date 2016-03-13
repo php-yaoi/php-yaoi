@@ -15,12 +15,11 @@ interface RequestMapperContract
      * @return \stdClass
      * @throws Exception
      */
-    public function readOptions(array $commandOptions);
+    public function readOptions(array $commandOptions, \stdClass $commandState, \stdClass $requestState);
 
     /**
-     * @param Option[] $commandOptions
-     * @param array $values
-     * @return string
+     * @param array $properties
+     * @return mixed
      */
     public function makeAnchor(array $properties);
 

@@ -58,6 +58,9 @@ class TestCommandOne extends Command
 
     public function performAction()
     {
+        //var_dump($this->someEnum);
+        //$this->response->success('Well done!');
+        return $this->someEnum;
     }
 
 }

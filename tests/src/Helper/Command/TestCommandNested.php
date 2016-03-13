@@ -6,6 +6,11 @@ namespace YaoiTests\Helper\Command;
 use Yaoi\Command;
 use Yaoi\Command\Definition;
 
+/**
+ * Class TestCommandNested
+ * @package YaoiTests
+ * @internal
+ */
 class TestCommandNested extends Command
 {
 
@@ -22,7 +27,7 @@ class TestCommandNested extends Command
 
     public function performAction()
     {
-        $this->action->performAction();
+        return $this->action->performAction();
     }
 
 }

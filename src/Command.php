@@ -59,8 +59,6 @@ abstract class Command extends BaseClass implements Command\Contract
      */
     public static function definition() {
         $className = get_called_class();
-        //var_dump('Getting Definition of ' . $className);
-
         $definition = &self::$definitions[$className];
         if (null !== $definition) {
             return $definition;
@@ -103,19 +101,19 @@ abstract class Command extends BaseClass implements Command\Contract
     public $commandClass;
 
     /**
-     * @param Io|null $fillFrom
+     * @param Io|null $fillFromIo
      * @return static
      */
-    public static function createState(Io $fillFrom = null)
+    public static function createState(Io $fillFromIo = null)
     {
         $commandClass = get_called_class();
 
         /** @var static $state */
         $state = null;
-        if ($fillFrom !== null) {
-            $state = $fillFrom->getCommandState($commandClass);
+        if ($fillFromIo !== null) {
+            $state = $fillFromIo->getRequestState($commandClass);
         }
-        if (!$state) {
+        else {
             $state = new \stdClass();
         }
         $state->commandClass = $commandClass;

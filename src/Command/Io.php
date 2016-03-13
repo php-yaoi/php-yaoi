@@ -4,11 +4,9 @@ namespace Yaoi\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Command;
-use Yaoi\Command\Option;
 use Yaoi\Io\Request;
 use Yaoi\Io\Response;
-use Yaoi\Sql\Symbol;
-use Yaoi\String\Utils;
+use Yaoi\String\Expression;
 use Yaoi\Undefined;
 
 class Io extends BaseClass
@@ -18,7 +16,7 @@ class Io extends BaseClass
     /** @var RequestMapperContract */
     protected $requestMapper;
 
-    /** @var Response  */
+    /** @var Response */
     protected $response;
 
     /** @var  Command\Definition */
@@ -28,6 +26,7 @@ class Io extends BaseClass
     protected $globalOptions = array();
 
     protected $commandStates = array();
+    protected $requestStates = array();
 
     /** @var Command */
     public $command;
@@ -55,7 +54,9 @@ class Io extends BaseClass
 
 
     private $definitionTree = array();
-    private function makeDefinitionsTree(Definition $definition) {
+
+    private function makeDefinitionsTree(Definition $definition)
+    {
         foreach ($definition->optionsArray() as $option) {
             if ($option->type === Option::TYPE_ENUM) {
                 foreach ($option->enumValues as $enumName => $value) {
@@ -71,16 +72,27 @@ class Io extends BaseClass
 
     /**
      * @param Command $commandState
+     * @return Expression
      */
-    public function makeAnchor($commandState) {
+    public function makeAnchor($commandState)
+    {
         $commandState->commandClass;
         $commandClass = $commandState->commandClass;
         $commandClasses = array();
-        while (isset($this->definitionTree[$commandClass])) {
-            $commandClass = $this->definitionTree[$commandClass];
-            $commandClasses []= $commandClass;
-            $commandClass = $commandClass[0];
+        if ($commandClass === $this->definition->commandClass) {
+            //$commandClasses = array(array($this->definition->commandClass, null, null));
         }
+        else {
+            while (isset($this->definitionTree[$commandClass])) {
+                $commandClass = $this->definitionTree[$commandClass];
+                $commandClasses[] = $commandClass; // TODO rename $commandClass as it is a structure
+                $commandClass = $commandClass[0];
+            }
+
+        }
+
+
+        //var_dump('Classes', $commandClasses);
 
         $properties = array();
         for ($i = count($commandClasses) - 1; $i >= 0; --$i) {
@@ -88,37 +100,40 @@ class Io extends BaseClass
             list($commandClass, $optionName, $enumName) = $commandClasses[$i];
             $optionsArray = $commandClass::definition()->optionsArray();
 
-            if (isset($this->commandStates[$commandClass])) {
-                foreach ((array)$this->commandStates[$commandClass] as $name => $value) {
-                    if (!isset($optionsArray[$name])) {
-                        continue;
-                    }
+            if (isset($this->requestStates[$commandClass])) {
+                $commandStateArray = (array)$this->requestStates[$commandClass];
+                //var_dump('h1', $commandClass, $commandStateArray);
+                if ($commandStateArray) {
+                    foreach ($commandStateArray as $name => $value) {
+                        if (!isset($optionsArray[$name])) {
+                            continue;
+                        }
 
-                    if ($name === $optionName) {
-                        $properties[] = array($optionsArray[$name], $enumName);
+                        if ($name === $optionName) {
+                            $properties[] = array($optionsArray[$name], $enumName);
+                        } else {
+                            $properties[] = array($optionsArray[$name], $value);
+                        }
                     }
-                    else {
-                        $properties[] = array($optionsArray[$name], $value);
+                } else {
+                    if (isset($optionsArray[$optionName])) {
+                        $properties[] = array($optionsArray[$optionName], $enumName);
                     }
                 }
             }
-
-
-
-            $commandClass = $commandState->commandClass;
-            $optionsArray = $commandClass::definition()->optionsArray();
-
-            foreach ((array)$commandState as $name => $value) {
-                if (!isset($optionsArray[$name])) {
-                    continue;
-                }
-
-                $properties[] = array($optionsArray[$name], $value);
-            }
-
-            //var_dump($properties);
-            //var_dump('red beech', $commandClasses[$i], $commandClass, $optionName);
         }
+
+        $commandClass = $commandState->commandClass;
+        $optionsArray = $commandClass::definition()->optionsArray();
+
+        foreach ((array)$commandState as $name => $value) {
+            if (!isset($optionsArray[$name])) {
+                continue;
+            }
+            $properties[] = array($optionsArray[$name], $value);
+        }
+
+        //var_dump($properties);
 
         return $this->requestMapper->makeAnchor($properties);
     }
@@ -128,14 +143,24 @@ class Io extends BaseClass
      * @param string|Command $commandClass
      * @return false|Command
      */
-    public function getCommandState($commandClass) {
+    public function getCommandState($commandClass)
+    {
         if (isset($this->commandStates[$commandClass])) {
             return $this->commandStates[$commandClass];
         }
         return false;
     }
 
-    protected function prepareCommand(Command\Definition $definition) {
+    public function getRequestState($commandClass)
+    {
+        if (isset($this->requestStates[$commandClass])) {
+            return $this->requestStates[$commandClass];
+        }
+        return false;
+    }
+
+    protected function prepareCommand(Command\Definition $definition)
+    {
         $commandClass = $definition->commandClass;
 
         /** @var Command $command */
@@ -145,12 +170,14 @@ class Io extends BaseClass
         $command->setIo($this);
 
         $commandOptions = $definition->optionsArray();
-        $commandState = $this->requestMapper->readOptions($commandOptions);
-        //var_dump($commandState);
+        $commandState = new \stdClass();
+        $requestState = new \stdClass();
+        $this->requestMapper->readOptions($commandOptions, $commandState, $requestState);
         $this->commandStates[$definition->commandClass] = $commandState;
+        $this->requestStates[$definition->commandClass] = $requestState;
 
         foreach ($commandOptions as $option) {
-            $this->globalOptions [$option->name]= $option; // todo consider managing overlapping options
+            $this->globalOptions [$option->name] = $option; // todo consider managing overlapping options
             if (!isset($commandState->{$option->name})) {
                 continue;
             }
@@ -170,22 +197,4 @@ class Io extends BaseClass
         return $command;
     }
 
-
-
-    public function makeUri(Command $command)
-    {
-        $url = $this->basePath;
-
-        if (isset($this->parent)) {
-        }
-
-        $values = array();
-        foreach ($command->optionsArray() as $name => $option) {
-            if (!$command->$name instanceof Undefined) {
-                $values[$name] = $command->$name;
-            }
-        }
-        $url .= '?' . http_build_query($values);
-        return $url;
-    }
 }
