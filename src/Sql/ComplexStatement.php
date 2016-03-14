@@ -91,6 +91,7 @@ abstract class ComplexStatement extends Expression implements
         $property = &$this->$field;
         if (null === $property) {
             $property = SimpleExpression::createFromFuncArguments($arguments);
+            $property->operand = $operand;
         } else {
             $property->addExpr($operand, SimpleExpression::createFromFuncArguments($arguments));
         }
@@ -274,7 +275,7 @@ abstract class ComplexStatement extends Expression implements
             if ($this->union->statement === ' ') {
                 return substr($this->union->build($quoter), 1);
             } else {
-                return $this->union->queue[0][0] . $this->union->build($quoter);
+                return $this->union->operand . $this->union->build($quoter);
             }
         } else {
             return '';

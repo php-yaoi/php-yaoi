@@ -33,4 +33,23 @@ class UnionTest extends \YaoiTests\PHPUnit\Sql\TestBase
 
         $this->assertSame('SELECT 1 AS id UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4', (string)$expr);
     }
+
+
+    public function testUnion3()
+    {
+        $expr = $this->db->select();
+        $first = true;
+        $ids = array(1, 2);
+        foreach ($ids as $id) {
+            if ($first) {
+                $expr->select('? AS id', $id);
+                $first = false;
+            } else {
+                $expr->unionAll('SELECT ?', $id);
+            }
+        }
+
+        $this->assertSame('SELECT 1 AS id UNION ALL SELECT 2', (string)$expr);
+    }
+
 }

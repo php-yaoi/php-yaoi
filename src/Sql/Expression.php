@@ -44,7 +44,7 @@ abstract class Expression extends BaseClass
     protected $statement;
     protected $binds;
     protected $queue = array();
-
+    protected $operand;
 
     public function asExpr($as)
     {
