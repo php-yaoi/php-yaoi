@@ -182,7 +182,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             if (array_key_exists($column->schemaName, $row)) {
                 $value = Column::castField($row[$column->schemaName], $column->flags);
                 $object->{$column->propertyName} = $value;
-                $object->originalData [$column->propertyName] = $value;
+                $object->originalData [$column->schemaName] = $value;
             }
         }
 
