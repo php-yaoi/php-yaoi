@@ -4,7 +4,7 @@ namespace Yaoi\Io\Content;
 
 use Yaoi\BaseClass;
 
-class Text extends BaseClass
+class Text extends BaseClass implements Element
 {
     const SUCCESS = 'success';
     const INFO = 'info';
