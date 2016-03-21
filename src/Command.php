@@ -113,7 +113,7 @@ abstract class Command extends BaseClass implements Command\Contract
         if ($fillFromIo !== null) {
             $state = $fillFromIo->getRequestState($commandClass);
         }
-        if (!$state) {
+        else {
             $state = new \stdClass();
         }
         $state->commandClass = $commandClass;

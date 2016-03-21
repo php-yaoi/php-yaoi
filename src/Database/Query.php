@@ -90,17 +90,23 @@ class Query implements \Iterator
 
         $result = array();
 
+        if ($keyField instanceof Database\Definition\Column) {
+            $keyField = $keyField->schemaName;
+        }
+
+        if ($valueField instanceof Database\Definition\Column) {
+            $valueField = $valueField->schemaName;
+        }
+
+
         if ($valueField) {
-            if ($valueField instanceof Database\Definition\Column) {
-                $valueField = $valueField->schemaName;
-                if ($keyField !== null) {
-                    while ($r = $this->driver->fetchAssoc($this->result)) {
-                        $result [$r[$keyField]] = $r[$valueField];
-                    }
-                } else {
-                    while ($r = $this->driver->fetchAssoc($this->result)) {
-                        $result [] = $r[$valueField];
-                    }
+            if ($keyField !== null) {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result [$r[$keyField]] = $r[$valueField];
+                }
+            } else {
+                while ($r = $this->driver->fetchAssoc($this->result)) {
+                    $result [] = $r[$valueField];
                 }
             }
         }

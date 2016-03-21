@@ -21,6 +21,7 @@ drop table test2
  */
 
 namespace Yaoi\Sql;
+
 use Yaoi\Database\Entity;
 use Yaoi\String\Quoter;
 
@@ -90,6 +91,7 @@ abstract class ComplexStatement extends Expression implements
         $property = &$this->$field;
         if (null === $property) {
             $property = SimpleExpression::createFromFuncArguments($arguments);
+            $property->operand = $operand;
         } else {
             $property->addExpr($operand, SimpleExpression::createFromFuncArguments($arguments));
         }
@@ -99,11 +101,14 @@ abstract class ComplexStatement extends Expression implements
 
     /** @var  SimpleExpression */
     protected $tables;
-    public function from($expression, $binds = null) {
+
+    public function from($expression, $binds = null)
+    {
         return $this->initAdd('tables', self::OP_COMMA, func_get_args());
     }
 
-    public function buildFrom(Quoter $quoter) {
+    public function buildFrom(Quoter $quoter)
+    {
         $from = '';
 
         if ($this->tables && !$this->tables->isEmpty()) {
@@ -114,7 +119,8 @@ abstract class ComplexStatement extends Expression implements
     }
 
 
-    public function buildTable(Quoter $quoter) {
+    public function buildTable(Quoter $quoter)
+    {
         $tables = '';
 
         if ($this->tables && !$this->tables->isEmpty()) {
@@ -266,7 +272,11 @@ abstract class ComplexStatement extends Expression implements
     protected function buildUnion(Quoter $quoter)
     {
         if ($this->union && !$this->union->isEmpty()) {
-            return substr($this->union->build($quoter), 1);
+            if ($this->union->statement === ' ') {
+                return substr($this->union->build($quoter), 1);
+            } else {
+                return $this->union->operand . $this->union->build($quoter);
+            }
         } else {
             return '';
         }
@@ -340,8 +350,7 @@ abstract class ComplexStatement extends Expression implements
         foreach ($collection as $item) {
             if ($item instanceof Entity) {
                 $this->values [] = $item->toArray();
-            }
-            else {
+            } else {
                 $this->values [] = $item;
             }
         }

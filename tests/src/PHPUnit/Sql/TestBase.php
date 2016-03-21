@@ -7,6 +7,7 @@ use Yaoi\Database;
 
 class TestBase extends \Yaoi\Test\PHPUnit\TestCase
 {
+    /** @var Database */
     protected $db;
 
     public function setUp()
