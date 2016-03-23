@@ -19,49 +19,43 @@ class RequestMapper implements RequestMapperContract
     }
 
 
-    private function readUnnamedOption(Option $option, \stdClass $commandState, \stdClass $requestState)
+    private function readUnnamedOption(Option $option)
     {
         if ($option->type === Option::TYPE_ENUM) {
-            $option->setEnumMapper($this->unnamedMapper);
+            $option->setEnumMapper(self::$unnamedMapper);
         }
 
         $value = array();
-        $requestValue = array();
 
         while (false !== $item = $this->getUnnamed()) {
-            $requestValue[] = $item;
             $item = $option->validateFilterValue($item);
 
             if (!$option->isVariadic) {
                 $value = $item;
-                $requestValue = $requestValue[0];
                 break;
             } else {
-                $value[] = $item;
+                $value [] = $item;
             }
         }
 
-        if ($value) {
-            $commandState->{$option->name} = $value;
+        if (!$value) {
+            $value = false;
         }
 
-
-        if ($requestValue) {
-            $requestState->{$option->name} = $requestValue;
-        }
+        return $value;
     }
 
 
-    private function readNamedOption(Option $option, \stdClass $commandState, \stdClass $requestState)
+    private function readNamedOption(Option $option)
     {
-        $publicName = $this->namedMapper->__invoke($option->name);
-        $requestValue = $this->request->request($publicName);
+        $publicName = self::$namedMapper->__invoke($option->name);
+        $value = $this->request->request($publicName, false);
 
         if ($option->type === Option::TYPE_ENUM) {
-            $option->setEnumMapper($this->namedMapper);
+            $option->setEnumMapper(self::$namedMapper);
         }
 
-        $value = $option->validateFilterValue($requestValue);
+        $value = $option->validateFilterValue($value);
 
         if ($option->isVariadic) {
             if (!is_array($value)) {
@@ -69,61 +63,58 @@ class RequestMapper implements RequestMapperContract
             }
         }
 
-        if ($requestValue !== null) {
-            $requestState->{$option->name} = $requestValue;
-            $commandState->{$option->name} = $value;
-
-        }
+        return $value;
     }
 
 
     /** @var \Closure */
-    private $unnamedMapper;
+    private static $unnamedMapper;
     /** @var \Closure */
-    private $namedMapper;
+    private static $namedMapper;
 
     /**
      * @param Option[] $commandOptions
      * @return \stdClass
      * @throws Command\Exception
      */
-    public function readOptions(array $commandOptions, \stdClass $commandState, \stdClass $requestState)
+    public function readOptions(array $commandOptions)
     {
-        $this->unnamedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '-');
-        };
-
-        $this->namedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '_');
-        };
+        $commandState = new \stdClass();
 
         foreach ($commandOptions as $option) {
             if ($option->isUnnamed) {
-                $this->readUnnamedOption($option, $commandState, $requestState);
-            } else {
-                $this->readNamedOption($option, $commandState, $requestState);
+                $value = $this->readUnnamedOption($option);
+            }
+            else {
+                $value = $this->readNamedOption($option);
             }
 
-            /*
-            if (false === $value && $option->isRequired) {
-                throw new Command\Exception('Option ' . $option->name . ' required',
-                    Command\Exception::OPTION_REQUIRED);
+            if (false !== $value) {
+                $commandState->{$option->name} = $value;
             }
-            */
+
+            else {
+                if ($option->isRequired) {
+                    throw new Command\Exception('Option ' . $option->name . ' required',
+                        Command\Exception::OPTION_REQUIRED);
+                }
+            }
         }
+
+        return $commandState;
+
     }
 
 
     private $unnamedValues;
-
-    private function getUnnamed()
-    {
+    private function getUnnamed() {
         if (null === $this->unnamedValues) {
             $this->unnamedValues = explode('/', trim($this->request->path(), '/'));
         }
         if (!$this->unnamedValues) {
             return false;
-        } else {
+        }
+        else {
             return array_shift($this->unnamedValues);
         }
     }
@@ -134,10 +125,6 @@ class RequestMapper implements RequestMapperContract
      */
     public function makeAnchor(array $properties)
     {
-        if (!$properties) {
-            throw new Command\Exception('Unable to make anchor, no properties');
-        }
-
         $unnamed = array();
         $unnamedTemplate = '';
 
@@ -149,15 +136,11 @@ class RequestMapper implements RequestMapperContract
             list($option, $value) = $property;
 
             if ($option->isUnnamed) {
-                if (!$option->isVariadic) {
-                    $value = array($value);
-                }
-                foreach ($value as $item) {
-                    $unnamedTemplate .= '/??';
-                    $unnamed[] = $this->unnamedMapper->__invoke($item);
-                }
-            } else {
-                $queryTemplate .= '&' . $this->namedMapper->__invoke($option->name) . '=??';
+                $unnamedTemplate .= '/??';
+                $unnamed[] = self::$unnamedMapper->__invoke($value);
+            }
+            else {
+                $queryTemplate .= '&' . self::$namedMapper->__invoke($option->name) . '=??';
                 $query[] = $value;
             }
         }
@@ -166,11 +149,32 @@ class RequestMapper implements RequestMapperContract
         $binds = $unnamed;
         if ($queryTemplate) {
             $template .= '?' . substr($queryTemplate, 1);
-            $binds = array_merge($binds, $query);
+            $binds = $binds + $query;
         }
 
         $expression = new Expression($template, $binds);
         $expression->setPlaceholder('??');
         return $expression;
     }
+
+    public function getExportName(Option $option)
+    {
+        if ($option->isUnnamed) {
+            return self::$unnamedMapper->__invoke($option->name);
+        }
+        else {
+            return self::$namedMapper->__invoke($option->name);
+        }
+    }
+
+    public static function setupMappers() {
+        self::$unnamedMapper = function($name){
+            return Utils::fromCamelCase($name, '-');
+        };
+
+        self::$namedMapper = function($name) {
+            return Utils::fromCamelCase($name, '_');
+        };
+    }
 }
+RequestMapper::setupMappers();

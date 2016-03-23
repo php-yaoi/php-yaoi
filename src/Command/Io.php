@@ -38,6 +38,11 @@ class Io extends BaseClass
     {
         return $this->command;
     }
+    
+    public function getRequestMapper()
+    {
+        return $this->requestMapper;
+    }
 
     public function __construct(Definition $definition, RequestMapperContract $requestMapper, Response $response)
     {
