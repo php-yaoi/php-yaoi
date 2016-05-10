@@ -19,13 +19,14 @@ class Completion extends \Yaoi\Cli\Command\Completion
     public function render()
     {
         $def = $this->command->definition();
+        $bashFunction = str_replace('-', '_', $def->name);
 
         ?>
 #!/bin/bash
 
 # Bash Completion for <?php echo $def->description ?>
 
-_<?php echo $def->name ?>() {
+_<?php echo $bashFunction ?>() {
 COMPREPLY=()
 local self=${COMP_WORDS[0]}
 local action=${COMP_WORDS[1]}
@@ -52,7 +53,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _<?php echo $def->name ?> -o default <?php echo $def->name ?>
+complete -F _<?php echo $bashFunction ?> -o default <?php echo $def->name ?>
 <?php
     }
 }
