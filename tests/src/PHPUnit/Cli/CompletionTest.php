@@ -16,7 +16,7 @@ class CompletionTest extends TestCase
         $expected = '#!/bin/bash
 
 # Bash Completion for This is a command one for doing nothing
-_the-first() {
+_the_first() {
 COMPREPLY=()
 local self=${COMP_WORDS[0]}
 local first=${COMP_WORDS[1]}
@@ -68,7 +68,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _the-first the-first
+complete -F _the_first the-first
 ';
 
         ob_start();
@@ -85,7 +85,7 @@ complete -F _the-first the-first
         $expected = '#!/bin/bash
 
 # Bash Completion for Test application description
-_test-application() {
+_test_application() {
 COMPREPLY=()
 local self=${COMP_WORDS[0]}
 local action=${COMP_WORDS[1]}
@@ -206,7 +206,7 @@ fi
 COMPREPLY=( $( compgen -W "${options[*]}" -- $cur) )
 }
 
-complete -F _test-application -o default test-application';
+complete -F _test_application -o default test-application';
 
         ob_start();
         \Yaoi\Cli\Command\Application\Runner::create(new TestApplication())->run(
