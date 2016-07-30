@@ -81,7 +81,8 @@ class Test extends TestCase
 
 
         $test1 = array();
-        foreach (MappableTest1::iterator(new ArrayIterator($res)) as $r) {
+        $a = new ArrayIterator($res);
+        foreach (MappableTest1::iterator($a) as $r) {
             $test1 [] = array($r->one, $r->two, $r->three);
         }
         $this->assertSame($expected, $test1);
