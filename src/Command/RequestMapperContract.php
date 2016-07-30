@@ -23,4 +23,11 @@ interface RequestMapperContract
      */
     public function makeAnchor(array $properties);
 
+    /**
+     * @param Option $option
+     * @return string
+     */
+    public function getExportName(Option $option);
+
+
 }

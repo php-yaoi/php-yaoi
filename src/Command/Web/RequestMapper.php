@@ -16,6 +16,14 @@ class RequestMapper implements RequestMapperContract
     public function __construct(Request $request)
     {
         $this->request = $request;
+
+        $this->unnamedMapper = function ($name) {
+            return Utils::fromCamelCase($name, '-');
+        };
+
+        $this->namedMapper = function ($name) {
+            return Utils::fromCamelCase($name, '_');
+        };
     }
 
 
@@ -89,14 +97,6 @@ class RequestMapper implements RequestMapperContract
      */
     public function readOptions(array $commandOptions, \stdClass $commandState, \stdClass $requestState)
     {
-        $this->unnamedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '-');
-        };
-
-        $this->namedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '_');
-        };
-
         foreach ($commandOptions as $option) {
             if ($option->isUnnamed) {
                 $this->readUnnamedOption($option, $commandState, $requestState);
@@ -173,4 +173,14 @@ class RequestMapper implements RequestMapperContract
         $expression->setPlaceholder('??');
         return $expression;
     }
+
+    public function getExportName(Option $option)
+    {
+        if ($option->isUnnamed) {
+            return $this->unnamedMapper->__invoke($option->name);
+        } else {
+            return $this->namedMapper->__invoke($option->name);
+        }
+    }
+
 }
