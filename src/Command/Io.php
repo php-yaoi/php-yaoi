@@ -39,6 +39,11 @@ class Io extends BaseClass
         return $this->command;
     }
 
+    public function getRequestMapper()
+    {
+        return $this->requestMapper;
+    }
+
     public function __construct(Definition $definition, RequestMapperContract $requestMapper, Response $response)
     {
         $this->requestMapper = $requestMapper;
@@ -73,26 +78,19 @@ class Io extends BaseClass
     /**
      * @param Command $commandState
      * @return Expression
+     * @todo add verbosity on missing command in app tree
      */
     public function makeAnchor($commandState)
     {
-        $commandState->commandClass;
         $commandClass = $commandState->commandClass;
         $commandClasses = array();
-        if ($commandClass === $this->definition->commandClass) {
-            //$commandClasses = array(array($this->definition->commandClass, null, null));
-        }
-        else {
+        if ($commandClass !== $this->definition->commandClass) {
             while (isset($this->definitionTree[$commandClass])) {
                 $commandClass = $this->definitionTree[$commandClass];
                 $commandClasses[] = $commandClass; // TODO rename $commandClass as it is a structure
                 $commandClass = $commandClass[0];
             }
-
         }
-
-
-        //var_dump('Classes', $commandClasses);
 
         $properties = array();
         for ($i = count($commandClasses) - 1; $i >= 0; --$i) {
@@ -102,23 +100,25 @@ class Io extends BaseClass
 
             if (isset($this->requestStates[$commandClass])) {
                 $commandStateArray = (array)$this->requestStates[$commandClass];
-                //var_dump('h1', $commandClass, $commandStateArray);
-                if ($commandStateArray) {
-                    foreach ($commandStateArray as $name => $value) {
-                        if (!isset($optionsArray[$name])) {
-                            continue;
-                        }
+            } else {
+                $commandStateArray = null;
+            }
 
-                        if ($name === $optionName) {
-                            $properties[] = array($optionsArray[$name], $enumName);
-                        } else {
-                            $properties[] = array($optionsArray[$name], $value);
-                        }
+            if ($commandStateArray) {
+                foreach ($commandStateArray as $name => $value) {
+                    if (!isset($optionsArray[$name])) {
+                        continue;
                     }
-                } else {
-                    if (isset($optionsArray[$optionName])) {
-                        $properties[] = array($optionsArray[$optionName], $enumName);
+
+                    if ($name === $optionName) {
+                        $properties[] = array($optionsArray[$name], $enumName);
+                    } else {
+                        $properties[] = array($optionsArray[$name], $value);
                     }
+                }
+            } else {
+                if (isset($optionsArray[$optionName])) {
+                    $properties[] = array($optionsArray[$optionName], $enumName);
                 }
             }
         }
@@ -132,8 +132,6 @@ class Io extends BaseClass
             }
             $properties[] = array($optionsArray[$name], $value);
         }
-
-        //var_dump($properties);
 
         return $this->requestMapper->makeAnchor($properties);
     }
