@@ -41,14 +41,14 @@ class TypeString
         return $intType;
     }
 
-    private function getFloatTypeString(Column $column) {
+    protected function getFloatTypeString(Column $column) {
         if ($column->flags & Column::SIZE_8B) {
             return 'double';
         }
         return 'float';
     }
 
-    private function getStringTypeString(Column $column) {
+    protected function getStringTypeString(Column $column) {
         // TODO implement long strings
 
         $length = $column->stringLength ? $column->stringLength : 255;
@@ -60,7 +60,7 @@ class TypeString
         }
     }
 
-    private function getTimestampTypeString(Column $column) {
+    protected function getTimestampTypeString(Column $column) {
         return 'timestamp';
     }
 

@@ -13,6 +13,13 @@ use Yaoi\Database\Definition\Column;
 
 class TypeString extends \Yaoi\Database\Mysql\TypeString
 {
+
+    protected function getFloatTypeString(Column $column)
+    {
+        return 'float';
+    }
+
+
     protected function getIntTypeString(Column $column)
     {
         return 'INTEGER';
