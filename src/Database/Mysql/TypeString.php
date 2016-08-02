@@ -19,29 +19,36 @@ class TypeString
     protected function getIntTypeString(Column $column) {
         $intType = 'int';
 
-        // TODO implement SIZE_ definitions
-        /*
+        $flags = $column->flags;
         switch (true) {
             case $flags & Column::SIZE_1B:
                 $intType = 'tinyint';
                 break;
 
             case $flags & Column::SIZE_2B:
-                $intType = 'mediumint';
+                $intType = 'smallint';
                 break;
 
             case $flags & Column::SIZE_3B:
                 $intType = 'mediumint';
                 break;
 
+            case $flags & Column::SIZE_4B:
+                $intType = 'int';
+                break;
+
+            case $flags & Column::SIZE_8B:
+                $intType = 'bigint';
+                break;
 
         }
-        */
         return $intType;
     }
 
     private function getFloatTypeString(Column $column) {
-        // TODO implement double
+        if ($column->flags & Column::SIZE_8B) {
+            return 'double';
+        }
         return 'float';
     }
 
