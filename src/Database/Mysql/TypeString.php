@@ -19,33 +19,36 @@ class TypeString
     protected function getIntTypeString(Column $column) {
         $intType = 'int';
 
-        // TODO implement SIZE_ definitions
-        /*
+        $flags = $column->flags;
         switch (true) {
             case $flags & Column::SIZE_1B:
                 $intType = 'tinyint';
                 break;
 
             case $flags & Column::SIZE_2B:
-                $intType = 'mediumint';
+                $intType = 'smallint';
                 break;
 
             case $flags & Column::SIZE_3B:
                 $intType = 'mediumint';
                 break;
 
+            case $flags & Column::SIZE_8B:
+                $intType = 'bigint';
+                break;
 
         }
-        */
         return $intType;
     }
 
-    private function getFloatTypeString(Column $column) {
-        // TODO implement double
+    protected function getFloatTypeString(Column $column) {
+        if ($column->flags & Column::SIZE_8B) {
+            return 'double';
+        }
         return 'float';
     }
 
-    private function getStringTypeString(Column $column) {
+    protected function getStringTypeString(Column $column) {
         // TODO implement long strings
 
         $length = $column->stringLength ? $column->stringLength : 255;
@@ -57,7 +60,7 @@ class TypeString
         }
     }
 
-    private function getTimestampTypeString(Column $column) {
+    protected function getTimestampTypeString(Column $column) {
         return 'timestamp';
     }
 

@@ -32,4 +32,16 @@ class TypeString extends \Yaoi\Database\Mysql\TypeString
 
         return $typeString;
     }
+
+    protected function getIntTypeString(Column $column)
+    {
+        $intType = 'int';
+        return $intType;
+    }
+
+    protected function getFloatTypeString(Column $column)
+    {
+        return 'float';
+    }
+
 }

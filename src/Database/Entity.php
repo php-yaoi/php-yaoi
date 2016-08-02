@@ -180,7 +180,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $object->originalData = array();
         foreach (static::table()->getColumns(true) as $column) {
             if (array_key_exists($column->schemaName, $row)) {
-                $value = Column::castField($row[$column->schemaName], $column->flags);
+                $value = Column::castField($row[$column->schemaName], $column->flags, true);
                 $object->{$column->propertyName} = $value;
                 $object->originalData [$column->schemaName] = $value;
             }
@@ -215,7 +215,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
                     $value = $column->getDefault();
                 }
             } elseif (!$skipCast) {
-                $value = Column::castField($value, $column->flags);
+                $value = Column::castField($value, $column->flags, false);
             }
 
             $result[$column->schemaName] = $value;
@@ -331,10 +331,9 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
         elseif (!$updateRecord) {
             self::fromArray($item->toArray(), $this);
+            $this->persistent = true;
         }
-        else {
 
-        }
         return $this;
     }
 

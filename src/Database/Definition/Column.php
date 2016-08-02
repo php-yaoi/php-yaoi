@@ -25,6 +25,7 @@ class Column extends BaseClass
 
     const AUTO_TYPE = 4096;
 
+    const USE_PHP_DATETIME = 8192;
 
     public $flags;
     public function __construct($flags = self::STRING)
@@ -115,13 +116,13 @@ class Column extends BaseClass
     /** @var  Table */
     public $table;
 
-    public static function castField($value, $columnFlags)
+    public static function castField($value, $columnFlags, $import = true)
     {
         if (!($columnFlags & self::NOT_NULL) && $value === null) {
             return null;
         }
 
-        if (is_object($value)) {
+        if (is_object($value) && !$value instanceof \DateTime) {
             $value = (string)$value;
         }
 
@@ -130,11 +131,28 @@ class Column extends BaseClass
                 case self::FLOAT & $columnFlags:
                     $value = (float)$value;
                     break;
+                case self::INTEGER & $columnFlags && self::USE_PHP_DATETIME & $columnFlags:
+                    if ($import) {
+                        $datetime = new \DateTime();
+                        $datetime->setTimestamp($value);
+                        $value = $datetime;
+                    } elseif ($value instanceof \DateTime) {
+                        $value = $value->getTimestamp();
+                    }
+                    break;
                 case self::INTEGER & $columnFlags:
                     $value = (int)$value;
                     break;
                 case self::STRING & $columnFlags:
                     $value = (string)$value;
+                    break;
+                case self::TIMESTAMP & $columnFlags && self::USE_PHP_DATETIME & $columnFlags:
+                    if ($import) {
+                        $value = new \DateTime($value);
+                    } elseif ($value instanceof \DateTime) {
+                        $value = $value->format("Y-m-d H:i:s");
+                    }
+                    break;
             }
         }
 

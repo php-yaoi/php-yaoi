@@ -297,15 +297,27 @@ class CreateTableReader extends BaseClass
         $type = strtoupper($type);
         switch (true) {
             case 'BIGINT' === substr($type, 0, 6):
+                $phpType = Column::INTEGER + Column::SIZE_8B;
+                break;
             case 'INT' === substr($type, 0, 3):
-            case 'MEDIUMINT' === substr($type, 0, 9):
-            case 'SMALLINT' === substr($type, 0, 8):
-            case 'TINYINT' === substr($type, 0, 7):
                 $phpType = Column::INTEGER;
+                break;
+            case 'MEDIUMINT' === substr($type, 0, 9):
+                $phpType = Column::INTEGER + Column::SIZE_3B;
+                break;
+            case 'SMALLINT' === substr($type, 0, 8):
+                $phpType = Column::INTEGER + Column::SIZE_2B;
+                break;
+            case 'TINYINT' === substr($type, 0, 7):
+                $phpType = Column::INTEGER + Column::SIZE_1B;
                 break;
 
             case 'DECIMAL' === substr($type, 0, 7):
+                $phpType = Column::FLOAT;
+                break;
             case 'DOUBLE' === $type:
+                $phpType = Column::FLOAT + Column::SIZE_8B;
+                break;
             case 'FLOAT' === $type:
                 $phpType = Column::FLOAT;
                 break;
