@@ -270,10 +270,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
                 unset($data[$key]);
             }
         }
+        $this->persistent = true;
+        if (empty($data)) {
+            return $this;
+        }
 
         $update->set($data);
         $update->query();
-        $this->persistent = true;
         return $this;
     }
 
