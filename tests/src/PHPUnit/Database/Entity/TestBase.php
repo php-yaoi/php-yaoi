@@ -7,7 +7,6 @@ use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
-use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\SessionTag;
@@ -354,7 +353,7 @@ SQL;
 
         $user = new User();
         $user->name = 123;
-        $this->assertSame(Undefined::get(), $user->id);
+        $this->assertSame(null, $user->id);
 
         $user->findOrSave();
         $this->assertInternalType('int', $user->id);

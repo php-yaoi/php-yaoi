@@ -7,7 +7,6 @@ use Yaoi\Command;
 use Yaoi\Io\Request;
 use Yaoi\Io\Response;
 use Yaoi\String\Expression;
-use Yaoi\Undefined;
 
 class Io extends BaseClass
 {

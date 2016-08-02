@@ -7,7 +7,6 @@ use Yaoi\Sql\Symbol;
 use SQLite3;
 use SQLite3Result;
 use Yaoi\Database;
-use Yaoi\Undefined;
 
 class Sqlite extends Driver
 {
@@ -56,10 +55,6 @@ class Sqlite extends Driver
         if (null === $this->dbHandle) {
             $this->connect();
         }
-        if ($value instanceof Undefined) {
-            $value = null;
-        }
-
         return $this->dbHandle->escapeString($value);
     }
 

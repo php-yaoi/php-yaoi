@@ -13,7 +13,6 @@ use Yaoi\Sql\Symbol;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
 use Yaoi\String\Utils;
-use Yaoi\Undefined;
 
 abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Contract
 {
@@ -21,6 +20,21 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @var Table[]
      */
     private static $tables = array();
+
+    private $___propertyValues = array();
+
+    public function __get($name)
+    {
+        if (isset($this->___propertyValues[$name])) {
+            return $this->___propertyValues[$name];
+        }
+        return null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->___propertyValues[$name] = $value;
+    }
 
     /**
      * Method should return table definition of entity
@@ -194,11 +208,6 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
     public function __construct() {
-        foreach (static::table()->getColumns(true) as $column) {
-            if (null === $this->{$column->propertyName}) {
-                $this->{$column->propertyName} = Undefined::get();
-            }
-        }
     }
 
 
@@ -206,15 +215,17 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     {
         $result = array();
         foreach (static::table()->getColumns(true) as $column) {
-            $value = $this->{$column->propertyName};
-            if ($value instanceof Undefined) {
+            if (array_key_exists($column->propertyName, $this->___propertyValues)) {
+                $value = $this->___propertyValues[$column->propertyName];
+            } else {
                 if ($skipNotSetProperties) {
                     continue;
-                }
-                else {
+                } else {
                     $value = $column->getDefault();
                 }
-            } elseif (!$skipCast) {
+            }
+
+            if (!$skipCast) {
                 $value = Column::castField($value, $column->flags);
             }
 
@@ -290,8 +301,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $query = $insert->query();
 
         if ($autoId) {
-            if ($this->{$autoId->propertyName} instanceof Undefined) {
-                $this->{$autoId->propertyName} = $query->lastInsertId();
+            if (!array_key_exists($autoId->propertyName, $this->___propertyValues)) {
+                $this->___propertyValues[$autoId->propertyName] = $query->lastInsertId();
             }
         }
 
