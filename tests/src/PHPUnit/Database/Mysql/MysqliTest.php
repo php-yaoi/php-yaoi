@@ -227,7 +227,7 @@ Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migrati
 CREATE TABLE `test_columns` (
  `id` int NOT NULL AUTO_INCREMENT,
  `int_column` int NOT NULL DEFAULT '2',
- `int8_column` int NOT NULL DEFAULT '2',
+ `int8_column` bigint NOT NULL DEFAULT '2',
  `float_column` float NOT NULL DEFAULT '1.33',
  `string_column` varchar(255) NOT NULL DEFAULT '11',
  PRIMARY KEY (`id`)

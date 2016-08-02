@@ -37,8 +37,8 @@ abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
      */
     public function testAutoIdColumn() {
         $this->assertSame(Column::AUTO_ID + Column::INTEGER + Column::NOT_NULL, Column::create(Column::AUTO_ID)->flags);
-        $this->assertSame(Column::AUTO_ID + Column::INTEGER + Column::SIZE_4B,
-            Column::create(Column::AUTO_ID + Column::INTEGER + Column::SIZE_4B)->flags);
+        $this->assertSame(Column::AUTO_ID + Column::INTEGER,
+            Column::create(Column::AUTO_ID + Column::INTEGER)->flags);
     }
 
     /**

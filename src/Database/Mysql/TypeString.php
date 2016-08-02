@@ -33,10 +33,6 @@ class TypeString
                 $intType = 'mediumint';
                 break;
 
-            case $flags & Column::SIZE_4B:
-                $intType = 'int';
-                break;
-
             case $flags & Column::SIZE_8B:
                 $intType = 'bigint';
                 break;

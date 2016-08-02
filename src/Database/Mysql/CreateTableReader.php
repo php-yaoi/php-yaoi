@@ -300,7 +300,7 @@ class CreateTableReader extends BaseClass
                 $phpType = Column::INTEGER + Column::SIZE_8B;
                 break;
             case 'INT' === substr($type, 0, 3):
-                $phpType = Column::INTEGER + Column::SIZE_4B;
+                $phpType = Column::INTEGER;
                 break;
             case 'MEDIUMINT' === substr($type, 0, 9):
                 $phpType = Column::INTEGER + Column::SIZE_3B;
