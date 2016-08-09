@@ -4,10 +4,8 @@ namespace Yaoi\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Command;
-use Yaoi\Io\Request;
 use Yaoi\Io\Response;
 use Yaoi\String\Expression;
-use Yaoi\Undefined;
 
 class Io extends BaseClass
 {
@@ -25,7 +23,10 @@ class Io extends BaseClass
     /** @var  Option[] */
     protected $globalOptions = array();
 
+    /** @var State[] */
     protected $commandStates = array();
+
+    /** @var State[] */
     protected $requestStates = array();
 
     /** @var Command */
@@ -76,11 +77,11 @@ class Io extends BaseClass
     }
 
     /**
-     * @param Command $commandState
+     * @param State $commandState
      * @return Expression
      * @todo add verbosity on missing command in app tree
      */
-    public function makeAnchor($commandState)
+    public function makeAnchor(State $commandState)
     {
         $commandClass = $commandState->commandClass;
         $commandClasses = array();
@@ -99,7 +100,7 @@ class Io extends BaseClass
             $optionsArray = $commandClass::definition()->optionsArray();
 
             if (isset($this->requestStates[$commandClass])) {
-                $commandStateArray = (array)$this->requestStates[$commandClass];
+                $commandStateArray = $this->requestStates[$commandClass]->export();
             } else {
                 $commandStateArray = null;
             }
@@ -126,7 +127,7 @@ class Io extends BaseClass
         $commandClass = $commandState->commandClass;
         $optionsArray = $commandClass::definition()->optionsArray();
 
-        foreach ((array)$commandState as $name => $value) {
+        foreach ($commandState->export() as $name => $value) {
             if (!isset($optionsArray[$name])) {
                 continue;
             }
@@ -168,15 +169,22 @@ class Io extends BaseClass
         $command->setIo($this);
 
         $commandOptions = $definition->optionsArray();
-        $commandState = new \stdClass();
-        $requestState = new \stdClass();
+        $commandState = new State();
+        $commandState->setIo($this);
+        $commandState->commandClass = $commandClass;
+
+        $requestState = new State();
+        $requestState->setIo($this);
+        $requestState->commandClass = $commandClass;
+
+
         $this->requestMapper->readOptions($commandOptions, $commandState, $requestState);
         $this->commandStates[$definition->commandClass] = $commandState;
         $this->requestStates[$definition->commandClass] = $requestState;
 
         foreach ($commandOptions as $option) {
             $this->globalOptions [$option->name] = $option; // todo consider managing overlapping options
-            if (!isset($commandState->{$option->name})) {
+            if (!$commandState->hasProperty($option->name)) {
                 continue;
             }
             $value = $commandState->{$option->name};

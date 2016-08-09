@@ -4,13 +4,14 @@ namespace YaoiTests\PHPUnit\Command;
 
 use Yaoi\Cli\Response;
 use Yaoi\Command\Io;
+use Yaoi\Command\State;
 use Yaoi\Command\Web\RequestMapper;
 use Yaoi\Io\Request;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandNested;
 use YaoiTests\Helper\Command\TestCommandOne;
 
-class StateTest extends TestCase
+class StateTest extends \PHPUnit_Framework_TestCase
 {
     private function getIo()
     {
@@ -34,13 +35,14 @@ class StateTest extends TestCase
             'action' => 'get',
             'optionD' => 15,
             'someEnum' => 'one',
-            'commandClass' => 'YaoiTests\\Helper\\Command\\TestCommandOne',
-        ), (array)$commandState);
+        ), $commandState->export());
+        $this->assertSame('YaoiTests\Helper\Command\TestCommandOne', $commandState->commandClass);
     }
 
     public function testGetCommandState()
     {
         $io = $this->getIo();
+        /** @var State $state */
         $state = $io->getCommandState(TestCommandOne::className());
         $this->assertSame(array (
             'action' => 'get',
@@ -50,6 +52,9 @@ class StateTest extends TestCase
                     0 => 15,
                 ),
             'someEnum' => 'one',
-        ), (array)$state);
+        ), $state->export());
+
+        $this->assertSame('/the-first/get?option_d=15&some_enum=one', (string)$state->makeAnchor());
     }
+
 }

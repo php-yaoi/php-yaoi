@@ -12,10 +12,12 @@ interface RequestMapperContract
 
     /**
      * @param Option[] $commandOptions
-     * @return \stdClass
+     * @param State $commandState
+     * @param State $requestState
+     * @return mixed
      * @throws Exception
      */
-    public function readOptions(array $commandOptions, \stdClass $commandState, \stdClass $requestState);
+    public function readOptions(array $commandOptions, State $commandState, State $requestState);
 
     /**
      * @param array $properties
