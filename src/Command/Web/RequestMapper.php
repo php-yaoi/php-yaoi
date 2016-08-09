@@ -27,7 +27,7 @@ class RequestMapper implements RequestMapperContract
     }
 
 
-    private function readUnnamedOption(Option $option, \stdClass $commandState, \stdClass $requestState)
+    private function readUnnamedOption(Option $option, Command\State $commandState, Command\State $requestState)
     {
         if ($option->type === Option::TYPE_ENUM) {
             $option->setEnumMapper($this->unnamedMapper);
@@ -60,7 +60,7 @@ class RequestMapper implements RequestMapperContract
     }
 
 
-    private function readNamedOption(Option $option, \stdClass $commandState, \stdClass $requestState)
+    private function readNamedOption(Option $option, Command\State $commandState, Command\State $requestState)
     {
         $publicName = $this->namedMapper->__invoke($option->name);
         $requestValue = $this->request->request($publicName);
@@ -95,7 +95,12 @@ class RequestMapper implements RequestMapperContract
      * @return \stdClass
      * @throws Command\Exception
      */
-    public function readOptions(array $commandOptions, \stdClass $commandState, \stdClass $requestState)
+    /**
+     * @param array $commandOptions
+     * @param Command\State $commandState
+     * @param Command\State $requestState
+     */
+    public function readOptions(array $commandOptions, Command\State $commandState, Command\State $requestState)
     {
         foreach ($commandOptions as $option) {
             if ($option->isUnnamed) {

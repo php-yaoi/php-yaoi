@@ -4,6 +4,7 @@ namespace YaoiTests\PHPUnit\Command;
 
 
 use Yaoi\Command\Option;
+use Yaoi\Command\State;
 use Yaoi\Command\Web\RequestMapper;
 use Yaoi\Io\Request;
 use Yaoi\Test\PHPUnit\TestCase;
@@ -20,8 +21,8 @@ class RequestMapperTest extends TestCase
         $options = array(
             Option::create()->setIsUnnamed()->setName('name')
         );
-        $commandState = new \stdClass();
-        $requestState = new \stdClass();
+        $commandState = new State();
+        $requestState = new State();
         $requestMapper->readOptions($options, $commandState, $requestState);
     }
 }

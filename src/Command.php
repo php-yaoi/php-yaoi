@@ -6,7 +6,7 @@ use Yaoi\Command\Definition;
 use Yaoi\Command\Io;
 use Yaoi\Command\Option;
 use Yaoi\Command\RequestMapperContract;
-use Yaoi\Command\RunnerContract;
+use Yaoi\Command\State;
 use Yaoi\Io\Response;
 use Yaoi\String\Utils;
 
@@ -98,23 +98,26 @@ abstract class Command extends BaseClass implements Command\Contract
     }
 
 
-    public $commandClass;
-
     /**
      * @param Io|null $fillFromIo
+     * @return State
      * @return static
      */
     public static function createState(Io $fillFromIo = null)
     {
         $commandClass = get_called_class();
 
-        /** @var static $state */
+        /** @var State $state */
         $state = null;
         if ($fillFromIo !== null) {
             $state = $fillFromIo->getRequestState($commandClass);
+            if (!$state) {
+                $state = new State();
+            }
+            $state->setIo($fillFromIo);
         }
         else {
-            $state = new \stdClass();
+            $state = new State();
         }
         $state->commandClass = $commandClass;
 
