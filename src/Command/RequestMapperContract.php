@@ -3,8 +3,8 @@
 namespace Yaoi\Command;
 
 
-use Yaoi\Io\Content\Anchor;
 use Yaoi\Io\Request;
+use Yaoi\String\Expression;
 
 interface RequestMapperContract
 {
@@ -21,7 +21,7 @@ interface RequestMapperContract
 
     /**
      * @param array $properties
-     * @return mixed
+     * @return Expression
      */
     public function makeAnchor(array $properties);
 
@@ -30,6 +30,5 @@ interface RequestMapperContract
      * @return string
      */
     public function getExportName(Option $option);
-
 
 }

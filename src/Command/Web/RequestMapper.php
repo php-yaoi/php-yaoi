@@ -16,21 +16,13 @@ class RequestMapper implements RequestMapperContract
     public function __construct(Request $request)
     {
         $this->request = $request;
-
-        $this->unnamedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '-');
-        };
-
-        $this->namedMapper = function ($name) {
-            return Utils::fromCamelCase($name, '_');
-        };
     }
 
 
     private function readUnnamedOption(Option $option, Command\State $commandState, Command\State $requestState)
     {
         if ($option->type === Option::TYPE_ENUM) {
-            $option->setEnumMapper($this->unnamedMapper);
+            $option->setEnumMapper(self::$unnamedMapper);
         }
 
         $value = array();
@@ -62,11 +54,11 @@ class RequestMapper implements RequestMapperContract
 
     private function readNamedOption(Option $option, Command\State $commandState, Command\State $requestState)
     {
-        $publicName = $this->namedMapper->__invoke($option->name);
+        $publicName = self::$namedMapper->__invoke($option->name);
         $requestValue = $this->request->request($publicName);
 
         if ($option->type === Option::TYPE_ENUM) {
-            $option->setEnumMapper($this->namedMapper);
+            $option->setEnumMapper(self::$namedMapper);
         }
 
         $value = $option->validateFilterValue($requestValue);
@@ -86,9 +78,9 @@ class RequestMapper implements RequestMapperContract
 
 
     /** @var \Closure */
-    private $unnamedMapper;
+    private static $unnamedMapper;
     /** @var \Closure */
-    private $namedMapper;
+    private static $namedMapper;
 
     /**
      * @param Option[] $commandOptions
@@ -159,10 +151,10 @@ class RequestMapper implements RequestMapperContract
                 }
                 foreach ($value as $item) {
                     $unnamedTemplate .= '/??';
-                    $unnamed[] = $this->unnamedMapper->__invoke($item);
+                    $unnamed[] = self::$unnamedMapper->__invoke($item);
                 }
             } else {
-                $queryTemplate .= '&' . $this->namedMapper->__invoke($option->name) . '=??';
+                $queryTemplate .= '&' . self::$namedMapper->__invoke($option->name) . '=??';
                 $query[] = $value;
             }
         }
@@ -182,10 +174,21 @@ class RequestMapper implements RequestMapperContract
     public function getExportName(Option $option)
     {
         if ($option->isUnnamed) {
-            return $this->unnamedMapper->__invoke($option->name);
-        } else {
-            return $this->namedMapper->__invoke($option->name);
+            return self::$unnamedMapper->__invoke($option->name);
+        }
+        else {
+            return self::$namedMapper->__invoke($option->name);
         }
     }
 
+    public static function setupMappers() {
+        self::$unnamedMapper = function($name){
+            return Utils::fromCamelCase($name, '-');
+        };
+
+        self::$namedMapper = function($name) {
+            return Utils::fromCamelCase($name, '_');
+        };
+    }
 }
+RequestMapper::setupMappers();
