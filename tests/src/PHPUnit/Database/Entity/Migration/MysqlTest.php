@@ -87,50 +87,50 @@ EOD;
         //$this->database->log(new Log('colored-stdout'));
 
         // prepare dependencies
-        User::table()->migration()->rollback();
-        Host::table()->migration()->apply();
-        Session::table()->migration()->apply();
+        User::migration()->rollback();
+        Host::migration()->apply();
+        Session::migration()->apply();
 
         Database\Entity\Migration::$enableStateCache = false;
         //$log = new Log('colored-stdout');
 
         $log->push('Table creation expected');
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('Table revision increased, added age, hostId');
         User::$revision = 2;
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('Table revision increased, removed hostId, name, added sessionId, firstName, lastName');
         User::$revision = 3;
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('No action (up to date) expected');
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->apply();
+        User::migration()->setLog($log)->apply();
 
         $log->push('Table removal expected');
-        User::table()->migration()->setLog($log)->rollback();
+        User::migration()->setLog($log)->rollback();
         User::bindDatabase($this->database, true);
         User::$revision = 1;
 
         $log->push('No action (is already non-existent) expected');
         User::bindDatabase($this->database, true);
-        User::table()->migration()->setLog($log)->rollback();
+        User::migration()->setLog($log)->rollback();
 
 
         $this->assertStringEqualsCRLF($this->expectedMigrationLog, $logString);

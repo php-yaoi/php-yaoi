@@ -7,6 +7,7 @@ use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\Raw;
 use Yaoi\String\Parser;
 use Yaoi\String\Lexer;
 
@@ -96,10 +97,12 @@ class CreateTableReader extends BaseClass
         $default = $parser->inner('DEFAULT ', null, false, true);
         if (!$default->isEmpty()) {
             $default = (string)$default;
-            if ('NULL' === strtoupper($default)) {
+            $defUpper = strtoupper($default);
+            if ('NULL' === $defUpper) {
                 $default = null;
-            }
-            elseif (strpos($default, self::BIND_PREFIX) !== false) {
+            } elseif ('CURRENT_TIMESTAMP' === $defUpper) {
+                $default = new Raw($defUpper);
+            } elseif (strpos($default, self::BIND_PREFIX) !== false) {
                 $default = $this->resolve($default);
             }
         }

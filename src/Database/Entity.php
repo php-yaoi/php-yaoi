@@ -340,5 +340,10 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $this;
     }
 
+    public static function migration()
+    {
+        return static::table()->migration();
+    }
+
 
 }

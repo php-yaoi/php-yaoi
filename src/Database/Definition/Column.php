@@ -57,11 +57,14 @@ class Column extends BaseClass
         return $this;
     }
 
-    /**
-     * @return bool|null
-     * @todo move custom logic to utility
-     */
     public function getDefault() {
+        if (null === $this->default && $this->flags & Column::NOT_NULL) {
+            switch (true) {
+                case $this->flags & Column::STRING: return '';
+                case $this->flags & Column::INTEGER: return 0;
+                case $this->flags & Column::FLOAT: return 0.0;
+            }
+        }
         if (is_string($this->default)) {
             if ($this->flags & Column::INTEGER) {
                 $this->default = (int)$this->default;

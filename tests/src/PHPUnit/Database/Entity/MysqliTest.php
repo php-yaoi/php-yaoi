@@ -10,7 +10,7 @@ CREATE TABLE `yaoi_tests_helper_entity_one_abbr` (
  `id` int NOT NULL AUTO_INCREMENT,
  `name` varchar(255) NOT NULL,
  `address` varchar(255) DEFAULT '',
- `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  UNIQUE KEY `unique_name` (`name`),
  PRIMARY KEY (`id`)
 )
@@ -19,8 +19,8 @@ SQL;
     protected $entityTwoCreateTableExpected = "CREATE TABLE `custom_name` (
  `id` int NOT NULL AUTO_INCREMENT,
  `one_id` int NOT NULL,
- `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `info` varchar(255) DEFAULT NULL,
  KEY `key_info` (`info`),
  CONSTRAINT `fk_custom_name_one_id_yaoi_tests_helper_entity_one_abbr_id` FOREIGN KEY (`one_id`) REFERENCES `yaoi_tests_helper_entity_one_abbr` (`id`),

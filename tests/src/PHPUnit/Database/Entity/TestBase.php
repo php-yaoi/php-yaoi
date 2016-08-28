@@ -125,8 +125,8 @@ OK
 CREATE TABLE `yaoi_tests_entity_session` (
  `id` int NOT NULL AUTO_INCREMENT,
  `host_id` int NOT NULL,
- `started_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- `ended_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `started_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `ended_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
  PRIMARY KEY (`id`)
 )
