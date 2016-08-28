@@ -3,6 +3,7 @@
 namespace Yaoi\Sql;
 
 
+use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
@@ -49,6 +50,7 @@ class AlterTable extends Batch
             }
             else {
                 $beforeColumn = $beforeColumns[$columnName];
+                $beforeColumn->setFlag(Column::IS_REFLECTED);
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
                     //var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
                     $this->alterLines->commaExpr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));

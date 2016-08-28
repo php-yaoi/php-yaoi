@@ -11,12 +11,15 @@ class TypeString
 {
 
     protected $database;
-    public function __construct(Contract $database) {
+
+    public function __construct(Contract $database)
+    {
         $this->database = $database;
     }
 
 
-    protected function getIntTypeString(Column $column) {
+    protected function getIntTypeString(Column $column)
+    {
         $intType = 'int';
 
         $flags = $column->flags;
@@ -41,31 +44,34 @@ class TypeString
         return $intType;
     }
 
-    protected function getFloatTypeString(Column $column) {
+    protected function getFloatTypeString(Column $column)
+    {
         if ($column->flags & Column::SIZE_8B) {
             return 'double';
         }
         return 'float';
     }
 
-    protected function getStringTypeString(Column $column) {
+    protected function getStringTypeString(Column $column)
+    {
         // TODO implement long strings
 
         $length = $column->stringLength ? $column->stringLength : 255;
         if ($column->stringFixed) {
             return 'char(' . $length . ')';
-        }
-        else {
+        } else {
             return 'varchar(' . $length . ')';
         }
     }
 
-    protected function getTimestampTypeString(Column $column) {
+    protected function getTimestampTypeString(Column $column)
+    {
         return 'timestamp';
     }
 
 
-    protected function getBaseType(Column $column) {
+    protected function getBaseType(Column $column)
+    {
         $flags = $column->flags;
 
         switch (true) {
@@ -95,7 +101,8 @@ class TypeString
     }
 
 
-    public function getByColumn(Column $column) {
+    public function getByColumn(Column $column)
+    {
         $flags = $column->flags;
 
         $typeString = $this->getBaseType($column);
@@ -107,8 +114,23 @@ class TypeString
         if ($flags & Column::NOT_NULL) {
             $typeString .= ' NOT NULL';
         }
-
         $default = $column->getDefault();
+        if (null === $default && $column->flags & Column::NOT_NULL) {
+            if (!$column->flags & Column::IS_REFLECTED) {
+                switch (true) {
+                    case $column->flags & Column::STRING:
+                        $default = '';
+                        break;
+                    case $column->flags & Column::INTEGER:
+                        $default = 0;
+                        break;
+                    case $column->flags & Column::FLOAT:
+                        $default = 0.0;
+                        break;
+                }
+            }
+        }
+
         if (false === $default && !($column->flags & Column::NOT_NULL)) {
             $default = null;
         }
