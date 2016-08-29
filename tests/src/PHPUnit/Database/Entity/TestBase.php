@@ -203,6 +203,26 @@ SQL;
 
     }
 
+    public function testSaveWithModKey()
+    {
+        $host = new Host();
+        $host->name = 'some';
+        if ($existing = $host->findSaved()) {
+            $existing->delete();
+        }
+
+        $host->save();
+
+        $host->id = 0;
+        $host->save();
+
+        $this->assertSame('some', Host::findByPrimaryKey(0)->name);
+
+        $host->delete();
+        $this->assertSame(null, Host::findByPrimaryKey(0));
+
+    }
+
 
     public function testFindOrSave() {
         $sessionTag = new SessionTag();
