@@ -7,6 +7,7 @@ use Yaoi\Log;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Database\CheckAvailable;
 use YaoiTests\Helper\Entity\Host;
+use YaoiTests\Helper\Entity\OneABBR;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\User;
 
@@ -135,5 +136,41 @@ EOD;
 
         $this->assertStringEqualsCRLF($this->expectedMigrationLog, $logString);
 
+    }
+
+    public function testDefaultAlter()
+    {
+        $logString = '';
+        $log = Log::getInstance(function()use(&$logString){
+            $settings = new Log\Settings();
+            $settings->driverClassName = Log\Driver\StringVar::className();
+            $settings->storage = &$logString;
+            return $settings;
+        });
+
+        OneABBR::migration()->rollback();
+        $this->database->query(<<<SQL
+CREATE TABLE `yaoi_tests_helper_entity_one_abbr` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `name` varchar(255) NOT NULL,
+ `address` varchar(255),
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY `unique_name` (`name`),
+ PRIMARY KEY (`id`)
+)
+
+SQL
+)->execute();
+
+        OneABBR::migration()->setLog($log)->apply();
+        $this->assertSame(<<<LOG
+Apply, table yaoi_tests_helper_entity_one_abbr (YaoiTests\Helper\Entity\OneABBR) requires migration
+ALTER TABLE `yaoi_tests_helper_entity_one_abbr`
+MODIFY COLUMN `name` varchar(255) NOT NULL DEFAULT ''
+OK
+
+LOG
+            , $logString
+);
     }
 }

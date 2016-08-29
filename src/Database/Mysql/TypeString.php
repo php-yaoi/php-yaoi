@@ -115,8 +115,11 @@ class TypeString
             $typeString .= ' NOT NULL';
         }
         $default = $column->getDefault();
-        if (null === $default && $column->flags & Column::NOT_NULL) {
-            if (!$column->flags & Column::IS_REFLECTED) {
+        if ((false === $default)
+            && ($column->flags & Column::NOT_NULL)
+            && !($column->flags & Column::AUTO_ID)) {
+            $isReflected = $column->flags & Column::IS_REFLECTED;
+            if (!$isReflected) {
                 switch (true) {
                     case $column->flags & Column::STRING:
                         $default = '';
@@ -132,7 +135,10 @@ class TypeString
         }
 
         if (false === $default && !($column->flags & Column::NOT_NULL)) {
-            $default = null;
+            $isReflected = $column->flags & Column::IS_REFLECTED;
+            if (!$isReflected) {
+                $default = null;
+            }
         }
 
         if (false !== $default) {
