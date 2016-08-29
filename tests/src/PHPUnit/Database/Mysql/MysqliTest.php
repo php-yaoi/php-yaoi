@@ -19,12 +19,12 @@ class MysqliTest extends TestUnified
 
     protected $createTableStatement = "CREATE TABLE `test_indexes` (
  `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) NOT NULL,
+ `name` varchar(255) NOT NULL DEFAULT '',
  `uni_one` int DEFAULT NULL,
  `uni_two` int DEFAULT NULL,
  `default_null` float DEFAULT NULL,
  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- `ref_id` int NOT NULL,
+ `ref_id` int NOT NULL DEFAULT '0',
  `r_one` int DEFAULT NULL,
  `r_two` int DEFAULT NULL,
  UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
@@ -111,8 +111,8 @@ class MysqliTest extends TestUnified
 
         $this->assertStringEqualsCRLF("CREATE TABLE `test_entity` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
- `fk_id` int unsigned NOT NULL,
- `fk_id2` int unsigned NOT NULL,
+ `fk_id` int unsigned NOT NULL DEFAULT '0',
+ `fk_id2` int unsigned NOT NULL DEFAULT '0',
  `date_ut` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `name` varchar(255) NOT NULL DEFAULT '',
  `seconds` float NOT NULL DEFAULT '0',
@@ -142,23 +142,26 @@ class MysqliTest extends TestUnified
 
         $sql = $utility->generateCreateTableOnDefinition($table);
 
-        $this->assertStringEqualsCRLF('CREATE TABLE `test_name` (
+        $this->assertStringEqualsCRLF("CREATE TABLE `test_name` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
- `branch` varchar(255) NOT NULL,
- `duration` float NOT NULL,
+ `branch` varchar(255) NOT NULL DEFAULT '',
+ `duration` float NOT NULL DEFAULT '0',
  `entity` varchar(255) DEFAULT NULL,
  `language` varchar(255) DEFAULT NULL,
  `project` varchar(255) DEFAULT NULL,
  `time` int DEFAULT NULL,
  `type` varchar(255) DEFAULT NULL,
  PRIMARY KEY (`id`)
-)', (string)$sql);
+)", (string)$sql);
 
     }
 
 
     protected $testCreateIndexesAlterExpected = <<<SQL
 ALTER TABLE `test_indexes`
+MODIFY COLUMN `name` varchar(255) NOT NULL DEFAULT '',
+MODIFY COLUMN `uni_one` int DEFAULT NULL,
+MODIFY COLUMN `uni_two` int DEFAULT NULL,
 ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
 ADD UNIQUE INDEX `unique_updated` (`updated`),
 DROP INDEX `unique_uni_one_uni_two`,
@@ -168,7 +171,7 @@ SQL;
     protected $testCreateTableAfterAlter = <<<SQL
 CREATE TABLE `test_indexes` (
  `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) NOT NULL,
+ `name` varchar(255) NOT NULL DEFAULT '',
  `uni_one` int DEFAULT NULL,
  `uni_two` int DEFAULT NULL,
  `default_null` float DEFAULT NULL,
@@ -203,8 +206,8 @@ SQL;
         $expected = <<<SQL
 CREATE TABLE `wtf_entity_waka_user_item` (
  `id` int unsigned NOT NULL AUTO_INCREMENT,
- `use``r_id` int NOT NULL,
- `item_id` int NOT NULL,
+ `use``r_id` int NOT NULL DEFAULT '0',
+ `item_id` int NOT NULL DEFAULT '0',
  `name` varchar(255) NOT NULL DEFAULT 'default',
  `created_at` int DEFAULT NULL,
  `modified_at` int DEFAULT NULL,

@@ -101,6 +101,8 @@ class TypeString
     }
 
 
+    protected $overrideDefault = true;
+
     public function getByColumn(Column $column)
     {
         $flags = $column->flags;
@@ -115,21 +117,23 @@ class TypeString
             $typeString .= ' NOT NULL';
         }
         $default = $column->getDefault();
-        if ((false === $default)
-            && ($column->flags & Column::NOT_NULL)
-            && !($column->flags & Column::AUTO_ID)) {
-            $isReflected = $column->flags & Column::IS_REFLECTED;
-            if (!$isReflected) {
-                switch (true) {
-                    case $column->flags & Column::STRING:
-                        $default = '';
-                        break;
-                    case $column->flags & Column::INTEGER:
-                        $default = 0;
-                        break;
-                    case $column->flags & Column::FLOAT:
-                        $default = 0.0;
-                        break;
+        if ($this->overrideDefault) {
+            if ((false === $default)
+                && ($column->flags & Column::NOT_NULL)
+                && !($column->flags & Column::AUTO_ID)) {
+                $isReflected = $column->flags & Column::IS_REFLECTED;
+                if (!$isReflected) {
+                    switch (true) {
+                        case $column->flags & Column::STRING:
+                            $default = '';
+                            break;
+                        case $column->flags & Column::INTEGER:
+                            $default = 0;
+                            break;
+                        case $column->flags & Column::FLOAT:
+                            $default = 0.0;
+                            break;
+                    }
                 }
             }
         }

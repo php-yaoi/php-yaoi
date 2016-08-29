@@ -5,9 +5,9 @@ namespace YaoiTests\PHPUnit\Database\Entity\Migration;
 
 use Yaoi\Database;
 use YaoiTests\Helper\Database\CheckAvailable;
-use YaoiTests\PHPUnit\Database\Entity\Migration\MysqlTest;
+use YaoiTests\PHPUnit\Database\Entity\Migration\BaseTest;
 
-class SqliteTest extends MysqlTest
+class SqliteTest extends BaseTest
 {
     private $databaseFileName;
 

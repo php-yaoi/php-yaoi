@@ -10,7 +10,7 @@ use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\User;
 
-class PgsqlTest extends MysqlTest
+class PgsqlTest extends BaseTest
 {
 
     public function setUp()
