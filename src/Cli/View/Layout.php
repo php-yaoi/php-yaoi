@@ -5,7 +5,7 @@ namespace Yaoi\Cli\View;
 use Yaoi\View\Renderer;
 use Yaoi\Io\Content\Semantic;
 use Yaoi\Io\Content\Rows;
-use Yaoi\Io\Content\Text;
+use Yaoi\Io\Content\Text as TextContent;
 use Yaoi\View\Stack;
 
 class Layout extends Stack
@@ -23,7 +23,7 @@ class Layout extends Stack
                 $this->renderRows($semantic);
                 break;
 
-            case $semantic instanceof Text:
+            case $semantic instanceof TextContent:
 
 
         }
