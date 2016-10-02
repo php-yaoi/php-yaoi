@@ -24,6 +24,9 @@ class Manager extends Service
      */
     private $storage;
 
+    /**
+     * @return Storage
+     */
     protected function getStorage()
     {
         if (null === $this->storage) {

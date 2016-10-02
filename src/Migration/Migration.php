@@ -26,6 +26,16 @@ interface Migration
     public function hasInternalState();
 
     public function getId();
+
+    /**
+     * @param Log|null $log
+     * @return $this
+     */
     public function setLog(Log $log = null);
+
+    /**
+     * @param bool $yes
+     * @return $this
+     */
     public function setDryRun($yes = true);
 }

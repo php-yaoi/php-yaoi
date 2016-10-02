@@ -27,7 +27,6 @@ class Migration extends AbstractMigration
     public function __construct(Table $table) {
         $this->id = null;
         $this->table = $table;
-
     }
 
     private function checkRun()
