@@ -33,10 +33,21 @@ class Table extends BaseClass
 
     public $entityClassName;
 
+    /**
+     * Table constructor.
+     * @param \stdClass|null $columns @deprecated
+     * @param Database\Contract|null $database
+     * @param $schemaName
+     */
     public function __construct(\stdClass $columns = null, Database\Contract $database = null, $schemaName) {
         $this->schemaName = $schemaName;
         $this->databaseId = DependencyRepository::add($database);
         $this->columns = new Columns($this);
+        if ($columns) {
+            foreach ((array)$columns as $name => $column) {
+                $this->columns->$name = $column;
+            }
+        }
     }
 
     /**
@@ -66,6 +77,11 @@ class Table extends BaseClass
     }
 
 
+    /**
+     * @param $columns
+     * @return $this
+     * @deprecated
+     */
     private function setColumns($columns) {
         if (is_object($columns)) {
             $this->columns = $columns;
@@ -122,6 +138,7 @@ class Table extends BaseClass
             }
         }
 
+        // TODO move to add column
         $this->database()->getUtility()->checkTable($this);
 
         return $this;

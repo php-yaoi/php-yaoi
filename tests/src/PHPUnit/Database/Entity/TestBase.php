@@ -74,7 +74,7 @@ abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
 
 
     /**
-     * @see Yaoi\Database\Definition\Table::schemaName
+     * @see \Yaoi\Database\Definition\Table::schemaName
      */
     public function testSchemaName() {
         $this->assertSame('yaoi_tests_helper_entity_one_abbr', OneABBR::table()->schemaName);
