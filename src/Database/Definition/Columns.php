@@ -24,7 +24,7 @@ class Columns
     {
         if (is_int($column)) {
             $column = new Column($column);
-            $this->_arrayOfColumnData[$name] = $column;
+            //$this->_arrayOfColumnData[$name] = $column;
         }
 
         // another column reference
@@ -37,7 +37,7 @@ class Columns
             $column->schemaName = Utils::fromCamelCase($name);
             $column->table = $this->table;
 
-            $this->_arrayOfColumnData[$name] = $column;
+            //$this->_arrayOfColumnData[$name] = $column;
             $foreignKey = new ForeignKey(array($column), array($refColumn));
             $this->table->addForeignKey($foreignKey);
             $column->setFlag(Column::AUTO_ID, false);
@@ -65,7 +65,7 @@ class Columns
             $this->table->addIndex($index);
         }
 
-
+        $this->table->database()->getUtility()->checkColumn($column);
         $this->_arrayOfColumnData[$name] = $column;
 
     }

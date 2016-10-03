@@ -49,14 +49,12 @@ class Utility extends \Yaoi\Database\Utility
     /**
      * @inheritdoc
      */
-    public function checkTable(Table $table)
+    public function checkColumn(Column $column)
     {
-        foreach ($table->getColumns(true) as $column) {
-            if ($column->flags & Column::TIMESTAMP) {
-                if (!$column->getDefault()) {
-                    $column->setFlag(Column::NOT_NULL);
-                    $column->setDefault(new Raw('CURRENT_TIMESTAMP'));
-                }
+        if ($column->flags & Column::TIMESTAMP) {
+            if (!$column->getDefault()) {
+                $column->setFlag(Column::NOT_NULL);
+                $column->setDefault(new Raw('CURRENT_TIMESTAMP'));
             }
         }
     }

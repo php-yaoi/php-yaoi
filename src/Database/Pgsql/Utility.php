@@ -33,7 +33,7 @@ class Utility extends \Yaoi\Database\Utility
     /**
      * @inheritdoc
      */
-    public function checkTable(Table $table)
+    public function checkColumn(Table $table)
     {
     }
 

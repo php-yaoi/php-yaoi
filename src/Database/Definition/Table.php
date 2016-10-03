@@ -139,7 +139,7 @@ class Table extends BaseClass
         }
 
         // TODO move to add column
-        $this->database()->getUtility()->checkTable($this);
+        $this->database()->getUtility()->checkColumn($this);
 
         return $this;
     }
