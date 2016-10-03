@@ -22,6 +22,8 @@ abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
     /** @var  \Yaoi\Database */
     protected $database;
 
+    protected $expectedMigrateLog;
+
     /**
      * By default column has STRING type
      * @see Column::__construct
@@ -107,75 +109,6 @@ abstract class TestBase extends \Yaoi\Test\PHPUnit\TestCase
 
 
 
-    protected $expectedMigrateLog = <<<EOD
-Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
-Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is already non-existent
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is already non-existent
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) requires migration
-CREATE TABLE `yaoi_tests_entity_host` (
- `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) NOT NULL,
- UNIQUE KEY `unique_name` (`name`),
- PRIMARY KEY (`id`)
-)
-OK
-CREATE TABLE `yaoi_tests_entity_session` (
- `id` int NOT NULL AUTO_INCREMENT,
- `host_id` int NOT NULL,
- `started_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- `ended_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
- CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
- PRIMARY KEY (`id`)
-)
-OK
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
-Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) requires migration
-CREATE TABLE `yaoi_tests_entity_tag` (
- `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) NOT NULL,
- UNIQUE KEY `unique_name` (`name`),
- PRIMARY KEY (`id`)
-)
-OK
-Apply, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
-Dependent migration required
-Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is up to date
-CREATE TABLE `yaoi_tests_entity_session_tag` (
- `session_id` int NOT NULL,
- `tag_id` int NOT NULL,
- `added_at_ut` int NOT NULL,
- PRIMARY KEY (`session_id`, `tag_id`)
-)
-OK
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
-Apply, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is up to date
-Apply, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is up to date
-Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires deletion
-Dependent migration required
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) requires deletion
-OK
-OK
-Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) requires deletion
-Dependent migration required
-Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
-OK
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) requires deletion
-Dependent migration required
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
-OK
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
-Rollback, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is already non-existent
-Rollback, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is already non-existent
-Rollback, table yaoi_tests_entity_tag (YaoiTests\Helper\Entity\Tag) is already non-existent
-Rollback, table yaoi_tests_entity_session_tag (YaoiTests\Helper\Entity\SessionTag) is already non-existent
-
-EOD;
 
     public function testMigrate() {
         /** @var Table[] $tables */
@@ -267,6 +200,26 @@ SQL;
         $host->delete();
 
         $this->assertNull(Host::findByPrimaryKey($host->id));
+
+    }
+
+    public function testSaveWithModKey()
+    {
+        $host = new Host();
+        $host->name = 'some';
+        if ($existing = $host->findSaved()) {
+            $existing->delete();
+        }
+
+        $host->save();
+
+        $host->id = 0;
+        $host->save();
+
+        $this->assertSame('some', Host::findByPrimaryKey(0)->name);
+
+        $host->delete();
+        $this->assertSame(null, Host::findByPrimaryKey(0));
 
     }
 

@@ -12,6 +12,7 @@ sudo: false
 
 addons:
   postgresql: "9.3"
+  mariadb: '10.0'
 
 services:
   - memcached # will start memcached
@@ -51,3 +52,7 @@ notifications:
    on_success: change  # options: [always|never|change] default: always
    on_failure: always  # options: [always|never|change] default: always
    on_start: false     # default: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache

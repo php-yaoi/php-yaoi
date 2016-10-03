@@ -23,7 +23,7 @@ class OneABBR extends Entity
     {
         $columns->id = Column::AUTO_ID;
         $columns->name = Column::create(Column::STRING + Column::NOT_NULL)->setUnique();
-        $columns->address = Column::create(Column::STRING)->setDefault('');
+        $columns->address = Column::STRING;
         $columns->createdAt = Column::TIMESTAMP;
     }
 

@@ -269,13 +269,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $table = static::table();
         $update = $table->database()->update($table->schemaName);
         $data = $this->toArray(true);
+        $newData = $data;
 
         foreach ($table->primaryKey as $keyField) {
-            if (!isset($data[$keyField->schemaName])) {
+            if (!isset($this->originalData[$keyField->schemaName])) {
                 throw new \Yaoi\Entity\Exception('Primary key required for update', \Yaoi\Entity\Exception::KEY_MISSING);
             }
-            $update->where("? = ?", new Symbol($keyField->schemaName), $data[$keyField->schemaName]);
-            unset($data[$keyField->schemaName]);
+            $update->where("? = ?", new Symbol($keyField->schemaName), $this->originalData[$keyField->schemaName]);
         }
 
         foreach ($data as $key => $value) {
@@ -290,6 +290,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
         $update->set($data);
         $update->query();
+        $this->originalData = $newData;
         return $this;
     }
 
@@ -304,10 +305,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $insert->valuesRow($data);
 
         $query = $insert->query();
+        $this->originalData = $data;
 
         if ($autoId) {
             if ($this->{$autoId->propertyName} instanceof Undefined) {
-                $this->{$autoId->propertyName} = $query->lastInsertId();
+                $lastId = $query->lastInsertId();
+                $this->{$autoId->propertyName} = $lastId;
+                $this->originalData[$autoId->schemaName] = $lastId;
             }
         }
 

@@ -27,6 +27,8 @@ class Column extends BaseClass
 
     const USE_PHP_DATETIME = 8192;
 
+    const IS_REFLECTED = 16384; // Column built by reflection (for ALTER TABLE check)
+
     public $flags;
     public function __construct($flags = self::STRING)
     {
@@ -57,10 +59,6 @@ class Column extends BaseClass
         return $this;
     }
 
-    /**
-     * @return bool|null
-     * @todo move custom logic to utility
-     */
     public function getDefault() {
         if (is_string($this->default)) {
             if ($this->flags & Column::INTEGER) {

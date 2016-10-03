@@ -7,6 +7,8 @@ use Yaoi\Database\Definition\Column;
 
 class TypeString extends \Yaoi\Database\Mysql\TypeString
 {
+    protected $overrideDefault = false;
+
     public function getByColumn(Column $column)
     {
         if ($column->flags & Column::AUTO_ID) {

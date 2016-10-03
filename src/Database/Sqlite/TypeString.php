@@ -14,6 +14,7 @@ use Yaoi\Database\Definition\Column;
 class TypeString extends \Yaoi\Database\Mysql\TypeString
 {
 
+    protected $overrideDefault = false;
     protected function getFloatTypeString(Column $column)
     {
         return 'float';

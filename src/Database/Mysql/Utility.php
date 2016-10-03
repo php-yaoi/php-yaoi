@@ -4,6 +4,7 @@ namespace Yaoi\Database\Mysql;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\Raw;
 use Yaoi\Sql\Symbol;
 use Yaoi\String\Lexer;
 
@@ -53,8 +54,8 @@ class Utility extends \Yaoi\Database\Utility
         foreach ($table->getColumns(true) as $column) {
             if ($column->flags & Column::TIMESTAMP) {
                 if (!$column->getDefault()) {
-                    $column->setDefault('0000-00-00 00:00:00');
                     $column->setFlag(Column::NOT_NULL);
+                    $column->setDefault(new Raw('CURRENT_TIMESTAMP'));
                 }
             }
         }
