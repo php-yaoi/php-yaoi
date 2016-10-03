@@ -17,7 +17,7 @@ class Utility extends \Yaoi\Database\Utility
     /**
      * @inheritdoc
      */
-    public function checkColumn(Table $table)
+    public function checkColumn(Column $table)
     {
     }
 
