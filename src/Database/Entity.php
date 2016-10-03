@@ -48,7 +48,6 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         $table = new Table(null, self::getDatabase($className), $schemaName);
         $table->entityClassName = $className;
         $table->alias = $alias;
-        var_dump($table->columns);
         static::setUpColumns($table->columns);
         static::setUpTable($table, $table->columns);
 

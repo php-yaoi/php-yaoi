@@ -111,8 +111,6 @@ class Column extends BaseClass
      */
     public $schemaName;
 
-
-
     /** @var  Table */
     public $table;
 

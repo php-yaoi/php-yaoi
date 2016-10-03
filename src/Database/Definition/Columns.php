@@ -35,7 +35,7 @@ class Columns
 
             $column->propertyName = $name;
             $column->schemaName = Utils::fromCamelCase($name);
-            $column->table = $this;
+            $column->table = $this->table;
 
             $this->_arrayOfColumnData[$name] = $column;
             $foreignKey = new ForeignKey(array($column), array($refColumn));
@@ -44,7 +44,7 @@ class Columns
         } else {
             $column->propertyName = $name;
             $column->schemaName = Utils::fromCamelCase($name);
-            $column->table = $this;
+            $column->table = $this->table;
         }
 
 
@@ -65,11 +65,15 @@ class Columns
             $this->table->addIndex($index);
         }
 
+
+        $this->_arrayOfColumnData[$name] = $column;
+
     }
 
     public function __get($name)
     {
         if (!isset($this->_arrayOfColumnData[$name])) {
+            var_dump(array_keys($this->_arrayOfColumnData));
             throw new Exception('Unknown column ' . $name);
         }
         return $this->_arrayOfColumnData[$name];
