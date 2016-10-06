@@ -137,14 +137,27 @@ class Table extends BaseClass
     /**
      * @var ForeignKey[]
      */
-    public $foreignKeys = array();
+    private $foreignKeys = array();
     public function addForeignKey(ForeignKey $foreignKey) {
         $foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
-        $this->foreignKeys []= $foreignKey;
+        $this->foreignKeys [$foreignKey->getName()]= $foreignKey;
         foreach ($foreignKey->getLocalColumns() as $column) {
             $this->columnForeignKeys[$column->propertyName] = $foreignKey;
         }
         return $this;
+    }
+
+    /**
+     *
+     */
+    public function getForeignKeys()
+    {
+        $foreignKeys = $this->foreignKeys;
+        foreach ($this->columns->getArray() as $column) {
+            if ($column->foreignKey) {
+                $foreignKeys[] = $column->foreignKey;
+            }
+        }
     }
 
 

@@ -112,6 +112,9 @@ class Column extends BaseClass
     /** @var  Table */
     public $table;
 
+    /** @var ForeignKey */
+    public $foreignKey;
+
     public static function castField($value, $columnFlags, $import = true)
     {
         if (!($columnFlags & self::NOT_NULL) && $value === null) {

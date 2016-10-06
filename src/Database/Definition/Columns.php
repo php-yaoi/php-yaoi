@@ -39,6 +39,7 @@ class Columns
 
             //$this->_arrayOfColumnData[$name] = $column;
             $foreignKey = new ForeignKey(array($column), array($refColumn));
+            $column->foreignKey = $foreignKey;
             $this->table->addForeignKey($foreignKey);
             $column->setFlag(Column::AUTO_ID, false);
         } else {
@@ -86,6 +87,13 @@ class Columns
 
     public function __unset($name)
     {
+        if (!isset($this->_arrayOfColumnData[$name])) {
+            return;
+        }
+        $column = $this->_arrayOfColumnData[$name];
+        if ($column->foreignKey !== null) {
+            $this->table->removeForeignKey($column->foreignKey);
+        }
         unset($this->_arrayOfColumnData[$name]);
     }
 
