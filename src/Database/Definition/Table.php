@@ -208,6 +208,9 @@ class Table extends BaseClass
 
 
     public function migration() {
+        foreach ($this->getForeignKeys() as $foreignKey) {
+            $foreignKey->getReferencedTable()->dependentTables[$this->schemaName] = $this;
+        }
         return new Database\Entity\Migration($this);
     }
 
