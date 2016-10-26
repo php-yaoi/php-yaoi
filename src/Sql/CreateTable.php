@@ -38,7 +38,7 @@ abstract class CreateTable extends Batch
         if ($this->table->disableForeignKeys) {
             return;
         }
-        foreach ($this->table->foreignKeys as $foreignKey) {
+        foreach ($this->table->getForeignKeys() as $foreignKey) {
             $this->createLines->commaExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
         }
     }

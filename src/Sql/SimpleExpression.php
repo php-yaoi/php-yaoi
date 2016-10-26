@@ -46,10 +46,10 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
             }
             return $expression;
         }
-        if ($arguments[0] instanceof \stdClass) {
+        if ($arguments[0] instanceof Database\Definition\Columns) {
             $columns = $arguments[0];
             $arguments = array(':columns', array('columns' => array()));
-            foreach ((array)$columns as $column) {
+            foreach ($columns->getArray() as $column) {
                 if ($column instanceof Database\Definition\Column) {
                     $arguments[1]['columns'][] = $column;
                 }

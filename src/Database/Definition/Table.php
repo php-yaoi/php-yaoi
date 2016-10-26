@@ -20,7 +20,7 @@ class Table extends BaseClass
     /** @var Index[]  */
     public $indexes = array();
 
-    /** @var \stdClass  */
+    /** @var Columns  */
     public $columns;
 
 
@@ -33,30 +33,39 @@ class Table extends BaseClass
 
     public $entityClassName;
 
+    /**
+     * Table constructor.
+     * @param \stdClass|null $columns @deprecated
+     * @param Database\Contract|null $database
+     * @param $schemaName
+     */
     public function __construct(\stdClass $columns = null, Database\Contract $database = null, $schemaName) {
         $this->schemaName = $schemaName;
         $this->databaseId = DependencyRepository::add($database);
-        if (null !== $columns) {
-            $this->setColumns($columns);
+        $this->columns = new Columns($this);
+        if ($columns) {
+            foreach ((array)$columns as $name => $column) {
+                $this->columns->$name = $column;
+            }
         }
     }
 
     /**
      * @param bool $asArray
      * @param bool $bySchemaName
-     * @return array|Column[]|\stdClass
+     * @return array|Column[]|Columns
      */
     public function getColumns($asArray = false, $bySchemaName = false) {
         if ($bySchemaName) {
             $columns = array();
             /** @var Column $column */
-            foreach ((array)$this->columns as $column) {
+            foreach ($this->columns->getArray() as $column) {
                 $columns [$column->schemaName]= $column;
             }
-            return $asArray ? $columns : (object)$columns;
+            return $columns;
         }
 
-        return $asArray ? (array)$this->columns : $this->columns;
+        return $asArray ? $this->columns->getArray() : $this->columns;
     }
 
     /**
@@ -64,85 +73,7 @@ class Table extends BaseClass
      * @return null|Column
      */
     public function getColumn($name) {
-        return isset($this->columns->$name) ? $this->columns->$name : null;
-    }
-
-
-    private $columnForeignKeys = array();
-
-    /**
-     * @param Column $column
-     * @return null|ForeignKey
-     */
-    public function getForeignKeyByColumn(Column $column) {
-        $name = $column->propertyName;
-        if (isset($this->columnForeignKeys[$name])) {
-            return $this->columnForeignKeys[$name];
-        }
-        else {
-            return null;
-        }
-    }
-
-    private function setColumns($columns) {
-        if (is_object($columns)) {
-            $this->columns = $columns;
-        }
-
-        /**
-         * @var string $name
-         * @var Column $column
-         */
-        foreach ((array)$this->columns as $name => $column) {
-            if (is_int($column)) {
-                $column = new Column($column);
-                $this->columns->$name = $column;
-            }
-
-            // another column reference
-            if (!empty($column->table) && $column->table->schemaName != $this->schemaName) {
-                $refColumn = $column;
-                $column = clone $column;
-
-                $column->propertyName = $name;
-                $column->schemaName = Utils::fromCamelCase($name);
-                $column->table = $this;
-
-                $this->columns->$name = $column;
-                $foreignKey = new ForeignKey(array($column), array($refColumn));
-                $this->columnForeignKeys [$name]= $foreignKey;
-                $this->addForeignKey($foreignKey);
-                $column->setFlag(Column::AUTO_ID, false);
-            }
-            else {
-                $column->propertyName = $name;
-                $column->schemaName = Utils::fromCamelCase($name);
-                $column->table = $this;
-            }
-
-
-            if ($column->flags & Column::AUTO_ID) {
-                $this->autoIdColumn = $column;
-                if (!$this->primaryKey) {
-                    $this->setPrimaryKey($column);
-                }
-            }
-
-            if ($column->isUnique) {
-                $index = new Index($column);
-                $index->setType(Index::TYPE_UNIQUE);
-                $this->addIndex($index);
-            }
-            elseif ($column->isIndexed) {
-                $index = new Index($column);
-                $index->setType(Index::TYPE_KEY);
-                $this->addIndex($index);
-            }
-        }
-
-        $this->database()->getUtility()->checkTable($this);
-
-        return $this;
+        return isset($this->columns->$name) ? $this->columns->__get($name) : null;
     }
 
     /**
@@ -180,21 +111,74 @@ class Table extends BaseClass
             return $this;
         }
 
-        $this->indexes []= $index;
+        $this->indexes [$index->getName()]= $index;
 
         return $this;
     }
 
-    /** @var array|Table[]  */
+    public function dropIndex($index)
+    {
+        if (!$index instanceof Index) {
+            $args = func_get_args();
+            $type = array_shift($args);
+            $columns = $args;
+
+            $index = Index::create($columns)->setType($type);
+        }
+
+        if ($index->type === Index::TYPE_PRIMARY) {
+            throw new Exception('Can not drop primary key', Exception::NOT_IMPLEMENTED);
+        }
+
+        if (isset($this->indexes[$index->getName()])) {
+            unset($this->indexes[$index->getName()]);
+        }
+
+        return $this;
+    }
+
+    private $columnForeignKeys = array();
+
+    /**
+     * @param Column $column
+     * @return null|ForeignKey
+     */
+    public function getForeignKeyByColumn(Column $column)
+    {
+        return $column->foreignKey;
+    }
+
+    /**
+     * @var array|Table[]
+     * @todo make dynamic
+     */
     public $dependentTables = array();
+
     /**
      * @var ForeignKey[]
      */
-    public $foreignKeys = array();
+    private $foreignKeys = array();
     public function addForeignKey(ForeignKey $foreignKey) {
-        $foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
-        $this->foreignKeys []= $foreignKey;
+        //$foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
+        $this->foreignKeys [$foreignKey->getName()]= $foreignKey;
+        foreach ($foreignKey->getLocalColumns() as $column) {
+            $this->columnForeignKeys[$column->propertyName] = $foreignKey;
+        }
         return $this;
+    }
+
+    /**
+     * @return array|ForeignKey[]
+     */
+    public function getForeignKeys()
+    {
+        $foreignKeys = $this->foreignKeys;
+        foreach ($this->columns->getArray() as $column) {
+            if ($column->foreignKey) {
+                $foreignKeys[] = $column->foreignKey;
+            }
+        }
+        return $foreignKeys;
     }
 
 
@@ -224,6 +208,9 @@ class Table extends BaseClass
 
 
     public function migration() {
+        foreach ($this->getForeignKeys() as $foreignKey) {
+            $foreignKey->getReferencedTable()->dependentTables[$this->schemaName] = $this;
+        }
         return new Database\Entity\Migration($this);
     }
 
@@ -235,5 +222,4 @@ class Table extends BaseClass
     }
 
     public $alias;
-
 }

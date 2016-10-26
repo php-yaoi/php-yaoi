@@ -44,8 +44,8 @@ interface Contract
     /**
      * Check/fix database related type misconceptions
      *
-     * @param Table $table
+     * @param Column $table
      */
-    public function checkTable(Table $table);
+    public function checkColumn(Column $table);
 
 }

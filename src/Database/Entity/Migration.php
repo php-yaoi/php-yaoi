@@ -27,7 +27,6 @@ class Migration extends AbstractMigration
     public function __construct(Table $table) {
         $this->id = null;
         $this->table = $table;
-
     }
 
     private function checkRun()
@@ -86,7 +85,7 @@ class Migration extends AbstractMigration
             return false;
         }
 
-        foreach ($this->table->foreignKeys as $foreignKey) {
+        foreach ($this->table->getForeignKeys() as $foreignKey) {
             $referenceMigration = $foreignKey->getReferencedTable()->migration();
             $referenceMigration->dryRun = $this->dryRun;
             $referenceMigration->log = $this->log;

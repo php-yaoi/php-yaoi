@@ -18,7 +18,7 @@ class CreateTable extends \Yaoi\Sql\CreateTable
 
         foreach ($this->table->getColumns(true) as $column) {
             if ($column->flags & Column::AUTO_ID) {
-                if (array_values($this->table->primaryKey) !== array($column)) {
+                if ($this->table->primaryKey && (array_values($this->table->primaryKey) !== array($column))) {
                     throw new Exception("Auto ID conflicts PRIMARY KEY", Exception::INVALID_SCHEMA);
                 }
                 else {

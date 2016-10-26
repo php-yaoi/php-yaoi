@@ -109,10 +109,11 @@ class Column extends BaseClass
      */
     public $schemaName;
 
-
-
     /** @var  Table */
     public $table;
+
+    /** @var ForeignKey */
+    public $foreignKey;
 
     public static function castField($value, $columnFlags, $import = true)
     {

@@ -29,8 +29,8 @@ class MysqliTest extends TestUnified
  `r_two` int DEFAULT NULL,
  UNIQUE KEY `unique_uni_one_uni_two` (`uni_one`, `uni_two`),
  KEY `key_name` (`name`),
- CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
  CONSTRAINT `fk_test_indexes_r_one_r_two_table_a_m_one_table_a_m_two` FOREIGN KEY (`r_one`, `r_two`) REFERENCES `table_a` (`m_one`, `m_two`),
+ CONSTRAINT `fk_test_indexes_ref_id_table_a_id` FOREIGN KEY (`ref_id`) REFERENCES `table_a` (`id`),
  PRIMARY KEY (`id`)
 )";
 
@@ -159,9 +159,6 @@ class MysqliTest extends TestUnified
 
     protected $testCreateIndexesAlterExpected = <<<SQL
 ALTER TABLE `test_indexes`
-MODIFY COLUMN `name` varchar(255) NOT NULL DEFAULT '',
-MODIFY COLUMN `uni_one` int DEFAULT NULL,
-MODIFY COLUMN `uni_two` int DEFAULT NULL,
 ADD COLUMN `new_field` char(15) NOT NULL DEFAULT 'normal',
 ADD UNIQUE INDEX `unique_updated` (`updated`),
 DROP INDEX `unique_uni_one_uni_two`,

@@ -22,6 +22,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      */
     private static $tables = array();
 
+    private static $settingColumns = array();
+
     /**
      * Method should return table definition of entity
      * @return Table
@@ -29,17 +31,25 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     public static function table($alias = null)
     {
         $className = get_called_class();
-        $table = &self::$tables[$className . ($alias ? ':' . $alias : '')];
+        $tableKey = $className . ($alias ? ':' . $alias : '');
+        $table = &self::$tables[$tableKey];
         if (null !== $table) {
             return $table;
         }
+        /*
+        if (isset(self::$settingColumns[$tableKey])) {
+            throw new Exception('Already setting columns');
+        }
         $columns = new \stdClass();
-        static::setUpColumns($columns);
+        self::$settingColumns[$tableKey] = $columns;
+        unset(self::$settingColumns[$tableKey]);
+        */
         $schemaName = Utils::fromCamelCase(str_replace('\\', '', $className));
-        $table = new Table($columns, self::getDatabase($className), $schemaName);
+        $table = new Table(null, self::getDatabase($className), $schemaName);
         $table->entityClassName = $className;
         $table->alias = $alias;
-        static::setUpTable($table, $columns);
+        static::setUpColumns($table->columns);
+        static::setUpTable($table, $table->columns);
 
         return $table;
     }
@@ -48,7 +58,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @param Table|null $table
      * @return static
      */
-    public static function columns(Table $table = null) {
+    public static function columns(Table $table = null)
+    {
         return null === $table
             ? static::table()->columns
             : $table->columns;
@@ -62,7 +73,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @param null|static $filter
      * @return SelectInterface
      */
-    public static function statement($filter = null) {
+    public static function statement($filter = null)
+    {
         $className = get_called_class();
         $table = static::table();
         $statement = $table->database()->select($table);
@@ -104,7 +116,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     /**
      * @return static
      */
-    public function findSaved() {
+    public function findSaved()
+    {
         $table = $this->table();
         $statement = self::statement();
         $data = $this->toArray(true);
@@ -145,8 +158,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
 
         if ($uniqueIndex) {
             $statement->where($uniqueIndex);
-        }
-        else {
+        } else {
             foreach ($table->getColumns(true) as $column) {
                 $schemaName = $column->schemaName;
 
@@ -193,7 +205,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $object;
     }
 
-    public function __construct() {
+    public function __construct()
+    {
         foreach (static::table()->getColumns(true) as $column) {
             if (null === $this->{$column->propertyName}) {
                 $this->{$column->propertyName} = Undefined::get();
@@ -210,8 +223,7 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
             if ($value instanceof Undefined) {
                 if ($skipNotSetProperties) {
                     continue;
-                }
-                else {
+                } else {
                     $value = $column->getDefault();
                 }
             } elseif (!$skipCast) {
@@ -233,7 +245,8 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
 
-    public function delete() {
+    public function delete()
+    {
         $table = static::table();
         $delete = $table->database()->delete($table->schemaName);
         $data = $this->toArray();
@@ -310,7 +323,9 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
      * @var Contract[]
      */
     private static $databases = array();
-    public static function bindDatabase(Contract $database, $forceTableCacheClean = false) {
+
+    public static function bindDatabase(Contract $database, $forceTableCacheClean = false)
+    {
         $class = get_called_class();
         if ($forceTableCacheClean || !isset(self::$databases[$class]) || self::$databases[$class] !== $database) {
             self::$databases[$class] = $database;
@@ -320,23 +335,23 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         }
     }
 
-    private static function getDatabase($class) {
+    private static function getDatabase($class)
+    {
         if (isset(self::$databases[$class])) {
             return self::$databases[$class];
-        }
-        else {
+        } else {
             return Database::getInstance();
         }
     }
 
 
-    public function findOrSave($updateRecord = false) {
+    public function findOrSave($updateRecord = false)
+    {
         $item = $this->findSaved();
 
         if (!$item) {
             $this->save();
-        }
-        elseif (!$updateRecord) {
+        } elseif (!$updateRecord) {
             self::fromArray($item->toArray(), $this);
             $this->persistent = true;
         }
@@ -344,6 +359,9 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
         return $this;
     }
 
+    /**
+     * @return Entity\Migration
+     */
     public static function migration()
     {
         return static::table()->migration();

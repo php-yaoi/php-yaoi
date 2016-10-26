@@ -7,6 +7,7 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
+use YaoiTests\Helper\Entity\User;
 
 class AlterTable extends Batch
 {
@@ -18,7 +19,8 @@ class AlterTable extends Batch
     /** @var  Expression */
     protected $alterLines;
 
-    public function __construct(Table $before, Table $after) {
+    public function __construct(Table $before, Table $after)
+    {
         $this->before = $before;
         $this->after = $after;
 
@@ -34,21 +36,20 @@ class AlterTable extends Batch
 
         if ($this->alterLines->isEmpty()) {
             $alterExpression->disable();
-        }
-        else {
+        } else {
             $alterExpression->appendExpr($this->alterLines);
         }
     }
 
-    protected function processColumns() {
+    protected function processColumns()
+    {
         $beforeColumns = $this->before->getColumns(true, true);
         foreach ($this->after->getColumns(true, true) as $columnName => $afterColumn) {
             $afterTypeString = $afterColumn->getTypeString();
 
             if (!isset($beforeColumns[$columnName])) {
                 $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
-            }
-            else {
+            } else {
                 $beforeColumn = $beforeColumns[$columnName];
                 $beforeColumn->setFlag(Column::IS_REFLECTED);
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
@@ -63,11 +64,12 @@ class AlterTable extends Batch
         }
     }
 
-    protected function processIndexes() {
+    protected function processIndexes()
+    {
         /** @var Index[] $beforeIndexes */
         $beforeIndexes = array();
         foreach ($this->before->indexes as $index) {
-            $beforeIndexes [$index->getName()]= $index;
+            $beforeIndexes [$index->getName()] = $index;
         }
 
         foreach ($this->after->indexes as $index) {
@@ -75,13 +77,12 @@ class AlterTable extends Batch
                 $this->alterLines->commaExpr('ADD '
                     . ($index->type === Index::TYPE_UNIQUE ? 'UNIQUE ' : '')
                     . 'INDEX ? (?)', new Symbol($index->getName()), Symbol::prepareColumns($index->columns));
-            }
-            else {
+            } else {
                 unset($beforeIndexes[$index->getName()]);
             }
         }
         if ($beforeIndexes) {
-            foreach ($this->after->foreignKeys as $foreignKey) {
+            foreach ($this->after->getForeignKeys() as $foreignKey) {
                 if (isset($beforeIndexes[$foreignKey->getName()])) {
                     unset($beforeIndexes[$foreignKey->getName()]);
                 }
@@ -93,15 +94,16 @@ class AlterTable extends Batch
     }
 
 
-    protected function processForeignKeys() {
+    protected function processForeignKeys()
+    {
         /** @var ForeignKey[] $beforeForeignKeys */
         $beforeForeignKeys = array();
         if (!$this->before->disableForeignKeys) {
-            foreach ($this->before->foreignKeys as $foreignKey) {
-                $beforeForeignKeys [$foreignKey->getName()]= $foreignKey;
+            foreach ($this->before->getForeignKeys() as $foreignKey) {
+                $beforeForeignKeys [$foreignKey->getName()] = $foreignKey;
             }
         }
-        $afterForeignKeys = $this->after->foreignKeys;
+        $afterForeignKeys = $this->after->getForeignKeys();
         if ($this->after->disableForeignKeys) {
             $afterForeignKeys = array();
         }
@@ -109,8 +111,7 @@ class AlterTable extends Batch
             if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
                 $this->alterLines->commaExpr('ADD');
                 $this->alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
-            }
-            else {
+            } else {
                 unset($beforeForeignKeys[$foreignKey->getName()]);
             }
         }
