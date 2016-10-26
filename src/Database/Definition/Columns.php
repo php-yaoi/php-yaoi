@@ -18,6 +18,7 @@ class Columns
     public function __construct(Table $table)
     {
         $this->table = $table;
+        $table->columns = $this;
     }
 
     public function __set($name, $column)
@@ -40,7 +41,7 @@ class Columns
             //$this->_arrayOfColumnData[$name] = $column;
             $foreignKey = new ForeignKey(array($column), array($refColumn));
             $column->foreignKey = $foreignKey;
-            $this->table->addForeignKey($foreignKey);
+            //$this->table->addForeignKey($foreignKey);
             $column->setFlag(Column::AUTO_ID, false);
         } else {
             $column->propertyName = $name;
@@ -74,7 +75,6 @@ class Columns
     public function __get($name)
     {
         if (!isset($this->_arrayOfColumnData[$name])) {
-            var_dump(array_keys($this->_arrayOfColumnData));
             throw new Exception('Unknown column ' . $name);
         }
         return $this->_arrayOfColumnData[$name];
@@ -89,10 +89,6 @@ class Columns
     {
         if (!isset($this->_arrayOfColumnData[$name])) {
             return;
-        }
-        $column = $this->_arrayOfColumnData[$name];
-        if ($column->foreignKey !== null) {
-            $this->table->removeForeignKey($column->foreignKey);
         }
         unset($this->_arrayOfColumnData[$name]);
     }

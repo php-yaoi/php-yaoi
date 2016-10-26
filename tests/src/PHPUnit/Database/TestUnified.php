@@ -150,7 +150,9 @@ SQL;
             return;
         }
 
-        $columns = new \stdClass();
+        $table = new Table(null, $this->db, 'test_indexes');
+
+        $columns = $table->columns;
         $columns->id = Column::AUTO_ID;
         $columns->name = Column::STRING + Column::NOT_NULL;
         $columns->uniOne = Column::INTEGER;
@@ -158,7 +160,6 @@ SQL;
         $columns->defaultNull = Column::create(Column::FLOAT)->setDefault(null);
         $columns->updated = Column::TIMESTAMP;
 
-        $table = new Table($columns, $this->db, 'test_indexes');
         $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
         $table->addIndex(Index::TYPE_KEY, $columns->name);
 
@@ -174,19 +175,20 @@ SQL;
 
         $actualTable = $utility->getTableDefinition('test_indexes');
 
-        $columns2 = clone $columns;
-        $columns2->newField = Column::create(Column::STRING + Column::NOT_NULL)
-            ->setDefault('normal')
-            ->setStringLength(15, true);
-
-        $updatedTable = new Table($columns2, $this->db, 'test_indexes');
-        $updatedTable->addIndex(Index::TYPE_UNIQUE, $columns2->updated);
-
         //$this->assertSame('', (string)$utility->generateAlterTable($actualTable, $table));
         $this->assertSame('', (string)$table->getAlterTableFrom($actualTable));
 
+
+        $columns->newField = Column::create(Column::STRING + Column::NOT_NULL)
+            ->setDefault('normal')
+            ->setStringLength(15, true);
+
+        $table->addIndex(Index::TYPE_UNIQUE, $columns->updated);
+        $table->dropIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
+        $table->dropIndex(Index::TYPE_KEY, $columns->name);
+
         //$alterTable = $utility->generateAlterTable($table, $updatedTable);
-        $alterTable = $updatedTable->getAlterTableFrom($table);
+        $alterTable = $table->getAlterTableFrom($actualTable);
         $this->assertStringEqualsCRLF(
             $this->testCreateIndexesAlterExpected,
             (string)$alterTable
@@ -218,14 +220,17 @@ SQL;
             return;
         }
 
-        $columnsA = new \stdClass();
+        $tableA = new Table(null, $this->db, 'table_a');
+
+        $columnsA = $tableA->columns;
         $columnsA->id = Column::AUTO_ID;
         $columnsA->mOne = Column::INTEGER;
         $columnsA->mTwo = Column::INTEGER;
-        $tableA = new Table($columnsA, $this->db, 'table_a');
         $tableA->addIndex(Index::TYPE_UNIQUE, $tableA->columns->mOne, $tableA->columns->mTwo);
 
-        $columns = new \stdClass();
+        $table = new Table(null, $this->db, 'test_indexes');
+
+        $columns = $table->columns;
         $columns->id = Column::AUTO_ID;
         $columns->name = Column::STRING + Column::NOT_NULL;
         $columns->uniOne = Column::INTEGER;
@@ -236,7 +241,6 @@ SQL;
         $columns->rOne = Column::INTEGER;
         $columns->rTwo = Column::INTEGER;
 
-        $table = new Table($columns, $this->db, 'test_indexes');
         $table->addIndex(Index::TYPE_UNIQUE, $columns->uniOne, $columns->uniTwo);
         $table->addIndex(Index::TYPE_KEY, $columns->name);
         $table->addForeignKey(new ForeignKey(array($columns->rOne, $columns->rTwo), array($columnsA->mOne, $columnsA->mTwo)));
@@ -337,7 +341,7 @@ SQL;
         $this->assertSame(
             'field_one',
             $actualTable->
-            indexes[0]->
+            indexes[Index::create($table->getColumn('fieldOne'))->setType(Index::TYPE_KEY)->getName()]->
             columns[0]->
             schemaName
         );

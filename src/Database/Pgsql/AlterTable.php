@@ -95,11 +95,11 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         /** @var ForeignKey[] $beforeForeignKeys */
         $beforeForeignKeys = array();
         if (!$this->before->disableForeignKeys) {
-            foreach ($this->before->foreignKeys as $foreignKey) {
+            foreach ($this->before->getForeignKeys() as $foreignKey) {
                 $beforeForeignKeys [$foreignKey->getName()] = $foreignKey;
             }
         }
-        $afterForeignKeys = $this->after->foreignKeys;
+        $afterForeignKeys = $this->after->getForeignKeys();
         if ($this->after->disableForeignKeys) {
             $afterForeignKeys = array();
         }

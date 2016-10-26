@@ -111,7 +111,28 @@ class Table extends BaseClass
             return $this;
         }
 
-        $this->indexes []= $index;
+        $this->indexes [$index->getName()]= $index;
+
+        return $this;
+    }
+
+    public function dropIndex($index)
+    {
+        if (!$index instanceof Index) {
+            $args = func_get_args();
+            $type = array_shift($args);
+            $columns = $args;
+
+            $index = Index::create($columns)->setType($type);
+        }
+
+        if ($index->type === Index::TYPE_PRIMARY) {
+            throw new Exception('Can not drop primary key', Exception::NOT_IMPLEMENTED);
+        }
+
+        if (isset($this->indexes[$index->getName()])) {
+            unset($this->indexes[$index->getName()]);
+        }
 
         return $this;
     }
@@ -124,22 +145,21 @@ class Table extends BaseClass
      */
     public function getForeignKeyByColumn(Column $column)
     {
-        $name = $column->propertyName;
-        if (isset($this->columnForeignKeys[$name])) {
-            return $this->columnForeignKeys[$name];
-        } else {
-            return null;
-        }
+        return $column->foreignKey;
     }
 
-    /** @var array|Table[]  */
+    /**
+     * @var array|Table[]
+     * @todo make dynamic
+     */
     public $dependentTables = array();
+
     /**
      * @var ForeignKey[]
      */
     private $foreignKeys = array();
     public function addForeignKey(ForeignKey $foreignKey) {
-        $foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
+        //$foreignKey->getReferencedTable()->dependentTables [$this->schemaName]= $this;
         $this->foreignKeys [$foreignKey->getName()]= $foreignKey;
         foreach ($foreignKey->getLocalColumns() as $column) {
             $this->columnForeignKeys[$column->propertyName] = $foreignKey;
@@ -148,7 +168,7 @@ class Table extends BaseClass
     }
 
     /**
-     *
+     * @return array|ForeignKey[]
      */
     public function getForeignKeys()
     {
@@ -158,6 +178,7 @@ class Table extends BaseClass
                 $foreignKeys[] = $column->foreignKey;
             }
         }
+        return $foreignKeys;
     }
 
 

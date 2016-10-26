@@ -82,7 +82,7 @@ class AlterTable extends Batch
             }
         }
         if ($beforeIndexes) {
-            foreach ($this->after->foreignKeys as $foreignKey) {
+            foreach ($this->after->getForeignKeys() as $foreignKey) {
                 if (isset($beforeIndexes[$foreignKey->getName()])) {
                     unset($beforeIndexes[$foreignKey->getName()]);
                 }
@@ -99,11 +99,11 @@ class AlterTable extends Batch
         /** @var ForeignKey[] $beforeForeignKeys */
         $beforeForeignKeys = array();
         if (!$this->before->disableForeignKeys) {
-            foreach ($this->before->foreignKeys as $foreignKey) {
+            foreach ($this->before->getForeignKeys() as $foreignKey) {
                 $beforeForeignKeys [$foreignKey->getName()] = $foreignKey;
             }
         }
-        $afterForeignKeys = $this->after->foreignKeys;
+        $afterForeignKeys = $this->after->getForeignKeys();
         if ($this->after->disableForeignKeys) {
             $afterForeignKeys = array();
         }

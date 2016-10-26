@@ -4,6 +4,7 @@
 namespace Yaoi\Sql;
 use Yaoi\BaseClass;
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\Columns;
 
 class Symbol extends BaseClass
 {
@@ -22,12 +23,12 @@ class Symbol extends BaseClass
 
 
     /**
-     * @param array|\stdClass $columns
+     * @param array|Columns $columns
      * @return array|Symbol[]
      */
     public static function prepareColumns($columns) {
-        if ($columns instanceof \stdClass) {
-            $columns = (array)$columns;
+        if ($columns instanceof Columns) {
+            $columns = $columns->getArray();
         }
         $result = array();
         foreach ($columns as $column) {
