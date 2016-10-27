@@ -2,9 +2,9 @@
 
 namespace Yaoi\Sql;
 
-use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
+use Yaoi\String\Quoter;
 
 abstract class CreateTable extends Batch
 {
@@ -39,7 +39,7 @@ abstract class CreateTable extends Batch
             return;
         }
         foreach ($this->table->getForeignKeys() as $foreignKey) {
-            $this->createLines->commaExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
+            $this->fkLines->commaExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
         }
     }
 
@@ -55,26 +55,45 @@ abstract class CreateTable extends Batch
     /** @var  Expression */
     protected $createLines;
 
+    /** @var  Expression */
+    protected $fkLines;
+
     public function __construct(Table $table) {
         $this->table = $table;
         $this->bindDatabase($table->database());
         $this->createLines = new SimpleExpression();
         $this->createLines->setOpComma(',' . PHP_EOL);
+        $this->fkLines = new SimpleExpression();
+        $this->fkLines->setOpComma(',' . PHP_EOL);
 
         $createExpression = new SimpleExpression('CREATE TABLE ? (' . PHP_EOL, $this->table);
         $this->add($createExpression);
 
+        $createExpression->appendExpr($this->createLines);
+        $createExpression->appendExpr(PHP_EOL . ')');
+
+
         $this->appendColumns();
         $this->appendIndexes();
+        $this->createLines->commaExpr($this->fkLines);
         $this->appendForeignKeys();
         $this->appendPrimaryKey();
 
         if ($this->createLines->isEmpty()) {
             $createExpression->disable();
         }
-        else {
-            $createExpression->appendExpr($this->createLines);
-            $createExpression->appendExpr(PHP_EOL . ')');
-        }
+    }
+
+    public function extractForeignKeysStatement()
+    {
+        $this->fkLines->disable();
+        return $this->database()->getUtility()
+            ->generateAlterTable(new Table(null, $this->database(), '_any_name'), $this->table)
+            ->extractForeignKeysStatement();
+    }
+
+    public function isEmpty()
+    {
+        return false;
     }
 }

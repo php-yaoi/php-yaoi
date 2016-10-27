@@ -38,6 +38,9 @@ interface Contract
 
     public function dropTableIfExists($tableName);
     public function dropTable($tableName);
+
+    public function generateDropTable($tableName);
+    public function generateDropForeignKeys($tableName);
     public function tableExists($tableName);
 
 

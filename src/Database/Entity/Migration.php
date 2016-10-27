@@ -6,17 +6,22 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\AbstractMigration;
+use Yaoi\Sql\Statement;
 use Yaoi\String\Expression;
 
 class Migration extends AbstractMigration
 {
 
-    /** @var Table  */
+    /** @var Table */
     private $table;
 
+    // @todo extract these statics to some managing object
     private static $applied = array();
     private static $rolledBack = array();
     public static $enableStateCache = true;
+    public static $dependenciesRollback = array();
+    public static $dependenciesApply = array();
+
 
     public static function dropStateCache()
     {
@@ -24,12 +29,16 @@ class Migration extends AbstractMigration
         self::$rolledBack = array();
     }
 
-    public function __construct(Table $table) {
+    public function __construct(Table $table)
+    {
         $this->id = null;
         $this->table = $table;
     }
 
-    private function checkRun()
+    /**
+     * @return \Yaoi\Sql\AlterTable|\Yaoi\Sql\CreateTable
+     */
+    private function checkRun($skipForeignKeys = false)
     {
         $database = $this->table->database();
         $utility = $database->getUtility();
@@ -47,6 +56,37 @@ class Migration extends AbstractMigration
     }
 
 
+    private function runStatement(\Yaoi\Sql\Expression $statement)
+    {
+        if ($this->log) {
+            $this->log->push($statement->build());
+        }
+        if (!$this->dryRun) {
+            $this->table->database()->query($statement);
+        }
+
+    }
+
+    private function applyRequired(\Yaoi\Sql\Expression $statement)
+    {
+        $requires = (string)$statement;
+        if ($this->log) {
+            $this->log->push(
+                Expression::create('Apply, table ? (?) ?',
+                    $this->table->schemaName,
+                    $this->table->entityClassName,
+                    $requires ? 'requires migration' : 'is up to date'
+                )
+
+            );
+        }
+        if (!$requires) {
+            self::setApplied($this->table->entityClassName);
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @return bool
      */
@@ -63,65 +103,72 @@ class Migration extends AbstractMigration
             return true;
         }
 
-        $database = $this->table->database();
-        $statement = $this->checkRun();
-        $requires = (string)$statement;
-        if ($this->log) {
-            $this->log->push(
-                Expression::create('Apply, table ? (?) ?',
-                    $this->table->schemaName,
-                    $this->table->entityClassName,
-                    $requires ? 'requires migration' : 'is up to date'
-                )
-
-            );
-        }
-
-        if (!$requires) {
-            self::$applied[$this->table->entityClassName] = true;
-            if (isset(self::$rolledBack[$this->table->entityClassName])) {
-                unset(self::$rolledBack[$this->table->entityClassName]);
-            }
-            return false;
-        }
-
+        /** @var Migration[] $dependentMigrations */
+        $dependentMigrations = array();
         foreach ($this->table->getForeignKeys() as $foreignKey) {
             $referenceMigration = $foreignKey->getReferencedTable()->migration();
             $referenceMigration->dryRun = $this->dryRun;
             $referenceMigration->log = $this->log;
+            $dependentMigrations[$referenceMigration->table->schemaName] = $referenceMigration;
+        }
+
+
+        try {
+            $statement = $this->checkRun();
+
+            if ($dependentMigrations) {
+
+                $fkStatement = $statement->extractForeignKeysStatement();
+
+                if (!$this->applyRequired($statement)) {
+                    return false;
+                }
+
+                $this->runStatement($statement);
+                self::setApplied($this->table->entityClassName);
+                if ($this->log) {
+                    $this->log->push('Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
+                }
+                foreach ($dependentMigrations as $migration) {
+                    $migration->apply();
+                }
+                $this->runStatement($fkStatement);
+            } else {
+                if (!$this->applyRequired($statement)) {
+                    return false;
+                }
+                $this->runStatement($statement);
+            }
 
             if ($this->log) {
-                $this->log->push('Dependent migration required');
+                $this->log->push('OK', Log::TYPE_SUCCESS);
             }
-
-            $referenceMigration->apply();
-        }
-
-        if ($this->log) {
-            $this->log->push($statement->build());
-        }
-
-        if (!$this->dryRun) {
-            try {
-                $database->query($statement);
-                self::$applied[$this->table->entityClassName] = true;
-                if (isset(self::$rolledBack[$this->table->entityClassName])) {
-                    unset(self::$rolledBack[$this->table->entityClassName]);
-                }
-                if ($this->log) {
-                    $this->log->push('OK', Log::TYPE_SUCCESS);
-                }
+        } catch (Exception $exception) {
+            if ($this->log) {
+                $this->log->push($exception->getMessage(), Log::TYPE_ERROR);
             }
-            catch (Exception $exception) {
-                if ($this->log) {
-                    $this->log->push($exception->getMessage(), Log::TYPE_ERROR);
-                }
-                return false;
-            }
+            return false;
         }
 
 
         return true;
+    }
+
+
+    private static function setApplied($name)
+    {
+        self::$applied[$name] = true;
+        if (isset(self::$rolledBack[$name])) {
+            unset(self::$rolledBack[$name]);
+        }
+    }
+
+    private static function setRolledBack($name)
+    {
+        self::$rolledBack[$name] = true;
+        if (isset(self::$applied[$name])) {
+            unset(self::$applied[$name]);
+        }
     }
 
     /**
@@ -158,40 +205,43 @@ class Migration extends AbstractMigration
         }
 
         if (!$requires) {
-            self::$rolledBack[$this->table->entityClassName] = true;
-            if (isset(self::$applied[$this->table->entityClassName])) {
-                unset(self::$applied[$this->table->entityClassName]);
-            }
+            self::setRolledBack($this->table->entityClassName);
             return false;
         }
 
 
+        /** @var Migration[] $dependentMigrations */
+        $dependentMigrations = array();
         foreach ($this->table->dependentTables as $dependentTable) {
             $referenceMigration = $dependentTable->migration();
             $referenceMigration->dryRun = $this->dryRun;
             $referenceMigration->log = $this->log;
-
-            if ($this->log) {
-                $this->log->push('Dependent migration required');
-            }
-
-            $referenceMigration->rollback();
+            $dependentMigrations[$referenceMigration->table->schemaName] = $referenceMigration;
         }
 
 
         if (!$this->dryRun) {
             try {
-                $utility->dropTable($this->table->schemaName);
-                self::$rolledBack[$this->table->entityClassName] = true;
-                if (isset(self::$applied[$this->table->entityClassName])) {
-                    unset(self::$applied[$this->table->entityClassName]);
+                if ($dependentMigrations) {
+                    $dropFk = $utility->generateDropForeignKeys($this->table->schemaName);
+                    $this->runStatement($dropFk);
+                    self::setRolledBack($this->table->entityClassName);
+                    if ($this->log) {
+                        $this->log->push('Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
+                    }
+                    foreach ($dependentMigrations as $migration) {
+                        $migration->rollback();
+                    }
+                    $this->runStatement($utility->generateDropTable($this->table->schemaName));
+                } else {
+                    $this->runStatement($utility->generateDropTable($this->table->schemaName));
+                    self::setRolledBack($this->table->entityClassName);
                 }
 
                 if ($this->log) {
                     $this->log->push('OK', Log::TYPE_SUCCESS);
                 }
-            }
-            catch (Exception $exception) {
+            } catch (Exception $exception) {
                 if ($this->log) {
                     $this->log->push($exception->getMessage(), Log::TYPE_ERROR);
                 }

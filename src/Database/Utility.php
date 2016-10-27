@@ -35,8 +35,26 @@ abstract class Utility extends BaseClass implements UtilityContract
 
     public function dropTable($tableName)
     {
-        $this->database->query("DROP TABLE ?", new Symbol($tableName));
+        $this->database->query($this->generateDropTable($tableName));
     }
+
+    public function generateDropTable($tableName)
+    {
+        return SimpleExpression::create("DROP TABLE ?", new Symbol($tableName))->bindDatabase($this->database);
+    }
+
+    /**
+     * @param $tableName
+     * @return \Yaoi\Sql\AlterTable
+     */
+    public function generateDropForeignKeys($tableName)
+    {
+        $before = $this->getTableDefinition($tableName);
+        $after = clone $before;
+        $after->removeForeignKeys();
+        return $this->generateAlterTable($before, $after);
+    }
+
 
     public function generateForeignKeyExpression(Database\Definition\ForeignKey $foreignKey) {
         return new SimpleExpression(' CONSTRAINT ? FOREIGN KEY (?) REFERENCES ? (?)??',

@@ -5,6 +5,7 @@ namespace Yaoi\Database\Pgsql;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
+use Yaoi\Sql\Expression;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
@@ -105,14 +106,14 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         }
         foreach ($afterForeignKeys as $foreignKey) {
             if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
-                $this->alterLines->commaExpr('ADD');
-                $this->alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
+                $alterLines->commaExpr('ADD');
+                $alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
             } else {
                 unset($beforeForeignKeys[$foreignKey->getName()]);
             }
         }
         foreach ($beforeForeignKeys as $foreignKey) {
-            $this->alterLines->commaExpr('DROP CONSTRAINT IF EXISTS ?', new Symbol($foreignKey->getName()));
+            $alterLines->commaExpr('DROP CONSTRAINT IF EXISTS ?', new Symbol($foreignKey->getName()));
         }
 
     }
