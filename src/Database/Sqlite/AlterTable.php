@@ -4,6 +4,7 @@ namespace Yaoi\Database\Sqlite;
 
 
 use Yaoi\Database\Definition\Index;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
@@ -74,6 +75,11 @@ class AlterTable extends \Yaoi\Sql\AlterTable
             $this->add($this->database()->expr("DROP TABLE _temp_table"));
         }
 
+    }
+
+    public function extractForeignKeysStatement()
+    {
+        return new SimpleExpression();
     }
 
 

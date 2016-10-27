@@ -19,20 +19,18 @@ class SqliteTest extends BaseTest
 
     protected $expectedMigrationLog = <<<LOG
 Table creation expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 CREATE TABLE `yaoi_tests_helper_entity_user` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
  `name` varchar(255) NOT NULL
-)
-OK
+);
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table revision increased, added age, hostId
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 ALTER TABLE `yaoi_tests_helper_entity_user` RENAME TO _temp_table;
 CREATE TABLE `yaoi_tests_helper_entity_user` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -44,14 +42,13 @@ CREATE TABLE `yaoi_tests_helper_entity_user` (
 CREATE INDEX `yaoi_tests_helper_entity_user_key_age` ON `yaoi_tests_helper_entity_user` (`age`);
 INSERT INTO `yaoi_tests_helper_entity_user` (`id`, `name`) SELECT `id`, `name` FROM _temp_table;
 DROP TABLE _temp_table;
-
-OK
+# Dependent tables found: yaoi_tests_entity_host
+# Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table revision increased, removed hostId, name, added sessionId, firstName, lastName
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 DROP INDEX 'yaoi_tests_helper_entity_user_key_age';
 ALTER TABLE `yaoi_tests_helper_entity_user` RENAME TO _temp_table;
 CREATE TABLE `yaoi_tests_helper_entity_user` (
@@ -66,15 +63,30 @@ CREATE INDEX `yaoi_tests_helper_entity_user_key_age` ON `yaoi_tests_helper_entit
 CREATE UNIQUE INDEX `yaoi_tests_helper_entity_user_unique_last_name_first_name` ON `yaoi_tests_helper_entity_user` (`last_name`, `first_name`);
 INSERT INTO `yaoi_tests_helper_entity_user` (`id`, `age`) SELECT `id`, `age` FROM _temp_table;
 DROP TABLE _temp_table;
-
-OK
+# Dependent tables found: yaoi_tests_entity_session
+# Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires migration
+ALTER TABLE `yaoi_tests_entity_session` RENAME TO _temp_table;
+CREATE TABLE `yaoi_tests_entity_session` (
+ `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ `host_id` INTEGER NOT NULL,
+ `started_at` timestamp DEFAULT NULL,
+ `ended_at` timestamp DEFAULT NULL,
+ CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+);
+INSERT INTO `yaoi_tests_entity_session` (`id`, `host_id`, `started_at`, `ended_at`) SELECT `id`, `host_id`, `started_at`, `ended_at` FROM _temp_table;
+DROP TABLE _temp_table;
+# Dependent tables found: yaoi_tests_entity_host
+# Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+# OK
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table removal expected
-Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion
-OK
+# Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion
+DROP TABLE `yaoi_tests_helper_entity_user`;
+# OK
 No action (is already non-existent) expected
-Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is already non-existent
+# Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is already non-existent
 
 LOG;
 
