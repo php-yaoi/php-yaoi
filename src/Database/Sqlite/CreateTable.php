@@ -64,4 +64,9 @@ class CreateTable extends \Yaoi\Sql\CreateTable
             }
         }
     }
+
+
+    protected function appendForeignKeys()
+    {
+    }
 }

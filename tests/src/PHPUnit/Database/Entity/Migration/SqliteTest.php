@@ -36,8 +36,7 @@ CREATE TABLE `yaoi_tests_helper_entity_user` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
  `name` varchar(255) NOT NULL,
  `age` INTEGER DEFAULT NULL,
- `host_id` INTEGER NOT NULL,
- CONSTRAINT `k432f6fb01e8766435a432e5ed8ffb2ef` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`)
+ `host_id` INTEGER NOT NULL
 );
 CREATE INDEX `yaoi_tests_helper_entity_user_key_age` ON `yaoi_tests_helper_entity_user` (`age`);
 INSERT INTO `yaoi_tests_helper_entity_user` (`id`, `name`) SELECT `id`, `name` FROM _temp_table;
@@ -56,28 +55,14 @@ CREATE TABLE `yaoi_tests_helper_entity_user` (
  `age` INTEGER DEFAULT NULL,
  `session_id` INTEGER NOT NULL,
  `first_name` varchar(255) NOT NULL,
- `last_name` varchar(255) NOT NULL,
- CONSTRAINT `k42405537c0e04845e2902c8a7fb322be` FOREIGN KEY (`session_id`) REFERENCES `yaoi_tests_entity_session` (`id`)
+ `last_name` varchar(255) NOT NULL
 );
 CREATE INDEX `yaoi_tests_helper_entity_user_key_age` ON `yaoi_tests_helper_entity_user` (`age`);
 CREATE UNIQUE INDEX `yaoi_tests_helper_entity_user_unique_last_name_first_name` ON `yaoi_tests_helper_entity_user` (`last_name`, `first_name`);
 INSERT INTO `yaoi_tests_helper_entity_user` (`id`, `age`) SELECT `id`, `age` FROM _temp_table;
 DROP TABLE _temp_table;
 # Dependent tables found: yaoi_tests_entity_session
-# Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) requires migration
-ALTER TABLE `yaoi_tests_entity_session` RENAME TO _temp_table;
-CREATE TABLE `yaoi_tests_entity_session` (
- `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
- `host_id` INTEGER NOT NULL,
- `started_at` timestamp DEFAULT NULL,
- `ended_at` timestamp DEFAULT NULL,
- CONSTRAINT `fk_yaoi_tests_entity_session_host_id_yaoi_tests_entity_host_id` FOREIGN KEY (`host_id`) REFERENCES `yaoi_tests_entity_host` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
-);
-INSERT INTO `yaoi_tests_entity_session` (`id`, `host_id`, `started_at`, `ended_at`) SELECT `id`, `host_id`, `started_at`, `ended_at` FROM _temp_table;
-DROP TABLE _temp_table;
-# Dependent tables found: yaoi_tests_entity_host
-# Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
-# OK
+# Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
 # OK
 No action (up to date) expected
 # Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
