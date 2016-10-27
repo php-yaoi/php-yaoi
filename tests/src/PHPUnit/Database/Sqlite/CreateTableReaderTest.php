@@ -4,6 +4,7 @@ namespace YaoiTests\PHPUnit\Database\Sqlite;
 
 
 use Yaoi\Database;
+use Yaoi\Log;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
@@ -29,7 +30,7 @@ class CreateTableReaderTest extends TestCase
         Session::bindDatabase($this->database, true);
         Host::bindDatabase($this->database, true);
 
-        Session::table()->migration()->apply();
+        Session::table()->migration()->setLog(Log::getInstance())->apply();
 
         $actualDefinition = $this->database->getUtility()->getTableDefinition(Session::table()->schemaName);
         $expectedDefinition = Session::table();

@@ -6,7 +6,6 @@ namespace Yaoi\Database\Sqlite;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Exception;
-use Yaoi\Sql\Batch;
 use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 
@@ -64,5 +63,10 @@ class CreateTable extends \Yaoi\Sql\CreateTable
                 //$this->appendExpr(' CONSTRAINT ? UNIQUE (?),' . PHP_EOL, new Symbol($index->getName()), $columns);
             }
         }
+    }
+
+
+    protected function appendForeignKeys()
+    {
     }
 }

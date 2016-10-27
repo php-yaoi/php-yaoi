@@ -182,6 +182,13 @@ class Table extends BaseClass
     }
 
 
+    public function removeForeignKeys()
+    {
+        $this->foreignKeys = array();
+        return $this;
+    }
+
+
 
     private $databaseId;
 
@@ -209,7 +216,12 @@ class Table extends BaseClass
 
     public function migration() {
         foreach ($this->getForeignKeys() as $foreignKey) {
-            $foreignKey->getReferencedTable()->dependentTables[$this->schemaName] = $this;
+            $referencedTable = $foreignKey->getReferencedTable();
+            $referencedTable->dependentTables[$this->schemaName] = $this;
+            Database\Entity\Migration::$dependenciesApply[$this->schemaName][$referencedTable->schemaName]
+                = $referencedTable->schemaName;
+            Database\Entity\Migration::$dependenciesRollback[$referencedTable->schemaName][$this->schemaName]
+                = $this->schemaName;
         }
         return new Database\Entity\Migration($this);
     }

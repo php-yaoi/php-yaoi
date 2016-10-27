@@ -4,11 +4,13 @@ namespace Yaoi\Database\Sqlite;
 
 
 use Yaoi\Database\Definition\Index;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable
 {
-    protected function processColumns() {
+    protected function processColumns()
+    {
         $this->alterLines->disable();
 
         $intersect = array();
@@ -24,10 +26,9 @@ class AlterTable extends \Yaoi\Sql\AlterTable
             if (!isset($beforeColumns[$columnName])) {
                 $changed = true;
                 $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
-            }
-            else {
+            } else {
                 $beforeColumn = $beforeColumns[$columnName];
-                $intersect []= new Symbol($beforeColumn->schemaName);
+                $intersect [] = new Symbol($beforeColumn->schemaName);
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
                     $changed = true;
                 }
@@ -37,19 +38,18 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         if ($changed) {
             /**
              * ALTER TABLE {tableName} RENAME TO TempOldTable;
-
-            Then create the new table with the missing column:
-
-            CREATE TABLE {tableName} (name TEXT, COLNew {type} DEFAULT {defaultValue}, qty INTEGER, rate REAL);
-
-            And populate it with the old data:
-
-            INSERT INTO {tableName} (name, qty, rate) SELECT name, qty, rate FROM TempOldTable;
-
-            Then delete the old table:
-
-            DROP TABLE TempOldTable;
-
+             *
+             * Then create the new table with the missing column:
+             *
+             * CREATE TABLE {tableName} (name TEXT, COLNew {type} DEFAULT {defaultValue}, qty INTEGER, rate REAL);
+             *
+             * And populate it with the old data:
+             *
+             * INSERT INTO {tableName} (name, qty, rate) SELECT name, qty, rate FROM TempOldTable;
+             *
+             * Then delete the old table:
+             *
+             * DROP TABLE TempOldTable;
              */
 
             foreach ($this->before->indexes as $index) {
@@ -76,8 +76,17 @@ class AlterTable extends \Yaoi\Sql\AlterTable
 
     }
 
+    public function extractForeignKeysStatement()
+    {
+        return new SimpleExpression();
+    }
 
-    protected function processIndexes() {
+    public function processForeignKeys()
+    {
+    }
 
+
+    protected function processIndexes()
+    {
     }
 }

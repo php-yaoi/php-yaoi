@@ -84,5 +84,4 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
             $this->setFromFuncArguments(func_get_args());
         }
     }
-
 }

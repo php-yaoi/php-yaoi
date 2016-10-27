@@ -223,7 +223,7 @@ SQL;
 
 
     protected $testDefaultValueConsistency = <<<LOG
-Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
+# Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
 CREATE TABLE `test_columns` (
  `id` int NOT NULL AUTO_INCREMENT,
  `int_column` int NOT NULL DEFAULT '2',
@@ -231,9 +231,9 @@ CREATE TABLE `test_columns` (
  `float_column` float NOT NULL DEFAULT '1.33',
  `string_column` varchar(255) NOT NULL DEFAULT '11',
  PRIMARY KEY (`id`)
-)
-OK
-Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
+);
+# OK
+# Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
 
 LOG;
 

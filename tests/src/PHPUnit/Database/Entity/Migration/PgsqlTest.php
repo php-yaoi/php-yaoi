@@ -20,52 +20,53 @@ class PgsqlTest extends BaseTest
 
     protected $expectedMigrationLog = <<<LOG
 Table creation expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 CREATE TABLE "yaoi_tests_helper_entity_user" (
  "id" SERIAL,
  "name" varchar(255) NOT NULL,
  PRIMARY KEY ("id")
-)
-OK
+);
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table revision increased, added age, hostId
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 ALTER TABLE "yaoi_tests_helper_entity_user"
 ADD COLUMN "age" int,
-ADD COLUMN "host_id" int NOT NULL,
-ADD CONSTRAINT "k432f6fb01e8766435a432e5ed8ffb2ef" FOREIGN KEY ("host_id") REFERENCES "yaoi_tests_entity_host" ("id");
+ADD COLUMN "host_id" int NOT NULL;
 CREATE INDEX "key_age" ON "yaoi_tests_helper_entity_user" ("age");
-
-OK
+# Dependent tables found: yaoi_tests_entity_host
+# Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+ALTER TABLE "yaoi_tests_helper_entity_user"
+ADD CONSTRAINT "k432f6fb01e8766435a432e5ed8ffb2ef" FOREIGN KEY ("host_id") REFERENCES "yaoi_tests_entity_host" ("id");
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table revision increased, removed hostId, name, added sessionId, firstName, lastName
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 ALTER TABLE "yaoi_tests_helper_entity_user"
 ADD COLUMN "session_id" int NOT NULL,
 ADD COLUMN "first_name" varchar(255) NOT NULL,
 ADD COLUMN "last_name" varchar(255) NOT NULL,
 DROP COLUMN "name",
 DROP COLUMN "host_id",
-ADD CONSTRAINT "k42405537c0e04845e2902c8a7fb322be" FOREIGN KEY ("session_id") REFERENCES "yaoi_tests_entity_session" ("id"),
 DROP CONSTRAINT IF EXISTS "k432f6fb01e8766435a432e5ed8ffb2ef";
 CREATE UNIQUE INDEX "unique_last_name_first_name" ON "yaoi_tests_helper_entity_user" ("last_name", "first_name");
-
-OK
+# Dependent tables found: yaoi_tests_entity_session
+# Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+ALTER TABLE "yaoi_tests_helper_entity_user"
+ADD CONSTRAINT "k42405537c0e04845e2902c8a7fb322be" FOREIGN KEY ("session_id") REFERENCES "yaoi_tests_entity_session" ("id");
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 Table removal expected
-Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion
-OK
+# Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires deletion
+DROP TABLE "yaoi_tests_helper_entity_user";
+# OK
 No action (is already non-existent) expected
-Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is already non-existent
+# Rollback, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is already non-existent
 
 LOG;
 
@@ -103,22 +104,22 @@ LOG;
         User::table()->migration()->setLog($log)->apply();
 
         $this->assertSame('Table revision increased, added age, hostId
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 CREATE TABLE "yaoi_tests_helper_entity_user" (
  "id" SERIAL,
  "name" varchar(255) NOT NULL,
  "age" int,
  "host_id" int NOT NULL,
- CONSTRAINT "k432f6fb01e8766435a432e5ed8ffb2ef" FOREIGN KEY ("host_id") REFERENCES "yaoi_tests_entity_host" ("id"),
  PRIMARY KEY ("id")
 );
 CREATE INDEX "key_age" ON "yaoi_tests_helper_entity_user" ("age");
-
-OK
+# Dependent tables found: yaoi_tests_entity_host
+# Apply, table yaoi_tests_entity_host (YaoiTests\Helper\Entity\Host) is up to date
+ALTER TABLE "yaoi_tests_helper_entity_user"
+ADD CONSTRAINT "k432f6fb01e8766435a432e5ed8ffb2ef" FOREIGN KEY ("host_id") REFERENCES "yaoi_tests_entity_host" ("id");
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 ', $logString);
 
     }
@@ -158,9 +159,7 @@ Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up 
         User::table()->migration()->setLog($log)->apply();
 
         $this->assertSame('Table creation expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
-Dependent migration required
-Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) requires migration
 CREATE TABLE "yaoi_tests_helper_entity_user" (
  "id" SERIAL,
  "age" int,
@@ -168,14 +167,16 @@ CREATE TABLE "yaoi_tests_helper_entity_user" (
  "first_name" varchar(255) NOT NULL,
  "last_name" varchar(255) NOT NULL,
  CONSTRAINT "unique_last_name_first_name" UNIQUE ("last_name", "first_name"),
- CONSTRAINT "k42405537c0e04845e2902c8a7fb322be" FOREIGN KEY ("session_id") REFERENCES "yaoi_tests_entity_session" ("id"),
  PRIMARY KEY ("id")
 );
 CREATE INDEX "key_age" ON "yaoi_tests_helper_entity_user" ("age");
-
-OK
+# Dependent tables found: yaoi_tests_entity_session
+# Apply, table yaoi_tests_entity_session (YaoiTests\Helper\Entity\Session) is up to date
+ALTER TABLE "yaoi_tests_helper_entity_user"
+ADD CONSTRAINT "k42405537c0e04845e2902c8a7fb322be" FOREIGN KEY ("session_id") REFERENCES "yaoi_tests_entity_session" ("id");
+# OK
 No action (up to date) expected
-Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
+# Apply, table yaoi_tests_helper_entity_user (YaoiTests\Helper\Entity\User) is up to date
 ', $logString);
 
     }

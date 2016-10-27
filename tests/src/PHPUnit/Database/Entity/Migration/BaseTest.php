@@ -30,6 +30,8 @@ abstract class BaseTest extends TestCase
             $settings->storage = &$logString;
             return $settings;
         });
+        //$log = new Log('stdout');
+        //$this->database->log($log);
 
         User::$revision = 1;
         User::bindDatabase($this->database, true);

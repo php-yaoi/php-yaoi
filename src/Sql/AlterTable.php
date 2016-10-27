@@ -2,12 +2,11 @@
 
 namespace Yaoi\Sql;
 
-
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use YaoiTests\Helper\Entity\User;
+use Yaoi\String\Quoter;
 
 class AlterTable extends Batch
 {
@@ -19,25 +18,34 @@ class AlterTable extends Batch
     /** @var  Expression */
     protected $alterLines;
 
+    /** @var  Expression */
+    protected $alterExpression;
+
+    /** @var  Expression */
+    protected $addFkExpression;
+
     public function __construct(Table $before, Table $after)
     {
         $this->before = $before;
         $this->after = $after;
-
         $this->bindDatabase($before->database());
-        $alterExpression = new SimpleExpression('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
+
+        $this->alterExpression = new SimpleExpression('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
         $this->alterLines = new SimpleExpression();
         $this->alterLines->setOpComma(',' . PHP_EOL);
-        $this->add($alterExpression);
+        $this->add($this->alterExpression);
+        $this->alterExpression->appendExpr($this->alterLines);
 
         $this->processColumns();
         $this->processIndexes();
+
+        $this->addFkExpression = new SimpleExpression();
         $this->processForeignKeys();
+        $this->alterExpression->appendExpr($this->addFkExpression);
+
 
         if ($this->alterLines->isEmpty()) {
-            $alterExpression->disable();
-        } else {
-            $alterExpression->appendExpr($this->alterLines);
+            $this->alterExpression->disable();
         }
     }
 
@@ -109,8 +117,8 @@ class AlterTable extends Batch
         }
         foreach ($afterForeignKeys as $foreignKey) {
             if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
-                $this->alterLines->commaExpr('ADD');
-                $this->alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
+                $this->addFkExpression->commaExpr('ADD');
+                $this->addFkExpression->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
             } else {
                 unset($beforeForeignKeys[$foreignKey->getName()]);
             }
@@ -118,7 +126,15 @@ class AlterTable extends Batch
         foreach ($beforeForeignKeys as $foreignKey) {
             $this->alterLines->commaExpr('DROP FOREIGN KEY ?', new Symbol($foreignKey->getName()));
         }
-
     }
 
+    public function extractForeignKeysStatement()
+    {
+        $alterExpression = new SimpleExpression('ALTER TABLE ?' . PHP_EOL, new Symbol($this->after->schemaName));
+        $alterExpression->bindDatabase($this->database());
+        $alterExpression->appendExpr(clone $this->addFkExpression);
+        $this->addFkExpression->disable();
+
+        return $alterExpression;
+    }
 }

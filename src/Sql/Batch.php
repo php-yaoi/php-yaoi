@@ -68,4 +68,14 @@ class Batch extends Expression
     public function __toString() {
         return $this->build();
     }
+
+    public function isEmpty()
+    {
+        foreach ($this->statements as $statement) {
+            if (!$statement->isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
