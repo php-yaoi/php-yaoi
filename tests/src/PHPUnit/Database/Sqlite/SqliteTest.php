@@ -103,16 +103,16 @@ SQL;
 
 
     protected $testDefaultValueConsistency = <<<LOG
-Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
+# Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) requires migration
 CREATE TABLE `test_columns` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
  `int_column` INTEGER NOT NULL DEFAULT '2',
  `int8_column` INTEGER NOT NULL DEFAULT '2',
  `float_column` float NOT NULL DEFAULT '1.33',
  `string_column` varchar(255) NOT NULL DEFAULT '11'
-)
-OK
-Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
+);
+# OK
+# Apply, table test_columns (YaoiTests\Helper\Entity\TestColumns) is up to date
 
 LOG;
 

@@ -58,8 +58,12 @@ class Migration extends AbstractMigration
 
     private function runStatement(\Yaoi\Sql\Expression $statement)
     {
+        $query = $statement->build();
+        if (!$query) {
+            return;
+        }
         if ($this->log) {
-            $this->log->push($statement->build());
+            $this->log->push(trim($query, ";\n") . ';');
         }
         if (!$this->dryRun) {
             $this->table->database()->query($statement);
@@ -72,7 +76,7 @@ class Migration extends AbstractMigration
         $requires = (string)$statement;
         if ($this->log) {
             $this->log->push(
-                Expression::create('Apply, table ? (?) ?',
+                Expression::create('# Apply, table ? (?) ?',
                     $this->table->schemaName,
                     $this->table->entityClassName,
                     $requires ? 'requires migration' : 'is up to date'
@@ -95,7 +99,7 @@ class Migration extends AbstractMigration
         if (self::$enableStateCache && isset(self::$applied[$this->table->entityClassName])) {
             if ($this->log) {
                 $this->log->push(Expression::create(
-                    'Migration for table ? (?) already applied, skipping',
+                    '# Migration for table ? (?) already applied, skipping',
                     $this->table->schemaName,
                     $this->table->entityClassName
                 ));
@@ -127,7 +131,7 @@ class Migration extends AbstractMigration
                 $this->runStatement($statement);
                 self::setApplied($this->table->entityClassName);
                 if ($this->log) {
-                    $this->log->push('Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
+                    $this->log->push('# Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
                 }
                 foreach ($dependentMigrations as $migration) {
                     $migration->apply();
@@ -141,7 +145,7 @@ class Migration extends AbstractMigration
             }
 
             if ($this->log) {
-                $this->log->push('OK', Log::TYPE_SUCCESS);
+                $this->log->push('# OK', Log::TYPE_SUCCESS);
             }
         } catch (Exception $exception) {
             if ($this->log) {
@@ -180,7 +184,7 @@ class Migration extends AbstractMigration
         if (self::$enableStateCache && isset(self::$rolledBack[$this->table->entityClassName])) {
             if ($this->log) {
                 $this->log->push(Expression::create(
-                    'Migration for table ? (?) already rolled back, skipping',
+                    '# Migration for table ? (?) already rolled back, skipping',
                     $this->table->schemaName,
                     $this->table->entityClassName
                 ));
@@ -195,7 +199,7 @@ class Migration extends AbstractMigration
         $requires = $tableExists;
         if ($this->log) {
             $this->log->push(
-                Expression::create('Rollback, table ? (?) ?',
+                Expression::create('# Rollback, table ? (?) ?',
                     $this->table->schemaName,
                     $this->table->entityClassName,
                     $requires ? 'requires deletion' : 'is already non-existent'
@@ -227,7 +231,7 @@ class Migration extends AbstractMigration
                     $this->runStatement($dropFk);
                     self::setRolledBack($this->table->entityClassName);
                     if ($this->log) {
-                        $this->log->push('Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
+                        $this->log->push('# Dependent tables found: ' . implode(', ', array_keys($dependentMigrations)));
                     }
                     foreach ($dependentMigrations as $migration) {
                         $migration->rollback();
@@ -239,7 +243,7 @@ class Migration extends AbstractMigration
                 }
 
                 if ($this->log) {
-                    $this->log->push('OK', Log::TYPE_SUCCESS);
+                    $this->log->push('# OK', Log::TYPE_SUCCESS);
                 }
             } catch (Exception $exception) {
                 if ($this->log) {

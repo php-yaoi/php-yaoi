@@ -106,14 +106,14 @@ class AlterTable extends \Yaoi\Sql\AlterTable
         }
         foreach ($afterForeignKeys as $foreignKey) {
             if (!isset($beforeForeignKeys[$foreignKey->getName()])) {
-                $alterLines->commaExpr('ADD');
-                $alterLines->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
+                $this->addFkExpression->commaExpr('ADD');
+                $this->addFkExpression->appendExpr($this->database()->getUtility()->generateForeignKeyExpression($foreignKey));
             } else {
                 unset($beforeForeignKeys[$foreignKey->getName()]);
             }
         }
         foreach ($beforeForeignKeys as $foreignKey) {
-            $alterLines->commaExpr('DROP CONSTRAINT IF EXISTS ?', new Symbol($foreignKey->getName()));
+            $this->alterLines->commaExpr('DROP CONSTRAINT IF EXISTS ?', new Symbol($foreignKey->getName()));
         }
 
     }
