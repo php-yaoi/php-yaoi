@@ -35,7 +35,7 @@ class ApplicationTest extends TestCase
 
     public function testCommandException()
     {
-        $expected = "\x1B" . '[37;41m Application required ' . "\x1B" . '[m' . PHP_EOL
+        $expected = "\x1B" . '[37;41mApplication required' . "\x1B" . '[m' . PHP_EOL
             . 'Use --help to show information.' . PHP_EOL;
 
         ob_start();

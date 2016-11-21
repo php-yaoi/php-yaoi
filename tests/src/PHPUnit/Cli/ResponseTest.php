@@ -46,7 +46,7 @@ class ResponseTest extends TestCase
 
     public function testError()
     {
-        $expected = "\x1B" . '[37;41m Unexpected expectations expected ' . "\x1B" . '[m' . PHP_EOL;
+        $expected = "\x1B" . '[37;41mUnexpected expectations expected' . "\x1B" . '[m' . PHP_EOL;
 
         ob_start();
         $this->getResponse()->error('Unexpected expectations expected');
@@ -58,7 +58,7 @@ class ResponseTest extends TestCase
 
     public function testSuccess()
     {
-        $expected = "\x1B" . '[30;42m Hooray ' . "\x1B" . '[m' . PHP_EOL;
+        $expected = "\x1B" . '[30;42mHooray' . "\x1B" . '[m' . PHP_EOL;
 
         ob_start();
         $this->getResponse()->success('Hooray');

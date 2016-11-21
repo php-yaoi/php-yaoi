@@ -44,7 +44,6 @@ class Text extends Hardcoded implements Renderer
 
         switch ($this->text->type) {
             case \Yaoi\Io\Content\Text::ERROR:
-                $value = ' ' . $value . ' ';
                 $console->set(Console::FG_WHITE, Console::BG_RED);
                 break;
 
@@ -53,7 +52,6 @@ class Text extends Hardcoded implements Renderer
                 break;
 
             case \Yaoi\Io\Content\Text::SUCCESS:
-                $value = ' ' . $value . ' ';
                 $console->set(Console::FG_BLACK, Console::BG_GREEN);
                 break;
 

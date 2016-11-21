@@ -60,7 +60,7 @@ class Test extends TestCase
         //echo $result;
         //echo $this->varExportString($result);
         $this->assertSame(
-            "\x1B" . '[37;41m Command definition error: Non-tailing variadic argument [variadicArgument...] ' . "\x1B" . '[m' . PHP_EOL
+            "\x1B" . '[37;41mCommand definition error: Non-tailing variadic argument [variadicArgument...]' . "\x1B" . '[m' . PHP_EOL
             , $result);
 
     }
@@ -71,7 +71,7 @@ class Test extends TestCase
         $result = ob_get_clean();
         //echo $result;
         //echo $this->varExportString($result);
-        $this->assertSame("\x1B" . '[30;42m Congratulations! ' . "\x1B" . '[m' . PHP_EOL, $result);
+        $this->assertSame("\x1B" . '[30;42mCongratulations!' . "\x1B" . '[m' . PHP_EOL, $result);
 
     }
 
@@ -255,10 +255,10 @@ class Test extends TestCase
         $response->success('hello, world!');
         $result = ob_get_clean();
         //echo $this->varExportString($result);
-        $expected = "\x1B" . '[37;41m hello, world! ' . "\x1B" . '[m' . PHP_EOL
-            . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL
-            . "\x1B" . '[37;41m hello, world! ' . "\x1B" . '[m' . PHP_EOL
-            . "\x1B" . '[30;42m hello, world! ' . "\x1B" . '[m' . PHP_EOL;
+        $expected = "\x1B" . '[37;41mhello, world!' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[30;42mhello, world!' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[37;41mhello, world!' . "\x1B" . '[m' . PHP_EOL
+            . "\x1B" . '[30;42mhello, world!' . "\x1B" . '[m' . PHP_EOL;
 
         $this->assertSame($expected, $result);
     }
