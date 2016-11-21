@@ -19,4 +19,9 @@ class Text extends BaseClass implements Element
     {
         $this->value = $text;
     }
+
+    public function __toString()
+    {
+        return (string)$this->value;
+    }
 }
