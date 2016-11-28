@@ -44,6 +44,10 @@ class Console extends BaseClass
     private $mode = array(self::RESET);
 
     public function set($mode = self::RESET) {
+        if (!$this->attached()) {
+            return $this;
+        }
+
         if (!is_array($mode)) {
             $mode = func_get_args();
         }
@@ -117,6 +121,13 @@ class Console extends BaseClass
             $instance = new static;
         }
         return $instance;
+    }
+
+    public $forceAttached = false;
+
+    public function attached()
+    {
+        return $this->forceAttached || posix_isatty(STDOUT);
     }
 
 
