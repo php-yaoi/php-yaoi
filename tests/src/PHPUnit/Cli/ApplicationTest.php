@@ -4,6 +4,7 @@ namespace YaoiTests\PHPUnit\Cli;
 
 
 use Yaoi\Cli\Command\Application\Runner;
+use Yaoi\Cli\Console;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestApplication;
 use YaoiTests\Helper\Command\TestCommandOne;
@@ -11,6 +12,11 @@ use YaoiTests\Helper\TestRequestHelper;
 
 class ApplicationTest extends TestCase
 {
+    public function setUp()
+    {
+        Console::getInstance()->forceColors = true;
+    }
+
     public function testHelp() {
         $expected = "\x1B" . '[36;1mv1.0 test-application' . "\x1B" . '[m' . PHP_EOL
             . "\x1B" . '[36;1mTest application description' . "\x1B" . '[m' . PHP_EOL

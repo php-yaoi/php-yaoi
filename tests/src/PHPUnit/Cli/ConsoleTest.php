@@ -11,7 +11,8 @@ class ConsoleTest extends TestCase
 {
 
     public function testColors() {
-        $con = Console::create();
+        $con = new Console();
+        $con->forceColors = true;
 
         $ref = new \ReflectionClass(Console::className());
 
