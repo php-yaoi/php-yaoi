@@ -44,7 +44,7 @@ class Console extends BaseClass
     private $mode = array(self::RESET);
 
     public function set($mode = self::RESET) {
-        if (!$this->attached()) {
+        if (!($this->forceColors || $this->attached())) {
             return $this;
         }
 
@@ -123,11 +123,11 @@ class Console extends BaseClass
         return $instance;
     }
 
-    public $forceAttached = false;
+    public $forceColors = false;
 
     public function attached()
     {
-        return $this->forceAttached || posix_isatty(STDOUT);
+        return posix_isatty(STDOUT);
     }
 
 
