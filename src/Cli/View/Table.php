@@ -48,8 +48,12 @@ class Table extends Hardcoded implements Renderer
                     $value = new Content\Text($value);
                 }
                 $renderer = new Text($value);
+                /**
+                 * @var  $lineIndex
+                 * @var Text $line
+                 */
                 foreach ($renderer->lines() as $lineIndex => $line) {
-                    $stringLength = strlen($line->text->value);
+                    $stringLength = $line->text->length();
                     if (!isset($this->length[$key]) || $this->length[$key] < $stringLength) {
                         $this->length[$key] = $stringLength;
                     }

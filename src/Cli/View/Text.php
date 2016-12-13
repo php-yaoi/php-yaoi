@@ -21,16 +21,21 @@ class Text extends Hardcoded implements Renderer
      */
     public function lines() {
         $lines = explode("\n", str_replace("\r\n", "\n", $this->text->value));
-        $result = array();
-        foreach ($lines as $line) {
-            $result []= new static($this->text->create($line));
+        if (count($lines) > 1) {
+            $result = array();
+            foreach ($lines as $line) {
+                $result [] = new static($this->text->create($line));
+            }
+        } else {
+            $result = array($this);
         }
         return $result;
     }
 
     public function strPad($length, $padString = ' ') {
-        if (strlen($this->text->value) < $length) {
-            $this->text->value = str_pad($this->text->value, $length, $padString);
+        $textLength = $this->text->length();
+        if ($textLength < $length) {
+            $this->text->value .= str_pad('', $length - $textLength, $padString);
         }
         return $this;
     }

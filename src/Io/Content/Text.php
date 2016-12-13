@@ -15,6 +15,17 @@ class Text extends BaseClass implements Element
     public $value;
     public $type = self::TEXT;
 
+    public $forceLength = false;
+
+    public function length()
+    {
+        if ($this->forceLength) {
+            return $this->forceLength;
+        } else {
+            return strlen($this->value);
+        }
+    }
+
     public function __construct($text)
     {
         $this->value = $text;
