@@ -316,9 +316,9 @@ class HighCharts extends BaseClass implements Renderer
 
         if (!self::$jsLoaded) {
             ?>
-<script type="text/javascript" src="http://code.highcharts.com/stock/highstock.js"></script>
-<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
-<script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/stock/highstock.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/highcharts-more.js"></script>
 <?php
             self::$jsLoaded = true;
         }

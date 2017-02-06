@@ -76,9 +76,9 @@ class ChartTest extends TestCase
 
 
         $e = <<<'EOD'
-<script type="text/javascript" src="http://code.highcharts.com/stock/highstock.js"></script>
-<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
-<script type="text/javascript" src="http://code.highcharts.com/highcharts-more.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/stock/highstock.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="//code.highcharts.com/highcharts-more.js"></script>
 <script type="text/javascript">
 (function(){
     Highcharts.setOptions({"global":{"useUTC":false}});
