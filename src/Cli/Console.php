@@ -127,8 +127,11 @@ class Console extends BaseClass
 
     public function attached()
     {
-        return posix_isatty(STDOUT);
+        if (function_exists('posix_isatty')) {
+            return posix_isatty(STDOUT);
+        } else {
+            return true;
+        }
     }
-
 
 }
