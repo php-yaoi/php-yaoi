@@ -18,10 +18,11 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
 
     /**
      * @param $arguments
+     * @param $operation
      * @return SimpleExpression
      * @throws \Yaoi\Sql\Exception
      */
-    public static function createFromFuncArguments($arguments)
+    public static function createFromFuncArguments($arguments, $operation = ' ')
     {
         if (empty($arguments)) {
             return new static();
@@ -33,7 +34,7 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
             return new self('?', $arguments[0]);
         }
         if ($arguments[0] instanceof Database\Definition\Column) {
-            return new self('?', $arguments[0]);
+            return new self(substr(str_repeat($operation . '?', count($arguments)), strlen($operation)), $arguments);
         }
         if ($arguments[0] instanceof Database\Definition\Table) {
             return new self('?', $arguments[0]);

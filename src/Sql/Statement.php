@@ -69,7 +69,8 @@ class Statement extends ComplexStatement
     {
         $this->command = self::CMD_SELECT;
         if (null !== $expression) {
-            $this->select [] = SimpleExpression::createFromFuncArguments(func_get_args());
+            $this->select [] = SimpleExpression::createFromFuncArguments(func_get_args(),
+                SimpleExpression::OP_COMMA);
         }
         return $this;
     }
