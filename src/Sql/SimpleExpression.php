@@ -21,45 +21,46 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
      * @param $operation
      * @return SimpleExpression
      * @throws \Yaoi\Sql\Exception
+     * @todo simplify a lot, please
      */
     public static function createFromFuncArguments($arguments, $operation = ' ')
     {
         if (empty($arguments)) {
             return new static();
         }
-        if ($arguments[0] instanceof Expression) {
-            return $arguments[0];
+
+        if (count($arguments) === 2 && is_string($arguments[0] && is_array($arguments[1]))) {
+            $expr = new self;
+            $expr->statement = $arguments[0];
+            $expr->binds = $arguments[1];
+            return $expr;
         }
-        if ($arguments[0] instanceof Symbol) {
-            return new self('?', $arguments[0]);
-        }
-        if ($arguments[0] instanceof Database\Definition\Column) {
-            return new self(substr(str_repeat($operation . '?', count($arguments)), strlen($operation)), $arguments);
-        }
-        if ($arguments[0] instanceof Database\Definition\Table) {
-            return new self('?', $arguments[0]);
-        }
-        if ($arguments[0] instanceof Closure) {
-            $expression = $arguments[0]();
-            if (!$expression instanceof Expression) {
-                throw new \Yaoi\Sql\Exception('Closure should return ' . get_called_class(),
-                    \Yaoi\Sql\Exception::CLOSURE_MISTYPE);
+
+
+        foreach ($arguments as &$argument) {
+            if ($argument instanceof Closure) {
+                $argument = $argument();
             }
-            return $expression;
-        }
-        if ($arguments[0] instanceof Database\Definition\Columns) {
-            $columns = $arguments[0];
-            $arguments = array(':columns', array('columns' => array()));
-            foreach ($columns->getArray() as $column) {
-                if ($column instanceof Database\Definition\Column) {
-                    $arguments[1]['columns'][] = $column;
-                }
+
+            if ($argument instanceof Database\Definition\Columns) {
+                $options = $argument->getArray();
+                $argument = new self();
+                $argument->statement = substr(str_repeat($operation . '?', count($options)), strlen($operation));
+                $argument->binds = $options;
             }
         }
 
-        $expression = new self;
-        $expression->setFromFuncArguments($arguments);
-        return $expression;
+        $expr = new self;
+
+        if (is_string($arguments[0])) {
+            $expr->statement = array_shift($arguments);
+            $expr->binds = $arguments;
+        } else {
+            $expr->statement = substr(str_repeat($operation . '?', count($arguments)), strlen($operation));
+            $expr->binds = $arguments;
+        }
+
+        return $expr;
     }
 
     private function setFromFuncArguments($arguments)

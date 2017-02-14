@@ -39,7 +39,7 @@ abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contrac
             }
             return substr($result, 0, -2);
         } elseif ($value instanceof Expression) {
-            return '(' . $value->build($this) . ')';
+            return $value->build($this);
         } elseif ($value instanceof Symbol) {
             return $this->quoteSymbol($value);
         } elseif ($value instanceof Raw) {

@@ -34,7 +34,14 @@ class Sqlite extends Driver
         if (null === $this->dbHandle) {
             $this->connect();
         }
-        return @$this->dbHandle->query($statement);
+        try {
+            $result = @$this->dbHandle->query($statement);
+            return $result;
+        } catch (\Exception $exception) {
+            $dbException = new Database\Exception($exception->getMessage(), $exception->getCode());
+            $dbException->query = $statement;
+            throw $dbException;
+        }
     }
 
     public function lastInsertId()
