@@ -223,5 +223,26 @@ abstract class Expression extends BaseClass
 
 
 
+    protected $isStatement = false;
+
+    /**
+     * @param boolean $isStatement
+     * @return Expression
+     */
+    public function setIsStatement($isStatement = true)
+    {
+        $this->isStatement = $isStatement;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isStatement()
+    {
+        return $this->isStatement;
+    }
+
+
 
 }

@@ -53,22 +53,6 @@ class ExpressionTest extends \YaoiTests\PHPUnit\Sql\TestBase
         )));
     }
 
-
-
-    /**
-     * @expectedException     \Yaoi\Sql\Exception
-     * @expectedExceptionCode \Yaoi\Sql\Exception::CLOSURE_MISTYPE
-     */
-    public function testCreateFromArgumentsBadClosure()
-    {
-        SimpleExpression::createFromFuncArguments(array(
-            function () {
-                return 'not a Sql_Expression instance';
-            }
-        ));
-    }
-
-
     public function testXor()
     {
         $ex = new SimpleExpression('1');

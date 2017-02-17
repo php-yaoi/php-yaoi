@@ -9,6 +9,7 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\DefaultValue;
 use Yaoi\Sql\Expression;
 use Yaoi\Sql\Raw;
+use Yaoi\Sql\Statement;
 use Yaoi\Sql\Symbol;
 
 abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contract
@@ -38,8 +39,10 @@ abstract class Driver extends BaseClass implements \Yaoi\Database\Driver\Contrac
                 $result .= $this->quote($item) . ', ';
             }
             return substr($result, 0, -2);
-        } elseif ($value instanceof Expression) {
+        } elseif ($value instanceof Statement) {
             return '(' . $value->build($this) . ')';
+        } elseif ($value instanceof Expression) {
+            return $value->isStatement() ? '(' . $value->build($this) . ')' : $value->build($this);
         } elseif ($value instanceof Symbol) {
             return $this->quoteSymbol($value);
         } elseif ($value instanceof Raw) {
