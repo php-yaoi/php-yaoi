@@ -168,5 +168,6 @@ class Statement extends ComplexStatement
         return $this;
     }
 
+    protected $isStatement = true;
 
 }

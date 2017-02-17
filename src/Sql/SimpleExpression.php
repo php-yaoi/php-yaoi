@@ -29,7 +29,7 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
             return new static();
         }
 
-        if (count($arguments) === 2 && is_string($arguments[0] && is_array($arguments[1]))) {
+        if ((count($arguments) === 2) && is_string($arguments[0]) && is_array($arguments[1])) {
             $expr = new self;
             $expr->statement = $arguments[0];
             $expr->binds = $arguments[1];
@@ -43,10 +43,16 @@ class SimpleExpression extends Expression implements \Yaoi\IsEmpty
             }
 
             if ($argument instanceof Database\Definition\Columns) {
-                $options = $argument->getArray();
+                $options = array_values($argument->getArray());
                 $argument = new self();
                 $argument->statement = substr(str_repeat($operation . '?', count($options)), strlen($operation));
                 $argument->binds = $options;
+            }
+        }
+
+        if (count($arguments) === 1) {
+            if ($arguments[0] instanceof Expression) {
+                return $arguments[0];
             }
         }
 

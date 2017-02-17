@@ -25,6 +25,21 @@ class SelectTest extends \YaoiTests\PHPUnit\Sql\TestBase
         );
     }
 
+    public function testExDisable()
+    {
+        $quoter = Database::getInstance()->getDriver();
+
+        $ex = new SimpleExpression('visible');
+        $e2 = new SimpleExpression('hidden');
+        $ex->orExpr($e2);
+
+        $e2->disable();
+        //print_r($e2);
+        //print_r($ex);
+        $this->assertSame("visible", $ex->build($quoter));
+
+    }
+
     public function testEx()
     {
         $quoter = Database::getInstance()->getDriver();
@@ -168,9 +183,9 @@ class SelectTest extends \YaoiTests\PHPUnit\Sql\TestBase
             ->leftJoin('t2 ON t1.id = t2.tid');
         $this->assertSame('SELECT * FROM t1 LEFT JOIN t2 ON t1.id = t2.tid', (string)$sql);
 
-        $expected = 'SELECT * FROM test3 LEFT JOIN (select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0) AS tt ON test3.sourceId = tt.sourceId RIGHT JOIN (select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0) AS tt2 ON test2.sourceId = tt2.sourceId INNER JOIN test5 AS ss ON (field1 = 1 AND field2 = 2)';
+        $expected = 'SELECT * FROM test3 LEFT JOIN (select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0) AS tt ON test3.sourceId = tt.sourceId RIGHT JOIN (select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0) AS tt2 ON test2.sourceId = tt2.sourceId INNER JOIN test5 AS ss ON field1 = 1 AND field2 = 2';
 
-        $derived = Yaoi\Database::getInstance('test_mysqli')->expr('select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0');
+        $derived = Yaoi\Database::getInstance('test_mysqli')->expr('select * from test2, test1 where test2.sourceId = test1.id AND test2.temperature > 0')->setIsStatement();
         $condition = Yaoi\Database::getInstance('test_mysqli')->expr('field1 = ? AND field2 = ?', 1, 2);
         $sql = Yaoi\Database::getInstance('test_mysqli')
             ->select('test3')

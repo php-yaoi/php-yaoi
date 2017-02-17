@@ -7,6 +7,8 @@ use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
+use Yaoi\Sql\Expression;
+use Yaoi\Sql\SimpleExpression;
 use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\Host;
 use YaoiTests\Helper\Entity\Session;
@@ -161,6 +163,26 @@ LEFT JOIN `yaoi_tests_entity_tag` ON `yaoi_tests_entity_tag`.`id` = `yaoi_tests_
 WHERE `yaoi_tests_entity_host`.`id` = 12
 GROUP BY `yaoi_tests_entity_tag`.`id`
 SQL;
+
+    public function testEmbeddedExpr()
+    {
+        $expr = SimpleExpression::createFromFuncArguments(array(Tag::columns()), Expression::OP_COMMA);
+        $res = $expr->build($this->database->getDriver());
+        //print_r($expr);
+        //var_dump($res);
+        $this->assertSame('`yaoi_tests_entity_tag`.`id`, `yaoi_tests_entity_tag`.`name`', $res);
+    }
+
+    public function testSelectColumns()
+    {
+        $select = Host::statement()
+            ->select(Tag::columns())
+            ->bindResultClass(Tag::className());
+
+        $this->assertSame(
+            "SELECT `yaoi_tests_entity_tag`.`id`, `yaoi_tests_entity_tag`.`name` FROM `yaoi_tests_entity_host`",
+            $select->build());
+    }
 
     public function testBinds() {
         $select = Host::statement()
