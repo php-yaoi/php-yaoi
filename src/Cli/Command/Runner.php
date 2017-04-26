@@ -225,8 +225,8 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
             }
         }
 
-        $this->response->success("To enable completion start new bash session or run:");
-        $this->response->addContent("source {$completionDir}{$basename}");
+        $this->response->success('OK');
+        system('bash exec');
     }
 
 }
