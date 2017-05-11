@@ -226,7 +226,7 @@ class Runner extends BaseClass implements \Yaoi\Command\RunnerContract
         }
 
         $this->response->success('OK');
-        system('bash exec');
+        system('exec bash');
     }
 
 }
