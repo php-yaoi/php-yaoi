@@ -206,12 +206,13 @@ abstract class Entity extends BaseClass implements Mappable\Contract, Entity\Con
     }
 
     public function __construct()
-    {
+    {/*
         foreach (static::table()->getColumns(true) as $column) {
             if (null === $this->{$column->propertyName}) {
                 $this->{$column->propertyName} = Undefined::get();
             }
         }
+*/
     }
 
 
