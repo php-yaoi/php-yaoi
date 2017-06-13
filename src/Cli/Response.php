@@ -69,7 +69,7 @@ class Response extends \Yaoi\Io\Response
                     $this->console->returnCaret();
                 }
 
-                $text = round(100 * $message->done / $message->total) . '%, '
+                $text = $message->prefix . round(100 * $message->done / $message->total) . '%, '
                     . $message->done . '/' . $message->total . ' ' . $message->text;
                 if (strlen($text) < $this->progressStartedLength) {
                     $text = str_pad($text, $this->progressStartedLength, ' ');
@@ -83,8 +83,11 @@ class Response extends \Yaoi\Io\Response
         }
 
         if ($this->progressStartedLength) {
+            $text = str_pad(' ', $this->progressStartedLength, ' ');
+            $this->console->returnCaret();
+            $this->console->printF($text);
+            $this->console->returnCaret();
             $this->progressStartedLength = 0;
-            $this->console->eol();
         }
 
         if ($message instanceof SubContent) {
@@ -104,4 +107,10 @@ class Response extends \Yaoi\Io\Response
         return $this;
     }
 
+    public function __destruct()
+    {
+        if ($this->progressStartedLength) {
+            $this->console->eol();
+        }
+    }
 }
