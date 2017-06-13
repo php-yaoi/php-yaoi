@@ -88,10 +88,7 @@ SQL
 
         OneABBR::migration()->setLog($log)->apply();
         $this->assertSame(<<<LOG
-# Apply, table yaoi_tests_helper_entity_one_abbr (YaoiTests\Helper\Entity\OneABBR) requires migration
-ALTER TABLE `yaoi_tests_helper_entity_one_abbr`
-MODIFY COLUMN `name` varchar(255) NOT NULL DEFAULT '';
-# OK
+# Apply, table yaoi_tests_helper_entity_one_abbr (YaoiTests\Helper\Entity\OneABBR) is up to date
 
 LOG
             , $logString

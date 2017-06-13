@@ -58,7 +58,7 @@ class AlterTable extends Batch
                 $this->alterLines->commaExpr('ADD COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
             } else {
                 $beforeColumn = $beforeColumns[$columnName];
-                $beforeColumn->setFlag(Column::IS_REFLECTED);
+                //$beforeColumn->setFlag(Column::IS_REFLECTED);
                 if ($beforeColumn->getTypeString() !== $afterTypeString) {
                     //var_dump('MODIFY:' . $beforeColumn->schemaName, $beforeColumn->getTypeString(), $afterTypeString);
                     $this->alterLines->commaExpr('MODIFY COLUMN ? ' . $afterTypeString, new Symbol($afterColumn->schemaName));
