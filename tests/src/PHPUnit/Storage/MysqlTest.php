@@ -2,14 +2,12 @@
 namespace YaoiTests\PHPUnit\Storage;
 
 use Yaoi\Database;
-use Yaoi\Migration\ClosureMigration;
 use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
 use Yaoi\Migration\Needed;
 use Yaoi\Storage;
 use Yaoi\Storage\Driver\DatabaseProxy;
 use Yaoi\Storage\Settings;
-use YaoiTests\PHPUnit\Storage\TestStorageBasic;
 
 
 class MysqlTest extends TestStorageBasic

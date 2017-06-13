@@ -7,7 +7,6 @@ use Yaoi\Log;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Database\CheckAvailable;
 use YaoiTests\Helper\Entity\Host;
-use YaoiTests\Helper\Entity\OneABBR;
 use YaoiTests\Helper\Entity\Session;
 use YaoiTests\Helper\Entity\User;
 

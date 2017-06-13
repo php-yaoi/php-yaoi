@@ -1,9 +1,6 @@
 <?php
 
 namespace YaoiTests\PHPUnit\Service;
-use YaoiTests\Helper\Service\TestServiceThree;
-use Yaoi\Date\TimeMachine;
-use Yaoi\Service\Exception;
 use Yaoi\Service\Settings;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Service\BasicExposed;

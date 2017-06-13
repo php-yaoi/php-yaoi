@@ -3,7 +3,6 @@ namespace YaoiTests\PHPUnit\Http\Client;
 
 use Yaoi\Http\Client;
 use Yaoi\Test\PHPUnit\TestCase;
-use YaoiTests\PHPUnit\Http\Client\MirrorTestBase;
 use YaoiTests\Helper\Http\ClientHelper;
 
 class FetchTest extends MirrorTestBase

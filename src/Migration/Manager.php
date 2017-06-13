@@ -3,8 +3,8 @@
 namespace Yaoi\Migration;
 
 use Yaoi\Log;
-use Yaoi\Storage;
 use Yaoi\Service;
+use Yaoi\Storage;
 
 class Manager extends Service
 {

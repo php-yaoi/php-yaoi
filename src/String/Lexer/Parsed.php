@@ -2,8 +2,6 @@
 namespace Yaoi\String\Lexer;
 
 
-use Yaoi\String\Expression;
-
 class Parsed
 {
     private static $sequenceId = 0;

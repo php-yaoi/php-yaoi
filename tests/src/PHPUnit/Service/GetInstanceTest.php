@@ -5,7 +5,6 @@ use Yaoi\Service;
 use YaoiTests\Helper\Service\Another;
 use YaoiTests\Helper\Service\BasicExposed;
 use YaoiTests\Helper\Service\DefaultPrimary;
-use YaoiTests\Helper\Service\NoSettings;
 
 class GetInstanceTest extends \Yaoi\Test\PHPUnit\TestCase
 {

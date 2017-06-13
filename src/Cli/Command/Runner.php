@@ -8,13 +8,13 @@
 namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
-use Yaoi\Command\Exception;
 use Yaoi\Cli\Response;
+use Yaoi\Cli\View\Table;
 use Yaoi\Command;
+use Yaoi\Command\Exception;
+use Yaoi\Io\Content\Heading;
 use Yaoi\Io\Content\SubContent;
 use Yaoi\Io\Request;
-use Yaoi\Cli\View\Table;
-use Yaoi\Io\Content\Heading;
 
 /**
  * Class Runner

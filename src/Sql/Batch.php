@@ -2,7 +2,6 @@
 
 namespace Yaoi\Sql;
 
-use Yaoi\BaseClass;
 use Yaoi\String\Quoter;
 
 class Batch extends Expression

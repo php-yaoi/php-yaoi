@@ -3,8 +3,8 @@ namespace Yaoi\Database\Sqlite;
 
 
 use Yaoi\Database;
-use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Definition\Index;
+use Yaoi\Database\Definition\Table;
 
 class SchemaReader extends Database\Mysql\SchemaReader
 {

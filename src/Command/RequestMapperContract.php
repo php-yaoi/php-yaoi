@@ -3,7 +3,6 @@
 namespace Yaoi\Command;
 
 
-use Yaoi\Io\Content\Anchor;
 use Yaoi\Io\Request;
 
 interface RequestMapperContract

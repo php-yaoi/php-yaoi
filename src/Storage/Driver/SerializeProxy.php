@@ -2,10 +2,10 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Contract\Driver;
-use Yaoi\Storage\Exception;
 use Yaoi\BaseClass;
 use Yaoi\Storage;
+use Yaoi\Storage\Contract\Driver;
+use Yaoi\Storage\Exception;
 use Yaoi\Storage\Settings;
 
 class SerializeProxy extends BaseClass implements Driver

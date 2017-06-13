@@ -2,11 +2,11 @@
 
 namespace Yaoi\Database\Driver;
 
-use Yaoi\Database\Driver;
-use Yaoi\Sql\Symbol;
 use SQLite3;
 use SQLite3Result;
 use Yaoi\Database;
+use Yaoi\Database\Driver;
+use Yaoi\Sql\Symbol;
 use Yaoi\Undefined;
 
 class Sqlite extends Driver

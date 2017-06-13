@@ -4,9 +4,8 @@ namespace Yaoi;
 
 use Closure;
 use Yaoi\Mock\Exception;
-use Yaoi\Storage;
-use Yaoi\Storage\PhpVar;
 use Yaoi\Storage\Nil;
+use Yaoi\Storage\PhpVar;
 
 class Mock extends Service
 {

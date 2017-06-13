@@ -3,8 +3,8 @@
 namespace YaoiTests\PHPUnit\String;
 
 use Yaoi\String\Lexer;
-use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\String\Lexer\Renderer;
+use Yaoi\Test\PHPUnit\TestCase;
 
 class LexerTest extends TestCase
 {

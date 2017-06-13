@@ -2,10 +2,10 @@
 
 namespace Yaoi\Database\Driver;
 
-use Yaoi\Database\Driver;
-use Yaoi\Database;
 use PDO;
 use PDOStatement;
+use Yaoi\Database;
+use Yaoi\Database\Driver;
 
 class PdoPgsql extends Driver
 {

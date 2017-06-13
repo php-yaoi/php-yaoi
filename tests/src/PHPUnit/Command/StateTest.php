@@ -7,7 +7,6 @@ use Yaoi\Command\Io;
 use Yaoi\Command\State;
 use Yaoi\Command\Web\RequestMapper;
 use Yaoi\Io\Request;
-use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandNested;
 use YaoiTests\Helper\Command\TestCommandOne;
 

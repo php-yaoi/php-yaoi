@@ -5,8 +5,6 @@ namespace YaoiTests\PHPUnit\Cli;
 use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Cli\Command\Runner;
 use Yaoi\Cli\Response;
-use Yaoi\Io\Request;
-use Yaoi\Io\Request\Server;
 use Yaoi\String\Expression;
 use Yaoi\Test\PHPUnit\TestCase;
 use YaoiTests\Helper\Command\TestCommandOne;

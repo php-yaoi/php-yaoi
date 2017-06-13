@@ -4,7 +4,6 @@ namespace YaoiTests\PHPUnit\Entity;
 
 use Yaoi\Database;
 use YaoiTests\Helper\Entity\TestEntityDB;
-use YaoiTests\PHPUnit\Entity\TestEntityDatabaseUnified;
 
 class PgsqlEntityDatabaseTest extends TestEntityDatabaseUnified
 {

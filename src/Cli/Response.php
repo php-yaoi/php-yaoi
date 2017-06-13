@@ -3,7 +3,7 @@
 namespace Yaoi\Cli;
 
 use Yaoi\Cli\View\Table;
-use \Yaoi\Cli\View\Text as ViewText;
+use Yaoi\Cli\View\Text as ViewText;
 use Yaoi\Io\Content\Error;
 use Yaoi\Io\Content\Progress;
 use Yaoi\Io\Content\Rows;

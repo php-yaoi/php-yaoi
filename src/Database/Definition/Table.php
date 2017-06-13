@@ -5,9 +5,7 @@ namespace Yaoi\Database\Definition;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\DependencyRepository;
-use Yaoi\Log;
 use Yaoi\Sql\CreateTable;
-use Yaoi\String\Utils;
 
 class Table extends BaseClass
 {

@@ -2,10 +2,10 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Contract\Driver;
-use Yaoi\Storage\Contract\ExportImportArray;
 use Yaoi\BaseClass;
 use Yaoi\Storage\Contract\ArrayKey;
+use Yaoi\Storage\Contract\Driver;
+use Yaoi\Storage\Contract\ExportImportArray;
 use Yaoi\Storage\Settings;
 
 class PhpVar extends BaseClass implements Driver, ArrayKey, ExportImportArray

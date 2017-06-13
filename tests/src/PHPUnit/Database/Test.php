@@ -1,10 +1,10 @@
 <?php
 namespace YaoiTests\PHPUnit\Database;
 
+use Yaoi\App;
 use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\App;
 
 /**
  * Class DatabaseBasicTest

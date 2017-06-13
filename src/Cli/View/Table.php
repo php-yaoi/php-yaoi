@@ -2,9 +2,9 @@
 
 namespace Yaoi\Cli\View;
 
-use Yaoi\View\Hardcoded;
-use Yaoi\Io\Content\Renderer;
 use Yaoi\Io\Content;
+use Yaoi\Io\Content\Renderer;
+use Yaoi\View\Hardcoded;
 
 class Table extends Hardcoded implements Renderer
 {

@@ -3,9 +3,9 @@
 namespace YaoiTests\Helper\Command;
 
 
+use Yaoi\Cli\Option;
 use Yaoi\Command;
 use Yaoi\Command\Definition;
-use Yaoi\Cli\Option;
 
 class TestCommandWithOptionValue extends Command
 {

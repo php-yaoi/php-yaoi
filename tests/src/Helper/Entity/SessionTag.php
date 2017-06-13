@@ -5,8 +5,6 @@ namespace YaoiTests\Helper\Entity;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
-use YaoiTests\Helper\Entity\Tag;
-use YaoiTests\Helper\Entity\Session;
 
 class SessionTag extends Entity
 {

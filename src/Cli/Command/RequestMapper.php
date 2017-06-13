@@ -4,7 +4,6 @@ namespace Yaoi\Cli\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Cli\Exception as CliException;
-use Yaoi\Command;
 use Yaoi\Command\Exception;
 use Yaoi\Command\Option;
 use Yaoi\Io\Request;

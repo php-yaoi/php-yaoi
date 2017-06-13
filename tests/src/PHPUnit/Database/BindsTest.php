@@ -1,9 +1,9 @@
 <?php
 namespace YaoiTests\PHPUnit\Database;
 
+use Yaoi\App;
 use Yaoi\Database;
 use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\App;
 
 class BindsTest extends TestCase
 {

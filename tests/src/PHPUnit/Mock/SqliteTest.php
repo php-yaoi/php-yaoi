@@ -9,7 +9,6 @@ use Yaoi\Storage;
 use Yaoi\Storage\Driver\DatabaseProxy;
 use Yaoi\Storage\Driver\JsonProxy;
 use Yaoi\Storage\Settings;
-use YaoiTests\PHPUnit\Mock\VarTest;
 
 class SqliteTest extends VarTest
 {

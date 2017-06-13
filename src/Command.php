@@ -8,7 +8,6 @@ use Yaoi\Command\Option;
 use Yaoi\Command\RequestMapperContract;
 use Yaoi\Command\State;
 use Yaoi\Io\Response;
-use Yaoi\String\Utils;
 
 
 /**

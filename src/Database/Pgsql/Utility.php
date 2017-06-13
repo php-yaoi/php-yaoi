@@ -4,7 +4,6 @@ namespace Yaoi\Database\Pgsql;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Table;
-use Yaoi\Log;
 
 class Utility extends \Yaoi\Database\Utility
 {

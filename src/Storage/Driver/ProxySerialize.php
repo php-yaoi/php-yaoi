@@ -2,8 +2,8 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Settings;
 use Yaoi\Storage\Contract\Driver;
+use Yaoi\Storage\Settings;
 
 class ProxySerialize implements Driver
 {

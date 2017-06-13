@@ -3,7 +3,6 @@
 namespace Yaoi\Database\Definition;
 
 use Yaoi\BaseClass;
-use Yaoi\Sql\Symbol;
 
 class Column extends BaseClass
 {

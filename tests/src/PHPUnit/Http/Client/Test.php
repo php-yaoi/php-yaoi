@@ -1,8 +1,8 @@
 <?php
 namespace YaoiTests\PHPUnit\Http\Client;
 
-use Yaoi\Http\Client\Settings;
 use Yaoi\Http\Client;
+use Yaoi\Http\Client\Settings;
 use Yaoi\Log;
 use Yaoi\Mock;
 use Yaoi\Storage;

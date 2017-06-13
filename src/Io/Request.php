@@ -4,8 +4,6 @@ namespace Yaoi\Io;
 
 use Yaoi\BaseClass;
 use Yaoi\Io\Request\Server;
-use Yaoi\String\Parser;
-use Yaoi\String\StringValue;
 
 class Request extends BaseClass
 {

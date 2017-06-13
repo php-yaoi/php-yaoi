@@ -2,10 +2,10 @@
 
 namespace Yaoi\Cli\View;
 
-use Yaoi\View\Renderer;
-use Yaoi\Io\Content\Semantic;
 use Yaoi\Io\Content\Rows;
+use Yaoi\Io\Content\Semantic;
 use Yaoi\Io\Content\Text as TextContent;
+use Yaoi\View\Renderer;
 use Yaoi\View\Stack;
 
 class Layout extends Stack

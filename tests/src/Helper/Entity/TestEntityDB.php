@@ -3,8 +3,6 @@ namespace YaoiTests\Helper\Entity;
 
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Entity;
-use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\Database;
 
 /**
  * Class TestEntityDB

@@ -3,7 +3,6 @@
 namespace Yaoi\Cli;
 
 use Yaoi\BaseClass;
-use Yaoi\String\Expression;
 
 class Console extends BaseClass
 {

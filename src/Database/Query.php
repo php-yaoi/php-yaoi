@@ -1,12 +1,11 @@
 <?php
 namespace Yaoi\Database;
 
-use Yaoi\DependencyRepository;
 use Yaoi\Database;
+use Yaoi\DependencyRepository;
 use Yaoi\Log;
 use Yaoi\Sql\Expression;
 use Yaoi\Sql\SimpleExpression;
-use Yaoi\Database\Driver;
 
 /**
  * Class Database_Sql_Generic_Query

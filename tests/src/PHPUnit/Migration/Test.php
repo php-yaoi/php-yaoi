@@ -4,9 +4,9 @@ namespace YaoiTests\PHPUnit\Migration;
 use User;
 use Yaoi\Database;
 use Yaoi\Migration\ClosureMigration;
+use Yaoi\Migration\Manager;
 use Yaoi\Migration\Migration;
 use Yaoi\Migration\Settings;
-use Yaoi\Migration\Manager;
 use Yaoi\Storage\PhpVar;
 use Yaoi\Test\PHPUnit\TestCase;
 

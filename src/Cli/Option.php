@@ -4,7 +4,6 @@ namespace Yaoi\Cli;
 
 use Yaoi\Cli\Command\RequestMapper;
 use Yaoi\Cli\Command\Runner;
-use Yaoi\String\Utils;
 
 class Option extends \Yaoi\Command\Option
 {

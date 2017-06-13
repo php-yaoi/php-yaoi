@@ -2,13 +2,13 @@
 
 namespace Yaoi\Database;
 
-use Yaoi\Database\Utility\Contract as UtilityContract;
 use Yaoi\BaseClass;
 use Yaoi\Database;
+use Yaoi\Database\Definition\ForeignKey;
+use Yaoi\Database\Utility\Contract as UtilityContract;
 use Yaoi\Sql\Raw;
 use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
-use Yaoi\Database\Definition\ForeignKey;
 
 abstract class Utility extends BaseClass implements UtilityContract
 {

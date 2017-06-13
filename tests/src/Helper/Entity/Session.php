@@ -5,7 +5,6 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
-use YaoiTests\Helper\Entity\Host;
 
 class Session extends Entity
 {

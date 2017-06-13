@@ -8,8 +8,8 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Sql\Raw;
-use Yaoi\String\Parser;
 use Yaoi\String\Lexer;
+use Yaoi\String\Parser;
 
 class CreateTableReader extends BaseClass
 {

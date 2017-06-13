@@ -2,8 +2,8 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Contract\Driver;
 use Yaoi\BaseClass;
+use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Settings;
 
 class Nil extends BaseClass implements Driver

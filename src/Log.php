@@ -1,9 +1,7 @@
 <?php
 namespace Yaoi;
 
-use Yaoi\Log\Driver;
 use Yaoi\Log\Settings;
-use Yaoi\Service;
 
 /**
  * Class Log

@@ -2,8 +2,6 @@
 
 namespace Yaoi\Migration;
 
-use Yaoi\Storage;
-
 class Settings extends \Yaoi\Service\Settings
 {
     /**

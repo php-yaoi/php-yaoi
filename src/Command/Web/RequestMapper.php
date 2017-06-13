@@ -2,8 +2,8 @@
 
 namespace Yaoi\Command\Web;
 
-use Yaoi\Command\Option;
 use Yaoi\Command;
+use Yaoi\Command\Option;
 use Yaoi\Command\RequestMapperContract;
 use Yaoi\Io\Request;
 use Yaoi\String\Expression;

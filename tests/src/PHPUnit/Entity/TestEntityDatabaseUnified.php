@@ -7,9 +7,9 @@
  */
 namespace YaoiTests\PHPUnit\Entity;
 
+use Yaoi\Test\PHPUnit\TestCase;
 use Yaoi\Undefined;
 use YaoiTests\Helper\Entity\TestEntityDB;
-use Yaoi\Test\PHPUnit\TestCase;
 
 class TestEntityDatabaseUnified extends TestCase
 {

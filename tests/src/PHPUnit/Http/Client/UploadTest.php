@@ -1,8 +1,8 @@
 <?php
 namespace YaoiTests\PHPUnit\Http\Client;
 
-use Yaoi\Http\Client\UploadFile;
 use Yaoi\Http\Client;
+use Yaoi\Http\Client\UploadFile;
 use Yaoi\Mock;
 use Yaoi\Storage;
 use Yaoi\Test\PHPUnit\TestCase;

@@ -4,8 +4,8 @@ namespace YaoiTests\PHPUnit\Database\Mysql;
 
 use Yaoi\Database;
 use Yaoi\Database\Definition\Column;
-use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Definition\Index;
+use Yaoi\Database\Definition\Table;
 use YaoiTests\PHPUnit\Database\TestUnified;
 
 class MysqliTest extends TestUnified

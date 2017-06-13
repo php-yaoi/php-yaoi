@@ -2,8 +2,8 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Contract\Driver;
 use Yaoi\Http\Client;
+use Yaoi\Storage\Contract\Driver;
 use Yaoi\Storage\Settings;
 
 class Http implements Driver

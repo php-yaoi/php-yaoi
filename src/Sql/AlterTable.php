@@ -6,7 +6,6 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use Yaoi\String\Quoter;
 
 class AlterTable extends Batch
 {

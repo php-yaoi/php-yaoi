@@ -6,7 +6,6 @@ use App;
 use Yaoi;
 use Yaoi\Log;
 use Yaoi\Log\Settings;
-use Yaoi\Storage;
 use Yaoi\Storage\PhpVar;
 use Yaoi\Test\PHPUnit\TestCase;
 

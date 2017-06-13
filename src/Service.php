@@ -3,8 +3,8 @@ namespace Yaoi;
 
 use Closure;
 use Yaoi\Service\Exception;
-use Yaoi\String\Utils;
 use Yaoi\Service\Settings;
+use Yaoi\String\Utils;
 
 /**
  * Class Service

@@ -8,8 +8,8 @@
 namespace YaoiTests\PHPUnit\Mappable;
 
 use ArrayIterator;
-use YaoiTests\Helper\Mappable\MappableTest1;
 use Yaoi\Test\PHPUnit\TestCase;
+use YaoiTests\Helper\Mappable\MappableTest1;
 
 class Test extends TestCase
 {

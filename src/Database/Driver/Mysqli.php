@@ -1,9 +1,9 @@
 <?php
 namespace Yaoi\Database\Driver;
 
+use Yaoi\Database;
 use Yaoi\Database\Driver;
 use Yaoi\Sql\Symbol;
-use Yaoi\Database;
 
 /**
  * Class Database_Driver_Mysqli

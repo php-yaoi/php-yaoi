@@ -3,8 +3,8 @@
 namespace YaoiTests\Helper\Command;
 
 
-use Yaoi\Command;
 use Yaoi\Cli\Option;
+use Yaoi\Command;
 use Yaoi\Command\Definition;
 
 class TestCommandWithNonTailingOptionalArgument extends Command

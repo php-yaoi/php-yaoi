@@ -4,7 +4,6 @@ namespace Yaoi\Sql;
 
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
-use Yaoi\String\Quoter;
 
 abstract class CreateTable extends Batch
 {

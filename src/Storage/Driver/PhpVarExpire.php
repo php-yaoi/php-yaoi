@@ -2,8 +2,8 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Storage\Contract\Expire;
 use Yaoi\Date\TimeMachine;
+use Yaoi\Storage\Contract\Expire;
 use Yaoi\Storage\Settings;
 
 class PhpVarExpire extends PhpVar implements Expire

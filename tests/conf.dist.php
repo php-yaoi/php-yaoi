@@ -2,7 +2,6 @@
 
 use Yaoi\Database;
 use Yaoi\Log;
-use Yaoi\Migration\ClosureMigration;
 use Yaoi\Storage\PhpVar;
 use Yaoi\Test\PHPUnit\TestCase;
 

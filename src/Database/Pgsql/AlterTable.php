@@ -5,7 +5,6 @@ namespace Yaoi\Database\Pgsql;
 use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\ForeignKey;
 use Yaoi\Database\Definition\Index;
-use Yaoi\Sql\Expression;
 use Yaoi\Sql\Symbol;
 
 class AlterTable extends \Yaoi\Sql\AlterTable

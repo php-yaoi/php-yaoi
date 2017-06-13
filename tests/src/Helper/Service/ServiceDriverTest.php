@@ -2,8 +2,6 @@
 
 namespace YaoiTests\Helper\Service;
 
-use Yaoi\Storage;
-
 class TestServiceThree extends \Yaoi\Service {
     /**
      * @return \Yaoi\Service\Settings

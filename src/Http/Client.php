@@ -1,8 +1,8 @@
 <?php
 namespace Yaoi\Http;
 
-use Yaoi\Http\Client\Settings;
 use Yaoi\Http\Client\Driver;
+use Yaoi\Http\Client\Settings;
 use Yaoi\Http\Client\UploadFile;
 use Yaoi\Log;
 use Yaoi\Mock;

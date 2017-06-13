@@ -3,7 +3,6 @@
 namespace YaoiTests\PHPUnit\String;
 
 use Yaoi\Database;
-use Yaoi\Sql\Symbol;
 use Yaoi\String\Exception;
 use Yaoi\String\Expression;
 use Yaoi\String\Quoter\DoubleQuote;

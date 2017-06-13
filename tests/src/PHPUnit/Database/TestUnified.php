@@ -3,13 +3,13 @@ namespace YaoiTests\PHPUnit\Database;
 
 use Yaoi\Database\Contract;
 use Yaoi\Database\Definition\Column;
+use Yaoi\Database\Definition\ForeignKey;
+use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
 use Yaoi\Log;
 use Yaoi\Sql\Symbol;
 use Yaoi\Test\PHPUnit\TestCase;
-use Yaoi\Database\Definition\Index;
-use Yaoi\Database\Definition\ForeignKey;
 use YaoiTests\Helper\Entity\TestColumns;
 
 abstract class TestUnified extends TestCase {

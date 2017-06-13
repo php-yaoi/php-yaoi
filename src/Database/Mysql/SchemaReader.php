@@ -3,10 +3,10 @@
 namespace Yaoi\Database\Mysql;
 
 use Yaoi\Database;
-use Yaoi\Sql\Symbol;
 use Yaoi\Database\Definition\Column;
-use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Definition\Index;
+use Yaoi\Database\Definition\Table;
+use Yaoi\Sql\Symbol;
 
 class SchemaReader
 {

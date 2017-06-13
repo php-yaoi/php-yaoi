@@ -3,9 +3,7 @@
 namespace Yaoi\Database\Pgsql;
 
 
-use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
-use Yaoi\Sql\Batch;
 use Yaoi\Sql\SimpleExpression;
 use Yaoi\Sql\Symbol;
 

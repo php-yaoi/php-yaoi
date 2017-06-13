@@ -3,8 +3,8 @@
 namespace Yaoi\Cli\View;
 
 use Yaoi\Cli\Console;
-use Yaoi\View\Hardcoded;
 use Yaoi\Io\Content\Renderer;
+use Yaoi\View\Hardcoded;
 
 class Text extends Hardcoded implements Renderer
 {

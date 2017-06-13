@@ -3,8 +3,8 @@
 namespace Yaoi\Sql;
 
 use Yaoi\Database\Contract;
-use Yaoi\String\Quoter;
 use Yaoi\Database\Query;
+use Yaoi\String\Quoter;
 
 
 /**

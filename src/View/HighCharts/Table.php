@@ -3,9 +3,9 @@
 namespace Yaoi\View\HighCharts;
 
 use Closure;
-use Yaoi\View\Table\Renderer;
 use Yaoi\Rows\Processor;
 use Yaoi\View\HighCharts;
+use Yaoi\View\Table\Renderer;
 
 class Table extends Renderer
 {

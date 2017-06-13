@@ -2,7 +2,6 @@
 
 namespace Yaoi\Sql;
 
-use Yaoi\Database;
 use Yaoi\Database\Contract;
 use Yaoi\String\Quoter;
 

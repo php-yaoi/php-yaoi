@@ -13,8 +13,6 @@ use Yaoi\Database\Definition\Column;
 use Yaoi\Database\Definition\Index;
 use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Entity;
-use YaoiTests\Helper\Entity\Host;
-use YaoiTests\Helper\Entity\Session;
 
 class User extends Entity
 {

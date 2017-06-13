@@ -6,7 +6,6 @@ use Yaoi\Database\Definition\Table;
 use Yaoi\Database\Exception;
 use Yaoi\Log;
 use Yaoi\Migration\AbstractMigration;
-use Yaoi\Sql\Statement;
 use Yaoi\String\Expression;
 
 class Migration extends AbstractMigration

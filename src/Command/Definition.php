@@ -4,7 +4,6 @@ namespace Yaoi\Command;
 
 use Yaoi\BaseClass;
 use Yaoi\Command;
-use Yaoi\String\Utils;
 
 class Definition extends BaseClass
 {

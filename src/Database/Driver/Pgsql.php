@@ -2,8 +2,8 @@
 
 namespace Yaoi\Database\Driver;
 
-use Yaoi\Database\Driver;
 use Yaoi\Database;
+use Yaoi\Database\Driver;
 
 class Pgsql extends Driver
 {

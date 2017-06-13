@@ -2,15 +2,15 @@
 
 namespace Yaoi\Storage\Driver;
 
-use Yaoi\Sql\Symbol;
-use Yaoi\Storage\Contract\Driver;
-use Yaoi\Storage\Exception;
-use Yaoi\Storage\Contract\Expire;
 use Yaoi\App;
 use Yaoi\BaseClass;
 use Yaoi\Database;
 use Yaoi\Date\TimeMachine;
 use Yaoi\Migration\ClosureMigration;
+use Yaoi\Sql\Symbol;
+use Yaoi\Storage\Contract\Driver;
+use Yaoi\Storage\Contract\Expire;
+use Yaoi\Storage\Exception;
 use Yaoi\Storage\Settings;
 
 class DatabaseProxy extends BaseClass implements Driver, Expire,

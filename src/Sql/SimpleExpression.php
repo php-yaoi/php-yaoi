@@ -3,10 +3,7 @@
 namespace Yaoi\Sql;
 
 use Closure;
-use Yaoi\BaseClass;
 use Yaoi\Database;
-use Yaoi\String\Quoter;
-use Yaoi\Debug;
 
 /**
  * Class Expression
