@@ -182,6 +182,11 @@ abstract class Service extends BaseClass
 
     protected $driver;
 
+    protected function getDriverNamespace()
+    {
+        return get_called_class() . '\\Driver\\';
+    }
+
     /**
      * @return object
      * @throws Service\Exception
@@ -196,9 +201,9 @@ abstract class Service extends BaseClass
                 $scheme = explode('.', $scheme, 2);
                 if (2 === count($scheme)) {
                     $driverClass = '\\' . Utils::toCamelCase($scheme[0], '-') . '\\'
-                        . get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[1], '-');
+                        . $this->getDriverNamespace() . Utils::toCamelCase($scheme[1], '-');
                 } else {
-                    $driverClass = get_called_class() . '\Driver\\' . Utils::toCamelCase($scheme[0], '-');
+                    $driverClass = $this->getDriverNamespace() . Utils::toCamelCase($scheme[0], '-');
                 }
 
             }
