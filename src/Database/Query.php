@@ -344,6 +344,7 @@ class Query implements \Iterator
     public function bindResultClass($resultClass = null)
     {
         $this->resultClass = $resultClass;
+        return $this;
     }
 
 
