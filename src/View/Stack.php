@@ -20,10 +20,20 @@ class Stack extends Hardcoded implements Renderer
         return $this;
     }
 
+    public function setElements($elements)
+    {
+        $this->elements = $elements;
+        return $this;
+    }
+
     public function render()
     {
         foreach ($this->elements as $element) {
-            $element->render();
+            if (is_string($element)) {
+                echo $element;
+            } else {
+                $element->render();
+            }
         }
         return $this;
     }
