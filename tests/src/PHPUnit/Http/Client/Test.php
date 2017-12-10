@@ -45,6 +45,7 @@ class Test extends TestCase
 
     public function testCookies()
     {
+        $this->markTestSkipped();
         $httpClient = new Client();
 
         $httpClient->url = 'http://' . TestCase::$settings['envHttpPHPServer'] . '/';
@@ -67,6 +68,7 @@ class Test extends TestCase
 
     public function testFollowLocation()
     {
+        $this->markTestSkipped();
         $httpClient = new Client();
 
         $httpClient->url = 'http://' . TestCase::$settings['envHttpPHPServer'] . '/';
